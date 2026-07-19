@@ -12,7 +12,7 @@ function AuthLayout() {
         <div className="bg-gradient-hero absolute inset-0" />
         <div className="relative flex h-full flex-col justify-between p-10">
           <Link to="/">
-            <Logo />
+            <Logo variant="horizontal" />
           </Link>
           <div>
             <h2 className="max-w-md font-display text-4xl font-semibold leading-tight tracking-tight">
@@ -28,7 +28,7 @@ function AuthLayout() {
         <div className="w-full max-w-sm">
           <div className="mb-8 lg:hidden">
             <Link to="/">
-              <Logo />
+              <Logo variant="horizontal" />
             </Link>
           </div>
           <Outlet />

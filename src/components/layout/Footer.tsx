@@ -7,7 +7,7 @@ export function Footer() {
     <footer className="border-t border-border/60 bg-background/60">
       <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 md:grid-cols-4">
         <div>
-          <Logo />
+          <Logo variant="horizontal" />
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
             Where independent music becomes community.
           </p>
