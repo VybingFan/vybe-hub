@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Compass, User, Settings, ShieldCheck, Music2 } from "lucide-react";
+import { Home, Compass, User, Settings, ShieldCheck, Music2, ListMusic } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -25,6 +25,7 @@ interface NavItem {
 const items: NavItem[] = [
   { title: "Dashboard", url: "/dashboard", icon: Home, allow: ["creator", "admin"] },
   { title: "Music", url: "/music", icon: Music2, allow: ["creator", "admin"] },
+  { title: "Playlists", url: "/playlists", icon: ListMusic, allow: ["creator", "admin"] },
   { title: "Discover", url: "/discover", icon: Compass, allow: ["supporter", "creator", "admin"] },
   { title: "Profile", url: "/profile", icon: User, allow: ["creator", "supporter", "admin"] },
   { title: "Admin", url: "/admin", icon: ShieldCheck, allow: ["admin"] },
