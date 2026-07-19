@@ -79,27 +79,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "VYBE — A platform built for independent music" },
+      { title: "VYBE — Where music becomes community" },
       {
         name: "description",
         content:
-          "VYBE is a modern creator platform for independent music artists. Upload music and video, grow your audience, and connect directly with supporters.",
+          "Discover independent music, meet the people behind it, and build lasting community on VYBE.",
       },
       { name: "author", content: "Aision Labs" },
-      { property: "og:title", content: "VYBE — A platform built for independent music" },
+      { property: "og:title", content: "VYBE — Where music becomes community" },
       {
         property: "og:description",
         content:
-          "Upload music, share videos, and connect directly with the people who support your art.",
+          "Discover music, share stories, and connect with independent artists and fellow supporters.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "VYBE — A platform built for independent music" },
-      { name: "description", content: "VYBE is a modern creator platform for independent music artists. Upload music and video, grow your audience, and connect directly with supporters." },
-      { property: "og:description", content: "VYBE is a modern creator platform for independent music artists. Upload music and video, grow your audience, and connect directly with supporters." },
-      { name: "twitter:description", content: "VYBE is a modern creator platform for independent music artists. Upload music and video, grow your audience, and connect directly with supporters." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7ade1289-5de5-4f15-ad77-1526772a3359/id-preview-803cbbfa--e20a765a-783b-4e37-bf58-361d910e4bfd.lovable.app-1783265185219.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7ade1289-5de5-4f15-ad77-1526772a3359/id-preview-803cbbfa--e20a765a-783b-4e37-bf58-361d910e4bfd.lovable.app-1783265185219.png" },
+      { name: "twitter:title", content: "VYBE — Where music becomes community" },
+      {
+        name: "twitter:description",
+        content:
+          "Discover music, share stories, and connect with independent artists and fellow supporters.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7ade1289-5de5-4f15-ad77-1526772a3359/id-preview-803cbbfa--e20a765a-783b-4e37-bf58-361d910e4bfd.lovable.app-1783265185219.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7ade1289-5de5-4f15-ad77-1526772a3359/id-preview-803cbbfa--e20a765a-783b-4e37-bf58-361d910e4bfd.lovable.app-1783265185219.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

@@ -9,17 +9,29 @@ export function Footer() {
         <div>
           <Logo />
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-            A modern creator platform for independent music artists.
+            Where independent music becomes community.
           </p>
         </div>
-        <FooterCol title="Platform" links={[["Discover", "/"], ["Pricing", "/#pricing"]]} />
         <FooterCol
-          title="Company"
-          links={[["About", "/#about"], ["Contact", "/#contact"]]}
+          title="Explore"
+          links={[
+            ["Discover", "/#discover"],
+            ["Community", "/#community"],
+          ]}
+        />
+        <FooterCol
+          title="VYBE"
+          links={[
+            ["For Artists", "/#artists"],
+            ["Stories", "/#stories"],
+          ]}
         />
         <FooterCol
           title="Legal"
-          links={[["Privacy", "/#privacy"], ["Terms", "/#terms"]]}
+          links={[
+            ["Privacy", "/#privacy"],
+            ["Terms", "/#terms"],
+          ]}
         />
       </div>
       <div className="border-t border-border/60 py-5 text-center text-xs text-muted-foreground">

@@ -46,7 +46,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Studio</SidebarGroupLabel>
+          <SidebarGroupLabel>Your VYBE</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {visible.map((item) => (
