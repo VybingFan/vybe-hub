@@ -14,8 +14,21 @@ export interface Playlist {
 
 export interface SharedPlaylist extends Playlist {
   artistName: string;
+  artistUsername: string | null;
   tracks: Track[];
 }
+
+export const PLAYLIST_PURPOSES = [
+  "New release",
+  "EP or album",
+  "Artist picks",
+  "Music that inspired me",
+  "Mood or moment",
+  "Fan favorites",
+  "Set list",
+  "Behind the music",
+  "Exclusive preview",
+] as const;
 
 export interface CreatePlaylistInput {
   title: string;

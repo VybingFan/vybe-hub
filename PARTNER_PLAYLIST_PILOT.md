@@ -10,6 +10,26 @@ Test one complete member experience with real artists and followers before expan
 4. A follower opens the link without signing in and listens to the full sequence.
 5. The follower can join VYBE to continue the relationship.
 
+The creator also claims a unique VYBE username. Their permanent home uses
+`/artist/username`, and playlist links retain that identity through
+`/artist/username/playlist/playlist-name-id`.
+
+## Share experiences supported in the first creator
+
+- New release
+- EP or album
+- Artist picks
+- Music that inspired me
+- Mood or moment
+- Fan favorites
+- Set list
+- Behind the music
+- Exclusive preview
+
+Later collection types may combine music with video, photos, stories, events,
+merchandise, press materials, and live listening. Those should build on the same
+artist-owned URL and continuous listening foundation rather than becoming separate products.
+
 This pilot is meant to reveal what artists and followers value. It is not a final decision about how every playlist, profile, or business feature must work.
 
 ## Suggested artist test prompts
@@ -45,6 +65,7 @@ This pilot is meant to reveal what artists and followers value. It is not a fina
 
 - Save/follow behavior and notifications
 - Playlist cover customization
+- Native merch inventory and checkout (the MVP connects an artist's existing store)
 - Track reordering and playlist editing
 - Private, expiring, or password-protected links
 - Comments, reactions, and artist-directed feedback

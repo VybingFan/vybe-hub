@@ -78,7 +78,7 @@ export const playlistService = {
     const [{ data: creator }, { data: items, error: itemsError }] = await Promise.all([
       supabase
         .from("creator_profiles")
-        .select("artist_name, display_name")
+        .select("artist_name, display_name, username")
         .eq("user_id", playlist.creator_id)
         .maybeSingle(),
       supabase
@@ -92,6 +92,7 @@ export const playlistService = {
     return {
       ...playlist,
       artistName: creator?.artist_name || creator?.display_name || "VYBE Artist",
+      artistUsername: creator?.username || null,
       tracks: await Promise.all(tracks.map(hydrateTrack)),
     };
   },

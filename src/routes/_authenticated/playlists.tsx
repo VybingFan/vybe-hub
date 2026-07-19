@@ -8,10 +8,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useUser } from "@/hooks/useUser";
 import { useCreatorTracks } from "@/hooks/useMusic";
 import { useCreatePlaylist, useMyPlaylists } from "@/hooks/usePlaylists";
 import { formatDuration } from "@/features/music/schema";
+import { PLAYLIST_PURPOSES } from "@/features/playlists/schema";
+import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 
 export const Route = createFileRoute("/_authenticated/playlists")({
   component: () => (
@@ -24,6 +33,7 @@ export const Route = createFileRoute("/_authenticated/playlists")({
 function PlaylistStudio() {
   const { user } = useUser();
   const { data: tracks = [], isLoading } = useCreatorTracks(user?.id);
+  const { data: creatorProfile } = useCreatorProfile(user?.id);
   const { data: playlists = [] } = useMyPlaylists(user?.id);
   const create = useCreatePlaylist(user?.id);
   const [selected, setSelected] = useState<string[]>([]);
@@ -49,8 +59,12 @@ function PlaylistStudio() {
       toast.error(error instanceof Error ? error.message : "Could not create playlist");
     }
   };
+  const playlistPath = (slug: string) =>
+    creatorProfile?.username
+      ? `/artist/${creatorProfile.username}/playlist/${slug}`
+      : `/playlist/${slug}`;
   const copy = async (slug: string) => {
-    const url = `${window.location.origin}/playlist/${slug}`;
+    const url = `${window.location.origin}${playlistPath(slug)}`;
     await navigator.clipboard.writeText(url);
     toast.success("Share link copied");
   };
@@ -73,7 +87,7 @@ function PlaylistStudio() {
             <p className="flex items-center gap-2 font-semibold">
               <Check className="h-5 w-5 text-primary" /> Ready to send
             </p>
-            <p className="mt-1 break-all text-sm text-muted-foreground">{`${typeof window !== "undefined" ? window.location.origin : ""}/playlist/${createdSlug}`}</p>
+            <p className="mt-1 break-all text-sm text-muted-foreground">{`${typeof window !== "undefined" ? window.location.origin : ""}${playlistPath(createdSlug)}`}</p>
           </div>
           <Button onClick={() => copy(createdSlug)}>
             <Copy className="mr-2 h-4 w-4" /> Copy link
@@ -99,13 +113,18 @@ function PlaylistStudio() {
             </div>
             <div>
               <Label htmlFor="occasion">What is it for?</Label>
-              <Input
-                className="mt-2"
-                id="occasion"
-                name="occasion"
-                maxLength={80}
-                placeholder="Tour warm-up, inspirations, fan favorites, a mood…"
-              />
+              <Select name="occasion">
+                <SelectTrigger className="mt-2" id="occasion">
+                  <SelectValue placeholder="Choose a playlist type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PLAYLIST_PURPOSES.map((purpose) => (
+                    <SelectItem key={purpose} value={purpose}>
+                      {purpose}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="description">A note to your listeners</Label>

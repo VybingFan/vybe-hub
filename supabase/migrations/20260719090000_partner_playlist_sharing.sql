@@ -1,4 +1,16 @@
 -- Partner-testable playlist sharing: creators publish one link; anyone with it can listen.
+ALTER TABLE public.creator_profiles
+  ADD COLUMN username text,
+  ADD COLUMN merch_url text;
+
+CREATE UNIQUE INDEX creator_profiles_username_key
+  ON public.creator_profiles (lower(username))
+  WHERE username IS NOT NULL;
+
+ALTER TABLE public.creator_profiles
+  ADD CONSTRAINT creator_profiles_username_format
+  CHECK (username IS NULL OR username ~ '^[a-z0-9][a-z0-9_-]{2,29}$');
+
 CREATE TABLE public.playlists (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -67,6 +79,17 @@ CREATE POLICY "Published playlist creators are public"
     WHERE p.creator_id = creator_profiles.user_id AND p.is_published
   ));
 
+CREATE POLICY "Named creator pages are public"
+  ON public.creator_profiles FOR SELECT TO anon
+  USING (username IS NOT NULL);
+
+CREATE POLICY "Published creator tracks are public"
+  ON public.tracks FOR SELECT TO anon
+  USING (status = 'published' AND EXISTS (
+    SELECT 1 FROM public.creator_profiles cp
+    WHERE cp.user_id = tracks.creator_id AND cp.username IS NOT NULL
+  ));
+
 -- Allows an anonymous shared-page visitor to request short-lived URLs only for
 -- audio and covers that are actually included in a published playlist.
 CREATE POLICY "Published playlist media can be signed"
@@ -84,6 +107,22 @@ CREATE POLICY "Published playlist media can be signed"
       JOIN public.playlist_tracks pt ON pt.track_id = t.id
       JOIN public.playlists p ON p.id = pt.playlist_id
       WHERE t.cover_url = name AND p.is_published
+    ))
+  );
+
+CREATE POLICY "Published creator media can be signed"
+  ON storage.objects FOR SELECT TO anon
+  USING (
+    (bucket_id = 'music-audio' AND EXISTS (
+      SELECT 1 FROM public.tracks t
+      JOIN public.creator_profiles cp ON cp.user_id = t.creator_id
+      WHERE t.audio_url = name AND t.status = 'published' AND cp.username IS NOT NULL
+    ))
+    OR
+    (bucket_id = 'music-covers' AND EXISTS (
+      SELECT 1 FROM public.tracks t
+      JOIN public.creator_profiles cp ON cp.user_id = t.creator_id
+      WHERE t.cover_url = name AND t.status = 'published' AND cp.username IS NOT NULL
     ))
   );
 

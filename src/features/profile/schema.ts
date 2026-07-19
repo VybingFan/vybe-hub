@@ -16,6 +16,13 @@ export const personalLinkSchema = z.object({
 });
 
 export const creatorProfileSchema = z.object({
+  username: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(3, "Use at least 3 characters")
+    .max(30)
+    .regex(/^[a-z0-9][a-z0-9_-]*$/, "Use lowercase letters, numbers, hyphens, or underscores"),
   artist_name: z.string().trim().min(1, "Artist name is required").max(80),
   display_name: z.string().trim().min(1, "Display name is required").max(80),
   bio: z.string().trim().max(1000).optional().or(z.literal("")),
@@ -24,6 +31,7 @@ export const creatorProfileSchema = z.object({
   avatar_url: optionalUrl,
   cover_url: optionalUrl,
   website: optionalUrl,
+  merch_url: optionalUrl,
   instagram: optionalHandle,
   facebook: optionalHandle,
   tiktok: optionalHandle,
@@ -38,6 +46,7 @@ export type CreatorProfileInput = z.infer<typeof creatorProfileSchema>;
 export type PersonalLink = z.infer<typeof personalLinkSchema>;
 
 export const emptyCreatorProfile: CreatorProfileInput = {
+  username: "",
   artist_name: "",
   display_name: "",
   bio: "",
@@ -46,6 +55,7 @@ export const emptyCreatorProfile: CreatorProfileInput = {
   avatar_url: "",
   cover_url: "",
   website: "",
+  merch_url: "",
   instagram: "",
   facebook: "",
   tiktok: "",

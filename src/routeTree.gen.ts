@@ -22,6 +22,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-passw
 import { Route as AuthRedirectRouteImport } from './routes/auth.redirect'
 import { Route as AuthOnboardingRouteImport } from './routes/auth.onboarding'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as ArtistUsernameRouteImport } from './routes/artist.$username'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPlaylistsRouteImport } from './routes/_authenticated/playlists'
@@ -30,6 +31,7 @@ import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music.upload'
+import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username.playlist.$slug'
 
 const ForBusinessesRoute = ForBusinessesRouteImport.update({
   id: '/for-businesses',
@@ -95,6 +97,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const ArtistUsernameRoute = ArtistUsernameRouteImport.update({
+  id: '/artist/$username',
+  path: '/artist/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -136,6 +143,12 @@ const AuthenticatedMusicUploadRoute =
     path: '/upload',
     getParentRoute: () => AuthenticatedMusicRoute,
   } as any)
+const ArtistUsernamePlaylistSlugRoute =
+  ArtistUsernamePlaylistSlugRouteImport.update({
+    id: '/playlist/$slug',
+    path: '/playlist/$slug',
+    getParentRoute: () => ArtistUsernameRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -149,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/artist/$username': typeof ArtistUsernameRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
   '/auth/redirect': typeof AuthRedirectRoute
@@ -158,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/creator/$username': typeof CreatorUsernameRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
+  '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -171,6 +186,7 @@ export interface FileRoutesByTo {
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/artist/$username': typeof ArtistUsernameRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
   '/auth/redirect': typeof AuthRedirectRoute
@@ -180,6 +196,7 @@ export interface FileRoutesByTo {
   '/creator/$username': typeof CreatorUsernameRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
+  '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -195,6 +212,7 @@ export interface FileRoutesById {
   '/_authenticated/playlists': typeof AuthenticatedPlaylistsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/artist/$username': typeof ArtistUsernameRouteWithChildren
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
   '/auth/redirect': typeof AuthRedirectRoute
@@ -204,6 +222,7 @@ export interface FileRoutesById {
   '/creator/$username': typeof CreatorUsernameRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/_authenticated/music/upload': typeof AuthenticatedMusicUploadRoute
+  '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -219,6 +238,7 @@ export interface FileRouteTypes {
     | '/playlists'
     | '/profile'
     | '/settings'
+    | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
     | '/auth/redirect'
@@ -228,6 +248,7 @@ export interface FileRouteTypes {
     | '/creator/$username'
     | '/playlist/$slug'
     | '/music/upload'
+    | '/artist/$username/playlist/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -241,6 +262,7 @@ export interface FileRouteTypes {
     | '/playlists'
     | '/profile'
     | '/settings'
+    | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
     | '/auth/redirect'
@@ -250,6 +272,7 @@ export interface FileRouteTypes {
     | '/creator/$username'
     | '/playlist/$slug'
     | '/music/upload'
+    | '/artist/$username/playlist/$slug'
   id:
     | '__root__'
     | '/'
@@ -264,6 +287,7 @@ export interface FileRouteTypes {
     | '/_authenticated/playlists'
     | '/_authenticated/profile'
     | '/_authenticated/settings'
+    | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
     | '/auth/redirect'
@@ -273,6 +297,7 @@ export interface FileRouteTypes {
     | '/creator/$username'
     | '/playlist/$slug'
     | '/_authenticated/music/upload'
+    | '/artist/$username/playlist/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -281,6 +306,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   ForArtistsRoute: typeof ForArtistsRoute
   ForBusinessesRoute: typeof ForBusinessesRoute
+  ArtistUsernameRoute: typeof ArtistUsernameRouteWithChildren
   CreatorUsernameRoute: typeof CreatorUsernameRoute
   PlaylistSlugRoute: typeof PlaylistSlugRoute
 }
@@ -378,6 +404,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/artist/$username': {
+      id: '/artist/$username'
+      path: '/artist/$username'
+      fullPath: '/artist/$username'
+      preLoaderRoute: typeof ArtistUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -433,6 +466,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/music/upload'
       preLoaderRoute: typeof AuthenticatedMusicUploadRouteImport
       parentRoute: typeof AuthenticatedMusicRoute
+    }
+    '/artist/$username/playlist/$slug': {
+      id: '/artist/$username/playlist/$slug'
+      path: '/playlist/$slug'
+      fullPath: '/artist/$username/playlist/$slug'
+      preLoaderRoute: typeof ArtistUsernamePlaylistSlugRouteImport
+      parentRoute: typeof ArtistUsernameRoute
     }
   }
 }
@@ -491,12 +531,25 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface ArtistUsernameRouteChildren {
+  ArtistUsernamePlaylistSlugRoute: typeof ArtistUsernamePlaylistSlugRoute
+}
+
+const ArtistUsernameRouteChildren: ArtistUsernameRouteChildren = {
+  ArtistUsernamePlaylistSlugRoute: ArtistUsernamePlaylistSlugRoute,
+}
+
+const ArtistUsernameRouteWithChildren = ArtistUsernameRoute._addFileChildren(
+  ArtistUsernameRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   ForArtistsRoute: ForArtistsRoute,
   ForBusinessesRoute: ForBusinessesRoute,
+  ArtistUsernameRoute: ArtistUsernameRouteWithChildren,
   CreatorUsernameRoute: CreatorUsernameRoute,
   PlaylistSlugRoute: PlaylistSlugRoute,
 }

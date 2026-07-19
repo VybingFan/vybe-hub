@@ -60,11 +60,13 @@ export type Database = {
           genre: string
           instagram: string | null
           location: string
+          merch_url: string | null
           personal_links: Json
           spotify: string | null
           tiktok: string | null
           updated_at: string
           user_id: string
+          username: string | null
           website: string | null
           x: string | null
           youtube: string | null
@@ -81,11 +83,13 @@ export type Database = {
           genre?: string
           instagram?: string | null
           location?: string
+          merch_url?: string | null
           personal_links?: Json
           spotify?: string | null
           tiktok?: string | null
           updated_at?: string
           user_id: string
+          username?: string | null
           website?: string | null
           x?: string | null
           youtube?: string | null
@@ -102,11 +106,13 @@ export type Database = {
           genre?: string
           instagram?: string | null
           location?: string
+          merch_url?: string | null
           personal_links?: Json
           spotify?: string | null
           tiktok?: string | null
           updated_at?: string
           user_id?: string
+          username?: string | null
           website?: string | null
           x?: string | null
           youtube?: string | null

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Download, Headphones, Loader2 } from "lucide-react";
+import { ArrowRight, Download, Headphones, Loader2, Share2, UserRound } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
 import { SharedPlaylistPlayer } from "@/components/playlists/SharedPlaylistPlayer";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,10 @@ export const Route = createFileRoute("/playlist/$slug")({ component: SharedPlayl
 
 function SharedPlaylistPage() {
   const { slug } = Route.useParams();
+  return <SharedPlaylistExperience slug={slug} />;
+}
+
+export function SharedPlaylistExperience({ slug }: { slug: string }) {
   const { data, isLoading, error } = useSharedPlaylist(slug);
   if (isLoading)
     return (
@@ -57,6 +61,25 @@ function SharedPlaylistPage() {
             <div className="mt-8 flex items-center gap-3 text-sm text-muted-foreground">
               <Headphones className="h-4 w-4 text-primary" /> {data.tracks.length} songs · Listen in
               order or choose any track
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              {data.artistUsername && (
+                <Button asChild variant="outline">
+                  <Link to="/artist/$username" params={{ username: data.artistUsername }}>
+                    <UserRound className="mr-2 h-4 w-4" /> Visit {data.artistName}
+                  </Link>
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                onClick={() =>
+                  navigator.share
+                    ? navigator.share({ title: data.title, url: window.location.href })
+                    : navigator.clipboard.writeText(window.location.href)
+                }
+              >
+                <Share2 className="mr-2 h-4 w-4" /> Share
+              </Button>
             </div>
             <div className="mt-10 rounded-3xl border border-border bg-surface/70 p-6">
               <Download className="h-6 w-6 text-genre-electronic" />

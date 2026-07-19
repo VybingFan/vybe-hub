@@ -25,6 +25,7 @@ interface Props {
 export function ProfileForm({ initial, onSubmit, onCancel, submitting }: Props) {
   const defaults: CreatorProfileInput = initial
     ? {
+        username: initial.username ?? "",
         artist_name: initial.artist_name ?? "",
         display_name: initial.display_name ?? "",
         bio: initial.bio ?? "",
@@ -33,6 +34,7 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting }: Props) 
         avatar_url: initial.avatar_url ?? "",
         cover_url: initial.cover_url ?? "",
         website: initial.website ?? "",
+        merch_url: initial.merch_url ?? "",
         instagram: initial.instagram ?? "",
         facebook: initial.facebook ?? "",
         tiktok: initial.tiktok ?? "",
@@ -67,6 +69,14 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting }: Props) 
     <form onSubmit={submit} className="space-y-6">
       <ProfileCard title="Basics" description="Your public identity on VYBE.">
         <div className="grid gap-4 md:grid-cols-2">
+          <Field label="VYBE username" error={errors.username?.message}>
+            <div>
+              <Input placeholder="jordanbanks" {...register("username")} />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Your public page: /artist/your-username
+              </p>
+            </div>
+          </Field>
           <Field label="Artist name" error={errors.artist_name?.message}>
             <Input placeholder="e.g. Night Wolf" {...register("artist_name")} />
           </Field>
@@ -96,7 +106,13 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting }: Props) 
         </div>
       </ProfileCard>
 
-      <ProfileCard title="Links & socials" description="Website, social platforms, and custom links.">
+      <ProfileCard
+        title="Links & socials"
+        description="Website, social platforms, and custom links."
+      >
+        <Field label="Merch store URL" error={errors.merch_url?.message}>
+          <Input placeholder="https://your-store.com" {...register("merch_url")} />
+        </Field>
         <SocialLinksForm control={control} register={register} errors={errors} />
       </ProfileCard>
 
@@ -112,7 +128,15 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting }: Props) 
   );
 }
 
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
