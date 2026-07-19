@@ -8,6 +8,7 @@ import {
   MessageCircle,
   Music2,
   Play,
+  ShoppingBag,
   Sparkles,
   Users,
 } from "lucide-react";
@@ -103,17 +104,17 @@ function Landing() {
 
             <div className="relative min-h-[470px]">
               <img
-                src="/images/editorial/local-spotlight.webp"
-                alt="Fans gathering for a vibrant independent music performance"
+                src="/images/editorial/member-experience-hero.webp"
+                alt="VYBE members discovering individual artists, events, playlists, community and merch"
                 className="h-[470px] w-full rounded-[2rem] object-cover shadow-elevated"
               />
               <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-t from-background/90 via-transparent to-transparent" />
               <div className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 rounded-2xl border border-white/10 bg-background/65 p-5 backdrop-blur-xl">
                 <div>
                   <p className="text-xs font-medium uppercase tracking-[0.2em] text-genre-country">
-                    Local spotlight
+                    Your music world
                   </p>
-                  <h2 className="mt-1 text-xl font-semibold">Find the sound growing near you</h2>
+                  <h2 className="mt-1 text-xl font-semibold">Discover. Connect. Belong.</h2>
                 </div>
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-background">
                   <Play className="ml-0.5 h-5 w-5 fill-current" />
@@ -171,6 +172,14 @@ function Landing() {
                 Come for the sound. Stay for the people.
               </h2>
             </div>
+            <div className="relative mt-10 overflow-hidden rounded-[2rem] border border-white/10">
+              <img
+                src="/images/editorial/connected-members.webp"
+                alt="VYBE members of different ages and abilities connecting through independent music"
+                className="aspect-[16/7] w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-background/35 via-transparent to-background/10" />
+            </div>
             <div className="mt-10 grid gap-4 md:grid-cols-3">
               {connectionCards.map((item, index) => (
                 <article
@@ -212,6 +221,34 @@ function Landing() {
             <Button asChild variant="outline" size="lg" className="mt-7 rounded-full">
               <Link to="/auth/sign-up">
                 Explore artist stories <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </section>
+
+        <section
+          id="merch"
+          className="mx-auto grid max-w-7xl scroll-mt-24 items-center gap-10 px-6 pb-24 lg:grid-cols-[1.05fr_0.95fr]"
+        >
+          <img
+            src="/images/merch/artist-marketplace-grid.webp"
+            alt="Four artist merch collections featuring music, art, fragrance, jewelry, keepsakes and collectibles"
+            className="aspect-square w-full rounded-[2rem] object-cover shadow-elevated"
+          />
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-genre-country">
+              More than a T-shirt
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
+              Every artist has something only they can create.
+            </h2>
+            <p className="mt-5 max-w-xl text-lg leading-8 text-muted-foreground">
+              Explore music, art, collectibles, handmade objects, accessories, keepsakes, limited
+              drops, and unexpected pieces that carry an artist's story into your world.
+            </p>
+            <Button asChild size="lg" className="mt-7 rounded-full bg-gradient-brand">
+              <Link to="/auth/sign-up">
+                <ShoppingBag className="mr-2 h-4 w-4" /> Explore artist merch
               </Link>
             </Button>
           </div>

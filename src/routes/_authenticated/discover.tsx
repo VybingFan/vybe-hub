@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { CSSProperties } from "react";
-import { ArrowRight, MapPin, Play, Sparkles, Users } from "lucide-react";
+import { ArrowRight, Compass, Play, Sparkles, Users } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,23 +41,23 @@ function DiscoverPage() {
 
         <section className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10">
           <img
-            src="/images/editorial/local-spotlight.webp"
-            alt="Local independent music showcase"
+            src="/images/editorial/choose-your-vybe.webp"
+            alt="Members choosing among individual artists, genres, communities and merch experiences"
             className="absolute inset-0 h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/45 to-transparent" />
           <div className="relative flex min-h-[360px] max-w-xl flex-col justify-end p-7 md:p-10">
             <p className="flex items-center gap-2 text-sm font-medium text-genre-country">
-              <MapPin className="h-4 w-4" /> Local spotlight
+              <Compass className="h-4 w-4" /> Choose your VYBE
             </p>
             <h2 className="mt-3 text-3xl font-semibold text-white md:text-4xl">
-              The scene is closer than you think.
+              Every sound opens another door.
             </h2>
             <p className="mt-3 text-white/70">
-              Meet artists, members, and live moments growing in your area.
+              Move between artists, genres, stories, communities, events, playlists and merch.
             </p>
             <Button className="mt-6 w-fit rounded-full bg-white text-black hover:bg-white/90">
-              <Play className="mr-2 h-4 w-4 fill-current" /> Explore nearby
+              <Play className="mr-2 h-4 w-4 fill-current" /> Start exploring
             </Button>
           </div>
         </section>

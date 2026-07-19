@@ -7,4 +7,5 @@ export const NAV_LINKS = [
   { label: "Community", to: "/#community" },
   { label: "For Artists", to: "/#artists" },
   { label: "Stories", to: "/#stories" },
+  { label: "Merch", to: "/#merch" },
 ] as const;
