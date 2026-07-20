@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Bell, Search } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 import { useUser } from "@/hooks/useUser";
 import { useMyActivity } from "@/hooks/useActivity";
+import { playNotificationChime } from "@/lib/notificationSound";
 
 export function TopNav() {
   const { signOut } = useAuth();
@@ -25,6 +26,17 @@ export function TopNav() {
   const { data: activity = [] } = useMyActivity(hasRole("creator") ? user?.id : undefined);
   const [lastSeen, setLastSeen] = useState(() => typeof window === "undefined" ? 0 : Number(window.localStorage.getItem("vybe:activity-seen") || 0));
   const unread = activity.filter((item) => new Date(item.created_at).getTime() > lastSeen).length;
+  const latestActivity = useRef<string | null>(null);
+  useEffect(() => {
+    const latest = activity[0]?.id;
+    if (!latest) return;
+    if (latestActivity.current && latestActivity.current !== latest) {
+      const saved = window.localStorage.getItem("vybe:preview-preferences");
+      const soundEnabled = saved ? JSON.parse(saved).sound === true : false;
+      if (soundEnabled) playNotificationChime();
+    }
+    latestActivity.current = latest;
+  }, [activity]);
   const displayName =
     creatorProfile?.display_name || profile?.display_name || user?.email?.split("@")[0] || "You";
   const avatarUrl = creatorProfile?.avatar_url || profile?.avatar_url || undefined;
@@ -72,6 +84,8 @@ export function TopNav() {
                 </div>
               </DropdownMenuItem>
             ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild><Link to="/activity">View all activity and totals</Link></DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Anonymous activity only. Refreshes every 30 seconds.</DropdownMenuLabel>
           </DropdownMenuContent>

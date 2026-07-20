@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Crown, ExternalLink, LockKeyhole, Moon, Sparkles, Sun, UserRound } from "lucide-react";
+import { BellRing, Crown, ExternalLink, LockKeyhole, Moon, Sparkles, Sun, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Section } from "@/components/common/Section";
@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 import { authService } from "@/services/auth/authService";
 import { displayNameSchema, resetPasswordSchema } from "@/features/auth/roles";
+import { playNotificationChime } from "@/lib/notificationSound";
 
 export const Route = createFileRoute("/_authenticated/settings")({ component: SettingsPage });
 
@@ -27,6 +28,7 @@ const preferenceItems = [
   ["followers", "New follower activity"],
   ["playlists", "Playlist activity"],
   ["merch", "Merch interest"],
+  ["sound", "Play a chime for new activity while VYBE is open"],
 ] as const;
 
 function SettingsContent() {
@@ -34,7 +36,7 @@ function SettingsContent() {
   const { signOut, updatePassword } = useAuth();
   const { data: creator } = useCreatorProfile(user?.id);
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
-  const [preferences, setPreferences] = useState<Record<string, boolean>>({ email: true, followers: true, playlists: true, merch: true });
+  const [preferences, setPreferences] = useState<Record<string, boolean>>({ email: true, followers: true, playlists: true, merch: true, sound: false });
 
   useEffect(() => {
     setThemeState(window.localStorage.getItem("vybe:theme") === "light" ? "light" : "dark");
@@ -77,7 +79,8 @@ function SettingsContent() {
     const next = { ...preferences, [key]: checked };
     setPreferences(next);
     window.localStorage.setItem("vybe:preview-preferences", JSON.stringify(next));
-    toast.success("Preview preference saved on this device");
+    if (key === "sound" && checked) playNotificationChime();
+    toast.success("Notification preference saved on this device");
   };
 
   return (
@@ -100,12 +103,13 @@ function SettingsContent() {
         <Card><CardContent className="space-y-5 p-6"><form onSubmit={changePassword} className="grid gap-4 sm:grid-cols-2"><div className="space-y-2"><Label>New password</Label><Input name="password" type="password" minLength={8} required /></div><div className="space-y-2"><Label>Confirm new password</Label><Input name="confirmPassword" type="password" minLength={8} required /></div><Button className="sm:col-span-2 sm:w-fit"><LockKeyhole className="mr-2 h-4 w-4" /> Update password</Button></form><Separator /><Button variant="outline" onClick={() => signOut()}>Sign out</Button></CardContent></Card>
       </Section>
 
-      <Section title="Notification preview preferences">
-        <Card><CardContent className="space-y-1 p-6"><p className="mb-4 text-sm text-muted-foreground">These showcase preferences are saved on this device. Notification delivery will be connected later.</p>{preferenceItems.map(([key, label]) => <div key={key} className="flex items-center justify-between border-b border-border/60 py-3 last:border-0"><Label htmlFor={`pref-${key}`}>{label}</Label><Switch id={`pref-${key}`} checked={preferences[key]} onCheckedChange={(checked) => updatePreference(key, checked)} /></div>)}</CardContent></Card>
+      <Section title="Notifications">
+        <Card><CardContent className="space-y-1 p-6"><p className="mb-4 text-sm text-muted-foreground">In-app activity and the optional sound work now. Other preferences are saved on this device while delivery services are being evaluated.</p>{preferenceItems.map(([key, label]) => <div key={key} className="flex items-center justify-between border-b border-border/60 py-3 last:border-0"><Label htmlFor={`pref-${key}`}>{label}</Label><Switch id={`pref-${key}`} checked={preferences[key]} onCheckedChange={(checked) => updatePreference(key, checked)} /></div>)}</CardContent></Card>
+        <Card className="mt-4"><CardContent className="flex items-start justify-between gap-5 p-6"><div className="flex gap-3"><BellRing className="mt-1 h-5 w-5 text-primary" /><div><h3 className="font-semibold">Phone and computer background alerts</h3><p className="mt-1 text-sm text-muted-foreground">Not connected in the alpha. This will require device permission and a secure push-delivery provider.</p></div></div><Button disabled variant="outline">Coming later</Button></CardContent></Card>
       </Section>
 
       <Section title="Creator AI roadmap">
-        <Card className="border-primary/20"><CardContent className="flex gap-4 p-6"><Sparkles className="mt-1 h-6 w-6 shrink-0 text-primary" /><div><h2 className="font-semibold">VYBE Creator Assistant — planned for V18</h2><p className="mt-2 text-sm text-muted-foreground">Planned assistance includes drafting bios and product descriptions, organizing releases and playlists, improving profile completeness, and guiding creators through available tools. Nothing will publish without creator review.</p></div></CardContent></Card>
+        <Card className="border-primary/20"><CardContent className="flex gap-4 p-6"><Sparkles className="mt-1 h-6 w-6 shrink-0 text-primary" /><div><h2 className="font-semibold">VYBE Creator Assistant — planned for V20</h2><p className="mt-2 text-sm text-muted-foreground">Planned assistance includes drafting bios and product descriptions, organizing releases and playlists, improving profile completeness, and guiding creators through available tools. Nothing will publish without creator review.</p></div></CardContent></Card>
       </Section>
 
       <Section title="Account management"><Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Account deletion is not automated during alpha testing. Contact VYBE support to request account removal and data review.</p></CardContent></Card></Section>

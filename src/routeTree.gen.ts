@@ -31,6 +31,7 @@ import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 
@@ -143,6 +144,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMusicUploadRoute =
   AuthenticatedMusicUploadRouteImport.update({
     id: '/music_/upload',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteWithChildren
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
+  '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
@@ -186,6 +193,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRouteWithChildren
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
+  '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteWithChildren
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
+  '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/for-artists'
     | '/for-businesses'
+    | '/activity'
     | '/admin'
     | '/dashboard'
     | '/discover'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/for-artists'
     | '/for-businesses'
+    | '/activity'
     | '/admin'
     | '/dashboard'
     | '/discover'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/for-artists'
     | '/for-businesses'
+    | '/_authenticated/activity'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/discover'
@@ -480,6 +492,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/activity': {
+      id: '/_authenticated/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof AuthenticatedActivityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/music_/upload': {
       id: '/_authenticated/music_/upload'
       path: '/music/upload'
@@ -498,6 +517,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
@@ -510,6 +530,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,

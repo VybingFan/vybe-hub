@@ -4,6 +4,7 @@ export type PlaylistActivityType = "link_opened" | "playback_started";
 
 export interface PlaylistActivity {
   id: string;
+  playlist_id: string;
   event_type: PlaylistActivityType;
   created_at: string;
   playlists: { title: string } | null;
@@ -34,10 +35,10 @@ export const activityService = {
   async listMine(creatorId: string): Promise<PlaylistActivity[]> {
     const { data, error } = await (supabase as any)
       .from("playlist_activity")
-      .select("id,event_type,created_at,playlists(title),tracks(title)")
+      .select("id,playlist_id,event_type,created_at,playlists(title),tracks(title)")
       .eq("creator_id", creatorId)
       .order("created_at", { ascending: false })
-      .limit(25);
+      .limit(250);
     if (error) throw error;
     return data ?? [];
   },
