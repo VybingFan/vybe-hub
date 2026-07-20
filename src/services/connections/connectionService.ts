@@ -8,7 +8,11 @@ export interface ListenerConnection {
   social_handle: string | null;
   message: string | null;
   consent_updates: boolean;
-  status: "new" | "contacted" | "archived";
+  status: "new" | "follow_up" | "contacted" | "archived";
+  is_favorite: boolean;
+  category: "supporter" | "superfan" | "collaborator" | "business" | "venue" | "media" | "merch_interest" | "event_interest" | "other";
+  tags: string[];
+  private_notes: string | null;
   created_at: string;
   playlists: { title: string } | null;
 }
@@ -40,15 +44,15 @@ export const connectionService = {
   async listMine(creatorId: string): Promise<ListenerConnection[]> {
     const { data, error } = await (supabase as any)
       .from("listener_connections")
-      .select("id,playlist_id,display_name,email,social_handle,message,consent_updates,status,created_at,playlists(title)")
+      .select("id,playlist_id,display_name,email,social_handle,message,consent_updates,status,is_favorite,category,tags,private_notes,created_at,playlists(title)")
       .eq("creator_id", creatorId)
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data ?? [];
   },
 
-  async updateStatus(id: string, status: ListenerConnection["status"]) {
-    const { error } = await (supabase as any).from("listener_connections").update({ status }).eq("id", id);
+  async update(id: string, patch: Pick<ListenerConnection, "status" | "is_favorite" | "category" | "tags" | "private_notes">) {
+    const { error } = await (supabase as any).from("listener_connections").update(patch).eq("id", id);
     if (error) throw error;
   },
 };

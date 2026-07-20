@@ -11,5 +11,5 @@ export function useSubmitConnection(slug: string) {
 
 export function useUpdateConnection(creatorId?: string) {
   const qc = useQueryClient();
-  return useMutation({ mutationFn: ({ id, status }: { id: string; status: ListenerConnection["status"] }) => connectionService.updateStatus(id, status), onSuccess: () => qc.invalidateQueries({ queryKey: ["listener-connections", creatorId] }) });
+  return useMutation({ mutationFn: ({ id, patch }: { id: string; patch: Pick<ListenerConnection, "status" | "is_favorite" | "category" | "tags" | "private_notes"> }) => connectionService.update(id, patch), onSuccess: () => qc.invalidateQueries({ queryKey: ["listener-connections", creatorId] }) });
 }
