@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Loader2, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
@@ -19,11 +19,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { MusicCard } from "@/components/music/MusicCard";
 import { MusicTable } from "@/components/music/MusicTable";
 import { useUser } from "@/hooks/useUser";
-import {
-  useCreatorTracks,
-  useDeleteTrack,
-  useUpdateTrack,
-} from "@/hooks/useMusic";
+import { useCreatorTracks, useDeleteTrack, useUpdateTrack } from "@/hooks/useMusic";
 import type { ContentStatus, Track } from "@/features/music/schema";
 
 export const Route = createFileRoute("/_authenticated/music")({
@@ -35,6 +31,7 @@ export const Route = createFileRoute("/_authenticated/music")({
 });
 
 function MusicLibrary() {
+  const navigate = useNavigate();
   const { user } = useUser();
   const { data: tracks = [], isLoading, error } = useCreatorTracks(user?.id);
   const del = useDeleteTrack(user?.id);
@@ -50,7 +47,8 @@ function MusicLibrary() {
     if (q.trim()) {
       const needle = q.toLowerCase();
       list = list.filter(
-        (t) => t.title.toLowerCase().includes(needle) || (t.genre || "").toLowerCase().includes(needle),
+        (t) =>
+          t.title.toLowerCase().includes(needle) || (t.genre || "").toLowerCase().includes(needle),
       );
     }
     const sorted = [...list];
@@ -93,10 +91,12 @@ function MusicLibrary() {
         title="Music library"
         description="Manage every song you've uploaded to VYBE."
         action={
-          <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
-            <Link to="/music/upload">
-              <Plus className="mr-2 h-4 w-4" /> Upload
-            </Link>
+          <Button
+            type="button"
+            onClick={() => navigate({ to: "/music/upload" })}
+            className="bg-gradient-brand text-primary-foreground shadow-glow"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Upload
           </Button>
         }
       >
@@ -111,7 +111,9 @@ function MusicLibrary() {
             />
           </div>
           <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
-            <SelectTrigger className="md:w-40"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="md:w-40">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All statuses</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
@@ -119,7 +121,9 @@ function MusicLibrary() {
             </SelectContent>
           </Select>
           <Select value={sort} onValueChange={(v) => setSort(v as typeof sort)}>
-            <SelectTrigger className="md:w-40"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="md:w-40">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="newest">Newest first</SelectItem>
               <SelectItem value="title">Title A–Z</SelectItem>
@@ -137,7 +141,19 @@ function MusicLibrary() {
         ) : filtered.length === 0 ? (
           <EmptyState
             title={tracks.length ? "No matches" : "No tracks yet"}
-            description={tracks.length ? "Try a different search or filter." : "Upload your first song to get started."}
+            description={
+              tracks.length
+                ? "Try a different search or filter."
+                : "Upload your first song to get started."
+            }
+            action={
+              tracks.length
+                ? undefined
+                : {
+                    label: "Upload your first song",
+                    onClick: () => navigate({ to: "/music/upload" }),
+                  }
+            }
           />
         ) : (
           <Tabs defaultValue="grid">
@@ -147,7 +163,9 @@ function MusicLibrary() {
             </TabsList>
             <TabsContent value="grid" className="mt-4">
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {filtered.map((t) => <MusicCard key={t.id} track={t} />)}
+                {filtered.map((t) => (
+                  <MusicCard key={t.id} track={t} />
+                ))}
               </div>
             </TabsContent>
             <TabsContent value="table" className="mt-4">

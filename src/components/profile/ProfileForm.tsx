@@ -68,6 +68,7 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId }:
   const [uploading, setUploading] = useState<"avatar" | "cover" | null>(null);
   const avatarPreview = watch("avatar_url");
   const coverPreview = watch("cover_url");
+  const bio = watch("bio") ?? "";
   const upload = async (kind: "avatar" | "cover", file?: File) => {
     if (!file) return;
     setUploading(kind);
@@ -144,13 +145,21 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId }:
           </Field>
         </div>
         <Field label="Bio" error={errors.bio?.message}>
-          <Textarea rows={5} placeholder="Tell supporters your story…" {...register("bio")} />
+          <Textarea
+            rows={5}
+            maxLength={1000}
+            placeholder="Tell supporters your story…"
+            {...register("bio")}
+          />
+          <p className="text-right text-xs text-muted-foreground">
+            {bio.length.toLocaleString()} / 1,000 characters
+          </p>
         </Field>
       </ProfileCard>
 
       <ProfileCard
         title="Imagery"
-        description="Click either image to upload JPG, PNG, or WebP (up to 8MB)."
+        description="Click either image to upload. Cover: 1600 × 400 px recommended. Profile: 800 × 800 px recommended. JPG, PNG, or WebP up to 8MB. Keep important details centered for mobile cropping."
       >
         <label className="group relative block h-52 cursor-pointer overflow-hidden rounded-2xl border border-border bg-muted">
           <img
