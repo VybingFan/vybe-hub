@@ -31,7 +31,7 @@ import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music.upload'
+import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username.playlist.$slug'
 
 const ForBusinessesRoute = ForBusinessesRouteImport.update({
@@ -145,9 +145,9 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 } as any)
 const AuthenticatedMusicUploadRoute =
   AuthenticatedMusicUploadRouteImport.update({
-    id: '/upload',
-    path: '/upload',
-    getParentRoute: () => AuthenticatedMusicRoute,
+    id: '/music_/upload',
+    path: '/music/upload',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const ArtistUsernamePlaylistSlugRoute =
   ArtistUsernamePlaylistSlugRouteImport.update({
@@ -165,7 +165,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/merch': typeof AuthenticatedMerchRoute
-  '/music': typeof AuthenticatedMusicRouteWithChildren
+  '/music': typeof AuthenticatedMusicRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -190,7 +190,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/merch': typeof AuthenticatedMerchRoute
-  '/music': typeof AuthenticatedMusicRouteWithChildren
+  '/music': typeof AuthenticatedMusicRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -217,7 +217,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
   '/_authenticated/merch': typeof AuthenticatedMerchRoute
-  '/_authenticated/music': typeof AuthenticatedMusicRouteWithChildren
+  '/_authenticated/music': typeof AuthenticatedMusicRoute
   '/_authenticated/playlists': typeof AuthenticatedPlaylistsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -230,7 +230,7 @@ export interface FileRoutesById {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/creator/$username': typeof CreatorUsernameRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
-  '/_authenticated/music/upload': typeof AuthenticatedMusicUploadRoute
+  '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRouteTypes {
@@ -308,7 +308,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/creator/$username'
     | '/playlist/$slug'
-    | '/_authenticated/music/upload'
+    | '/_authenticated/music_/upload'
     | '/artist/$username/playlist/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -479,12 +479,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/music/upload': {
-      id: '/_authenticated/music/upload'
-      path: '/upload'
+    '/_authenticated/music_/upload': {
+      id: '/_authenticated/music_/upload'
+      path: '/music/upload'
       fullPath: '/music/upload'
       preLoaderRoute: typeof AuthenticatedMusicUploadRouteImport
-      parentRoute: typeof AuthenticatedMusicRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/artist/$username/playlist/$slug': {
       id: '/artist/$username/playlist/$slug'
@@ -496,26 +496,16 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthenticatedMusicRouteChildren {
-  AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
-}
-
-const AuthenticatedMusicRouteChildren: AuthenticatedMusicRouteChildren = {
-  AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
-}
-
-const AuthenticatedMusicRouteWithChildren =
-  AuthenticatedMusicRoute._addFileChildren(AuthenticatedMusicRouteChildren)
-
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
   AuthenticatedMerchRoute: typeof AuthenticatedMerchRoute
-  AuthenticatedMusicRoute: typeof AuthenticatedMusicRouteWithChildren
+  AuthenticatedMusicRoute: typeof AuthenticatedMusicRoute
   AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -523,10 +513,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
   AuthenticatedMerchRoute: AuthenticatedMerchRoute,
-  AuthenticatedMusicRoute: AuthenticatedMusicRouteWithChildren,
+  AuthenticatedMusicRoute: AuthenticatedMusicRoute,
   AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

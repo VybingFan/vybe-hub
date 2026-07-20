@@ -9,7 +9,7 @@ import { useUser } from "@/hooks/useUser";
 import { useCreateAlbum, useUploadTrack } from "@/hooks/useMusic";
 import { musicService } from "@/services/music/musicService";
 
-export const Route = createFileRoute("/_authenticated/music/upload")({
+export const Route = createFileRoute("/_authenticated/music_/upload")({
   component: () => (
     <RoleGuard allow={["creator", "admin"]}>
       <UploadPage />
@@ -83,7 +83,9 @@ function UploadPage() {
       <div className="flex items-center justify-between">
         <div>
           <Button variant="ghost" size="sm" asChild>
-            <Link to="/music"><ChevronLeft className="mr-1 h-4 w-4" /> Back to library</Link>
+            <Link to="/music">
+              <ChevronLeft className="mr-1 h-4 w-4" /> Back to library
+            </Link>
           </Button>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight md:text-3xl">Upload music</h1>
           <p className="text-sm text-muted-foreground">Release a single track or a full album.</p>
