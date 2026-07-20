@@ -147,10 +147,20 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemePreference />
       <AuthProvider>
         <Outlet />
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>
   );
+}
+
+function ThemePreference() {
+  useEffect(() => {
+    const theme = window.localStorage.getItem("vybe:theme") || "dark";
+    document.documentElement.classList.toggle("light", theme === "light");
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, []);
+  return null;
 }

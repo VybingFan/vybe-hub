@@ -116,7 +116,7 @@ function MerchStudio() {
             <Label>Product image</Label>
             <label className="mt-2 flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-border p-4 transition hover:border-primary/60">
               {imagePreview ? <img src={imagePreview} alt="Product preview" className="h-24 w-24 rounded-xl object-cover" /> : <span className="flex h-24 w-24 items-center justify-center rounded-xl bg-muted"><ImagePlus className="h-8 w-8 text-muted-foreground" /></span>}
-              <span className="text-sm"><strong>{image ? image.name : "Choose product image"}</strong><br /><span className="text-muted-foreground">JPG, PNG, or WebP up to 8MB</span></span>
+              <span className="text-sm"><strong>{image ? image.name : "Choose product image"}</strong><br /><span className="text-muted-foreground">Recommended: 1200 × 1200 px square<br />JPG, PNG, or WebP • Maximum 8MB<br />Keep important artwork and text centered.</span></span>
               <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { const file = event.target.files?.[0] ?? null; setImage(file); setImagePreview(file ? URL.createObjectURL(file) : null); }} />
             </label>
           </div>

@@ -55,6 +55,14 @@ export const authService = {
     if (error) throw error;
   },
 
+  async updateDisplayName(userId: string, displayName: string) {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ display_name: displayName })
+      .eq("id", userId);
+    if (error) throw error;
+  },
+
   async fetchProfile(userId: string): Promise<Profile | null> {
     const { data, error } = await supabase
       .from("profiles")
