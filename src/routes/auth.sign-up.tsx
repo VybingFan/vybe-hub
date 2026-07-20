@@ -30,8 +30,15 @@ function SignUpPage() {
     setLoading(true);
     try {
       await signUp(parsed.data.email, parsed.data.password, parsed.data.displayName);
-      toast.success("Account created. Let's pick your role.");
-      navigate({ to: "/auth/onboarding" });
+      const pendingInvite = window.localStorage.getItem("vybe:pending-creator-invite");
+      toast.success(
+        pendingInvite ? "Account created. Continue your creator invitation." : "Account created.",
+      );
+      if (pendingInvite) {
+        navigate({ to: "/creator-invite/$token", params: { token: pendingInvite } });
+      } else {
+        navigate({ to: "/auth/onboarding" });
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create account");
     } finally {
@@ -42,7 +49,7 @@ function SignUpPage() {
   return (
     <AuthCard
       title="Create your VYBE"
-      description="Start releasing in minutes."
+      description="Join as a supporter. Creator Studio access requires a personal invitation."
       footer={
         <>
           Already have an account?{" "}
@@ -54,7 +61,7 @@ function SignUpPage() {
     >
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="name">Artist / Display name</Label>
+          <Label htmlFor="name">Display name</Label>
           <Input
             id="name"
             required

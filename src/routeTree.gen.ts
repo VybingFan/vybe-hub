@@ -16,6 +16,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlaylistSlugRouteImport } from './routes/playlist.$slug'
 import { Route as CreatorUsernameRouteImport } from './routes/creator.$username'
+import { Route as CreatorInviteTokenRouteImport } from './routes/creator-invite.$token'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
@@ -68,6 +69,11 @@ const PlaylistSlugRoute = PlaylistSlugRouteImport.update({
 const CreatorUsernameRoute = CreatorUsernameRouteImport.update({
   id: '/creator/$username',
   path: '/creator/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorInviteTokenRoute = CreatorInviteTokenRouteImport.update({
+  id: '/creator-invite/$token',
+  path: '/creator-invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/creator-invite/$token'
     | '/creator/$username'
     | '/playlist/$slug'
     | '/music/upload'
@@ -303,6 +313,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/creator-invite/$token'
     | '/creator/$username'
     | '/playlist/$slug'
     | '/music/upload'
@@ -331,6 +342,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/creator-invite/$token'
     | '/creator/$username'
     | '/playlist/$slug'
     | '/_authenticated/music_/upload'
@@ -344,6 +356,7 @@ export interface RootRouteChildren {
   ForArtistsRoute: typeof ForArtistsRoute
   ForBusinessesRoute: typeof ForBusinessesRoute
   ArtistUsernameRoute: typeof ArtistUsernameRoute
+  CreatorInviteTokenRoute: typeof CreatorInviteTokenRoute
   CreatorUsernameRoute: typeof CreatorUsernameRoute
   PlaylistSlugRoute: typeof PlaylistSlugRoute
   ArtistUsernamePlaylistSlugRoute: typeof ArtistUsernamePlaylistSlugRoute
@@ -398,6 +411,13 @@ declare module '@tanstack/react-router' {
       path: '/creator/$username'
       fullPath: '/creator/$username'
       preLoaderRoute: typeof CreatorUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creator-invite/$token': {
+      id: '/creator-invite/$token'
+      path: '/creator-invite/$token'
+      fullPath: '/creator-invite/$token'
+      preLoaderRoute: typeof CreatorInviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/sign-up': {
@@ -594,6 +614,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForArtistsRoute: ForArtistsRoute,
   ForBusinessesRoute: ForBusinessesRoute,
   ArtistUsernameRoute: ArtistUsernameRoute,
+  CreatorInviteTokenRoute: CreatorInviteTokenRoute,
   CreatorUsernameRoute: CreatorUsernameRoute,
   PlaylistSlugRoute: PlaylistSlugRoute,
   ArtistUsernamePlaylistSlugRoute: ArtistUsernamePlaylistSlugRoute,

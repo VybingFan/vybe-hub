@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Music2, Headphones, Loader2 } from "lucide-react";
+import { Headphones, Loader2, LockKeyhole } from "lucide-react";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { SubmitButton } from "@/components/auth/SubmitButton";
@@ -14,18 +14,14 @@ export const Route = createFileRoute("/auth/onboarding")({
   component: OnboardingPage,
 });
 
-const ROLE_META: Record<SelectableRole, { title: string; body: string; icon: typeof Music2 }> = {
-  creator: {
-    title: "I'm a Creator",
-    body: "Upload music and video, grow an audience, and connect with supporters.",
-    icon: Music2,
-  },
-  supporter: {
-    title: "I'm a Supporter",
-    body: "Follow creators, discover new music, and support the artists you love.",
-    icon: Headphones,
-  },
-};
+const ROLE_META: Record<SelectableRole, { title: string; body: string; icon: typeof Headphones }> =
+  {
+    supporter: {
+      title: "I'm a Supporter",
+      body: "Follow creators, discover new music, and support the artists you love.",
+      icon: Headphones,
+    },
+  };
 
 function OnboardingPage() {
   const { assignInitialRole } = useAuth();
@@ -34,7 +30,7 @@ function OnboardingPage() {
     isAuthenticated: useAuth().isAuthenticated,
   };
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<SelectableRole>("creator");
+  const [selected, setSelected] = useState<SelectableRole>("supporter");
   const [saving, setSaving] = useState(false);
 
   if (isLoading) {
@@ -68,7 +64,10 @@ function OnboardingPage() {
   }
 
   return (
-    <AuthCard title="Are you joining as…" description="You can be both later — pick a starting point.">
+    <AuthCard
+      title="Join the VYBE"
+      description="Creator Studio is currently a private, invitation-only beta."
+    >
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-3">
           {SELECTABLE_ROLES.map((r) => {
@@ -105,6 +104,13 @@ function OnboardingPage() {
               </button>
             );
           })}
+        </div>
+        <div className="flex gap-3 rounded-xl border border-border/60 bg-muted/30 p-4 text-sm text-muted-foreground">
+          <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <p>
+            Have a creator invitation? Open the personal link sent by the VYBE administrator after
+            creating your account.
+          </p>
         </div>
         <SubmitButton loading={saving}>Continue</SubmitButton>
       </form>
