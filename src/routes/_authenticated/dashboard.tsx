@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/useUser";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 import { useCreatorTracks } from "@/hooks/useMusic";
+import { useMyPlaylists } from "@/hooks/usePlaylists";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: DashboardPage });
 
@@ -28,6 +29,7 @@ function DashboardContent() {
   const { user, profile: account } = useUser();
   const { data: creator } = useCreatorProfile(user?.id);
   const { data: tracks = [] } = useCreatorTracks(user?.id);
+  const { data: playlists = [] } = useMyPlaylists(user?.id);
   const published = tracks.filter((track) => track.status === "published").length;
   const tasks = [
     {
@@ -61,9 +63,11 @@ function DashboardContent() {
       icon: ShoppingBag,
     },
     {
-      done: false,
+      done: playlists.some((playlist) => playlist.is_published),
       title: "Create a shareable experience",
-      body: "Build a release, playlist, inspiration set, or exclusive preview.",
+      body: playlists.length
+        ? `${playlists.length} shareable ${playlists.length === 1 ? "playlist is" : "playlists are"} ready.`
+        : "Build a release, playlist, inspiration set, or exclusive preview.",
       to: "/playlists",
       icon: ListMusic,
     },

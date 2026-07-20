@@ -38,16 +38,45 @@ function PlaylistStudio() {
   const create = useCreatePlaylist(user?.id);
   const [selected, setSelected] = useState<string[]>([]);
   const [songQuery, setSongQuery] = useState("");
+  const [songGenre, setSongGenre] = useState("all");
+  const [playlistQuery, setPlaylistQuery] = useState("");
+  const [playlistSort, setPlaylistSort] = useState<"newest" | "title">("newest");
+  const [visiblePlaylistCount, setVisiblePlaylistCount] = useState(8);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
+  const songGenres = useMemo(
+    () =>
+      Array.from(new Set(tracks.map((track) => track.genre?.trim()).filter(Boolean) as string[])).sort(
+        (a, b) => a.localeCompare(b),
+      ),
+    [tracks],
+  );
   const visibleTracks = useMemo(() => {
     const query = songQuery.trim().toLowerCase();
-    if (!query) return tracks;
     return tracks.filter(
       (track) =>
-        track.title.toLowerCase().includes(query) ||
-        (track.genre || "").toLowerCase().includes(query),
+        (songGenre === "all" || track.genre === songGenre) &&
+        (!query ||
+          track.title.toLowerCase().includes(query) ||
+          (track.genre || "").toLowerCase().includes(query) ||
+          (track.description || "").toLowerCase().includes(query)),
     );
-  }, [songQuery, tracks]);
+  }, [songGenre, songQuery, tracks]);
+  const filteredPlaylists = useMemo(() => {
+    const query = playlistQuery.trim().toLowerCase();
+    const matches = playlists.filter(
+      (playlist) =>
+        !query ||
+        playlist.title.toLowerCase().includes(query) ||
+        (playlist.occasion || "").toLowerCase().includes(query) ||
+        (playlist.description || "").toLowerCase().includes(query),
+    );
+    return [...matches].sort((a, b) =>
+      playlistSort === "title"
+        ? a.title.localeCompare(b.title)
+        : b.created_at.localeCompare(a.created_at),
+    );
+  }, [playlistQuery, playlistSort, playlists]);
+  const visiblePlaylists = filteredPlaylists.slice(0, visiblePlaylistCount);
 
   const publishAndAddTrack = async (trackId: string) => {
     try {
@@ -189,6 +218,29 @@ function PlaylistStudio() {
                   className="pl-9"
                 />
               </div>
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <Select value={songGenre} onValueChange={setSongGenre}>
+                  <SelectTrigger className="sm:w-56">
+                    <SelectValue placeholder="All genres" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All genres</SelectItem>
+                    {songGenres.map((genre) => (
+                      <SelectItem key={genre} value={genre}>
+                        {genre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
+                  <span>{selected.length} selected</span>
+                  {!!selected.length && (
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setSelected([])}>
+                      Clear selection
+                    </Button>
+                  )}
+                </div>
+              </div>
               <div className="mt-2 max-h-80 space-y-2 overflow-auto rounded-2xl border border-border p-2">
                 {isLoading ? (
                   <Loader2 className="m-6 animate-spin" />
@@ -284,10 +336,34 @@ function PlaylistStudio() {
           </div>
         </form>
         <section>
-          <h2 className="text-2xl font-semibold">Your shared playlists</h2>
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-semibold">Your shared playlists</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{playlists.length} published links</p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_10rem] lg:grid-cols-1 xl:grid-cols-[1fr_10rem]">
+            <Input
+              value={playlistQuery}
+              onChange={(event) => {
+                setPlaylistQuery(event.target.value);
+                setVisiblePlaylistCount(8);
+              }}
+              placeholder="Search playlist titles or types"
+            />
+            <Select value={playlistSort} onValueChange={(value) => setPlaylistSort(value as typeof playlistSort)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="title">Title A–Z</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="mt-5 space-y-3">
-            {playlists.length ? (
-              playlists.map((playlist) => (
+            {visiblePlaylists.length ? (
+              visiblePlaylists.map((playlist) => (
                 <article key={playlist.id} className="rounded-2xl border border-border bg-card p-5">
                   <p className="font-semibold">{playlist.title}</p>
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -306,10 +382,23 @@ function PlaylistStudio() {
                   </Button>
                 </article>
               ))
+            ) : playlists.length ? (
+              <div className="rounded-2xl border border-dashed border-border p-7 text-center text-muted-foreground">
+                No playlists match that search.
+              </div>
             ) : (
               <div className="rounded-2xl border border-dashed border-border p-7 text-center text-muted-foreground">
                 Your first shareable playlist will appear here.
               </div>
+            )}
+            {visiblePlaylistCount < filteredPlaylists.length && (
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setVisiblePlaylistCount((value) => value + 8)}
+              >
+                Load 8 more playlists
+              </Button>
             )}
           </div>
         </section>

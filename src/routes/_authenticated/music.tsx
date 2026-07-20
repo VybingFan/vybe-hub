@@ -46,16 +46,29 @@ function MusicLibrary() {
 
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | ContentStatus>("all");
+  const [genre, setGenre] = useState("all");
   const [sort, setSort] = useState<"newest" | "title" | "duration">("newest");
+  const [visibleLimit, setVisibleLimit] = useState(24);
+
+  const genres = useMemo(
+    () =>
+      Array.from(new Set(tracks.map((track) => track.genre?.trim()).filter(Boolean) as string[])).sort(
+        (a, b) => a.localeCompare(b),
+      ),
+    [tracks],
+  );
 
   const filtered = useMemo(() => {
     let list = tracks;
     if (status !== "all") list = list.filter((t) => t.status === status);
+    if (genre !== "all") list = list.filter((t) => t.genre === genre);
     if (q.trim()) {
       const needle = q.toLowerCase();
       list = list.filter(
         (t) =>
-          t.title.toLowerCase().includes(needle) || (t.genre || "").toLowerCase().includes(needle),
+          t.title.toLowerCase().includes(needle) ||
+          (t.genre || "").toLowerCase().includes(needle) ||
+          (t.description || "").toLowerCase().includes(needle),
       );
     }
     const sorted = [...list];
@@ -63,7 +76,8 @@ function MusicLibrary() {
     else if (sort === "duration") sorted.sort((a, b) => b.duration_sec - a.duration_sec);
     else sorted.sort((a, b) => (b.created_at > a.created_at ? 1 : -1));
     return sorted;
-  }, [tracks, q, status, sort]);
+  }, [tracks, q, status, genre, sort]);
+  const visibleTracks = filtered.slice(0, visibleLimit);
 
   const onDelete = async (t: Track) => {
     try {
@@ -133,7 +147,13 @@ function MusicLibrary() {
               className="pl-9"
             />
           </div>
-          <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
+          <Select
+            value={status}
+            onValueChange={(v) => {
+              setStatus(v as typeof status);
+              setVisibleLimit(24);
+            }}
+          >
             <SelectTrigger className="md:w-40">
               <SelectValue />
             </SelectTrigger>
@@ -141,6 +161,25 @@ function MusicLibrary() {
               <SelectItem value="all">All statuses</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="published">Published</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={genre}
+            onValueChange={(value) => {
+              setGenre(value);
+              setVisibleLimit(24);
+            }}
+          >
+            <SelectTrigger className="md:w-44">
+              <SelectValue placeholder="All genres" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All genres</SelectItem>
+              {genres.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {item}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={sort} onValueChange={(v) => setSort(v as typeof sort)}>
@@ -154,6 +193,11 @@ function MusicLibrary() {
             </SelectContent>
           </Select>
         </div>
+        {!!filtered.length && (
+          <p className="text-sm text-muted-foreground">
+            Showing {Math.min(visibleLimit, filtered.length)} of {filtered.length} matching songs · {tracks.length} total
+          </p>
+        )}
 
         {isLoading ? (
           <div className="flex min-h-[30vh] items-center justify-center">
@@ -186,7 +230,7 @@ function MusicLibrary() {
             </TabsList>
             <TabsContent value="grid" className="mt-4">
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {filtered.map((t) => (
+                {visibleTracks.map((t) => (
                   <MusicCard
                     key={t.id}
                     track={t}
@@ -198,13 +242,20 @@ function MusicLibrary() {
             </TabsContent>
             <TabsContent value="table" className="mt-4">
               <MusicTable
-                tracks={filtered}
+                tracks={visibleTracks}
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onToggleFeatured={onToggleFeatured}
               />
             </TabsContent>
           </Tabs>
+        )}
+        {visibleLimit < filtered.length && (
+          <div className="flex justify-center pt-2">
+            <Button variant="outline" onClick={() => setVisibleLimit((value) => value + 24)}>
+              Load 24 more songs
+            </Button>
+          </div>
         )}
       </Section>
     </div>
