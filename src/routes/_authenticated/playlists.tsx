@@ -1,6 +1,6 @@
 import { FormEvent, useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Check, Copy, ListMusic, Loader2, Plus } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Check, Copy, ListMusic, Loader2, Plus, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
@@ -172,10 +172,17 @@ function PlaylistStudio() {
                     );
                   })
                 ) : (
-                  <p className="p-5 text-sm text-muted-foreground">
-                    Publish songs in your Music Library, then return here to build the listening
-                    experience.
-                  </p>
+                  <div className="p-5 text-sm text-muted-foreground">
+                    <p>
+                      A playlist needs at least one published song. Upload music first, choose
+                      “Published,” then return here.
+                    </p>
+                    <Button asChild variant="outline" size="sm" className="mt-4">
+                      <Link to="/music/upload">
+                        <Upload className="mr-2 h-4 w-4" /> Upload your first song
+                      </Link>
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>

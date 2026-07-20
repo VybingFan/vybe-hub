@@ -96,19 +96,33 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId }:
     <form onSubmit={submit} className="space-y-6">
       <ProfileCard title="Basics" description="Your public identity on VYBE.">
         <div className="grid gap-4 md:grid-cols-2">
-          <Field label="VYBE username" error={errors.username?.message}>
+          <Field label="VYBE username (your unique link)" error={errors.username?.message}>
             <div>
               <Input placeholder="jordanbanks" {...register("username")} />
               <p className="mt-1 text-xs text-muted-foreground">
-                Your public page: /artist/your-username
+                Lowercase and unique. Your public link will be /artist/your-username.
               </p>
             </div>
           </Field>
           <Field label="Artist name" error={errors.artist_name?.message}>
-            <Input placeholder="e.g. Night Wolf" {...register("artist_name")} />
+            <div>
+              <Input placeholder="e.g. Night Wolf" {...register("artist_name")} />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Your primary public artist, band, creator, or business name.
+              </p>
+            </div>
           </Field>
-          <Field label="Display name" error={errors.display_name?.message}>
-            <Input placeholder="Shown alongside your artist name" {...register("display_name")} />
+          <Field label="Secondary public name" error={errors.display_name?.message}>
+            <div>
+              <Input
+                placeholder="e.g. Jordan Banks or Night Wolf Music"
+                {...register("display_name")}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Shown beneath the artist name. Use your name, group, or team name—not private legal
+                information.
+              </p>
+            </div>
           </Field>
           <Field label="Genres" error={errors.genres?.message}>
             <Controller
