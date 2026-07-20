@@ -1,0 +1,44 @@
+import { supabase } from "@/integrations/supabase/client";
+
+export type PlaylistActivityType = "link_opened" | "playback_started";
+
+export interface PlaylistActivity {
+  id: string;
+  event_type: PlaylistActivityType;
+  created_at: string;
+  playlists: { title: string } | null;
+  tracks: { title: string } | null;
+}
+
+function sessionId() {
+  const key = "vybe:listener-session";
+  const existing = window.sessionStorage.getItem(key);
+  if (existing) return existing;
+  const created = crypto.randomUUID();
+  window.sessionStorage.setItem(key, created);
+  return created;
+}
+
+export const activityService = {
+  async record(slug: string, eventType: PlaylistActivityType, trackId?: string) {
+    if (typeof window === "undefined") return;
+    const { error } = await (supabase.rpc as any)("record_shared_playlist_event", {
+      p_slug: slug,
+      p_event_type: eventType,
+      p_session_id: sessionId(),
+      p_track_id: trackId || null,
+    });
+    if (error) console.warn("Could not record playlist activity", error);
+  },
+
+  async listMine(creatorId: string): Promise<PlaylistActivity[]> {
+    const { data, error } = await (supabase as any)
+      .from("playlist_activity")
+      .select("id,event_type,created_at,playlists(title),tracks(title)")
+      .eq("creator_id", creatorId)
+      .order("created_at", { ascending: false })
+      .limit(25);
+    if (error) throw error;
+    return data ?? [];
+  },
+};

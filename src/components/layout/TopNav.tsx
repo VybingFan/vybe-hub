@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Bell, Search } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -15,11 +16,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 import { useUser } from "@/hooks/useUser";
+import { useMyActivity } from "@/hooks/useActivity";
 
 export function TopNav() {
   const { signOut } = useAuth();
   const { profile, user, hasRole } = useUser();
   const { data: creatorProfile } = useCreatorProfile(hasRole("creator") ? user?.id : undefined);
+  const { data: activity = [] } = useMyActivity(hasRole("creator") ? user?.id : undefined);
+  const [lastSeen, setLastSeen] = useState(() => typeof window === "undefined" ? 0 : Number(window.localStorage.getItem("vybe:activity-seen") || 0));
+  const unread = activity.filter((item) => new Date(item.created_at).getTime() > lastSeen).length;
   const displayName =
     creatorProfile?.display_name || profile?.display_name || user?.email?.split("@")[0] || "You";
   const avatarUrl = creatorProfile?.avatar_url || profile?.avatar_url || undefined;
@@ -41,9 +46,36 @@ export function TopNav() {
         />
       </div>
       <div className="ml-auto flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Bell className="h-4 w-4" />
-        </Button>
+        <DropdownMenu onOpenChange={(open) => {
+          if (open) {
+            const now = Date.now();
+            setLastSeen(now);
+            window.localStorage.setItem("vybe:activity-seen", String(now));
+          }
+        }}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative rounded-full" aria-label={`${unread} unread notifications`}>
+              <Bell className="h-4 w-4" />
+              {unread > 0 && <span className="absolute right-0 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">{Math.min(unread, 99)}</span>}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80">
+            <DropdownMenuLabel>Creator activity</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {!activity.length && <DropdownMenuItem disabled>No playlist activity yet.</DropdownMenuItem>}
+            {activity.slice(0, 10).map((item) => (
+              <DropdownMenuItem key={item.id} className="items-start py-3">
+                <div>
+                  <p className="text-sm font-medium">{item.event_type === "link_opened" ? "Playlist link opened" : "Track playback started"}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{item.tracks?.title ? `${item.tracks.title} • ` : ""}{item.playlists?.title || "Shared playlist"}</p>
+                  <p className="mt-1 text-[11px] text-muted-foreground">{new Date(item.created_at).toLocaleString()}</p>
+                </div>
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Anonymous activity only. Refreshes every 30 seconds.</DropdownMenuLabel>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">

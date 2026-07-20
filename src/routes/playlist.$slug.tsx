@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -19,6 +19,7 @@ import { SharedPlaylistPlayer } from "@/components/playlists/SharedPlaylistPlaye
 import { Button } from "@/components/ui/button";
 import { appLinks, getPreferredAppLink } from "@/config/appLinks";
 import { useSharedPlaylist } from "@/hooks/usePlaylists";
+import { activityService } from "@/services/activity/activityService";
 
 export const Route = createFileRoute("/playlist/$slug")({ component: SharedPlaylistPage });
 
@@ -31,6 +32,10 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
   const { data, isLoading, error } = useSharedPlaylist(slug);
   const [appBarVisible, setAppBarVisible] = useState(true);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (data) void activityService.record(slug, "link_opened");
+  }, [data, slug]);
 
   if (isLoading)
     return (
@@ -162,7 +167,7 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
           <div className="relative">
             <div className="absolute -inset-5 rounded-[2.5rem] bg-gradient-to-br from-fuchsia-500/20 via-violet-500/5 to-cyan-400/20 blur-2xl" />
             <div className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-white/[.055] p-3 shadow-2xl backdrop-blur-xl">
-              <SharedPlaylistPlayer tracks={data.tracks} />
+              <SharedPlaylistPlayer tracks={data.tracks} playlistSlug={slug} />
             </div>
           </div>
         </section>

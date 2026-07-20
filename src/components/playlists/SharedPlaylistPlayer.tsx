@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { formatDuration, type Track } from "@/features/music/schema";
+import { activityService } from "@/services/activity/activityService";
 
-export function SharedPlaylistPlayer({ tracks }: { tracks: Track[] }) {
+export function SharedPlaylistPlayer({ tracks, playlistSlug }: { tracks: Track[]; playlistSlug: string }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -13,6 +14,7 @@ export function SharedPlaylistPlayer({ tracks }: { tracks: Track[] }) {
   const [volume, setVolume] = useState(0.85);
   const [repeat, setRepeat] = useState(false);
   const [shuffle, setShuffle] = useState(false);
+  const recordedTracks = useRef(new Set<string>());
   const track = tracks[current];
 
   useEffect(() => {
@@ -68,6 +70,12 @@ export function SharedPlaylistPlayer({ tracks }: { tracks: Track[] }) {
       <audio
         ref={audioRef}
         src={track.audio_url}
+        onPlay={() => {
+          if (!recordedTracks.current.has(track.id)) {
+            recordedTracks.current.add(track.id);
+            void activityService.record(playlistSlug, "playback_started", track.id);
+          }
+        }}
         onTimeUpdate={(e) => setElapsed(e.currentTarget.currentTime)}
         onEnded={next}
         onLoadedMetadata={(event) => {
