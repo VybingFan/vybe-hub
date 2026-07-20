@@ -95,7 +95,7 @@ export function MusicTable({ tracks, onEdit, onDelete, onToggleFeatured }: Props
                       {onToggleFeatured && (
                         <DropdownMenuItem onClick={() => onToggleFeatured(t)}>
                           <Star className="mr-2 h-4 w-4" />
-                          {t.is_featured ? "Unfeature" : "Feature"}
+                          {t.is_featured ? "Clear profile lead" : "Set as profile lead"}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem className="text-destructive" onClick={() => setConfirm(t)}>

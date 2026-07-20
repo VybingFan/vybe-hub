@@ -85,7 +85,7 @@ export const musicService = {
       genre: params.input.genre || "",
       release_date: params.input.release_date || null,
       duration_sec: params.input.duration_sec,
-      is_featured: params.input.is_featured,
+      is_featured: false,
       status: params.input.status,
       track_number: params.input.track_number ?? null,
       album_id: params.albumId ?? params.input.album_id ?? null,
@@ -99,7 +99,19 @@ export const musicService = {
       if (coverPath) await this.removeStorage(COVER_BUCKET, coverPath);
       throw error;
     }
+    if (params.input.is_featured) {
+      const { error: leadError } = await supabase.rpc("set_profile_lead_track", {
+        _track_id: data.id,
+      });
+      if (leadError) throw leadError;
+      data.is_featured = true;
+    }
     return hydrateTrack(data);
+  },
+
+  async setProfileLead(trackId: string | null): Promise<void> {
+    const { error } = await supabase.rpc("set_profile_lead_track", { _track_id: trackId });
+    if (error) throw error;
   },
 
   async updateTrack(id: string, patch: Partial<TrackInput>): Promise<Track> {

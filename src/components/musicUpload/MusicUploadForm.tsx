@@ -192,8 +192,10 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
         </Field>
         <div className="flex items-center justify-between rounded-md border border-border/50 p-3">
           <div>
-            <Label className="text-sm">Featured song</Label>
-            <p className="text-xs text-muted-foreground">Highlight this on your profile.</p>
+            <Label className="text-sm">Make this my profile lead</Label>
+            <p className="text-xs text-muted-foreground">
+              It will replace the current lead song on your public page.
+            </p>
           </div>
           <Switch checked={values.is_featured} onCheckedChange={(c) => update("is_featured", c)} />
         </div>

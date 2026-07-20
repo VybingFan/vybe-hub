@@ -41,6 +41,14 @@ export function useUpdateTrack(userId: string | undefined) {
   });
 }
 
+export function useSetProfileLead(userId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (trackId: string | null) => musicService.setProfileLead(trackId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: creatorTracksKey(userId) }),
+  });
+}
+
 export function useReplaceTrackCover(userId: string | undefined) {
   const qc = useQueryClient();
   return useMutation({

@@ -32,6 +32,7 @@ import {
   useCreatorTracks,
   useDeleteTrack,
   useReplaceTrackCover,
+  useSetProfileLead,
   useUpdateTrack,
 } from "@/hooks/useMusic";
 import { MAX_COVER_BYTES, type ContentStatus, type Track } from "@/features/music/schema";
@@ -51,6 +52,7 @@ function MusicLibrary() {
   const del = useDeleteTrack(user?.id);
   const upd = useUpdateTrack(user?.id);
   const replaceCover = useReplaceTrackCover(user?.id);
+  const setProfileLead = useSetProfileLead(user?.id);
   const [coverTrackId, setCoverTrackId] = useState<string | null>(null);
   const [editing, setEditing] = useState<Track | null>(null);
   const [editTitle, setEditTitle] = useState("");
@@ -106,7 +108,8 @@ function MusicLibrary() {
 
   const onToggleFeatured = async (t: Track) => {
     try {
-      await upd.mutateAsync({ id: t.id, patch: { is_featured: !t.is_featured } });
+      await setProfileLead.mutateAsync(t.is_featured ? null : t.id);
+      toast.success(t.is_featured ? "Profile lead cleared" : `${t.title} is now your profile lead`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Update failed");
     }

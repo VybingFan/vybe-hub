@@ -43,7 +43,7 @@ export function MusicCard({ track, onPlay, onCoverChange, coverPending, classNam
         )}
         {track.is_featured && (
           <Badge className="absolute left-2 top-2 gap-1 bg-gradient-brand text-primary-foreground">
-            <Star className="h-3 w-3" /> Featured
+            <Star className="h-3 w-3" /> Profile lead
           </Badge>
         )}
         <Badge

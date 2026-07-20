@@ -592,6 +592,10 @@ export type Database = {
         Args: { _role: Database["public"]["Enums"]["app_role"] };
         Returns: Database["public"]["Enums"]["app_role"];
       };
+      set_profile_lead_track: {
+        Args: { _track_id?: string | null };
+        Returns: string | null;
+      };
     };
     Enums: {
       app_role: "creator" | "supporter" | "admin";
