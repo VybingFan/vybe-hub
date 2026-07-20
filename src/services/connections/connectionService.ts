@@ -14,7 +14,7 @@ export interface ListenerConnection {
   tags: string[];
   private_notes: string | null;
   created_at: string;
-  playlists: { title: string } | null;
+  playlists: { title: string; slug: string } | null;
 }
 
 export interface ConnectionInput {
@@ -44,7 +44,7 @@ export const connectionService = {
   async listMine(creatorId: string): Promise<ListenerConnection[]> {
     const { data, error } = await (supabase as any)
       .from("listener_connections")
-      .select("id,playlist_id,display_name,email,social_handle,message,consent_updates,status,is_favorite,category,tags,private_notes,created_at,playlists(title)")
+      .select("id,playlist_id,display_name,email,social_handle,message,consent_updates,status,is_favorite,category,tags,private_notes,created_at,playlists(title,slug)")
       .eq("creator_id", creatorId)
       .order("created_at", { ascending: false });
     if (error) throw error;
