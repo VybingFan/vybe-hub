@@ -14,6 +14,7 @@ import { useUser } from "@/hooks/useUser";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 import { useCreatorTracks } from "@/hooks/useMusic";
 import { useMyPlaylists } from "@/hooks/usePlaylists";
+import { useMerch } from "@/hooks/useMerch";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({ component: DashboardPage });
 
@@ -30,6 +31,7 @@ function DashboardContent() {
   const { data: creator } = useCreatorProfile(user?.id);
   const { data: tracks = [] } = useCreatorTracks(user?.id);
   const { data: playlists = [] } = useMyPlaylists(user?.id);
+  const { data: merch = [] } = useMerch(user?.id);
   const published = tracks.filter((track) => track.status === "published").length;
   const tasks = [
     {
@@ -56,10 +58,12 @@ function DashboardContent() {
       icon: UserRound,
     },
     {
-      done: !!creator?.merch_url,
-      title: "Connect your merch",
-      body: "Link the store or collection you already use.",
-      to: "/profile",
+      done: !!creator?.merch_url || merch.some((product) => product.is_active),
+      title: "Showcase your merch",
+      body: merch.length
+        ? `${merch.length} showcase ${merch.length === 1 ? "item is" : "items are"} on your page.`
+        : "Add a product preview or connect an external collection.",
+      to: "/merch",
       icon: ShoppingBag,
     },
     {

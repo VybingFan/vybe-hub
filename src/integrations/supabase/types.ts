@@ -147,9 +147,9 @@ export type Database = {
         Relationships: []
       }
       merch_products: {
-        Row: { id: string; creator_id: string; title: string; description: string; category: string; image_url: string | null; price_cents: number | null; currency: string; purchase_url: string | null; is_active: boolean; created_at: string; updated_at: string }
-        Insert: { id?: string; creator_id: string; title: string; description?: string; category?: string; image_url?: string | null; price_cents?: number | null; currency?: string; purchase_url?: string | null; is_active?: boolean; created_at?: string; updated_at?: string }
-        Update: { id?: string; creator_id?: string; title?: string; description?: string; category?: string; image_url?: string | null; price_cents?: number | null; currency?: string; purchase_url?: string | null; is_active?: boolean; created_at?: string; updated_at?: string }
+        Row: { id: string; creator_id: string; title: string; description: string; category: string; image_url: string | null; image_path: string | null; price_cents: number | null; currency: string; purchase_url: string | null; availability: string; is_active: boolean; created_at: string; updated_at: string }
+        Insert: { id?: string; creator_id: string; title: string; description?: string; category?: string; image_url?: string | null; image_path?: string | null; price_cents?: number | null; currency?: string; purchase_url?: string | null; availability?: string; is_active?: boolean; created_at?: string; updated_at?: string }
+        Update: { id?: string; creator_id?: string; title?: string; description?: string; category?: string; image_url?: string | null; image_path?: string | null; price_cents?: number | null; currency?: string; purchase_url?: string | null; availability?: string; is_active?: boolean; created_at?: string; updated_at?: string }
         Relationships: []
       }
       profiles: {

@@ -12,8 +12,10 @@ export function useMerch(creatorId?: string) {
 export function useCreateMerch(creatorId?: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: Omit<MerchProduct, "id" | "creator_id" | "created_at" | "updated_at">) =>
-      merchService.create(creatorId!, input),
+    mutationFn: ({ input, image }: {
+      input: Omit<MerchProduct, "id" | "creator_id" | "created_at" | "updated_at">;
+      image?: File | null;
+    }) => merchService.create(creatorId!, input, image),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["merch", creatorId] }),
   });
 }

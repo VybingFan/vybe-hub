@@ -51,6 +51,13 @@ export const publicCreatorService = {
         cover_url: await signedUrl("music-covers", track.cover_url),
       })),
     );
+    const hydratedMerch = await Promise.all(
+      ((merch ?? []) as MerchProduct[]).map(async (product) => ({
+        ...product,
+        image_url:
+          (await signedUrl("music-covers", product.image_path)) || product.image_url || null,
+      })),
+    );
 
     return {
       profile: {
@@ -72,7 +79,7 @@ export const publicCreatorService = {
           : [],
       },
       tracks,
-      merch: merch ?? [],
+      merch: hydratedMerch,
     };
   },
 };

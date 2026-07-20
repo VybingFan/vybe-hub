@@ -6,6 +6,7 @@ import { SocialLinksDisplay } from "@/components/socialLinks/SocialLinksDisplay"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { usePublicCreator } from "@/hooks/usePublicCreator";
+import { MERCH_AVAILABILITY } from "@/features/merch/schema";
 
 export const Route = createFileRoute("/creator/$username")({ component: CreatorPage });
 
@@ -175,13 +176,16 @@ export function PublicArtistHome({ username }: { username: string }) {
                     <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
                       {product.description}
                     </p>
+                    <Badge variant="outline" className="mt-3">
+                      {MERCH_AVAILABILITY.find((status) => status.value === product.availability)?.label || "Coming soon"}
+                    </Badge>
                     <div className="mt-4 flex items-center justify-between">
                       <span className="font-medium">
                         {product.price_cents == null
                           ? "Ask artist"
                           : `$${(product.price_cents / 100).toFixed(2)}`}
                       </span>
-                      {product.purchase_url && (
+                      {product.purchase_url && product.availability === "available_externally" && (
                         <Button asChild size="sm">
                           <a href={product.purchase_url} target="_blank" rel="noreferrer noopener">
                             View

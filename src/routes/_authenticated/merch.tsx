@@ -1,6 +1,6 @@
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ShoppingBag, Trash2 } from "lucide-react";
+import { ImagePlus, Loader2, ShoppingBag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { useUser } from "@/hooks/useUser";
 import { useCreateMerch, useDeleteMerch, useMerch } from "@/hooks/useMerch";
-import { MERCH_CATEGORIES } from "@/features/merch/schema";
+import { MERCH_AVAILABILITY, MERCH_CATEGORIES } from "@/features/merch/schema";
 
 export const Route = createFileRoute("/_authenticated/merch")({
   component: () => (
@@ -31,22 +31,31 @@ function MerchStudio() {
   const { data: products = [] } = useMerch(user?.id);
   const create = useCreateMerch(user?.id);
   const remove = useDeleteMerch(user?.id);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
     try {
       await create.mutateAsync({
-        title: String(data.get("title")),
-        description: String(data.get("description") || ""),
-        category: String(data.get("category") || "Other"),
-        image_url: String(data.get("image_url") || "") || null,
-        price_cents: data.get("price") ? Math.round(Number(data.get("price")) * 100) : null,
-        currency: "USD",
-        purchase_url: String(data.get("purchase_url") || "") || null,
-        is_active: true,
+        image,
+        input: {
+          title: String(data.get("title")),
+          description: String(data.get("description") || ""),
+          category: String(data.get("category") || "Other"),
+          image_url: null,
+          image_path: null,
+          price_cents: data.get("price") ? Math.round(Number(data.get("price")) * 100) : null,
+          currency: "USD",
+          purchase_url: String(data.get("purchase_url") || "") || null,
+          availability: String(data.get("availability") || "coming_soon") as never,
+          is_active: true,
+        },
       });
       form.reset();
+      setImage(null);
+      setImagePreview(null);
       toast.success("Merch item added to your artist page");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not add item");
@@ -88,25 +97,36 @@ function MerchStudio() {
           </div>
           <div>
             <Label>Description</Label>
-            <Textarea name="description" className="mt-2" />
+            <Textarea name="description" required className="mt-2" placeholder="Materials, sizes, colors, edition details, or the story behind this item" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Price (USD)</Label>
+              <Label>Display price (USD, optional)</Label>
               <Input name="price" type="number" min="0" step="0.01" className="mt-2" />
             </div>
             <div>
-              <Label>Image URL</Label>
-              <Input name="image_url" type="url" className="mt-2" />
+              <Label>Availability</Label>
+              <Select name="availability" defaultValue="coming_soon">
+                <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
+                <SelectContent>{MERCH_AVAILABILITY.map((status) => <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>)}</SelectContent>
+              </Select>
             </div>
           </div>
           <div>
-            <Label>Purchase or details URL</Label>
-            <Input name="purchase_url" type="url" className="mt-2" />
+            <Label>Product image</Label>
+            <label className="mt-2 flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-border p-4 transition hover:border-primary/60">
+              {imagePreview ? <img src={imagePreview} alt="Product preview" className="h-24 w-24 rounded-xl object-cover" /> : <span className="flex h-24 w-24 items-center justify-center rounded-xl bg-muted"><ImagePlus className="h-8 w-8 text-muted-foreground" /></span>}
+              <span className="text-sm"><strong>{image ? image.name : "Choose product image"}</strong><br /><span className="text-muted-foreground">JPG, PNG, or WebP up to 8MB</span></span>
+              <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { const file = event.target.files?.[0] ?? null; setImage(file); setImagePreview(file ? URL.createObjectURL(file) : null); }} />
+            </label>
           </div>
-          <Button className="w-full bg-gradient-brand text-white">
-            <ShoppingBag className="mr-2 h-4 w-4" />
-            Add to my page
+          <div>
+            <Label>External purchase or details URL (optional)</Label>
+            <Input name="purchase_url" type="url" className="mt-2" placeholder="Leave blank for coming soon" />
+          </div>
+          <Button disabled={create.isPending} className="w-full bg-gradient-brand text-white">
+            {create.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShoppingBag className="mr-2 h-4 w-4" />}
+            {create.isPending ? "Uploading and saving…" : "Add showcase item"}
           </Button>
         </form>
         <section>
@@ -131,6 +151,8 @@ function MerchStudio() {
                 <div className="p-4">
                   <p className="text-xs text-genre-country">{product.category}</p>
                   <h3 className="mt-1 font-semibold">{product.title}</h3>
+                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
+                  <p className="mt-2 text-xs font-medium text-primary">{MERCH_AVAILABILITY.find((status) => status.value === product.availability)?.label || "Coming soon"}</p>
                   <div className="mt-3 flex items-center justify-between">
                     <span>
                       {product.price_cents == null
