@@ -13,12 +13,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
+import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 import { useUser } from "@/hooks/useUser";
 
 export function TopNav() {
   const { signOut } = useAuth();
-  const { profile, user } = useUser();
-  const displayName = profile?.display_name || user?.email?.split("@")[0] || "You";
+  const { profile, user, hasRole } = useUser();
+  const { data: creatorProfile } = useCreatorProfile(hasRole("creator") ? user?.id : undefined);
+  const displayName =
+    creatorProfile?.display_name || profile?.display_name || user?.email?.split("@")[0] || "You";
+  const avatarUrl = creatorProfile?.avatar_url || profile?.avatar_url || undefined;
   const initials = displayName
     .split(" ")
     .map((s: string) => s[0])
@@ -44,7 +48,7 @@ export function TopNav() {
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={profile?.avatar_url ?? "/avatars/default-avatar.png"} />
+                {avatarUrl ? <AvatarImage src={avatarUrl} alt={`${displayName} profile photo`} /> : null}
                 <AvatarFallback className="bg-gradient-brand text-primary-foreground text-xs">
                   {initials}
                 </AvatarFallback>
