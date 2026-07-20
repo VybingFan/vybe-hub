@@ -30,6 +30,7 @@ import { Route as AuthenticatedMusicRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/merch'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedConnectionsRouteImport } from './routes/_authenticated/connections'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
@@ -139,6 +140,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedConnectionsRoute =
+  AuthenticatedConnectionsRouteImport.update({
+    id: '/connections',
+    path: '/connections',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -169,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/for-businesses': typeof ForBusinessesRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/connections': typeof AuthenticatedConnectionsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/merch': typeof AuthenticatedMerchRoute
@@ -195,6 +203,7 @@ export interface FileRoutesByTo {
   '/for-businesses': typeof ForBusinessesRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/connections': typeof AuthenticatedConnectionsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/merch': typeof AuthenticatedMerchRoute
@@ -223,6 +232,7 @@ export interface FileRoutesById {
   '/for-businesses': typeof ForBusinessesRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/connections': typeof AuthenticatedConnectionsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
   '/_authenticated/merch': typeof AuthenticatedMerchRoute
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/for-businesses'
     | '/activity'
     | '/admin'
+    | '/connections'
     | '/dashboard'
     | '/discover'
     | '/merch'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/for-businesses'
     | '/activity'
     | '/admin'
+    | '/connections'
     | '/dashboard'
     | '/discover'
     | '/merch'
@@ -304,6 +316,7 @@ export interface FileRouteTypes {
     | '/for-businesses'
     | '/_authenticated/activity'
     | '/_authenticated/admin'
+    | '/_authenticated/connections'
     | '/_authenticated/dashboard'
     | '/_authenticated/discover'
     | '/_authenticated/merch'
@@ -485,6 +498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/connections': {
+      id: '/_authenticated/connections'
+      path: '/connections'
+      fullPath: '/connections'
+      preLoaderRoute: typeof AuthenticatedConnectionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -519,6 +539,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedConnectionsRoute: typeof AuthenticatedConnectionsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
   AuthenticatedMerchRoute: typeof AuthenticatedMerchRoute
@@ -532,6 +553,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedConnectionsRoute: AuthenticatedConnectionsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
   AuthenticatedMerchRoute: AuthenticatedMerchRoute,

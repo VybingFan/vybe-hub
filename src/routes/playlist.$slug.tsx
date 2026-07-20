@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { appLinks, getPreferredAppLink } from "@/config/appLinks";
 import { useSharedPlaylist } from "@/hooks/usePlaylists";
 import { activityService } from "@/services/activity/activityService";
+import { ListenerConnectionForm } from "@/components/connections/ListenerConnectionForm";
 
 export const Route = createFileRoute("/playlist/$slug")({ component: SharedPlaylistPage });
 
@@ -237,6 +238,8 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
             </Button>
           </div>
         </section>
+
+        <ListenerConnectionForm slug={slug} artistName={data.artistName} />
 
         <section className="mt-8 rounded-[2rem] border border-white/10 bg-white/[.035] p-7 text-center">
           <p className="text-sm font-semibold uppercase tracking-[.2em] text-fuchsia-200">

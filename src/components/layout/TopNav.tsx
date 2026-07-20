@@ -18,17 +18,20 @@ import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 import { useUser } from "@/hooks/useUser";
 import { useMyActivity } from "@/hooks/useActivity";
 import { playNotificationChime } from "@/lib/notificationSound";
+import { useMyConnections } from "@/hooks/useConnections";
 
 export function TopNav() {
   const { signOut } = useAuth();
   const { profile, user, hasRole } = useUser();
   const { data: creatorProfile } = useCreatorProfile(hasRole("creator") ? user?.id : undefined);
   const { data: activity = [] } = useMyActivity(hasRole("creator") ? user?.id : undefined);
+  const { data: connections = [] } = useMyConnections(hasRole("creator") ? user?.id : undefined);
   const [lastSeen, setLastSeen] = useState(() => typeof window === "undefined" ? 0 : Number(window.localStorage.getItem("vybe:activity-seen") || 0));
-  const unread = activity.filter((item) => new Date(item.created_at).getTime() > lastSeen).length;
+  const unread = [...activity, ...connections].filter((item) => new Date(item.created_at).getTime() > lastSeen).length;
   const latestActivity = useRef<string | null>(null);
   useEffect(() => {
-    const latest = activity[0]?.id;
+    const latestItem = [...activity, ...connections].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+    const latest = latestItem?.id;
     if (!latest) return;
     if (latestActivity.current && latestActivity.current !== latest) {
       const saved = window.localStorage.getItem("vybe:preview-preferences");
@@ -36,7 +39,7 @@ export function TopNav() {
       if (soundEnabled) playNotificationChime();
     }
     latestActivity.current = latest;
-  }, [activity]);
+  }, [activity, connections]);
   const displayName =
     creatorProfile?.display_name || profile?.display_name || user?.email?.split("@")[0] || "You";
   const avatarUrl = creatorProfile?.avatar_url || profile?.avatar_url || undefined;
@@ -74,7 +77,12 @@ export function TopNav() {
           <DropdownMenuContent align="end" className="w-80">
             <DropdownMenuLabel>Creator activity</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {!activity.length && <DropdownMenuItem disabled>No playlist activity yet.</DropdownMenuItem>}
+            {connections.slice(0, 3).map((connection) => (
+              <DropdownMenuItem key={connection.id} className="items-start py-3" asChild>
+                <Link to="/connections"><div><p className="text-sm font-medium">New listener connection</p><p className="mt-0.5 text-xs text-muted-foreground">{connection.display_name || connection.email} • {connection.playlists?.title || "Shared playlist"}</p><p className="mt-1 text-[11px] text-muted-foreground">{new Date(connection.created_at).toLocaleString()}</p></div></Link>
+              </DropdownMenuItem>
+            ))}
+            {!activity.length && !connections.length && <DropdownMenuItem disabled>No creator activity yet.</DropdownMenuItem>}
             {activity.slice(0, 10).map((item) => (
               <DropdownMenuItem key={item.id} className="items-start py-3">
                 <div>
@@ -86,6 +94,7 @@ export function TopNav() {
             ))}
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild><Link to="/activity">View all activity and totals</Link></DropdownMenuItem>
+            <DropdownMenuItem asChild><Link to="/connections">View listener connections</Link></DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Anonymous activity only. Refreshes every 30 seconds.</DropdownMenuLabel>
           </DropdownMenuContent>

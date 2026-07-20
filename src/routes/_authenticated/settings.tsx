@@ -109,7 +109,7 @@ function SettingsContent() {
       </Section>
 
       <Section title="Creator AI roadmap">
-        <Card className="border-primary/20"><CardContent className="flex gap-4 p-6"><Sparkles className="mt-1 h-6 w-6 shrink-0 text-primary" /><div><h2 className="font-semibold">VYBE Creator Assistant — planned for V20</h2><p className="mt-2 text-sm text-muted-foreground">Planned assistance includes drafting bios and product descriptions, organizing releases and playlists, improving profile completeness, and guiding creators through available tools. Nothing will publish without creator review.</p></div></CardContent></Card>
+        <Card className="border-primary/20"><CardContent className="flex gap-4 p-6"><Sparkles className="mt-1 h-6 w-6 shrink-0 text-primary" /><div><h2 className="font-semibold">VYBE Creator Assistant — planned for V21</h2><p className="mt-2 text-sm text-muted-foreground">Planned assistance includes drafting bios and product descriptions, organizing releases and playlists, improving profile completeness, and guiding creators through available tools. Nothing will publish without creator review.</p></div></CardContent></Card>
       </Section>
 
       <Section title="Account management"><Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Account deletion is not automated during alpha testing. Contact VYBE support to request account removal and data review.</p></CardContent></Card></Section>

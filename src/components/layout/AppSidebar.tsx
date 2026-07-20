@@ -9,6 +9,7 @@ import {
   ListMusic,
   ShoppingBag,
   BellRing,
+  ContactRound,
 } from "lucide-react";
 import {
   Sidebar,
@@ -37,6 +38,7 @@ const items: NavItem[] = [
   { title: "Music", url: "/music", icon: Music2, allow: ["creator", "admin"] },
   { title: "Playlists", url: "/playlists", icon: ListMusic, allow: ["creator", "admin"] },
   { title: "Activity", url: "/activity", icon: BellRing, allow: ["creator", "admin"] },
+  { title: "Connections", url: "/connections", icon: ContactRound, allow: ["creator", "admin"] },
   { title: "Merch", url: "/merch", icon: ShoppingBag, allow: ["creator", "admin"] },
   { title: "Discover", url: "/discover", icon: Compass, allow: ["supporter", "creator", "admin"] },
   { title: "Profile", url: "/profile", icon: User, allow: ["creator", "supporter", "admin"] },
