@@ -48,7 +48,12 @@ export function useReplaceTrackCover(userId: string | undefined) {
       if (!userId) throw new Error("Not authenticated");
       return musicService.replaceTrackCover(userId, id, file);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: creatorTracksKey(userId) }),
+    onSuccess: (updated) => {
+      qc.setQueryData(creatorTracksKey(userId), (current: Array<typeof updated> | undefined) =>
+        current?.map((track) => (track.id === updated.id ? updated : track)),
+      );
+      qc.invalidateQueries({ queryKey: creatorTracksKey(userId) });
+    },
   });
 }
 
