@@ -25,6 +25,12 @@ export interface DiscoveryTrack {
   creator: DiscoveryCreator | null;
 }
 
+export interface DiscoveryArtistCredit {
+  name: string;
+  songCount: number;
+  uploaderCount: number;
+}
+
 async function signedCover(path: string | null) {
   if (!path) return null;
   const { data } = await supabase.storage.from("music-covers").createSignedUrl(path, 60 * 60);
@@ -97,11 +103,13 @@ export const publicDiscoveryService = {
       );
     }
 
-    const creatorMap = new Map(
-      [...directCreators, ...relatedCreators].map((creator) => [creator.user_id, creator]),
+    const allCreators = [...directCreators, ...relatedCreators].filter(
+      (creator, index, rows) =>
+        rows.findIndex((item) => item.user_id === creator.user_id) === index,
     );
+    const creatorMap = new Map(allCreators.map((creator) => [creator.user_id, creator]));
     const creators = await Promise.all(
-      directCreators.map(async (creator) => ({
+      allCreators.map(async (creator) => ({
         ...creator,
         avatar_url: await signedAvatar(creator.avatar_path, creator.avatar_url),
       })),
@@ -114,6 +122,36 @@ export const publicDiscoveryService = {
       })),
     );
 
-    return { creators, tracks: tracks.filter((track) => track.creator?.username) };
+    const visibleTracks = tracks.filter((track) => track.creator?.username);
+    const normalizedQuery = query.toLowerCase();
+    const artistCredits = new Map<
+      string,
+      { name: string; tracks: Set<string>; uploaders: Set<string> }
+    >();
+    for (const track of visibleTracks) {
+      const names = [track.primary_artist_name, ...track.featured_artist_names].filter(Boolean);
+      for (const name of names) {
+        if (normalizedQuery && !name.toLowerCase().includes(normalizedQuery)) continue;
+        const key = name.toLowerCase();
+        const current = artistCredits.get(key) ?? {
+          name,
+          tracks: new Set<string>(),
+          uploaders: new Set<string>(),
+        };
+        current.tracks.add(track.id);
+        current.uploaders.add(track.creator_id);
+        artistCredits.set(key, current);
+      }
+    }
+
+    const artists: DiscoveryArtistCredit[] = [...artistCredits.values()]
+      .map((artist) => ({
+        name: artist.name,
+        songCount: artist.tracks.size,
+        uploaderCount: artist.uploaders.size,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    return { creators, artists, tracks: visibleTracks };
   },
 };

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   publicDiscoveryService,
+  type DiscoveryArtistCredit,
   type DiscoveryCreator,
   type DiscoveryTrack,
 } from "@/services/discovery/publicDiscoveryService";
@@ -27,6 +28,7 @@ function PublicExplorePage() {
   const navigate = useNavigate();
   const [input, setInput] = useState(q);
   const [creators, setCreators] = useState<DiscoveryCreator[]>([]);
+  const [artists, setArtists] = useState<DiscoveryArtistCredit[]>([]);
   const [tracks, setTracks] = useState<DiscoveryTrack[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +41,7 @@ function PublicExplorePage() {
       .search(q)
       .then((result) => {
         setCreators(result.creators);
+        setArtists(result.artists);
         setTracks(result.tracks);
       })
       .catch((reason) => setError(reason instanceof Error ? reason.message : "Search failed"))
@@ -101,7 +104,7 @@ function PublicExplorePage() {
                 <div>
                   <p className="text-sm font-medium text-primary">Creators</p>
                   <h2 className="mt-1 text-2xl font-semibold">
-                    {q ? `Artists matching “${q}”` : "Explore VYBE creators"}
+                    {q ? `Creator accounts connected to “${q}”` : "Explore VYBE creator accounts"}
                   </h2>
                 </div>
                 <span className="text-sm text-muted-foreground">{creators.length} found</span>
@@ -143,7 +146,49 @@ function PublicExplorePage() {
                 </div>
               ) : (
                 <p className="mt-6 rounded-2xl border border-dashed p-8 text-center text-muted-foreground">
-                  No creators match this search yet.
+                  No creator accounts are connected to this search yet.
+                </p>
+              )}
+            </section>
+
+            <section>
+              <div className="flex items-end justify-between">
+                <div>
+                  <p className="text-sm font-medium text-primary">Artist credits</p>
+                  <h2 className="mt-1 text-2xl font-semibold">
+                    {q ? `Artists matching “${q}”` : "Credited performing artists"}
+                  </h2>
+                </div>
+                <span className="text-sm text-muted-foreground">{artists.length} found</span>
+              </div>
+              {artists.length ? (
+                <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {artists.map((artist) => (
+                    <button
+                      key={artist.name.toLowerCase()}
+                      type="button"
+                      onClick={() => navigate({ to: "/explore", search: { q: artist.name } })}
+                      className="rounded-2xl border bg-card p-5 text-left transition hover:border-primary/40"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <Music2 className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">{artist.name}</h3>
+                          <p className="text-xs text-muted-foreground">
+                            {artist.songCount} {artist.songCount === 1 ? "song" : "songs"} ·{" "}
+                            {artist.uploaderCount}{" "}
+                            {artist.uploaderCount === 1 ? "creator account" : "creator accounts"}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-6 rounded-2xl border border-dashed p-8 text-center text-muted-foreground">
+                  No performing-artist credits match this search yet.
                 </p>
               )}
             </section>

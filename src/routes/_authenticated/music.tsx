@@ -56,6 +56,7 @@ function MusicLibrary() {
   const [editTitle, setEditTitle] = useState("");
   const [editPrimaryArtist, setEditPrimaryArtist] = useState("");
   const [editFeaturedArtists, setEditFeaturedArtists] = useState("");
+  const [editStatus, setEditStatus] = useState<ContentStatus>("draft");
 
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | ContentStatus>("all");
@@ -116,6 +117,7 @@ function MusicLibrary() {
     setEditTitle(t.title);
     setEditPrimaryArtist(t.primary_artist_name || "");
     setEditFeaturedArtists((t.featured_artist_names || []).join(", "));
+    setEditStatus(t.status);
   };
 
   const saveCredits = async () => {
@@ -134,6 +136,7 @@ function MusicLibrary() {
             .split(",")
             .map((name) => name.trim())
             .filter(Boolean),
+          status: editStatus,
         },
       });
       toast.success("Track credits updated");
@@ -331,6 +334,21 @@ function MusicLibrary() {
                 placeholder="Jerzo, Calliope Slim"
               />
               <p className="text-xs text-muted-foreground">Separate multiple names with commas.</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Publishing status</Label>
+              <Select
+                value={editStatus}
+                onValueChange={(value) => setEditStatus(value as ContentStatus)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
