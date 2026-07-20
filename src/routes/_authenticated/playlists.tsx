@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -50,10 +49,11 @@ function PlaylistStudio() {
     );
   }, [songQuery, tracks]);
 
-  const publishTrack = async (trackId: string) => {
+  const publishAndAddTrack = async (trackId: string) => {
     try {
       await updateTrack.mutateAsync({ id: trackId, patch: { status: "published" } });
-      toast.success("Song published. You can now add it to the playlist.");
+      setSelected((current) => (current.includes(trackId) ? current : [...current, trackId]));
+      toast.success("Song published and added to the playlist.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not publish song");
     }
@@ -178,17 +178,9 @@ function PlaylistStudio() {
                         key={track.id}
                         className="flex items-center gap-3 rounded-xl p-3 hover:bg-white/5"
                       >
-                        <Checkbox
-                          checked={checked}
-                          disabled={!isPublished}
-                          onCheckedChange={(value) =>
-                            setSelected((current) =>
-                              value
-                                ? [...current, track.id]
-                                : current.filter((id) => id !== track.id),
-                            )
-                          }
-                        />
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
+                          {checked ? selected.indexOf(track.id) + 1 : "—"}
+                        </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate font-medium">{track.title}</span>
                           <span className="text-xs text-muted-foreground">
@@ -198,15 +190,38 @@ function PlaylistStudio() {
                         <span className="text-xs text-muted-foreground">
                           {formatDuration(track.duration_sec)}
                         </span>
-                        {!isPublished && (
+                        {isPublished ? (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant={checked ? "secondary" : "outline"}
+                            onClick={() =>
+                              setSelected((current) =>
+                                checked
+                                  ? current.filter((id) => id !== track.id)
+                                  : [...current, track.id],
+                              )
+                            }
+                          >
+                            {checked ? (
+                              <>
+                                <Check className="mr-2 h-4 w-4" /> Added · Remove
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="mr-2 h-4 w-4" /> Add to playlist
+                              </>
+                            )}
+                          </Button>
+                        ) : (
                           <Button
                             type="button"
                             size="sm"
                             variant="outline"
                             disabled={updateTrack.isPending}
-                            onClick={() => publishTrack(track.id)}
+                            onClick={() => publishAndAddTrack(track.id)}
                           >
-                            Publish
+                            Publish & add
                           </Button>
                         )}
                       </div>
