@@ -40,10 +40,12 @@ export function ProfileHeader({ profile, email, isEditing, onEditToggle }: Props
               {email && <p className="text-xs text-muted-foreground">{email}</p>}
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {profile.genre && (
-                <Badge variant="outline" className="gap-1">
-                  <Music2 className="h-3 w-3" /> {profile.genre}
-                </Badge>
+              {(profile.genres?.length ? profile.genres : profile.genre ? [profile.genre] : []).map(
+                (genre) => (
+                  <Badge key={genre} variant="outline" className="gap-1">
+                    <Music2 className="h-3 w-3" /> {genre}
+                  </Badge>
+                ),
               )}
               {profile.location && (
                 <Badge variant="outline" className="gap-1">

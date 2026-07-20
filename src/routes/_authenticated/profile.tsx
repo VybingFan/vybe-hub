@@ -28,11 +28,20 @@ function ProfilePage() {
 
 function ProfileContent() {
   const { user, primaryRole } = useUser();
-  if (primaryRole === "supporter") return <SupporterProfileContent userId={user?.id} email={user?.email} />;
+  if (primaryRole === "supporter")
+    return <SupporterProfileContent userId={user?.id} email={user?.email} />;
   return <CreatorProfileContent userId={user?.id} email={user?.email} canEdit />;
 }
 
-function CreatorProfileContent({ userId, email, canEdit }: { userId?: string; email?: string | null; canEdit: boolean }) {
+function CreatorProfileContent({
+  userId,
+  email,
+  canEdit,
+}: {
+  userId?: string;
+  email?: string | null;
+  canEdit: boolean;
+}) {
   const { data: profile, isLoading, error } = useCreatorProfile(userId);
   const save = useSaveCreatorProfile(userId);
   const [isEditing, setIsEditing] = useState(false);
@@ -56,6 +65,7 @@ function CreatorProfileContent({ userId, email, canEdit }: { userId?: string; em
       {isEditing && canEdit ? (
         <ProfileForm
           initial={profile ?? null}
+          userId={userId!}
           onSubmit={handleSave}
           onCancel={() => setIsEditing(false)}
           submitting={save.isPending}

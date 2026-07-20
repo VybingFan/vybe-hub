@@ -35,7 +35,7 @@ export function ProfileView({ profile }: Props) {
               value={profile?.username ? `@${profile.username}` : undefined}
             />
             <Row label="Display name" value={profile?.display_name} />
-            <Row label="Genre" value={profile?.genre} />
+            <Row label="Genres" value={profile?.genres?.join(", ") || profile?.genre} />
             <Row label="Location" value={profile?.location} />
             <Row label="Merch store" value={profile?.merch_url ? "Connected" : undefined} />
           </dl>

@@ -27,6 +27,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPlaylistsRouteImport } from './routes/_authenticated/playlists'
 import { Route as AuthenticatedMusicRouteImport } from './routes/_authenticated/music'
+import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/merch'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -122,6 +123,11 @@ const AuthenticatedMusicRoute = AuthenticatedMusicRouteImport.update({
   path: '/music',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMerchRoute = AuthenticatedMerchRouteImport.update({
+  id: '/merch',
+  path: '/merch',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDiscoverRoute = AuthenticatedDiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
+  '/merch': typeof AuthenticatedMerchRoute
   '/music': typeof AuthenticatedMusicRouteWithChildren
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
+  '/merch': typeof AuthenticatedMerchRoute
   '/music': typeof AuthenticatedMusicRouteWithChildren
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
+  '/_authenticated/merch': typeof AuthenticatedMerchRoute
   '/_authenticated/music': typeof AuthenticatedMusicRouteWithChildren
   '/_authenticated/playlists': typeof AuthenticatedPlaylistsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/discover'
+    | '/merch'
     | '/music'
     | '/playlists'
     | '/profile'
@@ -258,6 +268,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/discover'
+    | '/merch'
     | '/music'
     | '/playlists'
     | '/profile'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/discover'
+    | '/_authenticated/merch'
     | '/_authenticated/music'
     | '/_authenticated/playlists'
     | '/_authenticated/profile'
@@ -439,6 +451,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMusicRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/merch': {
+      id: '/_authenticated/merch'
+      path: '/merch'
+      fullPath: '/merch'
+      preLoaderRoute: typeof AuthenticatedMerchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/discover': {
       id: '/_authenticated/discover'
       path: '/discover'
@@ -492,6 +511,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
+  AuthenticatedMerchRoute: typeof AuthenticatedMerchRoute
   AuthenticatedMusicRoute: typeof AuthenticatedMusicRouteWithChildren
   AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -502,6 +522,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
+  AuthenticatedMerchRoute: AuthenticatedMerchRoute,
   AuthenticatedMusicRoute: AuthenticatedMusicRouteWithChildren,
   AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,

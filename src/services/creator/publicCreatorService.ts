@@ -1,10 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { CreatorProfile, PersonalLink } from "@/features/profile/schema";
 import type { Track } from "@/features/music/schema";
+import type { MerchProduct } from "@/features/merch/schema";
 
 export interface PublicCreatorPage {
   profile: CreatorProfile;
   tracks: Track[];
+  merch: MerchProduct[];
 }
 
 async function signedUrl(bucket: string, path: string | null) {
@@ -23,14 +25,24 @@ export const publicCreatorService = {
     if (error) throw error;
     if (!profile || !profile.username) return null;
 
-    const { data: rows, error: tracksError } = await supabase
-      .from("tracks")
-      .select("*")
-      .eq("creator_id", profile.user_id)
-      .eq("status", "published")
-      .order("is_featured", { ascending: false })
-      .order("created_at", { ascending: false });
+    const [{ data: rows, error: tracksError }, { data: merch, error: merchError }] =
+      await Promise.all([
+        supabase
+          .from("tracks")
+          .select("*")
+          .eq("creator_id", profile.user_id)
+          .eq("status", "published")
+          .order("is_featured", { ascending: false })
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("merch_products")
+          .select("*")
+          .eq("creator_id", profile.user_id)
+          .eq("is_active", true)
+          .order("created_at", { ascending: false }),
+      ]);
     if (tracksError) throw tracksError;
+    if (merchError) throw merchError;
 
     const tracks = await Promise.all(
       (rows ?? []).map(async (track) => ({
@@ -45,8 +57,8 @@ export const publicCreatorService = {
         ...profile,
         username: profile.username,
         merch_url: profile.merch_url ?? "",
-        avatar_url: profile.avatar_url ?? "",
-        cover_url: profile.cover_url ?? "",
+        avatar_url: (await signedUrl("avatars", profile.avatar_path)) || profile.avatar_url || "",
+        cover_url: (await signedUrl("avatars", profile.cover_path)) || profile.cover_url || "",
         website: profile.website ?? "",
         instagram: profile.instagram ?? "",
         facebook: profile.facebook ?? "",
@@ -60,6 +72,7 @@ export const publicCreatorService = {
           : [],
       },
       tracks,
+      merch: merch ?? [],
     };
   },
 };

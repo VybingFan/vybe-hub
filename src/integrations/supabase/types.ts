@@ -52,12 +52,15 @@ export type Database = {
           apple_music: string | null
           artist_name: string
           avatar_url: string | null
+          avatar_path: string | null
           bio: string
           cover_url: string | null
+          cover_path: string | null
           created_at: string
           display_name: string
           facebook: string | null
           genre: string
+          genres: string[]
           instagram: string | null
           location: string
           merch_url: string | null
@@ -75,12 +78,15 @@ export type Database = {
           apple_music?: string | null
           artist_name?: string
           avatar_url?: string | null
+          avatar_path?: string | null
           bio?: string
           cover_url?: string | null
+          cover_path?: string | null
           created_at?: string
           display_name?: string
           facebook?: string | null
           genre?: string
+          genres?: string[]
           instagram?: string | null
           location?: string
           merch_url?: string | null
@@ -98,12 +104,15 @@ export type Database = {
           apple_music?: string | null
           artist_name?: string
           avatar_url?: string | null
+          avatar_path?: string | null
           bio?: string
           cover_url?: string | null
+          cover_path?: string | null
           created_at?: string
           display_name?: string
           facebook?: string | null
           genre?: string
+          genres?: string[]
           instagram?: string | null
           location?: string
           merch_url?: string | null
@@ -135,6 +144,12 @@ export type Database = {
           creator_id?: string
           follower_id?: string
         }
+        Relationships: []
+      }
+      merch_products: {
+        Row: { id: string; creator_id: string; title: string; description: string; category: string; image_url: string | null; price_cents: number | null; currency: string; purchase_url: string | null; is_active: boolean; created_at: string; updated_at: string }
+        Insert: { id?: string; creator_id: string; title: string; description?: string; category?: string; image_url?: string | null; price_cents?: number | null; currency?: string; purchase_url?: string | null; is_active?: boolean; created_at?: string; updated_at?: string }
+        Update: { id?: string; creator_id?: string; title?: string; description?: string; category?: string; image_url?: string | null; price_cents?: number | null; currency?: string; purchase_url?: string | null; is_active?: boolean; created_at?: string; updated_at?: string }
         Relationships: []
       }
       profiles: {
