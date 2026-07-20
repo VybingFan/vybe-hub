@@ -61,10 +61,9 @@ export interface AlbumWithTracks extends Album {
   tracks: Track[];
 }
 
-export const MAX_AUDIO_BYTES = 50 * 1024 * 1024; // 50 MB
-export const MAX_COVER_BYTES = 8 * 1024 * 1024; // 8 MB
-export const ACCEPTED_AUDIO =
-  "audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/mp4,audio/aac,audio/ogg,audio/flac";
+export const MAX_AUDIO_BYTES = 15 * 1024 * 1024; // Creator Free client guard; DB owns plan limits.
+export const MAX_COVER_BYTES = 2 * 1024 * 1024;
+export const ACCEPTED_AUDIO = "audio/mpeg,audio/mp3";
 export const ACCEPTED_IMAGE = "image/jpeg,image/png,image/webp";
 
 export function formatDuration(totalSec: number): string {

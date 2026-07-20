@@ -112,7 +112,7 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
             hint={
               values.audio
                 ? `${formatDuration(values.duration_sec)} · ${(values.audio.size / (1024 * 1024)).toFixed(1)} MB`
-                : "MP3, WAV, FLAC — up to 50MB"
+                : "MP3 · your plan limit is checked before upload"
             }
           />
           <FilePicker
@@ -122,7 +122,7 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
             onChange={handleCover}
             icon={<ImageIcon className="h-5 w-5" />}
             preview={coverPreview}
-            hint="JPG, PNG or WebP — up to 8MB"
+            hint="JPG, PNG or WebP — up to 2MB"
           />
         </div>
       </ProfileCard>

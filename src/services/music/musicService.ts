@@ -7,6 +7,7 @@ import type {
   TrackInput,
 } from "@/features/music/schema";
 import { MAX_AUDIO_BYTES, MAX_COVER_BYTES } from "@/features/music/schema";
+import { membershipService } from "@/services/membership/membershipService";
 
 const AUDIO_BUCKET = "music-audio";
 const COVER_BUCKET = "music-covers";
@@ -48,7 +49,14 @@ export interface UploadTrackParams {
 
 export const musicService = {
   async uploadAudio(userId: string, file: File): Promise<string> {
-    if (file.size > MAX_AUDIO_BYTES) throw new Error("Audio file exceeds 50MB");
+    const membership = await membershipService.getMine().catch(() => null);
+    const maxBytes = membership?.limits.audio_bytes ?? MAX_AUDIO_BYTES;
+    if (file.size > maxBytes) {
+      throw new Error(`Audio files on your plan must be ${Math.round(maxBytes / 1024 / 1024)}MB or smaller`);
+    }
+    if (!file.type.match(/^audio\/(mpeg|mp3)$/) && !file.name.toLowerCase().endsWith(".mp3")) {
+      throw new Error("Choose an MP3 audio file");
+    }
     const path = `${userId}/${Date.now()}-${sanitize(file.name)}`;
     const { error } = await supabase.storage
       .from(AUDIO_BUCKET)
@@ -58,7 +66,7 @@ export const musicService = {
   },
 
   async uploadCover(userId: string, file: File): Promise<string> {
-    if (file.size > MAX_COVER_BYTES) throw new Error("Cover exceeds 8MB");
+    if (file.size > MAX_COVER_BYTES) throw new Error("Cover exceeds 2MB");
     const path = `${userId}/covers/${Date.now()}-${sanitize(file.name)}`;
     const { error } = await supabase.storage
       .from(COVER_BUCKET)

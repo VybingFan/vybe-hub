@@ -153,7 +153,7 @@ function MusicLibrary() {
     if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
       return toast.error("Choose a JPG, PNG, or WebP cover image.");
     }
-    if (file.size > MAX_COVER_BYTES) return toast.error("Cover exceeds 8MB");
+    if (file.size > MAX_COVER_BYTES) return toast.error("Cover exceeds 2MB");
     setCoverTrackId(track.id);
     try {
       await replaceCover.mutateAsync({ id: track.id, file });

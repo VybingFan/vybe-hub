@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/admin")({ component: Admin
 const PLAN_LABELS: Record<CreatorPlan, string> = {
   creator_free: "Creator Free",
   creator_plus: "Creator Plus",
-  founding_beta: "Founding Beta",
+  founding_beta: "Founding Creator (invitation-only)",
 };
 
 function AdminPage() {

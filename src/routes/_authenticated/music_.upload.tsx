@@ -8,6 +8,9 @@ import { AlbumUploadForm, type AlbumUploadValues } from "@/components/musicUploa
 import { useUser } from "@/hooks/useUser";
 import { useCreateAlbum, useUploadTrack } from "@/hooks/useMusic";
 import { musicService } from "@/services/music/musicService";
+import { useMembership } from "@/hooks/useMembership";
+import { UsageMeter } from "@/components/membership/UsageMeter";
+import { Card, CardContent } from "@/components/ui/card";
 
 export const Route = createFileRoute("/_authenticated/music_/upload")({
   component: () => (
@@ -22,9 +25,13 @@ function UploadPage() {
   const navigate = useNavigate();
   const upload = useUploadTrack(user?.id);
   const createAlbum = useCreateAlbum(user?.id);
+  const { data: membership } = useMembership(!!user?.id);
 
   const submitSingle = async (values: SingleUploadValues) => {
     if (!values.audio) throw new Error("Audio file required");
+    if (membership && values.duration_sec > membership.limits.track_duration_sec) {
+      throw new Error(`Songs on your plan must be ${membership.limits.track_duration_sec / 60} minutes or shorter`);
+    }
     await upload.mutateAsync({
       input: {
         title: values.title,
@@ -50,6 +57,13 @@ function UploadPage() {
 
   const submitAlbum = async (values: AlbumUploadValues) => {
     if (!user?.id) throw new Error("Not authenticated");
+    if (membership) {
+      const remaining = membership.limits.uploaded_tracks - membership.usage.uploaded_tracks;
+      if (values.tracks.length > remaining) throw new Error(`Your plan has room for ${remaining} more song${remaining === 1 ? "" : "s"}`);
+      if (values.tracks.some((track) => track.duration_sec > membership.limits.track_duration_sec)) {
+        throw new Error(`Every song must be ${membership.limits.track_duration_sec / 60} minutes or shorter`);
+      }
+    }
     const album = await createAlbum.mutateAsync({
       input: {
         title: values.title,
@@ -101,6 +115,10 @@ function UploadPage() {
           <p className="text-sm text-muted-foreground">Release a single track or a full album.</p>
         </div>
       </div>
+
+      {membership && (
+        <Card><CardContent className="space-y-3 p-5"><div><p className="font-medium">{membership.recognition_code === "first_wave" ? "First Wave Creator" : membership.public_name}</p><p className="text-sm text-muted-foreground">MP3 only · up to {membership.limits.track_duration_sec / 60} minutes · up to {Math.round(membership.limits.audio_bytes / 1024 / 1024)}MB per song</p></div><UsageMeter label="Songs in library" used={membership.usage.uploaded_tracks} limit={membership.limits.uploaded_tracks} /></CardContent></Card>
+      )}
 
       <Tabs defaultValue="single">
         <TabsList>

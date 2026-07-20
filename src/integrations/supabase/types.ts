@@ -53,6 +53,7 @@ export type Database = {
           expires_at: string | null;
           granted_by: string | null;
           plan_code: string;
+          recognition_code: string | null;
           source_invite_id: string | null;
           starts_at: string;
           status: string;
@@ -64,6 +65,7 @@ export type Database = {
           expires_at?: string | null;
           granted_by?: string | null;
           plan_code: string;
+          recognition_code?: string | null;
           source_invite_id?: string | null;
           starts_at?: string;
           status?: string;
@@ -75,6 +77,7 @@ export type Database = {
           expires_at?: string | null;
           granted_by?: string | null;
           plan_code?: string;
+          recognition_code?: string | null;
           source_invite_id?: string | null;
           starts_at?: string;
           status?: string;
@@ -554,6 +557,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      get_my_creator_membership: {
+        Args: Record<PropertyKey, never>;
+        Returns: Json;
+      };
       create_creator_invite: {
         Args: {
           _assigned_plan?: string;

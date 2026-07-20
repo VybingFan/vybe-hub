@@ -71,7 +71,7 @@ function OnboardingPage() {
   return (
     <AuthCard
       title="Join the VYBE"
-      description="Choose a free account type. Paid upgrades and personal Founding Beta invitations unlock more."
+      description="Choose a free account type. Paid upgrades and personal Founding Creator invitations unlock more."
     >
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-3">
@@ -113,7 +113,7 @@ function OnboardingPage() {
         <div className="flex gap-3 rounded-xl border border-border/60 bg-muted/30 p-4 text-sm text-muted-foreground">
           <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <p>
-            Have a personal Founding Beta invitation? Open that link after creating your account to
+            Have a personal Founding Creator invitation? Open that link after creating your account to
             activate its expanded access.
           </p>
         </div>

@@ -16,6 +16,8 @@ import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 import { authService } from "@/services/auth/authService";
 import { displayNameSchema, resetPasswordSchema } from "@/features/auth/roles";
 import { playNotificationChime } from "@/lib/notificationSound";
+import { useMembership } from "@/hooks/useMembership";
+import { UsageMeter } from "@/components/membership/UsageMeter";
 
 export const Route = createFileRoute("/_authenticated/settings")({ component: SettingsPage });
 
@@ -35,6 +37,7 @@ function SettingsContent() {
   const { profile, user, primaryRole, refresh } = useUser();
   const { signOut, updatePassword } = useAuth();
   const { data: creator } = useCreatorProfile(user?.id);
+  const { data: membership } = useMembership(primaryRole === "creator" || primaryRole === "admin");
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
   const [preferences, setPreferences] = useState<Record<string, boolean>>({ email: true, followers: true, playlists: true, merch: true, sound: false });
 
@@ -88,7 +91,7 @@ function SettingsContent() {
       <header><h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Settings</h1><p className="mt-1 text-sm text-muted-foreground">Manage your account, membership, security, and app experience.</p></header>
 
       <Section title="Membership">
-        <Card className="overflow-hidden border-primary/30 bg-gradient-hero"><CardContent className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between"><div><p className="flex items-center gap-2 text-sm font-semibold text-primary"><Crown className="h-4 w-4" /> CURRENT MEMBERSHIP</p><h2 className="mt-2 text-2xl font-semibold">{primaryRole === "creator" ? "Founding Creator — Alpha" : "VYBE Alpha Member"}</h2><p className="mt-2 text-sm text-muted-foreground">Early showcase access while plans, benefits, and pricing are being designed.</p></div><Button disabled variant="outline">Upgrade options coming soon</Button></CardContent></Card>
+        <Card className="overflow-hidden border-primary/30 bg-gradient-hero"><CardContent className="p-6"><div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"><div><p className="flex items-center gap-2 text-sm font-semibold text-primary"><Crown className="h-4 w-4" /> CURRENT MEMBERSHIP</p><h2 className="mt-2 text-2xl font-semibold">{membership?.recognition_code === "first_wave" ? "First Wave Creator" : membership?.public_name || (primaryRole === "creator" ? "Creator membership" : "VYBE Member")}</h2><p className="mt-2 max-w-2xl text-sm text-muted-foreground">{membership?.description || "Membership details will appear here."}</p>{membership?.recognition_code === "first_wave" && <p className="mt-2 text-xs font-medium text-primary">Early public Creator Plus supporter recognition</p>}</div><Button disabled variant="outline">Billing coming later</Button></div>{membership && <div className="mt-6 grid gap-4 border-t border-border/60 pt-6 sm:grid-cols-2"><UsageMeter label="Songs in library" used={membership.usage.uploaded_tracks} limit={membership.limits.uploaded_tracks} /><UsageMeter label="Published songs" used={membership.usage.published_tracks} limit={membership.limits.published_tracks} /><UsageMeter label="Published playlists" used={membership.usage.published_playlists} limit={membership.limits.published_playlists} /><UsageMeter label="Merch showcase" used={membership.usage.merch_items} limit={membership.limits.merch_items} /><UsageMeter label="Active connections" used={membership.usage.active_connections} limit={membership.limits.active_connections} /></div>}</CardContent></Card>
       </Section>
 
       <Section title="Appearance">
@@ -109,7 +112,7 @@ function SettingsContent() {
       </Section>
 
       <Section title="Creator AI roadmap">
-        <Card className="border-primary/20"><CardContent className="flex gap-4 p-6"><Sparkles className="mt-1 h-6 w-6 shrink-0 text-primary" /><div><h2 className="font-semibold">VYBE Creator Assistant — planned for V23</h2><p className="mt-2 text-sm text-muted-foreground">Planned assistance includes drafting bios and product descriptions, organizing releases and playlists, improving profile completeness, and guiding creators through available tools. Nothing will publish without creator review.</p></div></CardContent></Card>
+        <Card className="border-primary/20"><CardContent className="flex gap-4 p-6"><Sparkles className="mt-1 h-6 w-6 shrink-0 text-primary" /><div><h2 className="font-semibold">VYBE Creator Assistant — planned</h2><p className="mt-2 text-sm text-muted-foreground">Planned assistance includes drafting bios and product descriptions, organizing releases and playlists, improving profile completeness, and guiding creators through available tools. Nothing will publish without creator review.</p></div></CardContent></Card>
       </Section>
 
       <Section title="Account management"><Card><CardContent className="p-6"><p className="text-sm text-muted-foreground">Account deletion is not automated during alpha testing. Contact VYBE support to request account removal and data review.</p></CardContent></Card></Section>

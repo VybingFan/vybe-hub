@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { MerchProduct } from "@/features/merch/schema";
 
 const BUCKET = "music-covers";
-const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 
 async function hydrate(product: MerchProduct): Promise<MerchProduct> {
   if (!product.image_path) return product;
@@ -27,7 +27,7 @@ export const merchService = {
   ) {
     let imagePath: string | null = null;
     if (image) {
-      if (image.size > MAX_IMAGE_BYTES) throw new Error("Image must be 8MB or smaller");
+      if (image.size > MAX_IMAGE_BYTES) throw new Error("Image must be 2MB or smaller");
       if (!image.type.startsWith("image/")) throw new Error("Choose a JPG, PNG, or WebP image");
       const safeName = image.name.replace(/[^a-zA-Z0-9._-]+/g, "_");
       imagePath = `${creatorId}/merch/${Date.now()}-${safeName}`;
