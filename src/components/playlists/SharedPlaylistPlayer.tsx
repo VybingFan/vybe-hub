@@ -9,12 +9,15 @@ import { activityService } from "@/services/activity/activityService";
 export function SharedPlaylistPlayer({
   tracks,
   playlistSlug,
+  initialTrackId,
 }: {
   tracks: Track[];
-  playlistSlug: string;
+  playlistSlug?: string;
+  initialTrackId?: string;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [current, setCurrent] = useState(0);
+  const initialIndex = initialTrackId ? tracks.findIndex((item) => item.id === initialTrackId) : -1;
+  const [current, setCurrent] = useState(initialIndex >= 0 ? initialIndex : 0);
   const [playing, setPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [volume, setVolume] = useState(0.85);
@@ -22,6 +25,15 @@ export function SharedPlaylistPlayer({
   const [shuffle, setShuffle] = useState(false);
   const recordedTracks = useRef(new Set<string>());
   const track = tracks[current];
+
+  useEffect(() => {
+    if (!initialTrackId) return;
+    const index = tracks.findIndex((item) => item.id === initialTrackId);
+    if (index >= 0) {
+      setCurrent(index);
+      setElapsed(0);
+    }
+  }, [initialTrackId, tracks]);
 
   useEffect(() => {
     setElapsed(0);
@@ -77,7 +89,7 @@ export function SharedPlaylistPlayer({
         ref={audioRef}
         src={track.audio_url}
         onPlay={() => {
-          if (!recordedTracks.current.has(track.id)) {
+          if (playlistSlug && !recordedTracks.current.has(track.id)) {
             recordedTracks.current.add(track.id);
             void activityService.record(playlistSlug, "playback_started", track.id);
           }
@@ -178,6 +190,9 @@ export function SharedPlaylistPlayer({
         </div>
       </div>
       <div className="border-t border-border/70 p-3 md:p-5">
+        <p className="px-4 pb-2 text-xs font-semibold uppercase tracking-[.18em] text-muted-foreground">
+          More from this creator
+        </p>
         {tracks.map((item, index) => (
           <button
             key={item.id}

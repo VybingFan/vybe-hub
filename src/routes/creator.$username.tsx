@@ -15,7 +15,13 @@ function CreatorPage() {
   return <PublicArtistHome username={username} />;
 }
 
-export function PublicArtistHome({ username }: { username: string }) {
+export function PublicArtistHome({
+  username,
+  selectedTrackId,
+}: {
+  username: string;
+  selectedTrackId?: string;
+}) {
   const { data, isLoading, error } = usePublicCreator(username);
   if (isLoading)
     return (
@@ -109,12 +115,17 @@ export function PublicArtistHome({ username }: { username: string }) {
             </div>
           </div>
         </section>
-        <section className="mx-auto grid max-w-7xl gap-10 px-6 py-10 lg:grid-cols-[1.3fr_.7fr]">
+        <section
+          id="music"
+          className="mx-auto grid scroll-mt-8 max-w-7xl gap-10 px-6 py-10 lg:grid-cols-[1.3fr_.7fr]"
+        >
           <div>
             <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Music</p>
-            <h2 className="mt-2 text-3xl font-semibold">Listen without leaving the page</h2>
+            <h2 className="mt-2 text-3xl font-semibold">
+              {selectedTrackId ? "Your selected song" : "Listen without leaving the page"}
+            </h2>
             <div className="mt-6">
-              <SharedPlaylistPlayer tracks={tracks} />
+              <SharedPlaylistPlayer tracks={tracks} initialTrackId={selectedTrackId} />
             </div>
           </div>
           <aside className="space-y-5">
@@ -177,7 +188,8 @@ export function PublicArtistHome({ username }: { username: string }) {
                       {product.description}
                     </p>
                     <Badge variant="outline" className="mt-3">
-                      {MERCH_AVAILABILITY.find((status) => status.value === product.availability)?.label || "Coming soon"}
+                      {MERCH_AVAILABILITY.find((status) => status.value === product.availability)
+                        ?.label || "Coming soon"}
                     </Badge>
                     <div className="mt-4 flex items-center justify-between">
                       <span className="font-medium">
