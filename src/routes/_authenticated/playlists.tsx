@@ -1,6 +1,6 @@
 import { FormEvent, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Copy, ListMusic, Loader2, Plus, Upload } from "lucide-react";
+import { Check, Copy, ListMusic, Loader2, Plus, Search, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useUser } from "@/hooks/useUser";
-import { useCreatorTracks } from "@/hooks/useMusic";
+import { useCreatorTracks, useUpdateTrack } from "@/hooks/useMusic";
 import { useCreatePlaylist, useMyPlaylists } from "@/hooks/usePlaylists";
 import { formatDuration } from "@/features/music/schema";
 import { PLAYLIST_PURPOSES } from "@/features/playlists/schema";
@@ -33,12 +33,31 @@ export const Route = createFileRoute("/_authenticated/playlists")({
 function PlaylistStudio() {
   const { user } = useUser();
   const { data: tracks = [], isLoading } = useCreatorTracks(user?.id);
+  const updateTrack = useUpdateTrack(user?.id);
   const { data: creatorProfile } = useCreatorProfile(user?.id);
   const { data: playlists = [] } = useMyPlaylists(user?.id);
   const create = useCreatePlaylist(user?.id);
   const [selected, setSelected] = useState<string[]>([]);
+  const [songQuery, setSongQuery] = useState("");
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
-  const published = useMemo(() => tracks.filter((track) => track.status === "published"), [tracks]);
+  const visibleTracks = useMemo(() => {
+    const query = songQuery.trim().toLowerCase();
+    if (!query) return tracks;
+    return tracks.filter(
+      (track) =>
+        track.title.toLowerCase().includes(query) ||
+        (track.genre || "").toLowerCase().includes(query),
+    );
+  }, [songQuery, tracks]);
+
+  const publishTrack = async (trackId: string) => {
+    try {
+      await updateTrack.mutateAsync({ id: trackId, patch: { status: "published" } });
+      toast.success("Song published. You can now add it to the playlist.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not publish song");
+    }
+  };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -138,19 +157,30 @@ function PlaylistStudio() {
             </div>
             <div>
               <Label>Choose songs in play order</Label>
+              <div className="relative mt-2">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={songQuery}
+                  onChange={(event) => setSongQuery(event.target.value)}
+                  placeholder="Search your uploaded songs by title or genre"
+                  className="pl-9"
+                />
+              </div>
               <div className="mt-2 max-h-80 space-y-2 overflow-auto rounded-2xl border border-border p-2">
                 {isLoading ? (
                   <Loader2 className="m-6 animate-spin" />
-                ) : published.length ? (
-                  published.map((track) => {
+                ) : visibleTracks.length ? (
+                  visibleTracks.map((track) => {
                     const checked = selected.includes(track.id);
+                    const isPublished = track.status === "published";
                     return (
-                      <label
+                      <div
                         key={track.id}
-                        className="flex cursor-pointer items-center gap-3 rounded-xl p-3 hover:bg-white/5"
+                        className="flex items-center gap-3 rounded-xl p-3 hover:bg-white/5"
                       >
                         <Checkbox
                           checked={checked}
+                          disabled={!isPublished}
                           onCheckedChange={(value) =>
                             setSelected((current) =>
                               value
@@ -162,15 +192,30 @@ function PlaylistStudio() {
                         <span className="min-w-0 flex-1">
                           <span className="block truncate font-medium">{track.title}</span>
                           <span className="text-xs text-muted-foreground">
-                            {track.genre || "No genre"}
+                            {track.genre || "No genre"} · {isPublished ? "Published" : "Draft"}
                           </span>
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {formatDuration(track.duration_sec)}
                         </span>
-                      </label>
+                        {!isPublished && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            disabled={updateTrack.isPending}
+                            onClick={() => publishTrack(track.id)}
+                          >
+                            Publish
+                          </Button>
+                        )}
+                      </div>
                     );
                   })
+                ) : tracks.length ? (
+                  <p className="p-5 text-sm text-muted-foreground">
+                    No uploaded songs match “{songQuery}”. Try another title or genre.
+                  </p>
                 ) : (
                   <div className="p-5 text-sm text-muted-foreground">
                     <p>
@@ -187,7 +232,7 @@ function PlaylistStudio() {
               </div>
             </div>
             <Button
-              disabled={create.isPending || !published.length}
+              disabled={create.isPending || !selected.length}
               size="lg"
               className="bg-gradient-brand text-white"
             >
