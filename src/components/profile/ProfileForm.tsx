@@ -84,14 +84,25 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId }:
     }
   };
 
-  const submit = handleSubmit(async (values) => {
-    try {
-      await onSubmit(values);
-      toast.success("Profile saved");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save profile");
-    }
-  });
+  const submit = handleSubmit(
+    async (values) => {
+      try {
+        await onSubmit(values);
+        toast.success("Profile saved");
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Failed to save profile");
+      }
+    },
+    (validationErrors) => {
+      const firstError = Object.values(validationErrors).find((error) => error?.message);
+      toast.error(
+        typeof firstError?.message === "string"
+          ? firstError.message
+          : "Check the highlighted profile fields before saving.",
+      );
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+  );
 
   return (
     <form onSubmit={submit} className="space-y-6">

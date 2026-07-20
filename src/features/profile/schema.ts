@@ -8,6 +8,15 @@ const optionalUrl = z
   .optional()
   .or(z.literal(""));
 
+// Signed storage URLs are intentionally much longer than public website URLs.
+const optionalMediaUrl = z
+  .string()
+  .trim()
+  .max(4096)
+  .url({ message: "Uploaded image URL is invalid" })
+  .optional()
+  .or(z.literal(""));
+
 const optionalHandle = z.string().trim().max(120).optional().or(z.literal(""));
 
 export const personalLinkSchema = z.object({
@@ -29,8 +38,8 @@ export const creatorProfileSchema = z.object({
   genre: z.string().trim().max(60).optional().or(z.literal("")),
   genres: z.array(z.string().min(1).max(60)).min(1, "Choose at least one genre").max(5),
   location: z.string().trim().max(120).optional().or(z.literal("")),
-  avatar_url: optionalUrl,
-  cover_url: optionalUrl,
+  avatar_url: optionalMediaUrl,
+  cover_url: optionalMediaUrl,
   avatar_path: z.string().max(500).optional().nullable(),
   cover_path: z.string().max(500).optional().nullable(),
   website: optionalUrl,
