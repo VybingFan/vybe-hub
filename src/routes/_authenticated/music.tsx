@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Loader2, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/music")({
 });
 
 function MusicLibrary() {
-  const navigate = useNavigate();
+  const openUpload = () => window.location.assign("/music/upload");
   const { user } = useUser();
   const { data: tracks = [], isLoading, error } = useCreatorTracks(user?.id);
   const del = useDeleteTrack(user?.id);
@@ -93,7 +93,7 @@ function MusicLibrary() {
         action={
           <Button
             type="button"
-            onClick={() => navigate({ to: "/music/upload" })}
+            onClick={openUpload}
             className="bg-gradient-brand text-primary-foreground shadow-glow"
           >
             <Plus className="mr-2 h-4 w-4" /> Upload
@@ -151,7 +151,7 @@ function MusicLibrary() {
                 ? undefined
                 : {
                     label: "Upload your first song",
-                    onClick: () => navigate({ to: "/music/upload" }),
+                    onClick: openUpload,
                   }
             }
           />

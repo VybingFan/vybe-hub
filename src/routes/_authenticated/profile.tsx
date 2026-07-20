@@ -56,12 +56,6 @@ function CreatorProfileContent({
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
-      <ProfileHeader
-        profile={profile ?? {}}
-        email={email}
-        isEditing={isEditing}
-        onEditToggle={() => canEdit && setIsEditing((v) => !v)}
-      />
       {isEditing && canEdit ? (
         <ProfileForm
           initial={profile ?? null}
@@ -71,7 +65,15 @@ function CreatorProfileContent({
           submitting={save.isPending}
         />
       ) : (
-        <ProfileView profile={profile ?? null} />
+        <>
+          <ProfileHeader
+            profile={profile ?? {}}
+            email={email}
+            isEditing={false}
+            onEditToggle={() => canEdit && setIsEditing(true)}
+          />
+          <ProfileView profile={profile ?? null} />
+        </>
       )}
     </div>
   );

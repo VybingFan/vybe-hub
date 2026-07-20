@@ -95,6 +95,69 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId }:
 
   return (
     <form onSubmit={submit} className="space-y-6">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">
+            Creator profile
+          </p>
+          <h1 className="mt-1 text-3xl font-semibold">Edit your public profile</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Changes appear publicly after you select Save profile.
+          </p>
+        </div>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
+          Cancel
+        </Button>
+      </div>
+
+      <ProfileCard
+        title="Profile and cover images"
+        description="Click either image to upload. Cover: 1600 × 400 px recommended. Profile: 800 × 800 px recommended. JPG, PNG, or WebP up to 8MB. Keep important details centered for mobile cropping."
+      >
+        <label className="group relative block h-52 cursor-pointer overflow-hidden rounded-2xl border border-border bg-muted">
+          <img
+            src={coverPreview || "/banners/default-creator-banner.png"}
+            alt="Cover preview"
+            className="h-full w-full object-cover"
+          />
+          <span className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition group-hover:opacity-100">
+            {uploading === "cover" ? (
+              <Loader2 className="animate-spin text-white" />
+            ) : (
+              <span className="flex items-center gap-2 text-sm font-medium text-white">
+                <Camera className="h-5 w-5" /> Change cover
+              </span>
+            )}
+          </span>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={(event) => upload("cover", event.target.files?.[0])}
+          />
+        </label>
+        <label className="group relative -mt-14 ml-6 block h-28 w-28 cursor-pointer overflow-hidden rounded-3xl border-4 border-card bg-muted shadow-elevated">
+          <img
+            src={avatarPreview || "/avatars/default-avatar.png"}
+            alt="Profile preview"
+            className="h-full w-full object-cover"
+          />
+          <span className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition group-hover:opacity-100">
+            {uploading === "avatar" ? (
+              <Loader2 className="animate-spin text-white" />
+            ) : (
+              <Camera className="text-white" />
+            )}
+          </span>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={(event) => upload("avatar", event.target.files?.[0])}
+          />
+        </label>
+      </ProfileCard>
+
       <ProfileCard title="Basics" description="Your public identity on VYBE.">
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="VYBE username (your unique link)" error={errors.username?.message}>
@@ -155,54 +218,6 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId }:
             {bio.length.toLocaleString()} / 1,000 characters
           </p>
         </Field>
-      </ProfileCard>
-
-      <ProfileCard
-        title="Imagery"
-        description="Click either image to upload. Cover: 1600 × 400 px recommended. Profile: 800 × 800 px recommended. JPG, PNG, or WebP up to 8MB. Keep important details centered for mobile cropping."
-      >
-        <label className="group relative block h-52 cursor-pointer overflow-hidden rounded-2xl border border-border bg-muted">
-          <img
-            src={coverPreview || "/banners/default-creator-banner.png"}
-            alt="Cover preview"
-            className="h-full w-full object-cover"
-          />
-          <span className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition group-hover:opacity-100">
-            {uploading === "cover" ? (
-              <Loader2 className="animate-spin text-white" />
-            ) : (
-              <span className="flex items-center gap-2 text-sm font-medium text-white">
-                <Camera className="h-5 w-5" /> Change cover
-              </span>
-            )}
-          </span>
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            className="hidden"
-            onChange={(event) => upload("cover", event.target.files?.[0])}
-          />
-        </label>
-        <label className="group relative -mt-14 ml-6 block h-28 w-28 cursor-pointer overflow-hidden rounded-3xl border-4 border-card bg-muted shadow-elevated">
-          <img
-            src={avatarPreview || "/avatars/default-avatar.png"}
-            alt="Profile preview"
-            className="h-full w-full object-cover"
-          />
-          <span className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition group-hover:opacity-100">
-            {uploading === "avatar" ? (
-              <Loader2 className="animate-spin text-white" />
-            ) : (
-              <Camera className="text-white" />
-            )}
-          </span>
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            className="hidden"
-            onChange={(event) => upload("avatar", event.target.files?.[0])}
-          />
-        </label>
       </ProfileCard>
 
       <ProfileCard
