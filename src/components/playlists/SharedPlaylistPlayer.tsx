@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, SkipBack, SkipForward } from "lucide-react";
+import { Pause, Play, Repeat2, Shuffle, SkipBack, SkipForward, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,9 @@ export function SharedPlaylistPlayer({ tracks }: { tracks: Track[] }) {
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [volume, setVolume] = useState(0.85);
+  const [repeat, setRepeat] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
   const track = tracks[current];
 
   useEffect(() => {
@@ -34,11 +37,30 @@ export function SharedPlaylistPlayer({ tracks }: { tracks: Track[] }) {
     else await audioRef.current.play();
     setPlaying(!playing);
   };
-  const next = () => setCurrent((value) => (value + 1 < tracks.length ? value + 1 : 0));
+  const next = () => {
+    if (repeat) {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => setPlaying(false));
+      }
+      return;
+    }
+    setCurrent((value) =>
+      shuffle && tracks.length > 1
+        ? (value + 1 + Math.floor(Math.random() * (tracks.length - 1))) % tracks.length
+        : value + 1 < tracks.length
+          ? value + 1
+          : 0,
+    );
+  };
   const previous = () => setCurrent((value) => (value > 0 ? value - 1 : tracks.length - 1));
   const seek = ([value]: number[]) => {
     if (audioRef.current) audioRef.current.currentTime = value;
     setElapsed(value);
+  };
+  const changeVolume = ([value]: number[]) => {
+    setVolume(value);
+    if (audioRef.current) audioRef.current.volume = value;
   };
 
   return (
@@ -48,6 +70,9 @@ export function SharedPlaylistPlayer({ tracks }: { tracks: Track[] }) {
         src={track.audio_url}
         onTimeUpdate={(e) => setElapsed(e.currentTarget.currentTime)}
         onEnded={next}
+        onLoadedMetadata={(event) => {
+          event.currentTarget.volume = volume;
+        }}
       />
       <div className="grid gap-7 p-6 md:grid-cols-[220px_1fr] md:p-8">
         <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-brand">
@@ -79,7 +104,17 @@ export function SharedPlaylistPlayer({ tracks }: { tracks: Track[] }) {
               <span>{formatDuration(track.duration_sec)}</span>
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-center gap-3">
+          <div className="mt-4 flex items-center justify-center gap-2 sm:gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShuffle((value) => !value)}
+              className={cn(shuffle && "bg-cyan-400/10 text-cyan-300")}
+              aria-pressed={shuffle}
+              aria-label="Shuffle playlist"
+            >
+              <Shuffle className="h-4 w-4" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={previous} aria-label="Previous song">
               <SkipBack />
             </Button>
@@ -98,6 +133,27 @@ export function SharedPlaylistPlayer({ tracks }: { tracks: Track[] }) {
             <Button variant="ghost" size="icon" onClick={next} aria-label="Next song">
               <SkipForward />
             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setRepeat((value) => !value)}
+              className={cn(repeat && "bg-pink-400/10 text-pink-300")}
+              aria-pressed={repeat}
+              aria-label="Repeat current song"
+            >
+              <Repeat2 className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="mx-auto mt-4 flex w-full max-w-52 items-center gap-3">
+            <Volume2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <Slider
+              min={0}
+              max={1}
+              step={0.05}
+              value={[volume]}
+              onValueChange={changeVolume}
+              aria-label="Volume"
+            />
           </div>
         </div>
       </div>
