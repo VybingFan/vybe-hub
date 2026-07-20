@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Headphones, Loader2, LockKeyhole } from "lucide-react";
+import { Headphones, Loader2, Music2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { SubmitButton } from "@/components/auth/SubmitButton";
@@ -16,6 +16,11 @@ export const Route = createFileRoute("/auth/onboarding")({
 
 const ROLE_META: Record<SelectableRole, { title: string; body: string; icon: typeof Headphones }> =
   {
+    creator: {
+      title: "I'm a Creator",
+      body: "Start with Creator Free. Build your page, publish within Free limits, and upgrade as you grow.",
+      icon: Music2,
+    },
     supporter: {
       title: "I'm a Supporter",
       body: "Follow creators, discover new music, and support the artists you love.",
@@ -30,7 +35,7 @@ function OnboardingPage() {
     isAuthenticated: useAuth().isAuthenticated,
   };
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<SelectableRole>("supporter");
+  const [selected, setSelected] = useState<SelectableRole>("creator");
   const [saving, setSaving] = useState(false);
 
   if (isLoading) {
@@ -66,7 +71,7 @@ function OnboardingPage() {
   return (
     <AuthCard
       title="Join the VYBE"
-      description="Creator Studio is currently a private, invitation-only beta."
+      description="Choose a free account type. Paid upgrades and personal Founding Beta invitations unlock more."
     >
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="space-y-3">
@@ -106,10 +111,10 @@ function OnboardingPage() {
           })}
         </div>
         <div className="flex gap-3 rounded-xl border border-border/60 bg-muted/30 p-4 text-sm text-muted-foreground">
-          <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <p>
-            Have a creator invitation? Open the personal link sent by the VYBE administrator after
-            creating your account.
+            Have a personal Founding Beta invitation? Open that link after creating your account to
+            activate its expanded access.
           </p>
         </div>
         <SubmitButton loading={saving}>Continue</SubmitButton>

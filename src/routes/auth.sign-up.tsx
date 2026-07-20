@@ -49,7 +49,7 @@ function SignUpPage() {
   return (
     <AuthCard
       title="Create your VYBE"
-      description="Join as a supporter. Creator Studio access requires a personal invitation."
+      description="Join as a supporter or begin with the Creator Free plan."
       footer={
         <>
           Already have an account?{" "}

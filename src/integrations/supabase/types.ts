@@ -579,6 +579,10 @@ export type Database = {
         Args: { _token: string };
         Returns: string;
       };
+      select_initial_role: {
+        Args: { _role: Database["public"]["Enums"]["app_role"] };
+        Returns: Database["public"]["Enums"]["app_role"];
+      };
     };
     Enums: {
       app_role: "creator" | "supporter" | "admin";
