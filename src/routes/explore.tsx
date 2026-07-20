@@ -181,8 +181,16 @@ function PublicExplorePage() {
                       <div className="min-w-0">
                         <h3 className="truncate font-semibold">{track.title}</h3>
                         <p className="truncate text-sm text-muted-foreground">
-                          {track.creator?.artist_name || track.creator?.display_name}
+                          {track.primary_artist_name ||
+                            track.creator?.artist_name ||
+                            track.creator?.display_name}
+                          {track.featured_artist_names.length
+                            ? ` feat. ${track.featured_artist_names.join(", ")}`
+                            : ""}
                           {track.genre ? ` · ${track.genre}` : ""}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground/70">
+                          Uploaded by {track.creator?.artist_name || track.creator?.display_name}
                         </p>
                       </div>
                       <ArrowRight className="ml-auto h-4 w-4 text-muted-foreground" />

@@ -17,6 +17,8 @@ export interface DiscoveryTrack {
   id: string;
   creator_id: string;
   title: string;
+  primary_artist_name: string;
+  featured_artist_names: string[];
   genre: string;
   description: string;
   cover_url: string | null;
@@ -53,7 +55,9 @@ export const publicDiscoveryService = {
       .limit(30);
     let tracksQuery = supabase
       .from("tracks")
-      .select("id,creator_id,title,genre,description,cover_url")
+      .select(
+        "id,creator_id,title,primary_artist_name,featured_artist_names,genre,description,cover_url",
+      )
       .eq("status", "published")
       .limit(40);
 
@@ -62,7 +66,7 @@ export const publicDiscoveryService = {
         `artist_name.ilike.${term},display_name.ilike.${term},genre.ilike.${term},location.ilike.${term},bio.ilike.${term}`,
       );
       tracksQuery = tracksQuery.or(
-        `title.ilike.${term},genre.ilike.${term},description.ilike.${term}`,
+        `title.ilike.${term},artist_credit_search.ilike.${term},genre.ilike.${term},description.ilike.${term}`,
       );
     }
 

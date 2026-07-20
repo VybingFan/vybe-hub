@@ -460,6 +460,7 @@ export type Database = {
       tracks: {
         Row: {
           album_id: string | null;
+          artist_credit_search: string;
           audio_url: string;
           cover_url: string | null;
           created_at: string;
@@ -469,6 +470,8 @@ export type Database = {
           genre: string;
           id: string;
           is_featured: boolean;
+          primary_artist_name: string;
+          featured_artist_names: string[];
           release_date: string | null;
           status: Database["public"]["Enums"]["content_status"];
           title: string;
@@ -477,6 +480,7 @@ export type Database = {
         };
         Insert: {
           album_id?: string | null;
+          artist_credit_search?: string;
           audio_url: string;
           cover_url?: string | null;
           created_at?: string;
@@ -486,6 +490,8 @@ export type Database = {
           genre?: string;
           id?: string;
           is_featured?: boolean;
+          primary_artist_name?: string;
+          featured_artist_names?: string[];
           release_date?: string | null;
           status?: Database["public"]["Enums"]["content_status"];
           title: string;
@@ -494,6 +500,7 @@ export type Database = {
         };
         Update: {
           album_id?: string | null;
+          artist_credit_search?: string;
           audio_url?: string;
           cover_url?: string | null;
           created_at?: string;
@@ -503,6 +510,8 @@ export type Database = {
           genre?: string;
           id?: string;
           is_featured?: boolean;
+          primary_artist_name?: string;
+          featured_artist_names?: string[];
           release_date?: string | null;
           status?: Database["public"]["Enums"]["content_status"];
           title?: string;

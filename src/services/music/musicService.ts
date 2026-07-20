@@ -79,6 +79,8 @@ export const musicService = {
     const insert = {
       creator_id: params.userId,
       title: params.input.title,
+      primary_artist_name: params.input.primary_artist_name,
+      featured_artist_names: params.input.featured_artist_names,
       description: params.input.description || "",
       genre: params.input.genre || "",
       release_date: params.input.release_date || null,
@@ -222,7 +224,11 @@ export const musicService = {
   },
 
   async fetchAlbumWithTracks(id: string): Promise<AlbumWithTracks | null> {
-    const { data: album, error } = await supabase.from("albums").select("*").eq("id", id).maybeSingle();
+    const { data: album, error } = await supabase
+      .from("albums")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
     if (error) throw error;
     if (!album) return null;
     const { data: tracks, error: tErr } = await supabase

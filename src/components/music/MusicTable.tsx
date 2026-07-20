@@ -45,6 +45,7 @@ export function MusicTable({ tracks, onEdit, onDelete, onToggleFeatured }: Props
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
+              <TableHead>Artist credit</TableHead>
               <TableHead>Genre</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Release</TableHead>
@@ -61,14 +62,25 @@ export function MusicTable({ tracks, onEdit, onDelete, onToggleFeatured }: Props
                     <span className="line-clamp-1">{t.title}</span>
                   </div>
                 </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {t.primary_artist_name || "—"}
+                  {t.featured_artist_names?.length
+                    ? ` feat. ${t.featured_artist_names.join(", ")}`
+                    : ""}
+                </TableCell>
                 <TableCell className="text-muted-foreground">{t.genre || "—"}</TableCell>
                 <TableCell>
-                  <Badge variant={t.status === "published" ? "default" : "outline"} className="capitalize">
+                  <Badge
+                    variant={t.status === "published" ? "default" : "outline"}
+                    className="capitalize"
+                  >
                     {t.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground">{t.release_date || "—"}</TableCell>
-                <TableCell className="text-right tabular-nums">{formatDuration(t.duration_sec)}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {formatDuration(t.duration_sec)}
+                </TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

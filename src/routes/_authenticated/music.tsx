@@ -8,6 +8,15 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -43,6 +52,10 @@ function MusicLibrary() {
   const upd = useUpdateTrack(user?.id);
   const replaceCover = useReplaceTrackCover(user?.id);
   const [coverTrackId, setCoverTrackId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<Track | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editPrimaryArtist, setEditPrimaryArtist] = useState("");
+  const [editFeaturedArtists, setEditFeaturedArtists] = useState("");
 
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | ContentStatus>("all");
@@ -52,9 +65,9 @@ function MusicLibrary() {
 
   const genres = useMemo(
     () =>
-      Array.from(new Set(tracks.map((track) => track.genre?.trim()).filter(Boolean) as string[])).sort(
-        (a, b) => a.localeCompare(b),
-      ),
+      Array.from(
+        new Set(tracks.map((track) => track.genre?.trim()).filter(Boolean) as string[]),
+      ).sort((a, b) => a.localeCompare(b)),
     [tracks],
   );
 
@@ -67,6 +80,8 @@ function MusicLibrary() {
       list = list.filter(
         (t) =>
           t.title.toLowerCase().includes(needle) ||
+          (t.primary_artist_name || "").toLowerCase().includes(needle) ||
+          (t.featured_artist_names || []).some((name) => name.toLowerCase().includes(needle)) ||
           (t.genre || "").toLowerCase().includes(needle) ||
           (t.description || "").toLowerCase().includes(needle),
       );
@@ -96,11 +111,33 @@ function MusicLibrary() {
     }
   };
 
-  const onEdit = async (t: Track) => {
-    const next = t.status === "published" ? "draft" : "published";
+  const onEdit = (t: Track) => {
+    setEditing(t);
+    setEditTitle(t.title);
+    setEditPrimaryArtist(t.primary_artist_name || "");
+    setEditFeaturedArtists((t.featured_artist_names || []).join(", "));
+  };
+
+  const saveCredits = async () => {
+    if (!editing) return;
+    if (!editTitle.trim() || !editPrimaryArtist.trim()) {
+      toast.error("Song title and primary artist are required");
+      return;
+    }
     try {
-      await upd.mutateAsync({ id: t.id, patch: { status: next } });
-      toast.success(`Marked as ${next}`);
+      await upd.mutateAsync({
+        id: editing.id,
+        patch: {
+          title: editTitle.trim(),
+          primary_artist_name: editPrimaryArtist.trim(),
+          featured_artist_names: editFeaturedArtists
+            .split(",")
+            .map((name) => name.trim())
+            .filter(Boolean),
+        },
+      });
+      toast.success("Track credits updated");
+      setEditing(null);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Update failed");
     }
@@ -143,7 +180,7 @@ function MusicLibrary() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search title or genre"
+              placeholder="Search title, artist, or genre"
               className="pl-9"
             />
           </div>
@@ -195,7 +232,8 @@ function MusicLibrary() {
         </div>
         {!!filtered.length && (
           <p className="text-sm text-muted-foreground">
-            Showing {Math.min(visibleLimit, filtered.length)} of {filtered.length} matching songs · {tracks.length} total
+            Showing {Math.min(visibleLimit, filtered.length)} of {filtered.length} matching songs ·{" "}
+            {tracks.length} total
           </p>
         )}
 
@@ -258,6 +296,53 @@ function MusicLibrary() {
           </div>
         )}
       </Section>
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit song and artist credits</DialogTitle>
+            <DialogDescription>
+              The uploader account remains separate from the performers credited here.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-track-title">Song title</Label>
+              <Input
+                id="edit-track-title"
+                value={editTitle}
+                onChange={(event) => setEditTitle(event.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-primary-artist">Primary performing artist</Label>
+              <Input
+                id="edit-primary-artist"
+                value={editPrimaryArtist}
+                onChange={(event) => setEditPrimaryArtist(event.target.value)}
+                placeholder="Poppa"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-featured-artists">Additional / featured artists</Label>
+              <Input
+                id="edit-featured-artists"
+                value={editFeaturedArtists}
+                onChange={(event) => setEditFeaturedArtists(event.target.value)}
+                placeholder="Jerzo, Calliope Slim"
+              />
+              <p className="text-xs text-muted-foreground">Separate multiple names with commas.</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>
+              Cancel
+            </Button>
+            <Button disabled={upd.isPending} onClick={() => void saveCredits()}>
+              {upd.isPending ? "Saving…" : "Save credits"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

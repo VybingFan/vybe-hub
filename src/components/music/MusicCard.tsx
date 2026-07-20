@@ -21,7 +21,12 @@ export function MusicCard({ track, onPlay, onCoverChange, coverPending, classNam
     event.target.value = "";
   };
   return (
-    <Card className={cn("group overflow-hidden border-border/50 transition hover:border-primary/40", className)}>
+    <Card
+      className={cn(
+        "group overflow-hidden border-border/50 transition hover:border-primary/40",
+        className,
+      )}
+    >
       <div className="relative aspect-square w-full overflow-hidden bg-muted">
         <img src={cover} alt={track.title} className="h-full w-full object-cover" />
         {onPlay && (
@@ -50,6 +55,12 @@ export function MusicCard({ track, onPlay, onCoverChange, coverPending, classNam
       </div>
       <CardContent className="space-y-1 p-4">
         <h3 className="line-clamp-1 font-semibold">{track.title}</h3>
+        <p className="line-clamp-1 text-xs text-muted-foreground">
+          {track.primary_artist_name || "Artist not credited"}
+          {track.featured_artist_names?.length
+            ? ` feat. ${track.featured_artist_names.join(", ")}`
+            : ""}
+        </p>
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span className="truncate">{track.genre || "—"}</span>
           <span>{formatDuration(track.duration_sec)}</span>

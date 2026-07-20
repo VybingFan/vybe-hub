@@ -31,6 +31,8 @@ export interface AlbumTrackDraft {
 
 export interface AlbumUploadValues {
   title: string;
+  primary_artist_name: string;
+  featured_artists: string;
   description: string;
   genre: string;
   release_date: string;
@@ -46,6 +48,8 @@ interface Props {
 
 const empty: AlbumUploadValues = {
   title: "",
+  primary_artist_name: "",
+  featured_artists: "",
   description: "",
   genre: "",
   release_date: "",
@@ -91,6 +95,7 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!values.title.trim()) return toast.error("Album title is required");
+    if (!values.primary_artist_name.trim()) return toast.error("Primary artist is required");
     if (values.tracks.length === 0) return toast.error("Add at least one track");
     try {
       await onSubmit(values);
@@ -116,12 +121,35 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
             <Input value={values.genre} onChange={(e) => update("genre", e.target.value)} />
           </div>
           <div className="space-y-1.5">
+            <Label>Primary performing artist</Label>
+            <Input
+              value={values.primary_artist_name}
+              onChange={(e) => update("primary_artist_name", e.target.value)}
+              placeholder="Artist or group name"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Additional / featured artists</Label>
+            <Input
+              value={values.featured_artists}
+              onChange={(e) => update("featured_artists", e.target.value)}
+              placeholder="Separate names with commas"
+            />
+          </div>
+          <div className="space-y-1.5">
             <Label>Release date</Label>
-            <Input type="date" value={values.release_date} onChange={(e) => update("release_date", e.target.value)} />
+            <Input
+              type="date"
+              value={values.release_date}
+              onChange={(e) => update("release_date", e.target.value)}
+            />
           </div>
           <div className="space-y-1.5">
             <Label>Status</Label>
-            <Select value={values.status} onValueChange={(v) => update("status", v as ContentStatus)}>
+            <Select
+              value={values.status}
+              onValueChange={(v) => update("status", v as ContentStatus)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -137,14 +165,22 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
         </div>
         <div className="space-y-1.5">
           <Label>Description</Label>
-          <Textarea rows={4} value={values.description} onChange={(e) => update("description", e.target.value)} />
+          <Textarea
+            rows={4}
+            value={values.description}
+            onChange={(e) => update("description", e.target.value)}
+          />
         </div>
         <label className="flex cursor-pointer flex-col gap-2 rounded-md border border-dashed border-border/70 p-4">
           <div className="flex items-center gap-2 text-sm font-medium">
             <ImageIcon className="h-5 w-5" /> Cover art
           </div>
-          {coverPreview && <img src={coverPreview} alt="" className="h-24 w-24 rounded-md object-cover" />}
-          <p className="text-xs text-muted-foreground">{values.cover?.name || "JPG, PNG or WebP"}</p>
+          {coverPreview && (
+            <img src={coverPreview} alt="" className="h-24 w-24 rounded-md object-cover" />
+          )}
+          <p className="text-xs text-muted-foreground">
+            {values.cover?.name || "JPG, PNG or WebP"}
+          </p>
           <Input type="file" accept={ACCEPTED_IMAGE} onChange={handleCover} className="hidden" />
           <Button type="button" variant="outline" size="sm" asChild>
             <span>{values.cover ? "Replace" : "Choose file"}</span>
@@ -159,7 +195,13 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
           <Button type="button" variant="outline" size="sm" asChild>
             <label className="cursor-pointer">
               <Plus className="mr-1 h-4 w-4" /> Add tracks
-              <input type="file" accept={ACCEPTED_AUDIO} multiple onChange={addTracks} className="hidden" />
+              <input
+                type="file"
+                accept={ACCEPTED_AUDIO}
+                multiple
+                onChange={addTracks}
+                className="hidden"
+              />
             </label>
           </Button>
         }
@@ -169,14 +211,19 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
         ) : (
           <ol className="space-y-2">
             {values.tracks.map((t, i) => (
-              <li key={i} className="flex items-center gap-3 rounded-md border border-border/50 p-3">
+              <li
+                key={i}
+                className="flex items-center gap-3 rounded-md border border-border/50 p-3"
+              >
                 <span className="w-6 text-sm tabular-nums text-muted-foreground">{i + 1}.</span>
                 <Input
                   value={t.title}
                   onChange={(e) => updateTrack(i, { title: e.target.value })}
                   className="flex-1"
                 />
-                <span className="text-xs tabular-nums text-muted-foreground">{formatDuration(t.duration_sec)}</span>
+                <span className="text-xs tabular-nums text-muted-foreground">
+                  {formatDuration(t.duration_sec)}
+                </span>
                 <Button type="button" variant="ghost" size="icon" onClick={() => removeTrack(i)}>
                   <Trash2 className="h-4 w-4" />
                 </Button>

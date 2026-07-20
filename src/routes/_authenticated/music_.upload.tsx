@@ -28,6 +28,11 @@ function UploadPage() {
     await upload.mutateAsync({
       input: {
         title: values.title,
+        primary_artist_name: values.primary_artist_name,
+        featured_artist_names: values.featured_artists
+          .split(",")
+          .map((name) => name.trim())
+          .filter(Boolean),
         description: values.description,
         genre: values.genre,
         release_date: values.release_date,
@@ -64,6 +69,11 @@ function UploadPage() {
         albumId: album.id,
         input: {
           title: t.title,
+          primary_artist_name: values.primary_artist_name,
+          featured_artist_names: values.featured_artists
+            .split(",")
+            .map((name) => name.trim())
+            .filter(Boolean),
           description: "",
           genre: values.genre,
           release_date: values.release_date,

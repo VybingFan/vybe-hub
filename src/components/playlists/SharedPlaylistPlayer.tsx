@@ -6,7 +6,13 @@ import { cn } from "@/lib/utils";
 import { formatDuration, type Track } from "@/features/music/schema";
 import { activityService } from "@/services/activity/activityService";
 
-export function SharedPlaylistPlayer({ tracks, playlistSlug }: { tracks: Track[]; playlistSlug: string }) {
+export function SharedPlaylistPlayer({
+  tracks,
+  playlistSlug,
+}: {
+  tracks: Track[];
+  playlistSlug: string;
+}) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -97,7 +103,13 @@ export function SharedPlaylistPlayer({ tracks, playlistSlug }: { tracks: Track[]
             Now playing
           </p>
           <h2 className="mt-2 truncate text-3xl font-semibold">{track.title}</h2>
-          <p className="mt-2 text-muted-foreground">{track.genre || "Independent music"}</p>
+          <p className="mt-2 text-muted-foreground">
+            {track.primary_artist_name || "Independent artist"}
+            {track.featured_artist_names?.length
+              ? ` feat. ${track.featured_artist_names.join(", ")}`
+              : ""}
+            {track.genre ? ` · ${track.genre}` : ""}
+          </p>
           <div className="mt-7">
             <Slider
               min={0}
@@ -181,7 +193,10 @@ export function SharedPlaylistPlayer({ tracks, playlistSlug }: { tracks: Track[]
             <span className="min-w-0 flex-1">
               <span className="block truncate font-medium">{item.title}</span>
               <span className="block truncate text-xs text-muted-foreground">
-                {item.genre || "VYBE artist"}
+                {item.primary_artist_name || "VYBE artist"}
+                {item.featured_artist_names?.length
+                  ? ` feat. ${item.featured_artist_names.join(", ")}`
+                  : ""}
               </span>
             </span>
             <span className="text-xs text-muted-foreground">
