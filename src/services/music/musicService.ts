@@ -113,6 +113,34 @@ export const musicService = {
     return hydrateTrack(data);
   },
 
+  async replaceTrackCover(userId: string, id: string, file: File): Promise<Track> {
+    const { data: existing, error: lookupError } = await supabase
+      .from("tracks")
+      .select("cover_url")
+      .eq("id", id)
+      .eq("creator_id", userId)
+      .single();
+    if (lookupError) throw lookupError;
+
+    const previousPath = (existing.cover_url as string | null) ?? null;
+    const coverPath = await this.uploadCover(userId, file);
+    const { data, error } = await supabase
+      .from("tracks")
+      .update({ cover_url: coverPath })
+      .eq("id", id)
+      .eq("creator_id", userId)
+      .select("*")
+      .single();
+    if (error) {
+      await this.removeStorage(COVER_BUCKET, coverPath);
+      throw error;
+    }
+    if (previousPath && previousPath !== coverPath) {
+      await this.removeStorage(COVER_BUCKET, previousPath);
+    }
+    return hydrateTrack(data);
+  },
+
   async deleteTrack(id: string): Promise<void> {
     const { data: existing } = await supabase
       .from("tracks")

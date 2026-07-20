@@ -19,8 +19,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { MusicCard } from "@/components/music/MusicCard";
 import { MusicTable } from "@/components/music/MusicTable";
 import { useUser } from "@/hooks/useUser";
-import { useCreatorTracks, useDeleteTrack, useUpdateTrack } from "@/hooks/useMusic";
-import type { ContentStatus, Track } from "@/features/music/schema";
+import {
+  useCreatorTracks,
+  useDeleteTrack,
+  useReplaceTrackCover,
+  useUpdateTrack,
+} from "@/hooks/useMusic";
+import { MAX_COVER_BYTES, type ContentStatus, type Track } from "@/features/music/schema";
 
 export const Route = createFileRoute("/_authenticated/music")({
   component: () => (
@@ -36,6 +41,8 @@ function MusicLibrary() {
   const { data: tracks = [], isLoading, error } = useCreatorTracks(user?.id);
   const del = useDeleteTrack(user?.id);
   const upd = useUpdateTrack(user?.id);
+  const replaceCover = useReplaceTrackCover(user?.id);
+  const [coverTrackId, setCoverTrackId] = useState<string | null>(null);
 
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | ContentStatus>("all");
@@ -82,6 +89,22 @@ function MusicLibrary() {
       toast.success(`Marked as ${next}`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Update failed");
+    }
+  };
+
+  const onCoverChange = async (track: Track, file: File) => {
+    if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
+      return toast.error("Choose a JPG, PNG, or WebP cover image.");
+    }
+    if (file.size > MAX_COVER_BYTES) return toast.error("Cover exceeds 8MB");
+    setCoverTrackId(track.id);
+    try {
+      await replaceCover.mutateAsync({ id: track.id, file });
+      toast.success(track.cover_url ? "Cover art replaced" : "Cover art added");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save cover art");
+    } finally {
+      setCoverTrackId(null);
     }
   };
 
@@ -164,7 +187,12 @@ function MusicLibrary() {
             <TabsContent value="grid" className="mt-4">
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                 {filtered.map((t) => (
-                  <MusicCard key={t.id} track={t} />
+                  <MusicCard
+                    key={t.id}
+                    track={t}
+                    onCoverChange={onCoverChange}
+                    coverPending={coverTrackId === t.id}
+                  />
                 ))}
               </div>
             </TabsContent>

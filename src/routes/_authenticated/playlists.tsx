@@ -61,7 +61,8 @@ function PlaylistStudio() {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     if (!selected.length) return toast.error("Choose at least one published song.");
     try {
       const playlist = await create.mutateAsync({
@@ -70,9 +71,11 @@ function PlaylistStudio() {
         occasion: String(form.get("occasion") || ""),
         trackIds: selected,
       });
+      if (!playlist?.slug) throw new Error("Playlist published without a share link. Refresh and try again.");
       setCreatedSlug(playlist.slug);
       setSelected([]);
-      event.currentTarget.reset();
+      setSongQuery("");
+      formElement.reset();
       toast.success("Playlist published. Your share link is ready.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not create playlist");
@@ -82,10 +85,30 @@ function PlaylistStudio() {
     creatorProfile?.username
       ? `/artist/${creatorProfile.username}/playlist/${slug}`
       : `/playlist/${slug}`;
+  const shareUrl = (slug: string) =>
+    `${typeof window !== "undefined" ? window.location.origin : ""}${playlistPath(slug)}`;
   const copy = async (slug: string) => {
-    const url = `${window.location.origin}${playlistPath(slug)}`;
-    await navigator.clipboard.writeText(url);
-    toast.success("Share link copied");
+    if (!slug) return toast.error("This playlist does not have a share link yet.");
+    const url = shareUrl(slug);
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const input = document.createElement("textarea");
+        input.value = url;
+        input.style.position = "fixed";
+        input.style.opacity = "0";
+        document.body.appendChild(input);
+        input.select();
+        const copied = document.execCommand("copy");
+        input.remove();
+        if (!copied) throw new Error("Clipboard access was denied");
+      }
+      toast.success("Share link copied");
+    } catch {
+      window.prompt("Copy this playlist link:", url);
+      toast.error("Automatic copy was blocked. Copy the displayed link instead.");
+    }
   };
 
   return (
@@ -106,7 +129,7 @@ function PlaylistStudio() {
             <p className="flex items-center gap-2 font-semibold">
               <Check className="h-5 w-5 text-primary" /> Ready to send
             </p>
-            <p className="mt-1 break-all text-sm text-muted-foreground">{`${typeof window !== "undefined" ? window.location.origin : ""}${playlistPath(createdSlug)}`}</p>
+            <p className="mt-1 break-all text-sm text-muted-foreground">{shareUrl(createdSlug)}</p>
           </div>
           <Button onClick={() => copy(createdSlug)}>
             <Copy className="mr-2 h-4 w-4" /> Copy link
@@ -269,6 +292,9 @@ function PlaylistStudio() {
                   <p className="font-semibold">{playlist.title}</p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {playlist.occasion || "Shared listening experience"}
+                  </p>
+                  <p className="mt-3 break-all text-xs text-muted-foreground">
+                    {shareUrl(playlist.slug)}
                   </p>
                   <Button
                     variant="outline"

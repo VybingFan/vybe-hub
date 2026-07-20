@@ -41,6 +41,17 @@ export function useUpdateTrack(userId: string | undefined) {
   });
 }
 
+export function useReplaceTrackCover(userId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, file }: { id: string; file: File }) => {
+      if (!userId) throw new Error("Not authenticated");
+      return musicService.replaceTrackCover(userId, id, file);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: creatorTracksKey(userId) }),
+  });
+}
+
 export function useDeleteTrack(userId: string | undefined) {
   const qc = useQueryClient();
   return useMutation({

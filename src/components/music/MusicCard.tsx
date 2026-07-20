@@ -1,4 +1,5 @@
-import { Play, Star } from "lucide-react";
+import type { ChangeEvent } from "react";
+import { ImagePlus, Play, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -7,11 +8,18 @@ import { formatDuration, type Track } from "@/features/music/schema";
 interface Props {
   track: Track;
   onPlay?: (track: Track) => void;
+  onCoverChange?: (track: Track, file: File) => void;
+  coverPending?: boolean;
   className?: string;
 }
 
-export function MusicCard({ track, onPlay, className }: Props) {
+export function MusicCard({ track, onPlay, onCoverChange, coverPending, className }: Props) {
   const cover = track.cover_url || "/banners/default-creator-banner.png";
+  const chooseCover = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) onCoverChange?.(track, file);
+    event.target.value = "";
+  };
   return (
     <Card className={cn("group overflow-hidden border-border/50 transition hover:border-primary/40", className)}>
       <div className="relative aspect-square w-full overflow-hidden bg-muted">
@@ -46,6 +54,19 @@ export function MusicCard({ track, onPlay, className }: Props) {
           <span className="truncate">{track.genre || "—"}</span>
           <span>{formatDuration(track.duration_sec)}</span>
         </div>
+        {onCoverChange && (
+          <label className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium transition hover:border-primary/60 hover:text-primary">
+            <ImagePlus className="h-4 w-4" />
+            {coverPending ? "Saving cover…" : track.cover_url ? "Replace cover" : "Add cover art"}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              disabled={coverPending}
+              onChange={chooseCover}
+            />
+          </label>
+        )}
       </CardContent>
     </Card>
   );
