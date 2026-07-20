@@ -50,7 +50,9 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
         <Logo variant="horizontal" />
         <h1 className="text-3xl font-semibold">This playlist is not available.</h1>
         <Button asChild>
-          <Link to="/">Discover VYBE</Link>
+          <Link to="/explore" search={{ q: "" }}>
+            Discover VYBE
+          </Link>
         </Button>
       </div>
     );
@@ -97,7 +99,9 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
               </p>
             </div>
             <Button asChild variant="ghost" size="sm" className="hidden text-white sm:inline-flex">
-              <Link to="/">Explore VYBE</Link>
+              <Link to="/explore" search={{ q: "" }}>
+                Explore VYBE
+              </Link>
             </Button>
             {preferredAppLink ? (
               <Button asChild size="sm" className="bg-white text-black hover:bg-white/90">
@@ -234,7 +238,9 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
               variant="ghost"
               className="rounded-full text-white hover:bg-white/10 hover:text-white"
             >
-              <Link to="/">Explore the VYBE site</Link>
+              <Link to="/explore" search={{ q: "" }}>
+                Explore the VYBE site
+              </Link>
             </Button>
           </div>
         </section>

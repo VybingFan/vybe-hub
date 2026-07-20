@@ -87,9 +87,9 @@ function Landing() {
                   variant="outline"
                   className="rounded-full bg-background/40 backdrop-blur"
                 >
-                  <a href="#discover">
+                  <Link to="/explore" search={{ q: "" }}>
                     <Play className="mr-2 h-4 w-4" /> Start discovering
-                  </a>
+                  </Link>
                 </Button>
               </div>
               <div className="mt-10 flex flex-wrap gap-7 text-sm text-muted-foreground">
@@ -141,9 +141,10 @@ function Landing() {
           </div>
           <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
             {genres.map((genre) => (
-              <a
+              <Link
                 key={genre.name}
-                href="/auth/sign-up"
+                to="/explore"
+                search={{ q: genre.name }}
                 className="group relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 bg-card content-glow"
                 style={{ "--card-glow": genre.color } as CSSProperties}
               >
@@ -157,7 +158,7 @@ function Landing() {
                   <h3 className="font-semibold text-white">{genre.name}</h3>
                   <ArrowRight className="h-4 w-4 text-white/75 transition group-hover:translate-x-1" />
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </section>

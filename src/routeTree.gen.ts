@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ForBusinessesRouteImport } from './routes/for-businesses'
 import { Route as ForArtistsRouteImport } from './routes/for-artists'
+import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -45,6 +46,11 @@ const ForBusinessesRoute = ForBusinessesRouteImport.update({
 const ForArtistsRoute = ForArtistsRouteImport.update({
   id: '/for-artists',
   path: '/for-artists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -178,6 +184,7 @@ const ArtistUsernamePlaylistSlugRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/explore': typeof ExploreRoute
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
   '/activity': typeof AuthenticatedActivityRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/explore': typeof ExploreRoute
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
   '/activity': typeof AuthenticatedActivityRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/explore': typeof ExploreRoute
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/explore'
     | '/for-artists'
     | '/for-businesses'
     | '/activity'
@@ -294,6 +304,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/explore'
     | '/for-artists'
     | '/for-businesses'
     | '/activity'
@@ -323,6 +334,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/explore'
     | '/for-artists'
     | '/for-businesses'
     | '/_authenticated/activity'
@@ -353,6 +365,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  ExploreRoute: typeof ExploreRoute
   ForArtistsRoute: typeof ForArtistsRoute
   ForBusinessesRoute: typeof ForBusinessesRoute
   ArtistUsernameRoute: typeof ArtistUsernameRoute
@@ -376,6 +389,13 @@ declare module '@tanstack/react-router' {
       path: '/for-artists'
       fullPath: '/for-artists'
       preLoaderRoute: typeof ForArtistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -611,6 +631,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  ExploreRoute: ExploreRoute,
   ForArtistsRoute: ForArtistsRoute,
   ForBusinessesRoute: ForBusinessesRoute,
   ArtistUsernameRoute: ArtistUsernameRoute,
