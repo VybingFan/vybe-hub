@@ -7,6 +7,7 @@ import type {
   TrackInput,
 } from "@/features/music/schema";
 import { MAX_AUDIO_BYTES, MAX_COVER_BYTES } from "@/features/music/schema";
+import { membershipService } from "@/services/membership/membershipService";
 
 const AUDIO_BUCKET = "music-audio";
 const COVER_BUCKET = "music-covers";
@@ -48,7 +49,14 @@ export interface UploadTrackParams {
 
 export const musicService = {
   async uploadAudio(userId: string, file: File): Promise<string> {
-    if (file.size > MAX_AUDIO_BYTES) throw new Error("Audio file exceeds 50MB");
+    const membership = await membershipService.getMine().catch(() => null);
+    const maxBytes = membership?.limits.audio_bytes ?? MAX_AUDIO_BYTES;
+    if (file.size > maxBytes) {
+      throw new Error(`Audio files on your plan must be ${Math.round(maxBytes / 1024 / 1024)}MB or smaller`);
+    }
+    if (!file.type.match(/^audio\/(mpeg|mp3)$/) && !file.name.toLowerCase().endsWith(".mp3")) {
+      throw new Error("Choose an MP3 audio file");
+    }
     const path = `${userId}/${Date.now()}-${sanitize(file.name)}`;
     const { error } = await supabase.storage
       .from(AUDIO_BUCKET)
@@ -58,7 +66,7 @@ export const musicService = {
   },
 
   async uploadCover(userId: string, file: File): Promise<string> {
-    if (file.size > MAX_COVER_BYTES) throw new Error("Cover exceeds 8MB");
+    if (file.size > MAX_COVER_BYTES) throw new Error("Cover exceeds 2MB");
     const path = `${userId}/covers/${Date.now()}-${sanitize(file.name)}`;
     const { error } = await supabase.storage
       .from(COVER_BUCKET)
@@ -79,11 +87,13 @@ export const musicService = {
     const insert = {
       creator_id: params.userId,
       title: params.input.title,
+      primary_artist_name: params.input.primary_artist_name,
+      featured_artist_names: params.input.featured_artist_names,
       description: params.input.description || "",
       genre: params.input.genre || "",
       release_date: params.input.release_date || null,
       duration_sec: params.input.duration_sec,
-      is_featured: params.input.is_featured,
+      is_featured: false,
       status: params.input.status,
       track_number: params.input.track_number ?? null,
       album_id: params.albumId ?? params.input.album_id ?? null,
@@ -97,7 +107,19 @@ export const musicService = {
       if (coverPath) await this.removeStorage(COVER_BUCKET, coverPath);
       throw error;
     }
+    if (params.input.is_featured) {
+      const { error: leadError } = await supabase.rpc("set_profile_lead_track", {
+        _track_id: data.id,
+      });
+      if (leadError) throw leadError;
+      data.is_featured = true;
+    }
     return hydrateTrack(data);
+  },
+
+  async setProfileLead(trackId: string | null): Promise<void> {
+    const { error } = await supabase.rpc("set_profile_lead_track", { _track_id: trackId });
+    if (error) throw error;
   },
 
   async updateTrack(id: string, patch: Partial<TrackInput>): Promise<Track> {
@@ -110,6 +132,34 @@ export const musicService = {
       .select("*")
       .single();
     if (error) throw error;
+    return hydrateTrack(data);
+  },
+
+  async replaceTrackCover(userId: string, id: string, file: File): Promise<Track> {
+    const { data: existing, error: lookupError } = await supabase
+      .from("tracks")
+      .select("cover_url")
+      .eq("id", id)
+      .eq("creator_id", userId)
+      .single();
+    if (lookupError) throw lookupError;
+
+    const previousPath = (existing.cover_url as string | null) ?? null;
+    const coverPath = await this.uploadCover(userId, file);
+    const { data, error } = await supabase
+      .from("tracks")
+      .update({ cover_url: coverPath })
+      .eq("id", id)
+      .eq("creator_id", userId)
+      .select("*")
+      .single();
+    if (error) {
+      await this.removeStorage(COVER_BUCKET, coverPath);
+      throw error;
+    }
+    if (previousPath && previousPath !== coverPath) {
+      await this.removeStorage(COVER_BUCKET, previousPath);
+    }
     return hydrateTrack(data);
   },
 
@@ -194,7 +244,11 @@ export const musicService = {
   },
 
   async fetchAlbumWithTracks(id: string): Promise<AlbumWithTracks | null> {
-    const { data: album, error } = await supabase.from("albums").select("*").eq("id", id).maybeSingle();
+    const { data: album, error } = await supabase
+      .from("albums")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
     if (error) throw error;
     if (!album) return null;
     const { data: tracks, error: tErr } = await supabase

@@ -12,10 +12,16 @@ const optionalDate = z
 
 export const trackSchema = z.object({
   title: z.string().trim().min(1, "Title required").max(120),
+  primary_artist_name: z.string().trim().min(1, "Primary artist required").max(160),
+  featured_artist_names: z.array(z.string().trim().min(1).max(160)).max(20).default([]),
   description: z.string().trim().max(1000).optional().or(z.literal("")),
   genre: z.string().trim().max(60).optional().or(z.literal("")),
   release_date: optionalDate,
-  duration_sec: z.number().int().min(0).max(60 * 60 * 3),
+  duration_sec: z
+    .number()
+    .int()
+    .min(0)
+    .max(60 * 60 * 3),
   is_featured: z.boolean(),
   status: z.enum(CONTENT_STATUSES),
   track_number: z.number().int().min(1).max(999).optional().nullable(),
@@ -55,9 +61,9 @@ export interface AlbumWithTracks extends Album {
   tracks: Track[];
 }
 
-export const MAX_AUDIO_BYTES = 50 * 1024 * 1024; // 50 MB
-export const MAX_COVER_BYTES = 8 * 1024 * 1024; // 8 MB
-export const ACCEPTED_AUDIO = "audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/mp4,audio/aac,audio/ogg,audio/flac";
+export const MAX_AUDIO_BYTES = 15 * 1024 * 1024; // Creator Free client guard; DB owns plan limits.
+export const MAX_COVER_BYTES = 2 * 1024 * 1024;
+export const ACCEPTED_AUDIO = "audio/mpeg,audio/mp3";
 export const ACCEPTED_IMAGE = "image/jpeg,image/png,image/webp";
 
 export function formatDuration(totalSec: number): string {

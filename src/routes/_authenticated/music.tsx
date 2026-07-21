@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Loader2, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
@@ -8,6 +8,15 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -22,9 +31,11 @@ import { useUser } from "@/hooks/useUser";
 import {
   useCreatorTracks,
   useDeleteTrack,
+  useReplaceTrackCover,
+  useSetProfileLead,
   useUpdateTrack,
 } from "@/hooks/useMusic";
-import type { ContentStatus, Track } from "@/features/music/schema";
+import { MAX_COVER_BYTES, type ContentStatus, type Track } from "@/features/music/schema";
 
 export const Route = createFileRoute("/_authenticated/music")({
   component: () => (
@@ -35,22 +46,47 @@ export const Route = createFileRoute("/_authenticated/music")({
 });
 
 function MusicLibrary() {
+  const openUpload = () => window.location.assign("/music/upload");
   const { user } = useUser();
   const { data: tracks = [], isLoading, error } = useCreatorTracks(user?.id);
   const del = useDeleteTrack(user?.id);
   const upd = useUpdateTrack(user?.id);
+  const replaceCover = useReplaceTrackCover(user?.id);
+  const setProfileLead = useSetProfileLead(user?.id);
+  const [coverTrackId, setCoverTrackId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<Track | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editPrimaryArtist, setEditPrimaryArtist] = useState("");
+  const [editFeaturedArtists, setEditFeaturedArtists] = useState("");
+  const [editStatus, setEditStatus] = useState<ContentStatus>("draft");
 
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | ContentStatus>("all");
+  const [genre, setGenre] = useState("all");
   const [sort, setSort] = useState<"newest" | "title" | "duration">("newest");
+  const [visibleLimit, setVisibleLimit] = useState(24);
+
+  const genres = useMemo(
+    () =>
+      Array.from(
+        new Set(tracks.map((track) => track.genre?.trim()).filter(Boolean) as string[]),
+      ).sort((a, b) => a.localeCompare(b)),
+    [tracks],
+  );
 
   const filtered = useMemo(() => {
     let list = tracks;
     if (status !== "all") list = list.filter((t) => t.status === status);
+    if (genre !== "all") list = list.filter((t) => t.genre === genre);
     if (q.trim()) {
       const needle = q.toLowerCase();
       list = list.filter(
-        (t) => t.title.toLowerCase().includes(needle) || (t.genre || "").toLowerCase().includes(needle),
+        (t) =>
+          t.title.toLowerCase().includes(needle) ||
+          (t.primary_artist_name || "").toLowerCase().includes(needle) ||
+          (t.featured_artist_names || []).some((name) => name.toLowerCase().includes(needle)) ||
+          (t.genre || "").toLowerCase().includes(needle) ||
+          (t.description || "").toLowerCase().includes(needle),
       );
     }
     const sorted = [...list];
@@ -58,7 +94,8 @@ function MusicLibrary() {
     else if (sort === "duration") sorted.sort((a, b) => b.duration_sec - a.duration_sec);
     else sorted.sort((a, b) => (b.created_at > a.created_at ? 1 : -1));
     return sorted;
-  }, [tracks, q, status, sort]);
+  }, [tracks, q, status, genre, sort]);
+  const visibleTracks = filtered.slice(0, visibleLimit);
 
   const onDelete = async (t: Track) => {
     try {
@@ -71,19 +108,60 @@ function MusicLibrary() {
 
   const onToggleFeatured = async (t: Track) => {
     try {
-      await upd.mutateAsync({ id: t.id, patch: { is_featured: !t.is_featured } });
+      await setProfileLead.mutateAsync(t.is_featured ? null : t.id);
+      toast.success(t.is_featured ? "Profile lead cleared" : `${t.title} is now your profile lead`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Update failed");
     }
   };
 
-  const onEdit = async (t: Track) => {
-    const next = t.status === "published" ? "draft" : "published";
+  const onEdit = (t: Track) => {
+    setEditing(t);
+    setEditTitle(t.title);
+    setEditPrimaryArtist(t.primary_artist_name || "");
+    setEditFeaturedArtists((t.featured_artist_names || []).join(", "));
+    setEditStatus(t.status);
+  };
+
+  const saveCredits = async () => {
+    if (!editing) return;
+    if (!editTitle.trim() || !editPrimaryArtist.trim()) {
+      toast.error("Song title and primary artist are required");
+      return;
+    }
     try {
-      await upd.mutateAsync({ id: t.id, patch: { status: next } });
-      toast.success(`Marked as ${next}`);
+      await upd.mutateAsync({
+        id: editing.id,
+        patch: {
+          title: editTitle.trim(),
+          primary_artist_name: editPrimaryArtist.trim(),
+          featured_artist_names: editFeaturedArtists
+            .split(",")
+            .map((name) => name.trim())
+            .filter(Boolean),
+          status: editStatus,
+        },
+      });
+      toast.success("Track credits updated");
+      setEditing(null);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Update failed");
+    }
+  };
+
+  const onCoverChange = async (track: Track, file: File) => {
+    if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
+      return toast.error("Choose a JPG, PNG, or WebP cover image.");
+    }
+    if (file.size > MAX_COVER_BYTES) return toast.error("Cover exceeds 2MB");
+    setCoverTrackId(track.id);
+    try {
+      await replaceCover.mutateAsync({ id: track.id, file });
+      toast.success(track.cover_url ? "Cover art replaced" : "Cover art added");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save cover art");
+    } finally {
+      setCoverTrackId(null);
     }
   };
 
@@ -93,10 +171,12 @@ function MusicLibrary() {
         title="Music library"
         description="Manage every song you've uploaded to VYBE."
         action={
-          <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
-            <Link to="/music/upload">
-              <Plus className="mr-2 h-4 w-4" /> Upload
-            </Link>
+          <Button
+            type="button"
+            onClick={openUpload}
+            className="bg-gradient-brand text-primary-foreground shadow-glow"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Upload
           </Button>
         }
       >
@@ -106,20 +186,49 @@ function MusicLibrary() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search title or genre"
+              placeholder="Search title, artist, or genre"
               className="pl-9"
             />
           </div>
-          <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
-            <SelectTrigger className="md:w-40"><SelectValue /></SelectTrigger>
+          <Select
+            value={status}
+            onValueChange={(v) => {
+              setStatus(v as typeof status);
+              setVisibleLimit(24);
+            }}
+          >
+            <SelectTrigger className="md:w-40">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All statuses</SelectItem>
               <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="published">Published</SelectItem>
             </SelectContent>
           </Select>
+          <Select
+            value={genre}
+            onValueChange={(value) => {
+              setGenre(value);
+              setVisibleLimit(24);
+            }}
+          >
+            <SelectTrigger className="md:w-44">
+              <SelectValue placeholder="All genres" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All genres</SelectItem>
+              {genres.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {item}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={sort} onValueChange={(v) => setSort(v as typeof sort)}>
-            <SelectTrigger className="md:w-40"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="md:w-40">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="newest">Newest first</SelectItem>
               <SelectItem value="title">Title A–Z</SelectItem>
@@ -127,6 +236,12 @@ function MusicLibrary() {
             </SelectContent>
           </Select>
         </div>
+        {!!filtered.length && (
+          <p className="text-sm text-muted-foreground">
+            Showing {Math.min(visibleLimit, filtered.length)} of {filtered.length} matching songs ·{" "}
+            {tracks.length} total
+          </p>
+        )}
 
         {isLoading ? (
           <div className="flex min-h-[30vh] items-center justify-center">
@@ -137,7 +252,19 @@ function MusicLibrary() {
         ) : filtered.length === 0 ? (
           <EmptyState
             title={tracks.length ? "No matches" : "No tracks yet"}
-            description={tracks.length ? "Try a different search or filter." : "Upload your first song to get started."}
+            description={
+              tracks.length
+                ? "Try a different search or filter."
+                : "Upload your first song to get started."
+            }
+            action={
+              tracks.length
+                ? undefined
+                : {
+                    label: "Upload your first song",
+                    onClick: openUpload,
+                  }
+            }
           />
         ) : (
           <Tabs defaultValue="grid">
@@ -147,12 +274,19 @@ function MusicLibrary() {
             </TabsList>
             <TabsContent value="grid" className="mt-4">
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {filtered.map((t) => <MusicCard key={t.id} track={t} />)}
+                {visibleTracks.map((t) => (
+                  <MusicCard
+                    key={t.id}
+                    track={t}
+                    onCoverChange={onCoverChange}
+                    coverPending={coverTrackId === t.id}
+                  />
+                ))}
               </div>
             </TabsContent>
             <TabsContent value="table" className="mt-4">
               <MusicTable
-                tracks={filtered}
+                tracks={visibleTracks}
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onToggleFeatured={onToggleFeatured}
@@ -160,7 +294,76 @@ function MusicLibrary() {
             </TabsContent>
           </Tabs>
         )}
+        {visibleLimit < filtered.length && (
+          <div className="flex justify-center pt-2">
+            <Button variant="outline" onClick={() => setVisibleLimit((value) => value + 24)}>
+              Load 24 more songs
+            </Button>
+          </div>
+        )}
       </Section>
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit song and artist credits</DialogTitle>
+            <DialogDescription>
+              The uploader account remains separate from the performers credited here.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-track-title">Song title</Label>
+              <Input
+                id="edit-track-title"
+                value={editTitle}
+                onChange={(event) => setEditTitle(event.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-primary-artist">Primary performing artist</Label>
+              <Input
+                id="edit-primary-artist"
+                value={editPrimaryArtist}
+                onChange={(event) => setEditPrimaryArtist(event.target.value)}
+                placeholder="Poppa"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-featured-artists">Additional / featured artists</Label>
+              <Input
+                id="edit-featured-artists"
+                value={editFeaturedArtists}
+                onChange={(event) => setEditFeaturedArtists(event.target.value)}
+                placeholder="Jerzo, Calliope Slim"
+              />
+              <p className="text-xs text-muted-foreground">Separate multiple names with commas.</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Publishing status</Label>
+              <Select
+                value={editStatus}
+                onValueChange={(value) => setEditStatus(value as ContentStatus)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>
+              Cancel
+            </Button>
+            <Button disabled={upd.isPending} onClick={() => void saveCredits()}>
+              {upd.isPending ? "Saving…" : "Save credits"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

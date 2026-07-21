@@ -41,6 +41,12 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-genre-rock: var(--genre-rock);
+  --color-genre-country: var(--genre-country);
+  --color-genre-pop: var(--genre-pop);
+  --color-genre-electronic: var(--genre-electronic);
+  --color-genre-soul: var(--genre-soul);
+  --color-genre-jazz: var(--genre-jazz);
   --font-display: "Space Grotesk", "Inter", sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
 }
@@ -92,8 +98,17 @@
   --sidebar-border: oklch(1 0 0 / 6%);
   --sidebar-ring: oklch(0.72 0.22 300);
 
+  /* Content colors keep the brand shell dark while giving music its own energy. */
+  --genre-rock: oklch(0.7 0.21 35);
+  --genre-country: oklch(0.78 0.15 75);
+  --genre-pop: oklch(0.76 0.2 355);
+  --genre-electronic: oklch(0.78 0.16 195);
+  --genre-soul: oklch(0.76 0.16 55);
+  --genre-jazz: oklch(0.72 0.13 235);
+
   --gradient-brand: linear-gradient(135deg, oklch(0.72 0.22 300), oklch(0.78 0.19 315));
-  --gradient-hero: radial-gradient(ellipse at top, oklch(0.72 0.22 300 / 0.25), transparent 60%),
+  --gradient-hero:
+    radial-gradient(ellipse at top, oklch(0.72 0.22 300 / 0.25), transparent 60%),
     radial-gradient(ellipse at bottom, oklch(0.78 0.19 315 / 0.18), transparent 60%);
   --shadow-glow: 0 20px 60px -20px oklch(0.72 0.22 300 / 0.55);
   --shadow-elevated: 0 20px 50px -25px oklch(0 0 0 / 0.6);
@@ -150,6 +165,11 @@
   color: transparent;
 }
 
+@utility content-glow {
+  box-shadow: 0 24px 80px -36px
+    color-mix(in oklab, var(--card-glow, var(--primary)) 70%, transparent);
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -163,7 +183,11 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4, h5 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }

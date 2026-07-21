@@ -26,6 +26,8 @@ import { readAudioDuration } from "@/services/music/musicService";
 
 export interface SingleUploadValues {
   title: string;
+  primary_artist_name: string;
+  featured_artists: string;
   description: string;
   genre: string;
   release_date: string;
@@ -43,6 +45,8 @@ interface Props {
 
 const empty: SingleUploadValues = {
   title: "",
+  primary_artist_name: "",
+  featured_artists: "",
   description: "",
   genre: "",
   release_date: "",
@@ -83,6 +87,7 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
     e.preventDefault();
     if (!values.audio) return toast.error("Please select an audio file");
     if (!values.title.trim()) return toast.error("Title is required");
+    if (!values.primary_artist_name.trim()) return toast.error("Primary artist is required");
     try {
       await onSubmit(values);
       setValues(empty);
@@ -104,7 +109,11 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
             file={values.audio}
             onChange={handleAudio}
             icon={<Music2 className="h-5 w-5" />}
-            hint={values.audio ? `${formatDuration(values.duration_sec)} · ${(values.audio.size / (1024 * 1024)).toFixed(1)} MB` : "MP3, WAV, FLAC — up to 50MB"}
+            hint={
+              values.audio
+                ? `${formatDuration(values.duration_sec)} · ${(values.audio.size / (1024 * 1024)).toFixed(1)} MB`
+                : "MP3 · your plan limit is checked before upload"
+            }
           />
           <FilePicker
             label="Cover art"
@@ -113,7 +122,7 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
             onChange={handleCover}
             icon={<ImageIcon className="h-5 w-5" />}
             preview={coverPreview}
-            hint="JPG, PNG or WebP — up to 8MB"
+            hint="JPG, PNG or WebP — up to 2MB"
           />
         </div>
       </ProfileCard>
@@ -121,10 +130,32 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
       <ProfileCard title="Details">
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="Title">
-            <Input value={values.title} onChange={(e) => update("title", e.target.value)} placeholder="Song title" />
+            <Input
+              value={values.title}
+              onChange={(e) => update("title", e.target.value)}
+              placeholder="Song title"
+            />
+          </Field>
+          <Field label="Primary performing artist">
+            <Input
+              value={values.primary_artist_name}
+              onChange={(e) => update("primary_artist_name", e.target.value)}
+              placeholder="e.g. Poppa"
+            />
+          </Field>
+          <Field label="Additional / featured artists">
+            <Input
+              value={values.featured_artists}
+              onChange={(e) => update("featured_artists", e.target.value)}
+              placeholder="Jerzo, Calliope Slim"
+            />
           </Field>
           <Field label="Genre">
-            <Input value={values.genre} onChange={(e) => update("genre", e.target.value)} placeholder="e.g. Indie" />
+            <Input
+              value={values.genre}
+              onChange={(e) => update("genre", e.target.value)}
+              placeholder="e.g. Indie"
+            />
           </Field>
           <Field label="Release date">
             <Input
@@ -134,7 +165,10 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
             />
           </Field>
           <Field label="Status">
-            <Select value={values.status} onValueChange={(v) => update("status", v as ContentStatus)}>
+            <Select
+              value={values.status}
+              onValueChange={(v) => update("status", v as ContentStatus)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -158,8 +192,10 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
         </Field>
         <div className="flex items-center justify-between rounded-md border border-border/50 p-3">
           <div>
-            <Label className="text-sm">Featured song</Label>
-            <p className="text-xs text-muted-foreground">Highlight this on your profile.</p>
+            <Label className="text-sm">Make this my profile lead</Label>
+            <p className="text-xs text-muted-foreground">
+              It will replace the current lead song on your public page.
+            </p>
           </div>
           <Switch checked={values.is_featured} onCheckedChange={(c) => update("is_featured", c)} />
         </div>
@@ -207,9 +243,7 @@ function FilePicker({
         {label}
       </div>
       {preview && <img src={preview} alt="" className="h-24 w-24 rounded-md object-cover" />}
-      <p className="text-xs text-muted-foreground">
-        {file ? file.name : hint}
-      </p>
+      <p className="text-xs text-muted-foreground">{file ? file.name : hint}</p>
       <Input type="file" accept={accept} onChange={onChange} className="hidden" />
       <Button type="button" variant="outline" size="sm" asChild>
         <span>{file ? "Replace file" : "Choose file"}</span>

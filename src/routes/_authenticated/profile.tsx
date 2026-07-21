@@ -28,11 +28,20 @@ function ProfilePage() {
 
 function ProfileContent() {
   const { user, primaryRole } = useUser();
-  if (primaryRole === "supporter") return <SupporterProfileContent userId={user?.id} email={user?.email} />;
+  if (primaryRole === "supporter")
+    return <SupporterProfileContent userId={user?.id} email={user?.email} />;
   return <CreatorProfileContent userId={user?.id} email={user?.email} canEdit />;
 }
 
-function CreatorProfileContent({ userId, email, canEdit }: { userId?: string; email?: string | null; canEdit: boolean }) {
+function CreatorProfileContent({
+  userId,
+  email,
+  canEdit,
+}: {
+  userId?: string;
+  email?: string | null;
+  canEdit: boolean;
+}) {
   const { data: profile, isLoading, error } = useCreatorProfile(userId);
   const save = useSaveCreatorProfile(userId);
   const [isEditing, setIsEditing] = useState(false);
@@ -47,21 +56,24 @@ function CreatorProfileContent({ userId, email, canEdit }: { userId?: string; em
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
-      <ProfileHeader
-        profile={profile ?? {}}
-        email={email}
-        isEditing={isEditing}
-        onEditToggle={() => canEdit && setIsEditing((v) => !v)}
-      />
       {isEditing && canEdit ? (
         <ProfileForm
           initial={profile ?? null}
+          userId={userId!}
           onSubmit={handleSave}
           onCancel={() => setIsEditing(false)}
           submitting={save.isPending}
         />
       ) : (
-        <ProfileView profile={profile ?? null} />
+        <>
+          <ProfileHeader
+            profile={profile ?? {}}
+            email={email}
+            isEditing={false}
+            onEditToggle={() => canEdit && setIsEditing(true)}
+          />
+          <ProfileView profile={profile ?? null} />
+        </>
       )}
     </div>
   );

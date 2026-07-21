@@ -55,6 +55,14 @@ export const authService = {
     if (error) throw error;
   },
 
+  async updateDisplayName(userId: string, displayName: string) {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ display_name: displayName })
+      .eq("id", userId);
+    if (error) throw error;
+  },
+
   async fetchProfile(userId: string): Promise<Profile | null> {
     const { data, error } = await supabase
       .from("profiles")
@@ -66,18 +74,14 @@ export const authService = {
   },
 
   async fetchRoles(userId: string): Promise<AppRole[]> {
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
+    const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
     if (error) throw error;
     return (data ?? []).map((r) => r.role as AppRole);
   },
 
   async assignInitialRole(userId: string, role: SelectableRole) {
-    const { error } = await supabase
-      .from("user_roles")
-      .insert({ user_id: userId, role });
+    if (!userId) throw new Error("Not signed in");
+    const { error } = await supabase.rpc("select_initial_role", { _role: role });
     if (error) throw error;
   },
 };

@@ -41,6 +41,30 @@ export function useUpdateTrack(userId: string | undefined) {
   });
 }
 
+export function useSetProfileLead(userId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (trackId: string | null) => musicService.setProfileLead(trackId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: creatorTracksKey(userId) }),
+  });
+}
+
+export function useReplaceTrackCover(userId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, file }: { id: string; file: File }) => {
+      if (!userId) throw new Error("Not authenticated");
+      return musicService.replaceTrackCover(userId, id, file);
+    },
+    onSuccess: (updated) => {
+      qc.setQueryData(creatorTracksKey(userId), (current: Array<typeof updated> | undefined) =>
+        current?.map((track) => (track.id === updated.id ? updated : track)),
+      );
+      qc.invalidateQueries({ queryKey: creatorTracksKey(userId) });
+    },
+  });
+}
+
 export function useDeleteTrack(userId: string | undefined) {
   const qc = useQueryClient();
   return useMutation({

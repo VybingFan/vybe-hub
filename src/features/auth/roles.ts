@@ -3,15 +3,11 @@ import { z } from "zod";
 export const APP_ROLES = ["creator", "supporter", "admin"] as const;
 export type AppRole = (typeof APP_ROLES)[number];
 
-/** Roles a user can self-assign at onboarding. Admin is granted manually. */
+/** Public onboarding offers Supporter and the limited Creator Free plan. */
 export const SELECTABLE_ROLES = ["creator", "supporter"] as const;
 export type SelectableRole = (typeof SELECTABLE_ROLES)[number];
 
-export const emailSchema = z
-  .string()
-  .trim()
-  .email({ message: "Enter a valid email" })
-  .max(255);
+export const emailSchema = z.string().trim().email({ message: "Enter a valid email" }).max(255);
 
 export const passwordSchema = z
   .string()

@@ -20,6 +20,11 @@ function RedirectPage() {
       navigate({ to: "/auth/sign-in", replace: true });
       return;
     }
+    const pendingInvite = window.localStorage.getItem("vybe:pending-creator-invite");
+    if (pendingInvite) {
+      navigate({ to: "/creator-invite/$token", params: { token: pendingInvite }, replace: true });
+      return;
+    }
     if (!primaryRole) {
       navigate({ to: "/auth/onboarding", replace: true });
       return;

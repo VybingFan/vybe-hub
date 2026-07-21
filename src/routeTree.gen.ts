@@ -9,24 +9,50 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ForBusinessesRouteImport } from './routes/for-businesses'
+import { Route as ForArtistsRouteImport } from './routes/for-artists'
+import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlaylistSlugRouteImport } from './routes/playlist.$slug'
 import { Route as CreatorUsernameRouteImport } from './routes/creator.$username'
+import { Route as CreatorInviteTokenRouteImport } from './routes/creator-invite.$token'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
 import { Route as AuthRedirectRouteImport } from './routes/auth.redirect'
 import { Route as AuthOnboardingRouteImport } from './routes/auth.onboarding'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as ArtistUsernameRouteImport } from './routes/artist.$username'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPlaylistsRouteImport } from './routes/_authenticated/playlists'
 import { Route as AuthenticatedMusicRouteImport } from './routes/_authenticated/music'
+import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/merch'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedConnectionsRouteImport } from './routes/_authenticated/connections'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music.upload'
+import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
+import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
+import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 
+const ForBusinessesRoute = ForBusinessesRouteImport.update({
+  id: '/for-businesses',
+  path: '/for-businesses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForArtistsRoute = ForArtistsRouteImport.update({
+  id: '/for-artists',
+  path: '/for-artists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -41,9 +67,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaylistSlugRoute = PlaylistSlugRouteImport.update({
+  id: '/playlist/$slug',
+  path: '/playlist/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreatorUsernameRoute = CreatorUsernameRouteImport.update({
   id: '/creator/$username',
   path: '/creator/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorInviteTokenRoute = CreatorInviteTokenRouteImport.update({
+  id: '/creator-invite/$token',
+  path: '/creator-invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
@@ -76,6 +112,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const ArtistUsernameRoute = ArtistUsernameRouteImport.update({
+  id: '/artist/$username',
+  path: '/artist/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -86,9 +127,19 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPlaylistsRoute = AuthenticatedPlaylistsRouteImport.update({
+  id: '/playlists',
+  path: '/playlists',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMusicRoute = AuthenticatedMusicRouteImport.update({
   id: '/music',
   path: '/music',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMerchRoute = AuthenticatedMerchRouteImport.update({
+  id: '/merch',
+  path: '/merch',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDiscoverRoute = AuthenticatedDiscoverRouteImport.update({
@@ -101,141 +152,252 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedConnectionsRoute =
+  AuthenticatedConnectionsRouteImport.update({
+    id: '/connections',
+    path: '/connections',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMusicUploadRoute =
   AuthenticatedMusicUploadRouteImport.update({
-    id: '/upload',
-    path: '/upload',
-    getParentRoute: () => AuthenticatedMusicRoute,
+    id: '/music_/upload',
+    path: '/music/upload',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ArtistUsernamePlaylistSlugRoute =
+  ArtistUsernamePlaylistSlugRouteImport.update({
+    id: '/artist/$username_/playlist/$slug',
+    path: '/artist/$username/playlist/$slug',
+    getParentRoute: () => rootRouteImport,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/explore': typeof ExploreRoute
+  '/for-artists': typeof ForArtistsRoute
+  '/for-businesses': typeof ForBusinessesRoute
+  '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/connections': typeof AuthenticatedConnectionsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
-  '/music': typeof AuthenticatedMusicRouteWithChildren
+  '/merch': typeof AuthenticatedMerchRoute
+  '/music': typeof AuthenticatedMusicRoute
+  '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
   '/auth/redirect': typeof AuthRedirectRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
+  '/playlist/$slug': typeof PlaylistSlugRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
+  '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/explore': typeof ExploreRoute
+  '/for-artists': typeof ForArtistsRoute
+  '/for-businesses': typeof ForBusinessesRoute
+  '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/connections': typeof AuthenticatedConnectionsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
-  '/music': typeof AuthenticatedMusicRouteWithChildren
+  '/merch': typeof AuthenticatedMerchRoute
+  '/music': typeof AuthenticatedMusicRoute
+  '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
   '/auth/redirect': typeof AuthRedirectRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
+  '/playlist/$slug': typeof PlaylistSlugRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
+  '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/explore': typeof ExploreRoute
+  '/for-artists': typeof ForArtistsRoute
+  '/for-businesses': typeof ForBusinessesRoute
+  '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/connections': typeof AuthenticatedConnectionsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
-  '/_authenticated/music': typeof AuthenticatedMusicRouteWithChildren
+  '/_authenticated/merch': typeof AuthenticatedMerchRoute
+  '/_authenticated/music': typeof AuthenticatedMusicRoute
+  '/_authenticated/playlists': typeof AuthenticatedPlaylistsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
   '/auth/redirect': typeof AuthRedirectRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
-  '/_authenticated/music/upload': typeof AuthenticatedMusicUploadRoute
+  '/playlist/$slug': typeof PlaylistSlugRoute
+  '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
+  '/artist/$username_/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/explore'
+    | '/for-artists'
+    | '/for-businesses'
+    | '/activity'
     | '/admin'
+    | '/connections'
     | '/dashboard'
     | '/discover'
+    | '/merch'
     | '/music'
+    | '/playlists'
     | '/profile'
     | '/settings'
+    | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
     | '/auth/redirect'
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/creator-invite/$token'
     | '/creator/$username'
+    | '/playlist/$slug'
     | '/music/upload'
+    | '/artist/$username/playlist/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/explore'
+    | '/for-artists'
+    | '/for-businesses'
+    | '/activity'
     | '/admin'
+    | '/connections'
     | '/dashboard'
     | '/discover'
+    | '/merch'
     | '/music'
+    | '/playlists'
     | '/profile'
     | '/settings'
+    | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
     | '/auth/redirect'
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/creator-invite/$token'
     | '/creator/$username'
+    | '/playlist/$slug'
     | '/music/upload'
+    | '/artist/$username/playlist/$slug'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/explore'
+    | '/for-artists'
+    | '/for-businesses'
+    | '/_authenticated/activity'
     | '/_authenticated/admin'
+    | '/_authenticated/connections'
     | '/_authenticated/dashboard'
     | '/_authenticated/discover'
+    | '/_authenticated/merch'
     | '/_authenticated/music'
+    | '/_authenticated/playlists'
     | '/_authenticated/profile'
     | '/_authenticated/settings'
+    | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
     | '/auth/redirect'
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/creator-invite/$token'
     | '/creator/$username'
-    | '/_authenticated/music/upload'
+    | '/playlist/$slug'
+    | '/_authenticated/music_/upload'
+    | '/artist/$username_/playlist/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  ExploreRoute: typeof ExploreRoute
+  ForArtistsRoute: typeof ForArtistsRoute
+  ForBusinessesRoute: typeof ForBusinessesRoute
+  ArtistUsernameRoute: typeof ArtistUsernameRoute
+  CreatorInviteTokenRoute: typeof CreatorInviteTokenRoute
   CreatorUsernameRoute: typeof CreatorUsernameRoute
+  PlaylistSlugRoute: typeof PlaylistSlugRoute
+  ArtistUsernamePlaylistSlugRoute: typeof ArtistUsernamePlaylistSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/for-businesses': {
+      id: '/for-businesses'
+      path: '/for-businesses'
+      fullPath: '/for-businesses'
+      preLoaderRoute: typeof ForBusinessesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-artists': {
+      id: '/for-artists'
+      path: '/for-artists'
+      fullPath: '/for-artists'
+      preLoaderRoute: typeof ForArtistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -257,11 +419,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playlist/$slug': {
+      id: '/playlist/$slug'
+      path: '/playlist/$slug'
+      fullPath: '/playlist/$slug'
+      preLoaderRoute: typeof PlaylistSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/creator/$username': {
       id: '/creator/$username'
       path: '/creator/$username'
       fullPath: '/creator/$username'
       preLoaderRoute: typeof CreatorUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creator-invite/$token': {
+      id: '/creator-invite/$token'
+      path: '/creator-invite/$token'
+      fullPath: '/creator-invite/$token'
+      preLoaderRoute: typeof CreatorInviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/sign-up': {
@@ -306,6 +482,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/artist/$username': {
+      id: '/artist/$username'
+      path: '/artist/$username'
+      fullPath: '/artist/$username'
+      preLoaderRoute: typeof ArtistUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -320,11 +503,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/playlists': {
+      id: '/_authenticated/playlists'
+      path: '/playlists'
+      fullPath: '/playlists'
+      preLoaderRoute: typeof AuthenticatedPlaylistsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/music': {
       id: '/_authenticated/music'
       path: '/music'
       fullPath: '/music'
       preLoaderRoute: typeof AuthenticatedMusicRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/merch': {
+      id: '/_authenticated/merch'
+      path: '/merch'
+      fullPath: '/merch'
+      preLoaderRoute: typeof AuthenticatedMerchRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/discover': {
@@ -341,6 +538,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/connections': {
+      id: '/_authenticated/connections'
+      path: '/connections'
+      fullPath: '/connections'
+      preLoaderRoute: typeof AuthenticatedConnectionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -348,43 +552,56 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/music/upload': {
-      id: '/_authenticated/music/upload'
-      path: '/upload'
+    '/_authenticated/activity': {
+      id: '/_authenticated/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof AuthenticatedActivityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/music_/upload': {
+      id: '/_authenticated/music_/upload'
+      path: '/music/upload'
       fullPath: '/music/upload'
       preLoaderRoute: typeof AuthenticatedMusicUploadRouteImport
-      parentRoute: typeof AuthenticatedMusicRoute
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/artist/$username_/playlist/$slug': {
+      id: '/artist/$username_/playlist/$slug'
+      path: '/artist/$username/playlist/$slug'
+      fullPath: '/artist/$username/playlist/$slug'
+      preLoaderRoute: typeof ArtistUsernamePlaylistSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface AuthenticatedMusicRouteChildren {
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedConnectionsRoute: typeof AuthenticatedConnectionsRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
+  AuthenticatedMerchRoute: typeof AuthenticatedMerchRoute
+  AuthenticatedMusicRoute: typeof AuthenticatedMusicRoute
+  AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
 }
 
-const AuthenticatedMusicRouteChildren: AuthenticatedMusicRouteChildren = {
-  AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
-}
-
-const AuthenticatedMusicRouteWithChildren =
-  AuthenticatedMusicRoute._addFileChildren(AuthenticatedMusicRouteChildren)
-
-interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
-  AuthenticatedMusicRoute: typeof AuthenticatedMusicRouteWithChildren
-  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
-}
-
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedConnectionsRoute: AuthenticatedConnectionsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
-  AuthenticatedMusicRoute: AuthenticatedMusicRouteWithChildren,
+  AuthenticatedMerchRoute: AuthenticatedMerchRoute,
+  AuthenticatedMusicRoute: AuthenticatedMusicRoute,
+  AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -414,7 +631,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  ExploreRoute: ExploreRoute,
+  ForArtistsRoute: ForArtistsRoute,
+  ForBusinessesRoute: ForBusinessesRoute,
+  ArtistUsernameRoute: ArtistUsernameRoute,
+  CreatorInviteTokenRoute: CreatorInviteTokenRoute,
   CreatorUsernameRoute: CreatorUsernameRoute,
+  PlaylistSlugRoute: PlaylistSlugRoute,
+  ArtistUsernamePlaylistSlugRoute: ArtistUsernamePlaylistSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
