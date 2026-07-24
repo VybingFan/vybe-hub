@@ -133,10 +133,12 @@ function SettingsContent() {
                   <Crown className="h-4 w-4" /> CURRENT MEMBERSHIP
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold">
-                  {membership?.recognition_code === "vybe_pioneer"
-                    ? `${membership.public_name} · VYBE Pioneer`
-                    : membership?.public_name ||
-                      (primaryRole === "creator" ? "Creator membership" : "VYBE Member")}
+                  {membership?.plan_code === "founding_beta"
+                    ? "Founding Creator · Creator Pro Access"
+                    : membership?.recognition_code === "vybe_pioneer"
+                      ? `${membership.public_name} · VYBE Pioneer`
+                      : membership?.public_name ||
+                        (primaryRole === "creator" ? "Creator membership" : "VYBE Member")}
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
                   {membership?.description || "Membership details will appear here."}

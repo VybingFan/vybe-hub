@@ -110,8 +110,8 @@ INSERT INTO public.creator_plan_definitions (
   ),
   (
     'founding_beta', 'Founding Creator',
-    'Invitation-only testing access tied to an approved founding commitment.',
-    100, 75, 1200, 52428800, 60, 50, 25, 10000,
+    'Invitation-only Creator Pro access tied to an approved founding commitment.',
+    250, 200, 1200, 52428800, 100, 100, 50, 10000,
     0, 0, NULL, NULL, 250, 180, 100, NULL, 1, 30, false, 'invitation_only', 90
   )
 ON CONFLICT (plan_code) DO UPDATE SET

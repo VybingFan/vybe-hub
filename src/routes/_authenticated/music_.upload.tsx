@@ -130,9 +130,11 @@ function UploadPage() {
           <CardContent className="space-y-3 p-5">
             <div>
               <p className="font-medium">
-                {membership.recognition_code === "vybe_pioneer"
-                  ? `${membership.public_name} · VYBE Pioneer`
-                  : membership.public_name}
+                {membership.plan_code === "founding_beta"
+                  ? "Founding Creator · Creator Pro Access"
+                  : membership.recognition_code === "vybe_pioneer"
+                    ? `${membership.public_name} · VYBE Pioneer`
+                    : membership.public_name}
               </p>
               <p className="text-sm text-muted-foreground">
                 MP3 only · up to {membership.limits.track_duration_sec / 60} minutes · up to{" "}
