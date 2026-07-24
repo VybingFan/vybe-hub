@@ -63,6 +63,11 @@ function SongEditor() {
   const [description, setDescription] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
   const [status, setStatus] = useState<ContentStatus>("draft");
+  const [replacementAudio, setReplacementAudio] = useState<{
+    file: File;
+    durationSec: number;
+  } | null>(null);
+  const [replacementDetailsReviewed, setReplacementDetailsReviewed] = useState(false);
 
   useEffect(() => {
     if (!track) return;
@@ -73,12 +78,19 @@ function SongEditor() {
     setDescription(track.description || "");
     setReleaseDate(track.release_date || "");
     setStatus(track.status);
+    setReplacementAudio(null);
+    setReplacementDetailsReviewed(false);
   }, [track]);
 
   const save = async (event: FormEvent) => {
     event.preventDefault();
     if (!title.trim() || !primaryArtist.trim()) {
       return toast.error("Song title and primary artist are required.");
+    }
+    if (replacementAudio && !replacementDetailsReviewed) {
+      return toast.error(
+        "Review and confirm the retained song details before replacing the audio.",
+      );
     }
     try {
       await update.mutateAsync({
@@ -96,7 +108,18 @@ function SongEditor() {
           status,
         },
       });
-      toast.success("Song details saved.");
+      if (replacementAudio) {
+        await replaceAudio.mutateAsync({
+          id: trackId,
+          file: replacementAudio.file,
+          durationSec: replacementAudio.durationSec,
+        });
+        setReplacementAudio(null);
+        setReplacementDetailsReviewed(false);
+        toast.success("Audio and reviewed song details updated everywhere.");
+      } else {
+        toast.success("Song details saved.");
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not save the song");
     }
@@ -116,15 +139,16 @@ function SongEditor() {
     }
   };
 
-  const uploadAudio = async (file?: File) => {
+  const selectReplacementAudio = async (file?: File) => {
     if (!file) return;
     try {
       const durationSec = await readAudioDuration(file);
       if (!durationSec) throw new Error("VYBE could not read the replacement audio duration.");
-      await replaceAudio.mutateAsync({ id: trackId, file, durationSec });
-      toast.success("Audio replaced everywhere this song appears.");
+      setReplacementAudio({ file, durationSec });
+      setReplacementDetailsReviewed(false);
+      toast.info("Replacement selected. Review the highlighted song details, then save.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not replace the audio");
+      toast.error(error instanceof Error ? error.message : "Could not read the replacement audio");
     }
   };
 
@@ -211,8 +235,25 @@ function SongEditor() {
         </aside>
 
         <div className="space-y-8">
-          <section className="rounded-3xl border border-border bg-card p-6 md:p-8">
+          <section
+            className={
+              replacementAudio
+                ? "rounded-3xl border-2 border-amber-400 bg-amber-500/5 p-6 shadow-[0_0_0_4px_rgba(251,191,36,0.08)] md:p-8"
+                : "rounded-3xl border border-border bg-card p-6 md:p-8"
+            }
+          >
             <h2 className="text-2xl font-semibold">Song details</h2>
+            {replacementAudio ? (
+              <div className="mt-4 rounded-2xl border border-amber-400/60 bg-amber-400/10 p-4">
+                <p className="font-semibold text-amber-900 dark:text-amber-200">
+                  Review these retained details before replacing the audio
+                </p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  VYBE does not overwrite these fields from the MP3. Update anything that changed,
+                  or clear optional details such as featured artists.
+                </p>
+              </div>
+            ) : null}
             <div className="mt-6 grid gap-5">
               <div>
                 <Label htmlFor="song-title">Song title</Label>
@@ -306,6 +347,38 @@ function SongEditor() {
               Replacing the audio updates this song everywhere it appears on VYBE. The previous file
               is removed only after the replacement succeeds.
             </div>
+            {replacementAudio ? (
+              <div className="mt-5 rounded-2xl border border-amber-400/60 bg-amber-400/10 p-4">
+                <p className="font-semibold">{replacementAudio.file.name}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Replacement duration: {formatDuration(replacementAudio.durationSec)}
+                </p>
+                <label className="mt-4 flex cursor-pointer items-start gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 accent-primary"
+                    checked={replacementDetailsReviewed}
+                    onChange={(event) => setReplacementDetailsReviewed(event.target.checked)}
+                  />
+                  <span>
+                    I reviewed the title, artist credits, genre, release date, status, and
+                    description above.
+                  </span>
+                </label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="mt-3"
+                  onClick={() => {
+                    setReplacementAudio(null);
+                    setReplacementDetailsReviewed(false);
+                  }}
+                >
+                  Cancel replacement
+                </Button>
+              </div>
+            ) : null}
             <Label className="mt-5 inline-flex cursor-pointer items-center rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground">
               {replaceAudio.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -319,7 +392,7 @@ function SongEditor() {
                 className="hidden"
                 disabled={replaceAudio.isPending}
                 onChange={(event) => {
-                  void uploadAudio(event.target.files?.[0]);
+                  void selectReplacementAudio(event.target.files?.[0]);
                   event.target.value = "";
                 }}
               />
@@ -373,15 +446,15 @@ function SongEditor() {
               </Button>
               <Button
                 size="lg"
-                disabled={update.isPending}
+                disabled={update.isPending || replaceAudio.isPending}
                 className="bg-gradient-brand text-primary-foreground"
               >
-                {update.isPending ? (
+                {update.isPending || replaceAudio.isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <Save className="mr-2 h-4 w-4" />
                 )}
-                Save song
+                {replacementAudio ? "Save details and replace audio" : "Save song"}
               </Button>
             </div>
           </div>
