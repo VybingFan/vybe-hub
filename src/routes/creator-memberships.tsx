@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BadgeCheck, Check, Clock3, Crown, ShieldCheck, Sparkles } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { BadgeCheck, Check, Crown, ShieldCheck, Sparkles } from "lucide-react";
 import { MarketingNav } from "@/components/layout/MarketingNav";
 import { Footer } from "@/components/layout/Footer";
+import { MembershipCheckoutButton } from "@/components/membership/MembershipCheckoutButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -90,12 +91,6 @@ function CreatorMembershipsPage() {
                     ) : (
                       <div className="h-5" />
                     )}
-                    {plan.pioneerMonthlyPrice && plan.pioneerAnnualPrice ? (
-                      <p className="mt-2 rounded-lg bg-primary/10 px-3 py-2 text-xs font-medium text-primary">
-                        Eligible Pioneers: ${plan.pioneerMonthlyPrice}/month or $
-                        {plan.pioneerAnnualPrice}/year
-                      </p>
-                    ) : null}
                     <p className="mt-5 min-h-20 text-sm leading-6 text-muted-foreground">
                       {plan.audience}
                     </p>
@@ -124,17 +119,11 @@ function CreatorMembershipsPage() {
                       ))}
                     </ul>
 
-                    {plan.launchState === "available" ? (
-                      <Button asChild className="mt-7 bg-gradient-brand text-white">
-                        <Link to="/auth/sign-up">
-                          Start free <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
-                      </Button>
-                    ) : (
-                      <Button disabled variant="outline" className="mt-7">
-                        <Clock3 className="mr-2 h-4 w-4" /> Checkout coming later
-                      </Button>
-                    )}
+                    <MembershipCheckoutButton
+                      planCode={plan.code}
+                      planName={plan.name}
+                      interval={billing}
+                    />
                   </CardContent>
                 </Card>
               );
@@ -144,11 +133,7 @@ function CreatorMembershipsPage() {
 
         <section className="border-y border-border/60 bg-surface/35">
           <div className="mx-auto grid max-w-7xl gap-6 px-6 py-16 lg:grid-cols-3">
-            <PolicyCard
-              icon={BadgeCheck}
-              title="VYBE Pioneer"
-              body={`${PIONEER_NOTE} Pioneer pricing is reserved for the first 50 eligible paying creators and remains locked while membership stays continuously active.`}
-            />
+            <PolicyCard icon={BadgeCheck} title="VYBE Pioneer" body={PIONEER_NOTE} />
             <PolicyCard
               icon={Crown}
               title="Founding Creator"
@@ -168,9 +153,9 @@ function CreatorMembershipsPage() {
             <h2 className="mt-5 text-3xl font-semibold">Honest launch status</h2>
             <p className="mt-4 max-w-3xl leading-7 text-muted-foreground">
               Music profiles, libraries, editors, playlists, share links, and merchandise showcases
-              work today. Billing, creator AI, native video hosting, advanced analytics, commerce,
-              custom domains, and team workspaces will remain labeled Coming Soon until they are
-              connected and verified.
+              work today. Membership billing is entering controlled Stripe verification. Creator AI,
+              native video hosting, advanced analytics, commerce, custom domains, and team
+              workspaces remain labeled Coming Soon until each is connected and verified.
             </p>
           </div>
         </section>

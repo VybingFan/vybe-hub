@@ -238,4 +238,39 @@ VYBE-HUB has successfully completed the foundation phase.
 
 The application runs correctly and is ready for UI architecture and feature development.
 
+---
+
+# V24.8 Stripe Membership Billing
+
+V24.8 adds a controlled Stripe sandbox integration for Creator Plus, Creator Pro, and Creator
+Studio monthly and annual subscriptions.
+
+Implemented:
+
+- Stripe-hosted subscription Checkout
+- server-only Stripe key and Price ID configuration
+- signed webhook verification using Stripe's Web Crypto provider
+- webhook-controlled Supabase entitlement changes
+- out-of-order and duplicate event safeguards
+- Stripe Customer Portal access from Creator Settings
+- cancellation-at-period-end handling
+- return to Creator Free without automatic content deletion
+- 30-day paid-to-Free adjustment period
+- a server-side `STRIPE_CHECKOUT_ENABLED` launch switch
+
+Preserved:
+
+- Founding Creator remains invitation-only Creator Pro access
+- Stripe cannot overwrite a Founding Creator entitlement
+- VYBE Pioneer enrollment and discounted Stripe prices are postponed
+- no Stripe secret or Price ID is stored in source control or Supabase
+
+Required before testing:
+
+1. Apply `supabase/migrations/20260725230000_stripe_membership_billing_v24_8.sql`.
+2. Add sandbox secrets and the six standard sandbox Price IDs to Cloudflare.
+3. Register `/api/stripe/webhook` in the Stripe sandbox.
+4. Enable checkout only for controlled verification.
+
+See `STRIPE_V24_8_SETUP.md` for the exact environment variable and webhook checklist.
 

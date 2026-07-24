@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BellRing,
+  CreditCard,
   Crown,
   ExternalLink,
   LockKeyhole,
@@ -27,6 +28,7 @@ import { displayNameSchema, resetPasswordSchema } from "@/features/auth/roles";
 import { playNotificationChime } from "@/lib/notificationSound";
 import { useMembership } from "@/hooks/useMembership";
 import { UsageMeter } from "@/components/membership/UsageMeter";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/settings")({ component: SettingsPage });
 
@@ -52,6 +54,7 @@ function SettingsContent() {
   const { data: creator } = useCreatorProfile(user?.id);
   const { data: membership } = useMembership(primaryRole === "creator" || primaryRole === "admin");
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
+  const [isOpeningBilling, setIsOpeningBilling] = useState(false);
   const [preferences, setPreferences] = useState<Record<string, boolean>>({
     email: true,
     followers: true,
@@ -115,6 +118,29 @@ function SettingsContent() {
     toast.success("Notification preference saved on this device");
   };
 
+  const openBillingPortal = async () => {
+    setIsOpeningBilling(true);
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) throw new Error("Sign in again to manage billing.");
+      const response = await fetch("/api/stripe/portal", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const result = (await response.json()) as { url?: string; error?: string };
+      if (!response.ok || !result.url) {
+        throw new Error(result.error || "Billing management could not be opened.");
+      }
+      window.location.assign(result.url);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Billing management could not be opened.",
+      );
+      setIsOpeningBilling(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-4xl space-y-10">
       <header>
@@ -149,9 +175,22 @@ function SettingsContent() {
                   </p>
                 ) : null}
               </div>
-              <Button asChild variant="outline">
-                <Link to="/creator-memberships">Compare memberships</Link>
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                {membership?.billing.customer_ref ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isOpeningBilling}
+                    onClick={openBillingPortal}
+                  >
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    {isOpeningBilling ? "Opening…" : "Manage billing"}
+                  </Button>
+                ) : null}
+                <Button asChild variant="outline">
+                  <Link to="/creator-memberships">Compare memberships</Link>
+                </Button>
+              </div>
             </div>
 
             {membership ? (
@@ -206,10 +245,9 @@ function SettingsContent() {
                     </p>
                   </div>
                   <p className="mt-4 text-xs leading-5 text-muted-foreground">
-                    Billing is not active. VYBE will not charge or automatically change your plan.
-                    Future paid-to-Free downgrades will include a{" "}
-                    {membership.downgrade.adjustment_period_days}-day adjustment period with no
-                    automatic deletion.
+                    Stripe billing changes are applied only after a verified billing event.
+                    Paid-to-Free downgrades include a {membership.downgrade.adjustment_period_days}
+                    -day adjustment period with no automatic deletion.
                   </p>
                 </div>
               </>

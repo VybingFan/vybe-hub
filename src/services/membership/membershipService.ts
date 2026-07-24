@@ -15,6 +15,25 @@ export interface CreatorMembership {
     pioneer_monthly_cents: number | null;
     pioneer_annual_cents: number | null;
   };
+  billing: {
+    provider: "stripe" | null;
+    interval: "monthly" | "annual" | null;
+    customer_ref: string | null;
+    subscription_ref: string | null;
+    subscription_status:
+      | "active"
+      | "canceled"
+      | "incomplete"
+      | "incomplete_expired"
+      | "past_due"
+      | "paused"
+      | "trialing"
+      | "unpaid"
+      | null;
+    current_period_end: string | null;
+    cancel_at_period_end: boolean;
+    adjustment_ends_at: string | null;
+  };
   future_allowances: {
     written_posts: number;
     video_storage_minutes: number;

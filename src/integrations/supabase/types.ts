@@ -49,40 +49,94 @@ export type Database = {
       };
       account_entitlements: {
         Row: {
+          adjustment_ends_at: string | null;
+          billing_customer_ref: string | null;
+          billing_interval: string | null;
+          billing_provider: string | null;
+          billing_subscription_ref: string | null;
+          cancel_at_period_end: boolean;
           created_at: string;
+          current_period_end: string | null;
           expires_at: string | null;
           granted_by: string | null;
+          last_billing_event_created: number;
           plan_code: string;
           recognition_code: string | null;
+          scheduled_plan_code: string | null;
           source_invite_id: string | null;
           starts_at: string;
           status: string;
+          stripe_subscription_status: string | null;
           updated_at: string;
           user_id: string;
         };
         Insert: {
+          adjustment_ends_at?: string | null;
+          billing_customer_ref?: string | null;
+          billing_interval?: string | null;
+          billing_provider?: string | null;
+          billing_subscription_ref?: string | null;
+          cancel_at_period_end?: boolean;
           created_at?: string;
+          current_period_end?: string | null;
           expires_at?: string | null;
           granted_by?: string | null;
+          last_billing_event_created?: number;
           plan_code: string;
           recognition_code?: string | null;
+          scheduled_plan_code?: string | null;
           source_invite_id?: string | null;
           starts_at?: string;
           status?: string;
+          stripe_subscription_status?: string | null;
           updated_at?: string;
           user_id: string;
         };
         Update: {
+          adjustment_ends_at?: string | null;
+          billing_customer_ref?: string | null;
+          billing_interval?: string | null;
+          billing_provider?: string | null;
+          billing_subscription_ref?: string | null;
+          cancel_at_period_end?: boolean;
           created_at?: string;
+          current_period_end?: string | null;
           expires_at?: string | null;
           granted_by?: string | null;
+          last_billing_event_created?: number;
           plan_code?: string;
           recognition_code?: string | null;
+          scheduled_plan_code?: string | null;
           source_invite_id?: string | null;
           starts_at?: string;
           status?: string;
+          stripe_subscription_status?: string | null;
           updated_at?: string;
           user_id?: string;
+        };
+        Relationships: [];
+      };
+      stripe_webhook_events: {
+        Row: {
+          event_created: number;
+          event_id: string;
+          event_type: string;
+          outcome: string;
+          processed_at: string;
+        };
+        Insert: {
+          event_created: number;
+          event_id: string;
+          event_type: string;
+          outcome: string;
+          processed_at?: string;
+        };
+        Update: {
+          event_created?: number;
+          event_id?: string;
+          event_type?: string;
+          outcome?: string;
+          processed_at?: string;
         };
         Relationships: [];
       };

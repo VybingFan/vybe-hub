@@ -157,4 +157,4 @@ export const FOUNDING_CREATOR_NOTE =
   "Founding Creator remains invitation-only and is not a public membership.";
 
 export const PIONEER_NOTE =
-  "VYBE Pioneer is recognition for the first 50 public paying creators, not a separate plan.";
+  "VYBE Pioneer is planned recognition for the first 50 eligible public paying creators, not a separate plan. Enrollment and discounted pricing are not open yet.";
