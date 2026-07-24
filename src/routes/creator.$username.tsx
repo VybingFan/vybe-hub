@@ -1,6 +1,15 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ExternalLink, Heart, Loader2, MapPin, Share2, ShoppingBag } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  ExternalLink,
+  Heart,
+  Loader2,
+  MapPin,
+  Share2,
+  ShoppingBag,
+} from "lucide-react";
 import { Logo } from "@/components/common/Logo";
+import { MarketingNav } from "@/components/layout/MarketingNav";
 import { SharedPlaylistPlayer } from "@/components/playlists/SharedPlaylistPlayer";
 import { SocialLinksDisplay } from "@/components/socialLinks/SocialLinksDisplay";
 import { Button } from "@/components/ui/button";
@@ -22,6 +31,7 @@ export function PublicArtistHome({
   username: string;
   selectedTrackId?: string;
 }) {
+  const navigate = useNavigate();
   const { data, isLoading, error } = usePublicCreator(username);
   if (isLoading)
     return (
@@ -49,16 +59,27 @@ export function PublicArtistHome({
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border/50">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <Link to="/">
-            <Logo />
-          </Link>
-          <Button asChild size="sm" className="bg-gradient-brand text-white">
-            <Link to="/auth/sign-up">Join VYBE</Link>
+      <MarketingNav />
+      <div className="border-b border-border/50 bg-background/85">
+        <div className="mx-auto flex h-12 max-w-7xl items-center px-6">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="-ml-3 rounded-full"
+            onClick={() => {
+              if (window.history.length > 1) {
+                window.history.back();
+              } else {
+                navigate({ to: "/explore", search: { q: "" } });
+              }
+            }}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
           </Button>
         </div>
-      </header>
+      </div>
       <main>
         <section className="relative">
           <div className="h-64 overflow-hidden md:h-80">

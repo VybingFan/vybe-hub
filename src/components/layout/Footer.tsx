@@ -1,36 +1,50 @@
-import { Link } from "@tanstack/react-router";
 import { APP_NAME, COMPANY } from "@/constants/app";
 import { Logo } from "@/components/common/Logo";
 
 export function Footer() {
   return (
     <footer className="border-t border-border/60 bg-background/60">
-      <div className="mx-auto grid max-w-7xl gap-8 px-6 py-12 md:grid-cols-4">
-        <div>
+      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="sm:col-span-2 lg:col-span-1">
           <Logo variant="horizontal" />
-          <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-            Where independent music becomes community.
+          <p className="mt-3 max-w-xs text-sm leading-6 text-muted-foreground">
+            A creator-first entertainment community for discovering music, stories, films, and the
+            people behind them.
           </p>
         </div>
+
         <FooterCol
           title="Explore"
           links={[
-            ["Discover", "/#discover"],
+            ["Discover", "/explore"],
             ["Community", "/#community"],
+            ["Merch", "/#merch"],
           ]}
         />
         <FooterCol
-          title="VYBE"
+          title="Build on VYBE"
           links={[
-            ["For Artists", "/#artists"],
-            ["Stories", "/#stories"],
+            ["For Creators", "/for-artists"],
+            ["For Businesses", "/for-businesses"],
+            ["Creator sign in", "/auth/sign-in"],
+          ]}
+        />
+        <FooterCol
+          title="Support"
+          links={[
+            ["About VYBE", "/about"],
+            ["FAQ", "/faq"],
+            ["Help Center", "/help"],
+            ["Trust & Safety", "/trust"],
           ]}
         />
         <FooterCol
           title="Legal"
           links={[
-            ["Privacy", "/#privacy"],
-            ["Terms", "/#terms"],
+            ["Terms", "/terms"],
+            ["Privacy", "/privacy"],
+            ["Copyright", "/copyright"],
+            ["Community Guidelines", "/community-guidelines"],
           ]}
         />
       </div>
@@ -48,9 +62,9 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
       <ul className="space-y-2 text-sm text-muted-foreground">
         {links.map(([label, to]) => (
           <li key={label}>
-            <Link to={to} className="transition-colors hover:text-foreground">
+            <a href={to} className="transition-colors hover:text-foreground">
               {label}
-            </Link>
+            </a>
           </li>
         ))}
       </ul>

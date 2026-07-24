@@ -9,10 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrustRouteImport } from './routes/trust'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as ForBusinessesRouteImport } from './routes/for-businesses'
 import { Route as ForArtistsRouteImport } from './routes/for-artists'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as CopyrightRouteImport } from './routes/copyright'
+import { Route as CommunityGuidelinesRouteImport } from './routes/community-guidelines'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlaylistSlugRouteImport } from './routes/playlist.$slug'
@@ -38,6 +46,26 @@ import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 
+const TrustRoute = TrustRouteImport.update({
+  id: '/trust',
+  path: '/trust',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForBusinessesRoute = ForBusinessesRouteImport.update({
   id: '/for-businesses',
   path: '/for-businesses',
@@ -48,14 +76,34 @@ const ForArtistsRoute = ForArtistsRouteImport.update({
   path: '/for-artists',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CopyrightRoute = CopyrightRouteImport.update({
+  id: '/copyright',
+  path: '/copyright',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityGuidelinesRoute = CommunityGuidelinesRouteImport.update({
+  id: '/community-guidelines',
+  path: '/community-guidelines',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -183,10 +231,18 @@ const ArtistUsernamePlaylistSlugRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
+  '/community-guidelines': typeof CommunityGuidelinesRoute
+  '/copyright': typeof CopyrightRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
+  '/help': typeof HelpRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
+  '/trust': typeof TrustRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/connections': typeof AuthenticatedConnectionsRoute
@@ -212,10 +268,18 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
+  '/community-guidelines': typeof CommunityGuidelinesRoute
+  '/copyright': typeof CopyrightRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
+  '/help': typeof HelpRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
+  '/trust': typeof TrustRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/connections': typeof AuthenticatedConnectionsRoute
@@ -243,10 +307,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
+  '/community-guidelines': typeof CommunityGuidelinesRoute
+  '/copyright': typeof CopyrightRoute
   '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
+  '/help': typeof HelpRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
+  '/trust': typeof TrustRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/connections': typeof AuthenticatedConnectionsRoute
@@ -274,10 +346,18 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/auth'
+    | '/community-guidelines'
+    | '/copyright'
     | '/explore'
+    | '/faq'
     | '/for-artists'
     | '/for-businesses'
+    | '/help'
+    | '/privacy'
+    | '/terms'
+    | '/trust'
     | '/activity'
     | '/admin'
     | '/connections'
@@ -303,10 +383,18 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/auth'
+    | '/community-guidelines'
+    | '/copyright'
     | '/explore'
+    | '/faq'
     | '/for-artists'
     | '/for-businesses'
+    | '/help'
+    | '/privacy'
+    | '/terms'
+    | '/trust'
     | '/activity'
     | '/admin'
     | '/connections'
@@ -333,10 +421,18 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/about'
     | '/auth'
+    | '/community-guidelines'
+    | '/copyright'
     | '/explore'
+    | '/faq'
     | '/for-artists'
     | '/for-businesses'
+    | '/help'
+    | '/privacy'
+    | '/terms'
+    | '/trust'
     | '/_authenticated/activity'
     | '/_authenticated/admin'
     | '/_authenticated/connections'
@@ -364,10 +460,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRouteWithChildren
+  CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
+  CopyrightRoute: typeof CopyrightRoute
   ExploreRoute: typeof ExploreRoute
+  FaqRoute: typeof FaqRoute
   ForArtistsRoute: typeof ForArtistsRoute
   ForBusinessesRoute: typeof ForBusinessesRoute
+  HelpRoute: typeof HelpRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
+  TrustRoute: typeof TrustRoute
   ArtistUsernameRoute: typeof ArtistUsernameRoute
   CreatorInviteTokenRoute: typeof CreatorInviteTokenRoute
   CreatorUsernameRoute: typeof CreatorUsernameRoute
@@ -377,6 +481,34 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trust': {
+      id: '/trust'
+      path: '/trust'
+      fullPath: '/trust'
+      preLoaderRoute: typeof TrustRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/for-businesses': {
       id: '/for-businesses'
       path: '/for-businesses'
@@ -391,6 +523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForArtistsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/explore': {
       id: '/explore'
       path: '/explore'
@@ -398,11 +537,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/copyright': {
+      id: '/copyright'
+      path: '/copyright'
+      fullPath: '/copyright'
+      preLoaderRoute: typeof CopyrightRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community-guidelines': {
+      id: '/community-guidelines'
+      path: '/community-guidelines'
+      fullPath: '/community-guidelines'
+      preLoaderRoute: typeof CommunityGuidelinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -630,10 +790,18 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
   AuthRoute: AuthRouteWithChildren,
+  CommunityGuidelinesRoute: CommunityGuidelinesRoute,
+  CopyrightRoute: CopyrightRoute,
   ExploreRoute: ExploreRoute,
+  FaqRoute: FaqRoute,
   ForArtistsRoute: ForArtistsRoute,
   ForBusinessesRoute: ForBusinessesRoute,
+  HelpRoute: HelpRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
+  TrustRoute: TrustRoute,
   ArtistUsernameRoute: ArtistUsernameRoute,
   CreatorInviteTokenRoute: CreatorInviteTokenRoute,
   CreatorUsernameRoute: CreatorUsernameRoute,
