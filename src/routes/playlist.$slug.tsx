@@ -7,7 +7,6 @@ import {
   ExternalLink,
   Headphones,
   Heart,
-  LayoutDashboard,
   Loader2,
   Share2,
   Sparkles,
@@ -20,7 +19,6 @@ import { SharedPlaylistPlayer } from "@/components/playlists/SharedPlaylistPlaye
 import { Button } from "@/components/ui/button";
 import { appLinks, getPreferredAppLink } from "@/config/appLinks";
 import { useSharedPlaylist } from "@/hooks/usePlaylists";
-import { useUser } from "@/hooks/useUser";
 import { activityService } from "@/services/activity/activityService";
 import { ListenerConnectionForm } from "@/components/connections/ListenerConnectionForm";
 
@@ -33,15 +31,8 @@ function SharedPlaylistPage() {
 
 export function SharedPlaylistExperience({ slug }: { slug: string }) {
   const { data, isLoading, error } = useSharedPlaylist(slug);
-  const { user, primaryRole, defaultRoute, isLoading: userLoading } = useUser();
   const [appBarVisible, setAppBarVisible] = useState(true);
   const [copied, setCopied] = useState(false);
-  const appLabel =
-    primaryRole === "admin"
-      ? "Open Admin"
-      : primaryRole === "creator"
-        ? "Open Creator Studio"
-        : "Open VYBE";
 
   useEffect(() => {
     if (data) void activityService.record(slug, "link_opened");
@@ -112,17 +103,7 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
                 Explore VYBE
               </Link>
             </Button>
-            {!userLoading && user ? (
-              <Button asChild size="sm" className="bg-white text-black hover:bg-white/90">
-                <a href={defaultRoute}>
-                  <span className="sm:hidden">
-                    {primaryRole === "creator" ? "Studio" : "Open VYBE"}
-                  </span>
-                  <span className="hidden sm:inline">{appLabel}</span>
-                  <LayoutDashboard className="ml-2 h-4 w-4" />
-                </a>
-              </Button>
-            ) : preferredAppLink ? (
+            {preferredAppLink ? (
               <Button asChild size="sm" className="bg-white text-black hover:bg-white/90">
                 <a href={preferredAppLink} target="_blank" rel="noreferrer">
                   Get the app <Download className="ml-2 h-4 w-4" />
@@ -130,8 +111,8 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
               </Button>
             ) : (
               <Button asChild size="sm" className="bg-white text-black hover:bg-white/90">
-                <Link to="/auth/redirect">
-                  Open VYBE <ArrowRight className="ml-2 h-4 w-4" />
+                <Link to="/auth/sign-up">
+                  Get VYBE <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             )}
