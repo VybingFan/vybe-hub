@@ -19,6 +19,7 @@ import { Route as ForBusinessesRouteImport } from './routes/for-businesses'
 import { Route as ForArtistsRouteImport } from './routes/for-artists'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as CreatorMembershipsRouteImport } from './routes/creator-memberships'
 import { Route as CopyrightRouteImport } from './routes/copyright'
 import { Route as CommunityGuidelinesRouteImport } from './routes/community-guidelines'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -113,6 +114,11 @@ const FaqRoute = FaqRouteImport.update({
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorMembershipsRoute = CreatorMembershipsRouteImport.update({
+  id: '/creator-memberships',
+  path: '/creator-memberships',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CopyrightRoute = CopyrightRouteImport.update({
@@ -352,6 +358,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteWithChildren
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/copyright': typeof CopyrightRoute
+  '/creator-memberships': typeof CreatorMembershipsRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
@@ -408,6 +415,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRouteWithChildren
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/copyright': typeof CopyrightRoute
+  '/creator-memberships': typeof CreatorMembershipsRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
@@ -466,6 +474,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteWithChildren
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/copyright': typeof CopyrightRoute
+  '/creator-memberships': typeof CreatorMembershipsRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
@@ -524,6 +533,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/community-guidelines'
     | '/copyright'
+    | '/creator-memberships'
     | '/explore'
     | '/faq'
     | '/for-artists'
@@ -580,6 +590,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/community-guidelines'
     | '/copyright'
+    | '/creator-memberships'
     | '/explore'
     | '/faq'
     | '/for-artists'
@@ -637,6 +648,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/community-guidelines'
     | '/copyright'
+    | '/creator-memberships'
     | '/explore'
     | '/faq'
     | '/for-artists'
@@ -695,6 +707,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
   CopyrightRoute: typeof CopyrightRoute
+  CreatorMembershipsRoute: typeof CreatorMembershipsRoute
   ExploreRoute: typeof ExploreRoute
   FaqRoute: typeof FaqRoute
   ForArtistsRoute: typeof ForArtistsRoute
@@ -788,6 +801,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creator-memberships': {
+      id: '/creator-memberships'
+      path: '/creator-memberships'
+      fullPath: '/creator-memberships'
+      preLoaderRoute: typeof CreatorMembershipsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/copyright': {
@@ -1188,6 +1208,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   CommunityGuidelinesRoute: CommunityGuidelinesRoute,
   CopyrightRoute: CopyrightRoute,
+  CreatorMembershipsRoute: CreatorMembershipsRoute,
   ExploreRoute: ExploreRoute,
   FaqRoute: FaqRoute,
   ForArtistsRoute: ForArtistsRoute,

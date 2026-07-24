@@ -13,6 +13,8 @@ export const Route = createFileRoute("/creator-invite/$token")({ component: Crea
 const PLAN_NAMES = {
   creator_free: "Creator Free",
   creator_plus: "Creator Plus",
+  creator_pro: "Creator Pro",
+  creator_studio: "Creator Studio",
   founding_beta: "Founding Creator",
 } as const;
 

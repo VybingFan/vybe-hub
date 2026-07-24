@@ -36,6 +36,11 @@ export const BUILD_ON_VYBE_LINKS = [
     to: "/for-writers-poets",
   },
   {
+    label: "Creator Memberships",
+    description: "Compare Free, Plus, Pro, and Studio plans with honest launch status.",
+    to: "/creator-memberships",
+  },
+  {
     label: "For Businesses",
     description: "Discover partnership, promotion, venue, and brand opportunities.",
     to: "/for-businesses",

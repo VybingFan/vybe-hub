@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { CreatorPlanCode } from "@/features/membership/catalog";
 
-export type CreatorPlan = "creator_free" | "creator_plus" | "founding_beta";
+export type CreatorPlan = CreatorPlanCode;
 
 export interface CreatorInvite {
   id: string;

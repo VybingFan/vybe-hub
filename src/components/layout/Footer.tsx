@@ -25,6 +25,7 @@ export function Footer() {
           title="Build on VYBE"
           links={[
             ["For Creators", "/for-artists"],
+            ["Creator Memberships", "/creator-memberships"],
             ["For Businesses", "/for-businesses"],
             ["Creator sign in", "/auth/sign-in"],
           ]}

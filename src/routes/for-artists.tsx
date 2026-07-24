@@ -367,11 +367,16 @@ function ForArtists() {
                   </p>
                 ))}
               </div>
-              <Button asChild size="lg" className="mt-9 bg-gradient-brand text-primary-foreground">
-                <Link to="/auth/sign-up">
-                  Create your free account <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              <div className="mt-9 flex flex-wrap gap-3">
+                <Button asChild size="lg" className="bg-gradient-brand text-primary-foreground">
+                  <Link to="/auth/sign-up">
+                    Create your free account <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline">
+                  <Link to="/creator-memberships">Compare creator memberships</Link>
+                </Button>
+              </div>
             </div>
             <aside className="rounded-[2rem] border border-primary/25 bg-card p-8">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
