@@ -212,6 +212,63 @@ export type Database = {
         };
         Relationships: [];
       };
+      creator_videos: {
+        Row: {
+          created_at: string;
+          creator_id: string;
+          description: string;
+          duration_sec: number | null;
+          id: string;
+          is_featured: boolean;
+          provider: string;
+          provider_video_id: string;
+          rights_confirmed: boolean;
+          source_url: string | null;
+          status: string;
+          thumbnail_url: string | null;
+          title: string;
+          updated_at: string;
+          video_type: string;
+          visibility: string;
+        };
+        Insert: {
+          created_at?: string;
+          creator_id: string;
+          description?: string;
+          duration_sec?: number | null;
+          id?: string;
+          is_featured?: boolean;
+          provider: string;
+          provider_video_id: string;
+          rights_confirmed?: boolean;
+          source_url?: string | null;
+          status?: string;
+          thumbnail_url?: string | null;
+          title: string;
+          updated_at?: string;
+          video_type?: string;
+          visibility?: string;
+        };
+        Update: {
+          created_at?: string;
+          creator_id?: string;
+          description?: string;
+          duration_sec?: number | null;
+          id?: string;
+          is_featured?: boolean;
+          provider?: string;
+          provider_video_id?: string;
+          rights_confirmed?: boolean;
+          source_url?: string | null;
+          status?: string;
+          thumbnail_url?: string | null;
+          title?: string;
+          updated_at?: string;
+          video_type?: string;
+          visibility?: string;
+        };
+        Relationships: [];
+      };
       follows: {
         Row: {
           created_at: string;

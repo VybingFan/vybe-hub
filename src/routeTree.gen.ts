@@ -26,6 +26,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VideoVideoIdRouteImport } from './routes/video.$videoId'
 import { Route as PlaylistSlugRouteImport } from './routes/playlist.$slug'
 import { Route as ExperienceWatchRouteImport } from './routes/experience.watch'
 import { Route as ExperienceReadRouteImport } from './routes/experience.read'
@@ -43,6 +44,7 @@ import { Route as AuthOnboardingRouteImport } from './routes/auth.onboarding'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as ArtistUsernameRouteImport } from './routes/artist.$username'
 import { Route as AuthenticatedWatchRouteImport } from './routes/_authenticated/watch'
+import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedReadRouteImport } from './routes/_authenticated/read'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -150,6 +152,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VideoVideoIdRoute = VideoVideoIdRouteImport.update({
+  id: '/video/$videoId',
+  path: '/video/$videoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlaylistSlugRoute = PlaylistSlugRouteImport.update({
   id: '/playlist/$slug',
   path: '/playlist/$slug',
@@ -233,6 +240,11 @@ const ArtistUsernameRoute = ArtistUsernameRouteImport.update({
 const AuthenticatedWatchRoute = AuthenticatedWatchRouteImport.update({
   id: '/watch',
   path: '/watch',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVideosRoute = AuthenticatedVideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -387,6 +399,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -404,6 +417,7 @@ export interface FileRoutesByFullPath {
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
+  '/video/$videoId': typeof VideoVideoIdRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -444,6 +458,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -461,6 +476,7 @@ export interface FileRoutesByTo {
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
+  '/video/$videoId': typeof VideoVideoIdRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -503,6 +519,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/read': typeof AuthenticatedReadRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_authenticated/watch': typeof AuthenticatedWatchRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -520,6 +537,7 @@ export interface FileRoutesById {
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
+  '/video/$videoId': typeof VideoVideoIdRoute
   '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
   '/_authenticated/playlists_/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -562,6 +580,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/read'
     | '/settings'
+    | '/videos'
     | '/watch'
     | '/artist/$username'
     | '/auth/forgot-password'
@@ -579,6 +598,7 @@ export interface FileRouteTypes {
     | '/experience/read'
     | '/experience/watch'
     | '/playlist/$slug'
+    | '/video/$videoId'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -619,6 +639,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/read'
     | '/settings'
+    | '/videos'
     | '/watch'
     | '/artist/$username'
     | '/auth/forgot-password'
@@ -636,6 +657,7 @@ export interface FileRouteTypes {
     | '/experience/read'
     | '/experience/watch'
     | '/playlist/$slug'
+    | '/video/$videoId'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -677,6 +699,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/read'
     | '/_authenticated/settings'
+    | '/_authenticated/videos'
     | '/_authenticated/watch'
     | '/artist/$username'
     | '/auth/forgot-password'
@@ -694,6 +717,7 @@ export interface FileRouteTypes {
     | '/experience/read'
     | '/experience/watch'
     | '/playlist/$slug'
+    | '/video/$videoId'
     | '/_authenticated/music_/$trackId'
     | '/_authenticated/music_/upload'
     | '/_authenticated/playlists_/$playlistId'
@@ -728,6 +752,7 @@ export interface RootRouteChildren {
   ExperienceReadRoute: typeof ExperienceReadRoute
   ExperienceWatchRoute: typeof ExperienceWatchRoute
   PlaylistSlugRoute: typeof PlaylistSlugRoute
+  VideoVideoIdRoute: typeof VideoVideoIdRoute
   ArtistUsernamePlaylistSlugRoute: typeof ArtistUsernamePlaylistSlugRoute
 }
 
@@ -852,6 +877,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/video/$videoId': {
+      id: '/video/$videoId'
+      path: '/video/$videoId'
+      fullPath: '/video/$videoId'
+      preLoaderRoute: typeof VideoVideoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/playlist/$slug': {
       id: '/playlist/$slug'
       path: '/playlist/$slug'
@@ -969,6 +1001,13 @@ declare module '@tanstack/react-router' {
       path: '/watch'
       fullPath: '/watch'
       preLoaderRoute: typeof AuthenticatedWatchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/videos': {
+      id: '/_authenticated/videos'
+      path: '/videos'
+      fullPath: '/videos'
+      preLoaderRoute: typeof AuthenticatedVideosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings': {
@@ -1147,6 +1186,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReadRoute: typeof AuthenticatedReadRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
   AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
@@ -1172,6 +1212,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReadRoute: AuthenticatedReadRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
   AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
@@ -1229,6 +1270,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExperienceReadRoute: ExperienceReadRoute,
   ExperienceWatchRoute: ExperienceWatchRoute,
   PlaylistSlugRoute: PlaylistSlugRoute,
+  VideoVideoIdRoute: VideoVideoIdRoute,
   ArtistUsernamePlaylistSlugRoute: ArtistUsernamePlaylistSlugRoute,
 }
 export const routeTree = rootRouteImport

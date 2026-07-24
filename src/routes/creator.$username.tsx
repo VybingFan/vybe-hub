@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   ExternalLink,
+  Film,
   Heart,
   LayoutDashboard,
   Loader2,
@@ -18,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { usePublicCreator } from "@/hooks/usePublicCreator";
 import { useUser } from "@/hooks/useUser";
 import { MERCH_AVAILABILITY } from "@/features/merch/schema";
+import { VIDEO_TYPES } from "@/features/video/schema";
 
 export const Route = createFileRoute("/creator/$username")({ component: CreatorPage });
 
@@ -53,7 +55,7 @@ export function PublicArtistHome({
       </div>
     );
 
-  const { profile, tracks, merch } = data;
+  const { profile, tracks, merch, videos } = data;
   const isOwner = user?.id === profile.user_id;
   const name = profile.artist_name || profile.display_name;
   const share = () =>
@@ -191,6 +193,46 @@ export function PublicArtistHome({
             )}
           </aside>
         </section>
+        {!!videos.length && (
+          <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+            <p className="text-sm font-semibold uppercase tracking-[.2em] text-rose-400">Watch</p>
+            <h2 className="mt-2 text-3xl font-semibold">Videos from {name}</h2>
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {videos.map((video) => (
+                <Link
+                  key={video.id}
+                  to="/video/$videoId"
+                  params={{ videoId: video.id }}
+                  className="group overflow-hidden rounded-2xl border border-border bg-card transition hover:border-rose-400/50"
+                >
+                  <div className="relative aspect-video overflow-hidden bg-muted">
+                    {video.thumbnail_url ? (
+                      <img
+                        src={video.thumbnail_url}
+                        alt=""
+                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-gradient-to-br from-rose-500/20 to-violet-500/20">
+                        <Film className="h-12 w-12 text-rose-300" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <p className="text-xs font-medium text-rose-400">
+                      {VIDEO_TYPES.find((type) => type.value === video.video_type)?.label ||
+                        "Video"}
+                    </p>
+                    <h3 className="mt-1 line-clamp-2 text-lg font-semibold">{video.title}</h3>
+                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                      {video.description || `Watch ${video.title} on VYBE.`}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
         {!!merch.length && (
           <section className="mx-auto max-w-7xl px-6 pb-16">
             <p className="text-sm font-semibold uppercase tracking-[.2em] text-genre-country">

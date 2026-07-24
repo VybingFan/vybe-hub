@@ -2,11 +2,13 @@ import { supabase } from "@/integrations/supabase/client";
 import type { CreatorProfile, PersonalLink } from "@/features/profile/schema";
 import type { Track } from "@/features/music/schema";
 import type { MerchProduct } from "@/features/merch/schema";
+import type { CreatorVideo } from "@/features/video/schema";
 
 export interface PublicCreatorPage {
   profile: CreatorProfile;
   tracks: Track[];
   merch: MerchProduct[];
+  videos: CreatorVideo[];
 }
 
 async function signedUrl(bucket: string, path: string | null) {
@@ -25,24 +27,36 @@ export const publicCreatorService = {
     if (error) throw error;
     if (!profile || !profile.username) return null;
 
-    const [{ data: rows, error: tracksError }, { data: merch, error: merchError }] =
-      await Promise.all([
-        supabase
-          .from("tracks")
-          .select("*")
-          .eq("creator_id", profile.user_id)
-          .eq("status", "published")
-          .order("is_featured", { ascending: false })
-          .order("created_at", { ascending: false }),
-        supabase
-          .from("merch_products")
-          .select("*")
-          .eq("creator_id", profile.user_id)
-          .eq("is_active", true)
-          .order("created_at", { ascending: false }),
-      ]);
+    const [
+      { data: rows, error: tracksError },
+      { data: merch, error: merchError },
+      { data: videos, error: videosError },
+    ] = await Promise.all([
+      supabase
+        .from("tracks")
+        .select("*")
+        .eq("creator_id", profile.user_id)
+        .eq("status", "published")
+        .order("is_featured", { ascending: false })
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("merch_products")
+        .select("*")
+        .eq("creator_id", profile.user_id)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("creator_videos")
+        .select("*")
+        .eq("creator_id", profile.user_id)
+        .eq("status", "published")
+        .eq("visibility", "public")
+        .order("is_featured", { ascending: false })
+        .order("created_at", { ascending: false }),
+    ]);
     if (tracksError) throw tracksError;
     if (merchError) throw merchError;
+    if (videosError) throw videosError;
 
     const tracks = await Promise.all(
       (rows ?? []).map(async (track) => ({
@@ -80,6 +94,7 @@ export const publicCreatorService = {
       },
       tracks,
       merch: hydratedMerch,
+      videos: (videos ?? []) as CreatorVideo[],
     };
   },
 };

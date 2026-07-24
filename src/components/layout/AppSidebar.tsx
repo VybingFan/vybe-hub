@@ -69,6 +69,7 @@ const creatorItems: NavItem[] = [
   { title: "Content", url: "/content", icon: LibraryBig, allow: ["creator", "admin"] },
   { title: "Music Library", url: "/music", icon: Music2, allow: ["creator", "admin"] },
   { title: "Upload Music", url: "/music/upload", icon: Upload, allow: ["creator", "admin"] },
+  { title: "Video Library", url: "/videos", icon: Clapperboard, allow: ["creator", "admin"] },
   { title: "Playlists", url: "/playlists", icon: ListMusic, allow: ["creator", "admin"] },
   { title: "Activity", url: "/activity", icon: BellRing, allow: ["creator", "admin"] },
   { title: "Connections", url: "/connections", icon: ContactRound, allow: ["creator", "admin"] },

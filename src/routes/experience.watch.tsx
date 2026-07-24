@@ -35,7 +35,7 @@ function WatchPreview() {
           icon: Video,
         },
       ]}
-      note="This demonstrates the intended experience. Video hosting, publishing, rights controls, moderation, and streaming are not enabled yet."
+      note="Creators can now publish YouTube and Vimeo work through a VYBE Video Library and shareable VYBE pages. Native uploads, VYBE-hosted streaming, advanced moderation, and premieres activate in later infrastructure stages."
     />
   );
 }

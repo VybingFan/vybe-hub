@@ -25,8 +25,10 @@ function ContentPage() {
           {
             title: "Videos",
             description:
-              "Future music videos, performances, interviews, trailers, and behind-the-scenes publishing.",
+              "Publish hosted music videos, performances, interviews, trailers, and behind-the-scenes stories.",
             icon: Camera,
+            status: "Available now",
+            to: "/videos",
           },
           {
             title: "Short films",
@@ -52,7 +54,7 @@ function ContentPage() {
             icon: Mic2,
           },
         ]}
-        note="Only Music is enabled. The preview categories do not accept uploads yet; each requires its own storage, rights, moderation, publishing, and membership-limit foundation."
+        note="Music and hosted-video publishing are enabled. Native VYBE video uploads will activate after Cloudflare Stream is connected; the remaining preview categories still require their own foundations."
       />
     </RoleGuard>
   );
