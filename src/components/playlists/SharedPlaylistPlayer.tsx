@@ -58,6 +58,9 @@ export function SharedPlaylistPlayer({
     setPlaying(!playing);
   };
   const next = () => {
+    setCurrent((value) => (value + 1 < tracks.length ? value + 1 : 0));
+  };
+  const handleEnded = () => {
     if (repeat) {
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
@@ -95,7 +98,7 @@ export function SharedPlaylistPlayer({
           }
         }}
         onTimeUpdate={(e) => setElapsed(e.currentTarget.currentTime)}
-        onEnded={next}
+        onEnded={handleEnded}
         onLoadedMetadata={(event) => {
           event.currentTarget.volume = volume;
         }}
@@ -147,10 +150,17 @@ export function SharedPlaylistPlayer({
             >
               <Shuffle className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={previous} aria-label="Previous song">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={previous}
+              aria-label="Previous song"
+            >
               <SkipBack />
             </Button>
             <Button
+              type="button"
               size="icon"
               className="h-14 w-14 rounded-full bg-gradient-brand text-white"
               onClick={toggle}
@@ -162,7 +172,7 @@ export function SharedPlaylistPlayer({
                 <Play className="ml-1 fill-current" />
               )}
             </Button>
-            <Button variant="ghost" size="icon" onClick={next} aria-label="Next song">
+            <Button type="button" variant="ghost" size="icon" onClick={next} aria-label="Next song">
               <SkipForward />
             </Button>
             <Button
