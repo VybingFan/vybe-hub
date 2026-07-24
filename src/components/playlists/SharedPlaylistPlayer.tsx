@@ -100,8 +100,8 @@ export function SharedPlaylistPlayer({
           event.currentTarget.volume = volume;
         }}
       />
-      <div className="grid gap-7 p-6 md:grid-cols-[220px_1fr] md:p-8">
-        <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-brand">
+      <div className="grid gap-6 p-4 sm:p-6 md:grid-cols-[220px_1fr] md:gap-7 md:p-8">
+        <div className="mx-auto aspect-square w-full max-w-xs overflow-hidden rounded-2xl bg-gradient-brand md:max-w-none">
           {track.cover_url ? (
             <img src={track.cover_url} alt="" className="h-full w-full object-cover" />
           ) : (
@@ -114,7 +114,7 @@ export function SharedPlaylistPlayer({
           <p className="text-xs font-semibold uppercase tracking-[.2em] text-primary">
             Now playing
           </p>
-          <h2 className="mt-2 truncate text-3xl font-semibold">{track.title}</h2>
+          <h2 className="mt-2 line-clamp-2 text-2xl font-semibold sm:text-3xl">{track.title}</h2>
           <p className="mt-2 text-muted-foreground">
             {track.primary_artist_name || "Independent artist"}
             {track.featured_artist_names?.length
@@ -189,8 +189,8 @@ export function SharedPlaylistPlayer({
           </div>
         </div>
       </div>
-      <div className="border-t border-border/70 p-3 md:p-5">
-        <p className="px-4 pb-2 text-xs font-semibold uppercase tracking-[.18em] text-muted-foreground">
+      <div className="border-t border-border/70 p-2 sm:p-3 md:p-5">
+        <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-[.18em] text-muted-foreground sm:px-4">
           More from this creator
         </p>
         {tracks.map((item, index) => (
@@ -198,7 +198,7 @@ export function SharedPlaylistPlayer({
             key={item.id}
             onClick={() => select(index)}
             className={cn(
-              "flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left transition hover:bg-white/5",
+              "flex min-h-12 w-full items-center gap-3 rounded-xl px-2 py-3 text-left transition hover:bg-white/5 sm:gap-4 sm:px-4",
               index === current && "bg-primary/10",
             )}
           >

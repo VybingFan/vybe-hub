@@ -34,7 +34,7 @@ export function MarketingNav() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/40 bg-background/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" aria-label="VYBE home">
           <Logo />
         </Link>
@@ -66,7 +66,7 @@ export function MarketingNav() {
         </div>
 
         <button
-          className="rounded-full p-2 md:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-full md:hidden"
           onClick={() => setOpen((value) => !value)}
           aria-label="Toggle menu"
           aria-expanded={open}
@@ -76,8 +76,8 @@ export function MarketingNav() {
       </div>
 
       {open && (
-        <div className="border-t border-border/40 bg-background md:hidden">
-          <div className="space-y-5 px-6 py-5">
+        <div className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-border/40 bg-background md:hidden">
+          <div className="space-y-5 px-4 py-5 sm:px-6">
             <MobileSection
               title="Discover"
               items={NAV_LINKS.map((item) => ({ label: item.label, to: item.to }))}
@@ -92,7 +92,7 @@ export function MarketingNav() {
                 <a href={defaultRoute}>{appLabel}</a>
               </Button>
             ) : !isLoading ? (
-              <div className="grid grid-cols-2 gap-2 border-t border-border/50 pt-4">
+              <div className="grid grid-cols-1 gap-2 border-t border-border/50 pt-4 min-[360px]:grid-cols-2">
                 <Button asChild variant="outline">
                   <Link to="/auth/sign-in">Sign in</Link>
                 </Button>
@@ -174,7 +174,7 @@ function MobileSection({
           <a
             key={item.to}
             href={item.to}
-            className="rounded-xl px-3 py-2 text-sm transition-colors hover:bg-muted"
+            className="flex min-h-11 items-center rounded-xl px-3 py-2 text-sm transition-colors hover:bg-muted"
           >
             {item.label}
           </a>

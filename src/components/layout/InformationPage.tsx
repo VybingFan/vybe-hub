@@ -23,17 +23,17 @@ export function InformationPage({
       <MarketingNav />
       <main>
         <section className="border-b border-border/60 bg-surface/35">
-          <div className="mx-auto max-w-5xl px-6 py-20">
+          <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
               {eyebrow}
             </p>
-            <h1 className="mt-4 max-w-4xl text-4xl font-bold tracking-tight md:text-6xl">
+            <h1 className="mt-4 max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl md:text-6xl">
               {title}
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">{description}</p>
           </div>
         </section>
-        <section className="mx-auto grid max-w-5xl gap-5 px-6 py-16 md:grid-cols-2">
+        <section className="mx-auto grid max-w-5xl gap-5 px-4 py-12 sm:px-6 sm:py-16 md:grid-cols-2">
           {sections.map((section) => (
             <article
               id={section.id}

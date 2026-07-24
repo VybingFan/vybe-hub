@@ -67,7 +67,7 @@ export function GenrePicker({
           <ChevronDown className="ml-2 h-4 w-4 shrink-0" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-[340px] p-2">
+      <PopoverContent align="start" className="w-[calc(100vw-2rem)] max-w-[340px] p-2">
         <p className="px-2 pb-2 text-xs text-muted-foreground">
           First selection is your primary genre · {value.length}/{max}
         </p>

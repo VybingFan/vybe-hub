@@ -24,11 +24,11 @@ function CreatorMembershipsPage() {
       <MarketingNav />
       <main>
         <section className="border-b border-border/60 bg-gradient-hero">
-          <div className="mx-auto max-w-7xl px-6 py-20 text-center">
+          <div className="mx-auto max-w-7xl px-4 py-14 text-center sm:px-6 sm:py-20">
             <Badge variant="outline" className="border-primary/30 bg-primary/5 text-primary">
               Creator memberships
             </Badge>
-            <h1 className="mx-auto mt-5 max-w-4xl text-4xl font-bold tracking-tight md:text-6xl">
+            <h1 className="mx-auto mt-5 max-w-4xl text-3xl font-bold tracking-tight sm:text-4xl md:text-6xl">
               Start free. Build the creator home your work deserves.
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
@@ -36,7 +36,7 @@ function CreatorMembershipsPage() {
               playlists. Paid memberships will add capacity, video, AI, analytics, and professional
               tools as each feature becomes ready.
             </p>
-            <div className="mt-8 inline-flex rounded-full border border-border bg-background p-1">
+            <div className="mt-8 inline-flex max-w-full flex-wrap justify-center rounded-2xl border border-border bg-background p-1 sm:rounded-full">
               <Button
                 type="button"
                 size="sm"
@@ -53,13 +53,13 @@ function CreatorMembershipsPage() {
                 className="rounded-full"
                 onClick={() => setBilling("annual")}
               >
-                Annual · save about 2 months
+                Annual · save 2 months
               </Button>
             </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 py-16">
+        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
           <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
             {CREATOR_PLAN_CATALOG.map((plan) => {
               const price = billing === "annual" ? plan.annualPrice : plan.monthlyPrice;
