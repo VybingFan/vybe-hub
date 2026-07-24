@@ -10,6 +10,8 @@ export interface Playlist {
   is_published: boolean;
   created_at: string;
   updated_at: string;
+  /** Ordered track IDs included on creator-owned playlist queries. */
+  trackIds?: string[];
 }
 
 export interface SharedPlaylist extends Playlist {

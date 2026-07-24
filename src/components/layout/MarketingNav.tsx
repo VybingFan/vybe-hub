@@ -3,11 +3,7 @@ import { useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/common/Logo";
-import {
-  BUILD_ON_VYBE_LINKS,
-  MORE_LINKS,
-  NAV_LINKS,
-} from "@/constants/app";
+import { BUILD_ON_VYBE_LINKS, MORE_LINKS, NAV_LINKS } from "@/constants/app";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,11 +12,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useUser } from "@/hooks/useUser";
 import { cn } from "@/lib/utils";
 
 export function MarketingNav() {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const { user, primaryRole, defaultRoute, isLoading } = useUser();
+  const appLabel =
+    primaryRole === "admin"
+      ? "Open Admin"
+      : primaryRole === "creator"
+        ? "Open Creator Studio"
+        : "Open VYBE";
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/40 bg-background/70 backdrop-blur-xl">
@@ -48,12 +52,20 @@ export function MarketingNav() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button asChild variant="ghost">
-            <Link to="/auth/sign-in">Sign in</Link>
-          </Button>
-          <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
-            <Link to="/auth/sign-up">Join VYBE</Link>
-          </Button>
+          {!isLoading && user ? (
+            <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
+              <a href={defaultRoute}>{appLabel}</a>
+            </Button>
+          ) : !isLoading ? (
+            <>
+              <Button asChild variant="ghost">
+                <Link to="/auth/sign-in">Sign in</Link>
+              </Button>
+              <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
+                <Link to="/auth/sign-up">Join VYBE</Link>
+              </Button>
+            </>
+          ) : null}
         </div>
 
         <button
@@ -76,14 +88,20 @@ export function MarketingNav() {
             <MobileSection title="Build on VYBE" items={BUILD_ON_VYBE_LINKS} />
             <MobileSection title="More" items={MORE_LINKS} />
 
-            <div className="grid grid-cols-2 gap-2 border-t border-border/50 pt-4">
-              <Button asChild variant="outline">
-                <Link to="/auth/sign-in">Sign in</Link>
+            {!isLoading && user ? (
+              <Button asChild className="w-full bg-gradient-brand text-primary-foreground">
+                <a href={defaultRoute}>{appLabel}</a>
               </Button>
-              <Button asChild className="bg-gradient-brand text-primary-foreground">
-                <Link to="/auth/sign-up">Join VYBE</Link>
-              </Button>
-            </div>
+            ) : !isLoading ? (
+              <div className="grid grid-cols-2 gap-2 border-t border-border/50 pt-4">
+                <Button asChild variant="outline">
+                  <Link to="/auth/sign-in">Sign in</Link>
+                </Button>
+                <Button asChild className="bg-gradient-brand text-primary-foreground">
+                  <Link to="/auth/sign-up">Join VYBE</Link>
+                </Button>
+              </div>
+            ) : null}
           </div>
         </div>
       )}
@@ -115,9 +133,7 @@ function NavDropdown({
               <div>
                 <p className="font-medium">{item.label}</p>
                 {detailed && item.description ? (
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                    {item.description}
-                  </p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">{item.description}</p>
                 ) : null}
               </div>
             </a>

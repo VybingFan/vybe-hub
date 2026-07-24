@@ -1,8 +1,28 @@
 import { FormEvent, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Copy, ListMusic, Loader2, Plus, Search, Upload } from "lucide-react";
+import {
+  Check,
+  Copy,
+  ListMusic,
+  Loader2,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,9 +36,14 @@ import {
 } from "@/components/ui/select";
 import { useUser } from "@/hooks/useUser";
 import { useCreatorTracks, useUpdateTrack } from "@/hooks/useMusic";
-import { useCreatePlaylist, useMyPlaylists } from "@/hooks/usePlaylists";
+import {
+  useCreatePlaylist,
+  useDeletePlaylist,
+  useMyPlaylists,
+  useReplacePlaylistTracks,
+} from "@/hooks/usePlaylists";
 import { formatDuration } from "@/features/music/schema";
-import { PLAYLIST_PURPOSES } from "@/features/playlists/schema";
+import { PLAYLIST_PURPOSES, type Playlist } from "@/features/playlists/schema";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 
 export const Route = createFileRoute("/_authenticated/playlists")({
@@ -36,6 +61,8 @@ function PlaylistStudio() {
   const { data: creatorProfile } = useCreatorProfile(user?.id);
   const { data: playlists = [] } = useMyPlaylists(user?.id);
   const create = useCreatePlaylist(user?.id);
+  const replaceTracks = useReplacePlaylistTracks(user?.id);
+  const deletePlaylist = useDeletePlaylist(user?.id);
   const [selected, setSelected] = useState<string[]>([]);
   const [songQuery, setSongQuery] = useState("");
   const [songGenre, setSongGenre] = useState("all");
@@ -43,11 +70,14 @@ function PlaylistStudio() {
   const [playlistSort, setPlaylistSort] = useState<"newest" | "title">("newest");
   const [visiblePlaylistCount, setVisiblePlaylistCount] = useState(8);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
+  const [editingPlaylistId, setEditingPlaylistId] = useState<string | null>(null);
+  const [editSelected, setEditSelected] = useState<string[]>([]);
+  const [deleteTarget, setDeleteTarget] = useState<Playlist | null>(null);
   const songGenres = useMemo(
     () =>
-      Array.from(new Set(tracks.map((track) => track.genre?.trim()).filter(Boolean) as string[])).sort(
-        (a, b) => a.localeCompare(b),
-      ),
+      Array.from(
+        new Set(tracks.map((track) => track.genre?.trim()).filter(Boolean) as string[]),
+      ).sort((a, b) => a.localeCompare(b)),
     [tracks],
   );
   const visibleTracks = useMemo(() => {
@@ -77,6 +107,10 @@ function PlaylistStudio() {
     );
   }, [playlistQuery, playlistSort, playlists]);
   const visiblePlaylists = filteredPlaylists.slice(0, visiblePlaylistCount);
+  const publishedTracks = useMemo(
+    () => tracks.filter((track) => track.status === "published"),
+    [tracks],
+  );
 
   const publishAndAddTrack = async (trackId: string) => {
     try {
@@ -100,7 +134,8 @@ function PlaylistStudio() {
         occasion: String(form.get("occasion") || ""),
         trackIds: selected,
       });
-      if (!playlist?.slug) throw new Error("Playlist published without a share link. Refresh and try again.");
+      if (!playlist?.slug)
+        throw new Error("Playlist published without a share link. Refresh and try again.");
       setCreatedSlug(playlist.slug);
       setSelected([]);
       setSongQuery("");
@@ -137,6 +172,43 @@ function PlaylistStudio() {
     } catch {
       window.prompt("Copy this playlist link:", url);
       toast.error("Automatic copy was blocked. Copy the displayed link instead.");
+    }
+  };
+  const beginEditing = (playlist: Playlist) => {
+    setEditingPlaylistId(playlist.id);
+    setEditSelected(playlist.trackIds ?? []);
+  };
+  const savePlaylistSongs = async () => {
+    if (!editingPlaylistId) return;
+    if (!editSelected.length) {
+      toast.error("Keep at least one published song in the playlist.");
+      return;
+    }
+    try {
+      await replaceTracks.mutateAsync({
+        playlistId: editingPlaylistId,
+        trackIds: editSelected,
+      });
+      setEditingPlaylistId(null);
+      setEditSelected([]);
+      toast.success("Playlist songs updated.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not update playlist songs");
+    }
+  };
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deletePlaylist.mutateAsync(deleteTarget.id);
+      if (editingPlaylistId === deleteTarget.id) {
+        setEditingPlaylistId(null);
+        setEditSelected([]);
+      }
+      if (createdSlug === deleteTarget.slug) setCreatedSlug(null);
+      setDeleteTarget(null);
+      toast.success("Playlist deleted. Your uploaded songs are still in your music library.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not delete playlist");
     }
   };
 
@@ -339,7 +411,9 @@ function PlaylistStudio() {
           <div className="flex items-end justify-between gap-3">
             <div>
               <h2 className="text-2xl font-semibold">Your shared playlists</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{playlists.length} published links</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {playlists.length} published links
+              </p>
             </div>
           </div>
           <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_10rem] lg:grid-cols-1 xl:grid-cols-[1fr_10rem]">
@@ -351,7 +425,10 @@ function PlaylistStudio() {
               }}
               placeholder="Search playlist titles or types"
             />
-            <Select value={playlistSort} onValueChange={(value) => setPlaylistSort(value as typeof playlistSort)}>
+            <Select
+              value={playlistSort}
+              onValueChange={(value) => setPlaylistSort(value as typeof playlistSort)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -365,21 +442,130 @@ function PlaylistStudio() {
             {visiblePlaylists.length ? (
               visiblePlaylists.map((playlist) => (
                 <article key={playlist.id} className="rounded-2xl border border-border bg-card p-5">
-                  <p className="font-semibold">{playlist.title}</p>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold">{playlist.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {(playlist.trackIds ?? []).length}{" "}
+                        {(playlist.trackIds ?? []).length === 1 ? "song" : "songs"}
+                      </p>
+                    </div>
+                  </div>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {playlist.occasion || "Shared listening experience"}
                   </p>
                   <p className="mt-3 break-all text-xs text-muted-foreground">
                     {shareUrl(playlist.slug)}
                   </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-4"
-                    onClick={() => copy(playlist.slug)}
-                  >
-                    <Copy className="mr-2 h-4 w-4" /> Copy link
-                  </Button>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Button variant="outline" size="sm" onClick={() => copy(playlist.slug)}>
+                      <Copy className="mr-2 h-4 w-4" /> Copy link
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (editingPlaylistId === playlist.id) {
+                          setEditingPlaylistId(null);
+                          setEditSelected([]);
+                        } else {
+                          beginEditing(playlist);
+                        }
+                      }}
+                    >
+                      <Pencil className="mr-2 h-4 w-4" />
+                      {editingPlaylistId === playlist.id ? "Close" : "Manage songs"}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => setDeleteTarget(playlist)}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" /> Delete
+                    </Button>
+                  </div>
+
+                  {editingPlaylistId === playlist.id && (
+                    <div className="mt-5 rounded-2xl border border-border/70 bg-background/60 p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="font-medium">Songs in this playlist</p>
+                          <p className="text-xs text-muted-foreground">
+                            Select your published songs, then save.
+                          </p>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {editSelected.length} selected
+                        </span>
+                      </div>
+                      <div className="mt-3 max-h-64 space-y-2 overflow-auto">
+                        {publishedTracks.length ? (
+                          publishedTracks.map((track) => {
+                            const checked = editSelected.includes(track.id);
+                            return (
+                              <button
+                                key={track.id}
+                                type="button"
+                                className="flex w-full items-center gap-3 rounded-xl border border-border/60 px-3 py-2 text-left transition-colors hover:bg-muted"
+                                onClick={() =>
+                                  setEditSelected((current) =>
+                                    checked
+                                      ? current.filter((id) => id !== track.id)
+                                      : [...current, track.id],
+                                  )
+                                }
+                              >
+                                <span
+                                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border ${
+                                    checked
+                                      ? "border-primary bg-primary text-primary-foreground"
+                                      : "border-border"
+                                  }`}
+                                >
+                                  {checked && <Check className="h-3.5 w-3.5" />}
+                                </span>
+                                <span className="min-w-0 flex-1 truncate text-sm">
+                                  {track.title}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {formatDuration(track.duration_sec)}
+                                </span>
+                              </button>
+                            );
+                          })
+                        ) : (
+                          <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+                            Publish a song before managing this playlist.
+                          </p>
+                        )}
+                      </div>
+                      <div className="mt-4 flex flex-wrap justify-end gap-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingPlaylistId(null);
+                            setEditSelected([]);
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          disabled={!editSelected.length || replaceTracks.isPending}
+                          onClick={savePlaylistSongs}
+                        >
+                          {replaceTracks.isPending && (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          )}
+                          Save songs
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </article>
               ))
             ) : playlists.length ? (
@@ -403,6 +589,36 @@ function PlaylistStudio() {
           </div>
         </section>
       </div>
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => {
+          if (!open && !deletePlaylist.isPending) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete “{deleteTarget?.title}”?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes the playlist and its share link. Your uploaded songs will
+              remain in your music library.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletePlaylist.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deletePlaylist.isPending}
+              onClick={(event) => {
+                event.preventDefault();
+                void confirmDelete();
+              }}
+            >
+              {deletePlaylist.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Delete playlist
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

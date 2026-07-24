@@ -23,6 +23,7 @@ function AboutPage() {
           body: "Businesses, venues, brands, and creative organizations can find thoughtful ways to collaborate with creators and communities.",
         },
         {
+          id: "how-vybe-works",
           title: "How VYBE works",
           body: "Public discovery stays fan-friendly while creator and business tools live in clearly separated professional areas.",
         },

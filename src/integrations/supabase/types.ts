@@ -595,6 +595,13 @@ export type Database = {
         Args: { _token: string };
         Returns: string;
       };
+      replace_playlist_tracks: {
+        Args: {
+          _playlist_id: string;
+          _track_ids: string[];
+        };
+        Returns: undefined;
+      };
       select_initial_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] };
         Returns: Database["public"]["Enums"]["app_role"];

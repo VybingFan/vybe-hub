@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ExternalLink,
   Heart,
+  LayoutDashboard,
   Loader2,
   MapPin,
   Share2,
@@ -15,6 +16,7 @@ import { SocialLinksDisplay } from "@/components/socialLinks/SocialLinksDisplay"
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { usePublicCreator } from "@/hooks/usePublicCreator";
+import { useUser } from "@/hooks/useUser";
 import { MERCH_AVAILABILITY } from "@/features/merch/schema";
 
 export const Route = createFileRoute("/creator/$username")({ component: CreatorPage });
@@ -32,6 +34,7 @@ export function PublicArtistHome({
   selectedTrackId?: string;
 }) {
   const navigate = useNavigate();
+  const { user, defaultRoute } = useUser();
   const { data, isLoading, error } = usePublicCreator(username);
   if (isLoading)
     return (
@@ -51,6 +54,7 @@ export function PublicArtistHome({
     );
 
   const { profile, tracks, merch } = data;
+  const isOwner = user?.id === profile.user_id;
   const name = profile.artist_name || profile.display_name;
   const share = () =>
     navigator.share
@@ -61,7 +65,7 @@ export function PublicArtistHome({
     <div className="min-h-screen bg-background">
       <MarketingNav />
       <div className="border-b border-border/50 bg-background/85">
-        <div className="mx-auto flex h-12 max-w-7xl items-center px-6">
+        <div className="mx-auto flex h-12 max-w-7xl items-center justify-between gap-3 px-6">
           <Button
             type="button"
             variant="ghost"
@@ -78,6 +82,14 @@ export function PublicArtistHome({
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
+          {isOwner && (
+            <Button asChild size="sm" className="bg-gradient-brand text-white">
+              <a href={defaultRoute}>
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                Open Creator Studio
+              </a>
+            </Button>
+          )}
         </div>
       </div>
       <main>

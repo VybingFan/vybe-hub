@@ -58,11 +58,27 @@ export const playlistService = {
   async listMine(userId: string): Promise<Playlist[]> {
     const { data, error } = await supabase
       .from("playlists")
-      .select("*")
+      .select("*, playlist_tracks(track_id, position)")
       .eq("creator_id", userId)
       .order("created_at", { ascending: false });
     if (error) throw error;
-    return data ?? [];
+    return (data ?? []).map(({ playlist_tracks: items, ...playlist }) => ({
+      ...playlist,
+      trackIds: [...items].sort((a, b) => a.position - b.position).map((item) => item.track_id),
+    }));
+  },
+
+  async replaceTracks(playlistId: string, trackIds: string[]): Promise<void> {
+    const { error } = await supabase.rpc("replace_playlist_tracks", {
+      _playlist_id: playlistId,
+      _track_ids: trackIds,
+    });
+    if (error) throw error;
+  },
+
+  async delete(playlistId: string): Promise<void> {
+    const { error } = await supabase.from("playlists").delete().eq("id", playlistId);
+    if (error) throw error;
   },
 
   async getShared(slug: string): Promise<SharedPlaylist | null> {
