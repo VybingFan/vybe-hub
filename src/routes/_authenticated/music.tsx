@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Loader2, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
@@ -8,15 +8,6 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -33,9 +24,8 @@ import {
   useDeleteTrack,
   useReplaceTrackCover,
   useSetProfileLead,
-  useUpdateTrack,
 } from "@/hooks/useMusic";
-import { MAX_COVER_BYTES, type ContentStatus, type Track } from "@/features/music/schema";
+import { MAX_COVER_BYTES, type Track } from "@/features/music/schema";
 
 export const Route = createFileRoute("/_authenticated/music")({
   component: () => (
@@ -46,20 +36,14 @@ export const Route = createFileRoute("/_authenticated/music")({
 });
 
 function MusicLibrary() {
+  const navigate = useNavigate();
   const openUpload = () => window.location.assign("/music/upload");
   const { user } = useUser();
   const { data: tracks = [], isLoading, error } = useCreatorTracks(user?.id);
   const del = useDeleteTrack(user?.id);
-  const upd = useUpdateTrack(user?.id);
   const replaceCover = useReplaceTrackCover(user?.id);
   const setProfileLead = useSetProfileLead(user?.id);
   const [coverTrackId, setCoverTrackId] = useState<string | null>(null);
-  const [editing, setEditing] = useState<Track | null>(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editPrimaryArtist, setEditPrimaryArtist] = useState("");
-  const [editFeaturedArtists, setEditFeaturedArtists] = useState("");
-  const [editStatus, setEditStatus] = useState<ContentStatus>("draft");
-
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | ContentStatus>("all");
   const [genre, setGenre] = useState("all");
@@ -115,39 +99,8 @@ function MusicLibrary() {
     }
   };
 
-  const onEdit = (t: Track) => {
-    setEditing(t);
-    setEditTitle(t.title);
-    setEditPrimaryArtist(t.primary_artist_name || "");
-    setEditFeaturedArtists((t.featured_artist_names || []).join(", "));
-    setEditStatus(t.status);
-  };
-
-  const saveCredits = async () => {
-    if (!editing) return;
-    if (!editTitle.trim() || !editPrimaryArtist.trim()) {
-      toast.error("Song title and primary artist are required");
-      return;
-    }
-    try {
-      await upd.mutateAsync({
-        id: editing.id,
-        patch: {
-          title: editTitle.trim(),
-          primary_artist_name: editPrimaryArtist.trim(),
-          featured_artist_names: editFeaturedArtists
-            .split(",")
-            .map((name) => name.trim())
-            .filter(Boolean),
-          status: editStatus,
-        },
-      });
-      toast.success("Track credits updated");
-      setEditing(null);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Update failed");
-    }
-  };
+  const openEditor = (track: Track) =>
+    navigate({ to: "/music/$trackId", params: { trackId: track.id } });
 
   const onCoverChange = async (track: Track, file: File) => {
     if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
@@ -280,6 +233,7 @@ function MusicLibrary() {
                     track={t}
                     onCoverChange={onCoverChange}
                     coverPending={coverTrackId === t.id}
+                    onEdit={openEditor}
                   />
                 ))}
               </div>
@@ -287,7 +241,7 @@ function MusicLibrary() {
             <TabsContent value="table" className="mt-4">
               <MusicTable
                 tracks={visibleTracks}
-                onEdit={onEdit}
+                onEdit={openEditor}
                 onDelete={onDelete}
                 onToggleFeatured={onToggleFeatured}
               />
@@ -302,68 +256,6 @@ function MusicLibrary() {
           </div>
         )}
       </Section>
-      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit song and artist credits</DialogTitle>
-            <DialogDescription>
-              The uploader account remains separate from the performers credited here.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="edit-track-title">Song title</Label>
-              <Input
-                id="edit-track-title"
-                value={editTitle}
-                onChange={(event) => setEditTitle(event.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-primary-artist">Primary performing artist</Label>
-              <Input
-                id="edit-primary-artist"
-                value={editPrimaryArtist}
-                onChange={(event) => setEditPrimaryArtist(event.target.value)}
-                placeholder="Poppa"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-featured-artists">Additional / featured artists</Label>
-              <Input
-                id="edit-featured-artists"
-                value={editFeaturedArtists}
-                onChange={(event) => setEditFeaturedArtists(event.target.value)}
-                placeholder="Jerzo, Calliope Slim"
-              />
-              <p className="text-xs text-muted-foreground">Separate multiple names with commas.</p>
-            </div>
-            <div className="space-y-2">
-              <Label>Publishing status</Label>
-              <Select
-                value={editStatus}
-                onValueChange={(value) => setEditStatus(value as ContentStatus)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>
-              Cancel
-            </Button>
-            <Button disabled={upd.isPending} onClick={() => void saveCredits()}>
-              {upd.isPending ? "Saving…" : "Save credits"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

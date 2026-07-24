@@ -65,6 +65,24 @@ export function useReplaceTrackCover(userId: string | undefined) {
   });
 }
 
+export function useReplaceTrackAudio(userId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, file, durationSec }: { id: string; file: File; durationSec: number }) => {
+      if (!userId) throw new Error("Not authenticated");
+      return musicService.replaceTrackAudio(userId, id, file, durationSec);
+    },
+    onSuccess: (updated) => {
+      qc.setQueryData(creatorTracksKey(userId), (current: Array<typeof updated> | undefined) =>
+        current?.map((track) => (track.id === updated.id ? updated : track)),
+      );
+      qc.invalidateQueries({ queryKey: creatorTracksKey(userId) });
+      qc.invalidateQueries({ queryKey: ["playlists", userId] });
+      qc.invalidateQueries({ queryKey: ["shared-playlist"] });
+    },
+  });
+}
+
 export function useDeleteTrack(userId: string | undefined) {
   const qc = useQueryClient();
   return useMutation({

@@ -24,17 +24,17 @@ async function signedUrl(bucket: string, path: string | null): Promise<string | 
   return data?.signedUrl ?? null;
 }
 
-async function hydrateTrack(row: any): Promise<Track> {
+async function hydrateTrack(row: Track): Promise<Track> {
   return {
-    ...(row as Track),
+    ...row,
     audio_url: (await signedUrl(AUDIO_BUCKET, row.audio_url)) ?? "",
     cover_url: await signedUrl(COVER_BUCKET, row.cover_url),
   };
 }
 
-async function hydrateAlbum(row: any): Promise<Album> {
+async function hydrateAlbum(row: Album): Promise<Album> {
   return {
-    ...(row as Album),
+    ...row,
     cover_url: await signedUrl(COVER_BUCKET, row.cover_url),
   };
 }
@@ -52,7 +52,9 @@ export const musicService = {
     const membership = await membershipService.getMine().catch(() => null);
     const maxBytes = membership?.limits.audio_bytes ?? MAX_AUDIO_BYTES;
     if (file.size > maxBytes) {
-      throw new Error(`Audio files on your plan must be ${Math.round(maxBytes / 1024 / 1024)}MB or smaller`);
+      throw new Error(
+        `Audio files on your plan must be ${Math.round(maxBytes / 1024 / 1024)}MB or smaller`,
+      );
     }
     if (!file.type.match(/^audio\/(mpeg|mp3)$/) && !file.name.toLowerCase().endsWith(".mp3")) {
       throw new Error("Choose an MP3 audio file");
@@ -159,6 +161,39 @@ export const musicService = {
     }
     if (previousPath && previousPath !== coverPath) {
       await this.removeStorage(COVER_BUCKET, previousPath);
+    }
+    return hydrateTrack(data);
+  },
+
+  async replaceTrackAudio(
+    userId: string,
+    id: string,
+    file: File,
+    durationSec: number,
+  ): Promise<Track> {
+    const { data: existing, error: lookupError } = await supabase
+      .from("tracks")
+      .select("audio_url")
+      .eq("id", id)
+      .eq("creator_id", userId)
+      .single();
+    if (lookupError) throw lookupError;
+
+    const previousPath = existing.audio_url;
+    const newPath = await this.uploadAudio(userId, file);
+    const { data, error } = await supabase
+      .from("tracks")
+      .update({ audio_url: newPath, duration_sec: durationSec })
+      .eq("id", id)
+      .eq("creator_id", userId)
+      .select("*")
+      .single();
+    if (error) {
+      await this.removeStorage(AUDIO_BUCKET, newPath);
+      throw error;
+    }
+    if (previousPath && previousPath !== newPath) {
+      await this.removeStorage(AUDIO_BUCKET, previousPath);
     }
     return hydrateTrack(data);
   },

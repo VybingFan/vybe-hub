@@ -36,12 +36,7 @@ import {
 } from "@/components/ui/select";
 import { useUser } from "@/hooks/useUser";
 import { useCreatorTracks, useUpdateTrack } from "@/hooks/useMusic";
-import {
-  useCreatePlaylist,
-  useDeletePlaylist,
-  useMyPlaylists,
-  useReplacePlaylistTracks,
-} from "@/hooks/usePlaylists";
+import { useCreatePlaylist, useDeletePlaylist, useMyPlaylists } from "@/hooks/usePlaylists";
 import { formatDuration } from "@/features/music/schema";
 import { PLAYLIST_PURPOSES, type Playlist } from "@/features/playlists/schema";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
@@ -61,7 +56,6 @@ function PlaylistStudio() {
   const { data: creatorProfile } = useCreatorProfile(user?.id);
   const { data: playlists = [] } = useMyPlaylists(user?.id);
   const create = useCreatePlaylist(user?.id);
-  const replaceTracks = useReplacePlaylistTracks(user?.id);
   const deletePlaylist = useDeletePlaylist(user?.id);
   const [selected, setSelected] = useState<string[]>([]);
   const [songQuery, setSongQuery] = useState("");
@@ -70,8 +64,6 @@ function PlaylistStudio() {
   const [playlistSort, setPlaylistSort] = useState<"newest" | "title">("newest");
   const [visiblePlaylistCount, setVisiblePlaylistCount] = useState(8);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
-  const [editingPlaylistId, setEditingPlaylistId] = useState<string | null>(null);
-  const [editSelected, setEditSelected] = useState<string[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<Playlist | null>(null);
   const songGenres = useMemo(
     () =>
@@ -107,11 +99,6 @@ function PlaylistStudio() {
     );
   }, [playlistQuery, playlistSort, playlists]);
   const visiblePlaylists = filteredPlaylists.slice(0, visiblePlaylistCount);
-  const publishedTracks = useMemo(
-    () => tracks.filter((track) => track.status === "published"),
-    [tracks],
-  );
-
   const publishAndAddTrack = async (trackId: string) => {
     try {
       await updateTrack.mutateAsync({ id: trackId, patch: { status: "published" } });
@@ -174,36 +161,10 @@ function PlaylistStudio() {
       toast.error("Automatic copy was blocked. Copy the displayed link instead.");
     }
   };
-  const beginEditing = (playlist: Playlist) => {
-    setEditingPlaylistId(playlist.id);
-    setEditSelected(playlist.trackIds ?? []);
-  };
-  const savePlaylistSongs = async () => {
-    if (!editingPlaylistId) return;
-    if (!editSelected.length) {
-      toast.error("Keep at least one published song in the playlist.");
-      return;
-    }
-    try {
-      await replaceTracks.mutateAsync({
-        playlistId: editingPlaylistId,
-        trackIds: editSelected,
-      });
-      setEditingPlaylistId(null);
-      setEditSelected([]);
-      toast.success("Playlist songs updated.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not update playlist songs");
-    }
-  };
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     try {
       await deletePlaylist.mutateAsync(deleteTarget.id);
-      if (editingPlaylistId === deleteTarget.id) {
-        setEditingPlaylistId(null);
-        setEditSelected([]);
-      }
       if (createdSlug === deleteTarget.slug) setCreatedSlug(null);
       setDeleteTarget(null);
       toast.success("Playlist deleted. Your uploaded songs are still in your music library.");
@@ -461,20 +422,11 @@ function PlaylistStudio() {
                     <Button variant="outline" size="sm" onClick={() => copy(playlist.slug)}>
                       <Copy className="mr-2 h-4 w-4" /> Copy link
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        if (editingPlaylistId === playlist.id) {
-                          setEditingPlaylistId(null);
-                          setEditSelected([]);
-                        } else {
-                          beginEditing(playlist);
-                        }
-                      }}
-                    >
-                      <Pencil className="mr-2 h-4 w-4" />
-                      {editingPlaylistId === playlist.id ? "Close" : "Manage songs"}
+                    <Button asChild variant="outline" size="sm">
+                      <Link to="/playlists/$playlistId" params={{ playlistId: playlist.id }}>
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Manage playlist
+                      </Link>
                     </Button>
                     <Button
                       variant="ghost"
@@ -485,96 +437,6 @@ function PlaylistStudio() {
                       <Trash2 className="mr-2 h-4 w-4" /> Delete playlist
                     </Button>
                   </div>
-
-                  {editingPlaylistId === playlist.id && (
-                    <div className="mt-5 rounded-2xl border border-border/70 bg-background/60 p-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="font-medium">Songs in this playlist</p>
-                          <p className="text-xs text-muted-foreground">
-                            Choose Add or Remove for each published song, then save.
-                          </p>
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          {editSelected.length} selected
-                        </span>
-                      </div>
-                      <div className="mt-3 max-h-64 space-y-2 overflow-auto">
-                        {publishedTracks.length ? (
-                          publishedTracks.map((track) => {
-                            const checked = editSelected.includes(track.id);
-                            return (
-                              <button
-                                key={track.id}
-                                type="button"
-                                className="flex w-full items-center gap-3 rounded-xl border border-border/60 px-3 py-2 text-left transition-colors hover:bg-muted"
-                                onClick={() =>
-                                  setEditSelected((current) =>
-                                    checked
-                                      ? current.filter((id) => id !== track.id)
-                                      : [...current, track.id],
-                                  )
-                                }
-                              >
-                                <span
-                                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border ${
-                                    checked
-                                      ? "border-primary bg-primary text-primary-foreground"
-                                      : "border-border"
-                                  }`}
-                                >
-                                  {checked && <Check className="h-3.5 w-3.5" />}
-                                </span>
-                                <span className="min-w-0 flex-1 truncate text-sm">
-                                  {track.title}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {formatDuration(track.duration_sec)}
-                                </span>
-                                <span
-                                  className={
-                                    checked
-                                      ? "text-xs font-medium text-destructive"
-                                      : "text-xs font-medium text-primary"
-                                  }
-                                >
-                                  {checked ? "Remove" : "Add"}
-                                </span>
-                              </button>
-                            );
-                          })
-                        ) : (
-                          <p className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-                            Publish a song before managing this playlist.
-                          </p>
-                        )}
-                      </div>
-                      <div className="mt-4 flex flex-wrap justify-end gap-2">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setEditingPlaylistId(null);
-                            setEditSelected([]);
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          disabled={!editSelected.length || replaceTracks.isPending}
-                          onClick={savePlaylistSongs}
-                        >
-                          {replaceTracks.isPending && (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          )}
-                          Save songs
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                 </article>
               ))
             ) : playlists.length ? (

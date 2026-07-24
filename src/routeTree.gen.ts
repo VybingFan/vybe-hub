@@ -60,7 +60,9 @@ import { Route as AuthenticatedConnectionsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
+import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_authenticated/playlists.$playlistId'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
+import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authenticated/music.$trackId'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 
 const TrustRoute = TrustRouteImport.update({
@@ -319,11 +321,23 @@ const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPlaylistsPlaylistIdRoute =
+  AuthenticatedPlaylistsPlaylistIdRouteImport.update({
+    id: '/$playlistId',
+    path: '/$playlistId',
+    getParentRoute: () => AuthenticatedPlaylistsRoute,
+  } as any)
 const AuthenticatedMusicUploadRoute =
   AuthenticatedMusicUploadRouteImport.update({
     id: '/music_/upload',
     path: '/music/upload',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMusicTrackIdRoute =
+  AuthenticatedMusicTrackIdRouteImport.update({
+    id: '/$trackId',
+    path: '/$trackId',
+    getParentRoute: () => AuthenticatedMusicRoute,
   } as any)
 const ArtistUsernamePlaylistSlugRoute =
   ArtistUsernamePlaylistSlugRouteImport.update({
@@ -359,10 +373,10 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
   '/merch': typeof AuthenticatedMerchRoute
-  '/music': typeof AuthenticatedMusicRoute
+  '/music': typeof AuthenticatedMusicRouteWithChildren
   '/my-vybe': typeof AuthenticatedMyVybeRoute
   '/play': typeof AuthenticatedPlayRoute
-  '/playlists': typeof AuthenticatedPlaylistsRoute
+  '/playlists': typeof AuthenticatedPlaylistsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -383,7 +397,9 @@ export interface FileRoutesByFullPath {
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
+  '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
+  '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRoutesByTo {
@@ -413,10 +429,10 @@ export interface FileRoutesByTo {
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
   '/merch': typeof AuthenticatedMerchRoute
-  '/music': typeof AuthenticatedMusicRoute
+  '/music': typeof AuthenticatedMusicRouteWithChildren
   '/my-vybe': typeof AuthenticatedMyVybeRoute
   '/play': typeof AuthenticatedPlayRoute
-  '/playlists': typeof AuthenticatedPlaylistsRoute
+  '/playlists': typeof AuthenticatedPlaylistsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -437,7 +453,9 @@ export interface FileRoutesByTo {
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
+  '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
+  '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRoutesById {
@@ -469,10 +487,10 @@ export interface FileRoutesById {
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/listen': typeof AuthenticatedListenRoute
   '/_authenticated/merch': typeof AuthenticatedMerchRoute
-  '/_authenticated/music': typeof AuthenticatedMusicRoute
+  '/_authenticated/music': typeof AuthenticatedMusicRouteWithChildren
   '/_authenticated/my-vybe': typeof AuthenticatedMyVybeRoute
   '/_authenticated/play': typeof AuthenticatedPlayRoute
-  '/_authenticated/playlists': typeof AuthenticatedPlaylistsRoute
+  '/_authenticated/playlists': typeof AuthenticatedPlaylistsRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/read': typeof AuthenticatedReadRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -493,7 +511,9 @@ export interface FileRoutesById {
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
+  '/_authenticated/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
+  '/_authenticated/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/artist/$username_/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRouteTypes {
@@ -549,7 +569,9 @@ export interface FileRouteTypes {
     | '/experience/read'
     | '/experience/watch'
     | '/playlist/$slug'
+    | '/music/$trackId'
     | '/music/upload'
+    | '/playlists/$playlistId'
     | '/artist/$username/playlist/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -603,7 +625,9 @@ export interface FileRouteTypes {
     | '/experience/read'
     | '/experience/watch'
     | '/playlist/$slug'
+    | '/music/$trackId'
     | '/music/upload'
+    | '/playlists/$playlistId'
     | '/artist/$username/playlist/$slug'
   id:
     | '__root__'
@@ -658,7 +682,9 @@ export interface FileRouteTypes {
     | '/experience/read'
     | '/experience/watch'
     | '/playlist/$slug'
+    | '/_authenticated/music/$trackId'
     | '/_authenticated/music_/upload'
+    | '/_authenticated/playlists/$playlistId'
     | '/artist/$username_/playlist/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -1051,12 +1077,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedActivityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/playlists/$playlistId': {
+      id: '/_authenticated/playlists/$playlistId'
+      path: '/$playlistId'
+      fullPath: '/playlists/$playlistId'
+      preLoaderRoute: typeof AuthenticatedPlaylistsPlaylistIdRouteImport
+      parentRoute: typeof AuthenticatedPlaylistsRoute
+    }
     '/_authenticated/music_/upload': {
       id: '/_authenticated/music_/upload'
       path: '/music/upload'
       fullPath: '/music/upload'
       preLoaderRoute: typeof AuthenticatedMusicUploadRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/music/$trackId': {
+      id: '/_authenticated/music/$trackId'
+      path: '/$trackId'
+      fullPath: '/music/$trackId'
+      preLoaderRoute: typeof AuthenticatedMusicTrackIdRouteImport
+      parentRoute: typeof AuthenticatedMusicRoute
     }
     '/artist/$username_/playlist/$slug': {
       id: '/artist/$username_/playlist/$slug'
@@ -1067,6 +1107,32 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedMusicRouteChildren {
+  AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
+}
+
+const AuthenticatedMusicRouteChildren: AuthenticatedMusicRouteChildren = {
+  AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
+}
+
+const AuthenticatedMusicRouteWithChildren =
+  AuthenticatedMusicRoute._addFileChildren(AuthenticatedMusicRouteChildren)
+
+interface AuthenticatedPlaylistsRouteChildren {
+  AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
+}
+
+const AuthenticatedPlaylistsRouteChildren: AuthenticatedPlaylistsRouteChildren =
+  {
+    AuthenticatedPlaylistsPlaylistIdRoute:
+      AuthenticatedPlaylistsPlaylistIdRoute,
+  }
+
+const AuthenticatedPlaylistsRouteWithChildren =
+  AuthenticatedPlaylistsRoute._addFileChildren(
+    AuthenticatedPlaylistsRouteChildren,
+  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
@@ -1080,10 +1146,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedListenRoute: typeof AuthenticatedListenRoute
   AuthenticatedMerchRoute: typeof AuthenticatedMerchRoute
-  AuthenticatedMusicRoute: typeof AuthenticatedMusicRoute
+  AuthenticatedMusicRoute: typeof AuthenticatedMusicRouteWithChildren
   AuthenticatedMyVybeRoute: typeof AuthenticatedMyVybeRoute
   AuthenticatedPlayRoute: typeof AuthenticatedPlayRoute
-  AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRoute
+  AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReadRoute: typeof AuthenticatedReadRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -1103,10 +1169,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedListenRoute: AuthenticatedListenRoute,
   AuthenticatedMerchRoute: AuthenticatedMerchRoute,
-  AuthenticatedMusicRoute: AuthenticatedMusicRoute,
+  AuthenticatedMusicRoute: AuthenticatedMusicRouteWithChildren,
   AuthenticatedMyVybeRoute: AuthenticatedMyVybeRoute,
   AuthenticatedPlayRoute: AuthenticatedPlayRoute,
-  AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRoute,
+  AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReadRoute: AuthenticatedReadRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,

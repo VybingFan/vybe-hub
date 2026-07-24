@@ -8,6 +8,8 @@ export interface Playlist {
   occasion: string;
   slug: string;
   is_published: boolean;
+  cover_path: string | null;
+  cover_url: string | null;
   created_at: string;
   updated_at: string;
   /** Ordered track IDs included on creator-owned playlist queries. */
@@ -37,4 +39,11 @@ export interface CreatePlaylistInput {
   description: string;
   occasion: string;
   trackIds: string[];
+}
+
+export interface UpdatePlaylistInput {
+  title: string;
+  description: string;
+  occasion: string;
+  is_published: boolean;
 }

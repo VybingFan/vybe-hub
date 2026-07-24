@@ -57,7 +57,7 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
       </div>
     );
 
-  const artwork = data.tracks.find((track) => track.cover_url)?.cover_url;
+  const artwork = data.cover_url || data.tracks.find((track) => track.cover_url)?.cover_url;
   const totalSeconds = data.tracks.reduce((total, track) => total + track.duration_sec, 0);
   const minutes = Math.max(1, Math.round(totalSeconds / 60));
   const preferredAppLink = getPreferredAppLink();
@@ -131,6 +131,13 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
       <main className="relative z-10 mx-auto max-w-6xl px-5 pb-16 pt-10 sm:px-6 md:pt-16">
         <section className="grid items-center gap-8 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:gap-14">
           <div>
+            {data.cover_url && (
+              <img
+                src={data.cover_url}
+                alt={`${data.title} playlist cover`}
+                className="mb-6 h-28 w-28 rounded-2xl border border-white/15 object-cover shadow-2xl sm:h-36 sm:w-36"
+              />
+            )}
             <div className="inline-flex items-center gap-2 rounded-full border border-fuchsia-300/25 bg-fuchsia-400/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[.18em] text-fuchsia-200">
               <Sparkles className="h-3.5 w-3.5" /> A personal VYBE from {data.artistName}
             </div>

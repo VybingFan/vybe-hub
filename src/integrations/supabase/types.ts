@@ -313,6 +313,7 @@ export type Database = {
       };
       playlists: {
         Row: {
+          cover_path: string | null;
           created_at: string;
           creator_id: string;
           description: string;
@@ -324,6 +325,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          cover_path?: string | null;
           created_at?: string;
           creator_id: string;
           description?: string;
@@ -335,6 +337,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          cover_path?: string | null;
           created_at?: string;
           creator_id?: string;
           description?: string;

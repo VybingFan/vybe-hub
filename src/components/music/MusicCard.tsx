@@ -1,5 +1,6 @@
 import type { ChangeEvent } from "react";
-import { ImagePlus, Play, Star } from "lucide-react";
+import { ImagePlus, Pencil, Play, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -9,11 +10,19 @@ interface Props {
   track: Track;
   onPlay?: (track: Track) => void;
   onCoverChange?: (track: Track, file: File) => void;
+  onEdit?: (track: Track) => void;
   coverPending?: boolean;
   className?: string;
 }
 
-export function MusicCard({ track, onPlay, onCoverChange, coverPending, className }: Props) {
+export function MusicCard({
+  track,
+  onPlay,
+  onCoverChange,
+  onEdit,
+  coverPending,
+  className,
+}: Props) {
   const cover = track.cover_url || "/banners/default-creator-banner.png";
   const chooseCover = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -77,6 +86,17 @@ export function MusicCard({ track, onPlay, onCoverChange, coverPending, classNam
               onChange={chooseCover}
             />
           </label>
+        )}
+        {onEdit && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-2 w-full"
+            onClick={() => onEdit(track)}
+          >
+            <Pencil className="mr-2 h-4 w-4" /> Manage song
+          </Button>
         )}
       </CardContent>
     </Card>

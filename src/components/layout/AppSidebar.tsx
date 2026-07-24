@@ -18,6 +18,7 @@ import {
   LayoutDashboard,
   LibraryBig,
   UsersRound,
+  Upload,
 } from "lucide-react";
 import {
   Sidebar,
@@ -66,6 +67,8 @@ const creatorItems: NavItem[] = [
     allow: ["creator", "admin"],
   },
   { title: "Content", url: "/content", icon: LibraryBig, allow: ["creator", "admin"] },
+  { title: "Music Library", url: "/music", icon: Music2, allow: ["creator", "admin"] },
+  { title: "Upload Music", url: "/music/upload", icon: Upload, allow: ["creator", "admin"] },
   { title: "Playlists", url: "/playlists", icon: ListMusic, allow: ["creator", "admin"] },
   { title: "Activity", url: "/activity", icon: BellRing, allow: ["creator", "admin"] },
   { title: "Connections", url: "/connections", icon: ContactRound, allow: ["creator", "admin"] },
