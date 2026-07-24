@@ -64,8 +64,6 @@ function CreatorMembershipsPage() {
           <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
             {CREATOR_PLAN_CATALOG.map((plan) => {
               const price = billing === "annual" ? plan.annualPrice : plan.monthlyPrice;
-              const displayPrice =
-                billing === "annual" && price > 0 ? Math.round(price / 12) : price;
               return (
                 <Card
                   key={plan.code}
@@ -83,11 +81,16 @@ function CreatorMembershipsPage() {
                   <CardContent className="flex h-full flex-col p-6">
                     <p className="text-sm font-semibold text-primary">{plan.name}</p>
                     <div className="mt-4">
-                      <span className="text-4xl font-bold">${displayPrice}</span>
-                      <span className="text-sm text-muted-foreground"> / month</span>
+                      <span className="text-4xl font-bold">${price}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {" "}
+                        / {billing === "annual" ? "year" : "month"}
+                      </span>
                     </div>
                     {billing === "annual" && price > 0 ? (
-                      <p className="mt-1 text-xs text-muted-foreground">${price} billed annually</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Save ${(plan.monthlyPrice * 12) - price} compared with monthly billing
+                      </p>
                     ) : (
                       <div className="h-5" />
                     )}
