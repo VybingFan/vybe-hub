@@ -1,5 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { CreateVideoInput, CreatorVideo, VideoProvider } from "@/features/video/schema";
+import type {
+  CreateVideoInput,
+  CreatorVideo,
+  VideoProvider,
+  VideoType,
+} from "@/features/video/schema";
 
 function parseHostedVideo(source: string): {
   provider: VideoProvider;
@@ -91,6 +96,39 @@ export const videoService = {
         source_url: input.sourceUrl.trim(),
         thumbnail_url: input.thumbnailUrl?.trim() || null,
         status: input.publishNow ? "published" : "draft",
+        visibility: "public",
+        rights_confirmed: true,
+      })
+      .select("*")
+      .single();
+    if (error) throw error;
+    return data as CreatorVideo;
+  },
+
+  async createNative(
+    creatorId: string,
+    input: {
+      title: string;
+      description: string;
+      videoType: VideoType;
+      streamUid: string;
+      rightsConfirmed: boolean;
+    },
+  ): Promise<CreatorVideo> {
+    if (!input.rightsConfirmed)
+      throw new Error("Confirm that you have rights to share this video.");
+    const { data, error } = await supabase
+      .from("creator_videos")
+      .insert({
+        creator_id: creatorId,
+        title: input.title.trim(),
+        description: input.description.trim(),
+        video_type: input.videoType,
+        provider: "cloudflare_stream",
+        provider_video_id: input.streamUid,
+        source_url: null,
+        thumbnail_url: null,
+        status: "draft",
         visibility: "public",
         rights_confirmed: true,
       })

@@ -18,6 +18,15 @@ export function useCreateVideo(creatorId?: string) {
   });
 }
 
+export function useCreateNativeVideo(creatorId?: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: Parameters<typeof videoService.createNative>[1]) =>
+      videoService.createNative(creatorId!, input),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["creator-videos", creatorId] }),
+  });
+}
+
 export function useSetVideoPublished(creatorId?: string) {
   const queryClient = useQueryClient();
   return useMutation({

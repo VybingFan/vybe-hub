@@ -43,6 +43,7 @@ import { Route as AuthRedirectRouteImport } from './routes/auth.redirect'
 import { Route as AuthOnboardingRouteImport } from './routes/auth.onboarding'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as ArtistUsernameRouteImport } from './routes/artist.$username'
+import { Route as ApiVideoUploadUrlRouteImport } from './routes/api.video-upload-url'
 import { Route as AuthenticatedWatchRouteImport } from './routes/_authenticated/watch'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -237,6 +238,11 @@ const ArtistUsernameRoute = ArtistUsernameRouteImport.update({
   path: '/artist/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiVideoUploadUrlRoute = ApiVideoUploadUrlRouteImport.update({
+  id: '/api/video-upload-url',
+  path: '/api/video-upload-url',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedWatchRoute = AuthenticatedWatchRouteImport.update({
   id: '/watch',
   path: '/watch',
@@ -401,6 +407,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
+  '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
@@ -460,6 +467,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
+  '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
@@ -521,6 +529,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_authenticated/watch': typeof AuthenticatedWatchRoute
+  '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
@@ -582,6 +591,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/videos'
     | '/watch'
+    | '/api/video-upload-url'
     | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
@@ -641,6 +651,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/videos'
     | '/watch'
+    | '/api/video-upload-url'
     | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
@@ -701,6 +712,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/videos'
     | '/_authenticated/watch'
+    | '/api/video-upload-url'
     | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
@@ -742,6 +754,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   TrustRoute: typeof TrustRoute
+  ApiVideoUploadUrlRoute: typeof ApiVideoUploadUrlRoute
   ArtistUsernameRoute: typeof ArtistUsernameRoute
   CreatorInviteTokenRoute: typeof CreatorInviteTokenRoute
   CreatorUsernameRoute: typeof CreatorUsernameRoute
@@ -994,6 +1007,13 @@ declare module '@tanstack/react-router' {
       path: '/artist/$username'
       fullPath: '/artist/$username'
       preLoaderRoute: typeof ArtistUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/video-upload-url': {
+      id: '/api/video-upload-url'
+      path: '/api/video-upload-url'
+      fullPath: '/api/video-upload-url'
+      preLoaderRoute: typeof ApiVideoUploadUrlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/watch': {
@@ -1260,6 +1280,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   TrustRoute: TrustRoute,
+  ApiVideoUploadUrlRoute: ApiVideoUploadUrlRoute,
   ArtistUsernameRoute: ArtistUsernameRoute,
   CreatorInviteTokenRoute: CreatorInviteTokenRoute,
   CreatorUsernameRoute: CreatorUsernameRoute,

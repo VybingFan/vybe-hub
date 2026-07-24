@@ -6,8 +6,10 @@ import {
   CloudUpload,
   Copy,
   ExternalLink,
+  FileVideo2,
   Loader2,
   Trash2,
+  Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
@@ -27,12 +29,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { VIDEO_TYPES, type VideoType } from "@/features/video/schema";
 import {
   useCreateVideo,
+  useCreateNativeVideo,
   useDeleteVideo,
   useMyVideos,
   useSetVideoPublished,
 } from "@/hooks/useVideos";
 import { useUser } from "@/hooks/useUser";
 import { videoEmbedUrl } from "@/services/video/videoService";
+import { supabase } from "@/integrations/supabase/client";
+
+const MAX_DIRECT_UPLOAD_BYTES = 200 * 1024 * 1024;
 
 export const Route = createFileRoute("/_authenticated/videos")({
   component: () => (
@@ -94,15 +100,17 @@ function VideoStudio() {
         <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start">
           <CloudUpload className="h-6 w-6 shrink-0 text-cyan-400" />
           <div>
-            <p className="font-semibold">Native VYBE uploads are infrastructure-ready</p>
+            <p className="font-semibold">Upload from your computer or phone gallery</p>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              YouTube and Vimeo links work now. Direct uploads will activate after Cloudflare Stream
-              is connected, providing secure encoding and mobile-quality playback without exposing
+              The upload interface is ready now. It activates after Cloudflare Stream credentials
+              are added, providing secure encoding and mobile-quality playback without exposing
               platform credentials.
             </p>
           </div>
         </CardContent>
       </Card>
+
+      <NativeUploadCard creatorId={user?.id} />
 
       <div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
         <form
@@ -251,12 +259,16 @@ function VideoStudio() {
                         <Copy />
                         Copy link
                       </Button>
-                    ) : (
+                    ) : video.source_url ? (
                       <Button asChild variant="outline">
-                        <a href={video.source_url || "#"} target="_blank" rel="noreferrer noopener">
+                        <a href={video.source_url} target="_blank" rel="noreferrer noopener">
                           <ExternalLink />
                           Source
                         </a>
+                      </Button>
+                    ) : (
+                      <Button type="button" variant="outline" disabled>
+                        Stream draft
                       </Button>
                     )}
                   </div>
@@ -280,4 +292,184 @@ function VideoStudio() {
       </div>
     </div>
   );
+}
+
+function NativeUploadCard({ creatorId }: { creatorId?: string }) {
+  const createNative = useCreateNativeVideo(creatorId);
+  const [file, setFile] = useState<File | null>(null);
+  const [videoType, setVideoType] = useState<VideoType>("music_video");
+  const [progress, setProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    if (!file) {
+      toast.error("Choose a video from your computer or phone gallery.");
+      return;
+    }
+    if (file.size > MAX_DIRECT_UPLOAD_BYTES) {
+      toast.error("This first direct uploader accepts videos up to 200MB.");
+      return;
+    }
+    if (!file.type.startsWith("video/")) {
+      toast.error("Choose a video file.");
+      return;
+    }
+
+    setUploading(true);
+    setProgress(0);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) throw new Error("Sign in again before uploading.");
+
+      const prepare = await fetch("/api/video-upload-url", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ fileName: file.name, fileSize: file.size }),
+      });
+      const prepared = (await prepare.json()) as {
+        uploadURL?: string;
+        uid?: string;
+        error?: string;
+      };
+      if (!prepare.ok || !prepared.uploadURL || !prepared.uid) {
+        throw new Error(prepared.error || "Could not prepare video upload.");
+      }
+
+      await uploadVideoFile(prepared.uploadURL, file, setProgress);
+      await createNative.mutateAsync({
+        title: String(data.get("native_title") || ""),
+        description: String(data.get("native_description") || ""),
+        videoType,
+        streamUid: prepared.uid,
+        rightsConfirmed: data.get("native_rights") === "on",
+      });
+      form.reset();
+      setFile(null);
+      setVideoType("music_video");
+      setProgress(0);
+      toast.success("Video uploaded as a draft. Publish it after processing completes.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not upload video");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={submit} className="rounded-3xl border border-cyan-400/25 bg-card p-5 sm:p-6">
+      <div className="flex items-start gap-3">
+        <Upload className="mt-1 h-6 w-6 shrink-0 text-cyan-400" />
+        <div>
+          <h2 className="text-xl font-semibold">Upload a video from your device</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Choose a video from a computer, tablet, or phone gallery. The initial direct uploader
+            supports files up to 200MB.
+          </p>
+        </div>
+      </div>
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div>
+          <Label htmlFor="native-title">Video title</Label>
+          <Input id="native-title" name="native_title" required maxLength={160} className="mt-2" />
+        </div>
+        <div>
+          <Label>Video type</Label>
+          <Select value={videoType} onValueChange={(value) => setVideoType(value as VideoType)}>
+            <SelectTrigger className="mt-2">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {VIDEO_TYPES.map((type) => (
+                <SelectItem key={type.value} value={type.value}>
+                  {type.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="md:col-span-2">
+          <Label htmlFor="native-description">Description</Label>
+          <Textarea
+            id="native-description"
+            name="native_description"
+            maxLength={5000}
+            className="mt-2"
+          />
+        </div>
+        <label className="flex min-h-28 cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-border p-4 transition hover:border-cyan-400 md:col-span-2">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10">
+            <FileVideo2 className="h-7 w-7 text-cyan-400" />
+          </span>
+          <span className="min-w-0 text-sm">
+            <strong className="block truncate">{file?.name || "Choose video from device"}</strong>
+            <span className="mt-1 block text-muted-foreground">
+              MP4, MOV, or WebM · Maximum 200MB
+            </span>
+          </span>
+          <input
+            type="file"
+            accept="video/mp4,video/quicktime,video/webm,video/*"
+            className="hidden"
+            onChange={(event) => setFile(event.target.files?.[0] || null)}
+          />
+        </label>
+        <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-border p-3 md:col-span-2">
+          <input name="native_rights" type="checkbox" required className="mt-1 h-4 w-4" />
+          <span className="text-sm">
+            I own this video or have permission to upload and publish it on VYBE.
+          </span>
+        </label>
+      </div>
+      {uploading && (
+        <div className="mt-4">
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Uploading securely to Cloudflare Stream</span>
+            <span>{progress}%</span>
+          </div>
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-cyan-400 transition-[width]"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      )}
+      <Button
+        disabled={uploading || createNative.isPending}
+        className="mt-5 w-full bg-gradient-brand text-white sm:w-auto"
+      >
+        {uploading ? <Loader2 className="animate-spin" /> : <Upload />}
+        {uploading ? "Uploading video…" : "Upload from device"}
+      </Button>
+      <p className="mt-3 text-xs text-muted-foreground">
+        Before Stream is connected, this button safely explains which Cloudflare settings are
+        missing. No video leaves your device until a secure one-time upload link is created.
+      </p>
+    </form>
+  );
+}
+
+function uploadVideoFile(uploadURL: string, file: File, onProgress: (progress: number) => void) {
+  return new Promise<void>((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("POST", uploadURL);
+    request.upload.onprogress = (event) => {
+      if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100));
+    };
+    request.onerror = () => reject(new Error("The video upload was interrupted."));
+    request.onload = () => {
+      if (request.status >= 200 && request.status < 300) resolve();
+      else reject(new Error("Cloudflare could not receive this video."));
+    };
+    const body = new FormData();
+    body.append("file", file);
+    request.send(body);
+  });
 }
