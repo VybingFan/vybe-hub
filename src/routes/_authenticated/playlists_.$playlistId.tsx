@@ -51,7 +51,7 @@ import {
 import { formatDuration } from "@/features/music/schema";
 import { PLAYLIST_PURPOSES } from "@/features/playlists/schema";
 
-export const Route = createFileRoute("/_authenticated/playlists/$playlistId")({
+export const Route = createFileRoute("/_authenticated/playlists_/$playlistId")({
   component: () => (
     <RoleGuard allow={["creator", "admin"]}>
       <PlaylistEditor />

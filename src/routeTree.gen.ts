@@ -60,9 +60,9 @@ import { Route as AuthenticatedConnectionsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
-import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_authenticated/playlists.$playlistId'
+import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_authenticated/playlists_.$playlistId'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
-import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authenticated/music.$trackId'
+import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authenticated/music_.$trackId'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 
 const TrustRoute = TrustRouteImport.update({
@@ -323,9 +323,9 @@ const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
 } as any)
 const AuthenticatedPlaylistsPlaylistIdRoute =
   AuthenticatedPlaylistsPlaylistIdRouteImport.update({
-    id: '/$playlistId',
-    path: '/$playlistId',
-    getParentRoute: () => AuthenticatedPlaylistsRoute,
+    id: '/playlists_/$playlistId',
+    path: '/playlists/$playlistId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedMusicUploadRoute =
   AuthenticatedMusicUploadRouteImport.update({
@@ -335,9 +335,9 @@ const AuthenticatedMusicUploadRoute =
   } as any)
 const AuthenticatedMusicTrackIdRoute =
   AuthenticatedMusicTrackIdRouteImport.update({
-    id: '/$trackId',
-    path: '/$trackId',
-    getParentRoute: () => AuthenticatedMusicRoute,
+    id: '/music_/$trackId',
+    path: '/music/$trackId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const ArtistUsernamePlaylistSlugRoute =
   ArtistUsernamePlaylistSlugRouteImport.update({
@@ -373,10 +373,10 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
   '/merch': typeof AuthenticatedMerchRoute
-  '/music': typeof AuthenticatedMusicRouteWithChildren
+  '/music': typeof AuthenticatedMusicRoute
   '/my-vybe': typeof AuthenticatedMyVybeRoute
   '/play': typeof AuthenticatedPlayRoute
-  '/playlists': typeof AuthenticatedPlaylistsRouteWithChildren
+  '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -429,10 +429,10 @@ export interface FileRoutesByTo {
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
   '/merch': typeof AuthenticatedMerchRoute
-  '/music': typeof AuthenticatedMusicRouteWithChildren
+  '/music': typeof AuthenticatedMusicRoute
   '/my-vybe': typeof AuthenticatedMyVybeRoute
   '/play': typeof AuthenticatedPlayRoute
-  '/playlists': typeof AuthenticatedPlaylistsRouteWithChildren
+  '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -487,10 +487,10 @@ export interface FileRoutesById {
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/listen': typeof AuthenticatedListenRoute
   '/_authenticated/merch': typeof AuthenticatedMerchRoute
-  '/_authenticated/music': typeof AuthenticatedMusicRouteWithChildren
+  '/_authenticated/music': typeof AuthenticatedMusicRoute
   '/_authenticated/my-vybe': typeof AuthenticatedMyVybeRoute
   '/_authenticated/play': typeof AuthenticatedPlayRoute
-  '/_authenticated/playlists': typeof AuthenticatedPlaylistsRouteWithChildren
+  '/_authenticated/playlists': typeof AuthenticatedPlaylistsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/read': typeof AuthenticatedReadRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -511,9 +511,9 @@ export interface FileRoutesById {
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
-  '/_authenticated/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
+  '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
-  '/_authenticated/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
+  '/_authenticated/playlists_/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/artist/$username_/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRouteTypes {
@@ -682,9 +682,9 @@ export interface FileRouteTypes {
     | '/experience/read'
     | '/experience/watch'
     | '/playlist/$slug'
-    | '/_authenticated/music/$trackId'
+    | '/_authenticated/music_/$trackId'
     | '/_authenticated/music_/upload'
-    | '/_authenticated/playlists/$playlistId'
+    | '/_authenticated/playlists_/$playlistId'
     | '/artist/$username_/playlist/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -1077,12 +1077,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedActivityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/playlists/$playlistId': {
-      id: '/_authenticated/playlists/$playlistId'
-      path: '/$playlistId'
+    '/_authenticated/playlists_/$playlistId': {
+      id: '/_authenticated/playlists_/$playlistId'
+      path: '/playlists/$playlistId'
       fullPath: '/playlists/$playlistId'
       preLoaderRoute: typeof AuthenticatedPlaylistsPlaylistIdRouteImport
-      parentRoute: typeof AuthenticatedPlaylistsRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/music_/upload': {
       id: '/_authenticated/music_/upload'
@@ -1091,12 +1091,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMusicUploadRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/music/$trackId': {
-      id: '/_authenticated/music/$trackId'
-      path: '/$trackId'
+    '/_authenticated/music_/$trackId': {
+      id: '/_authenticated/music_/$trackId'
+      path: '/music/$trackId'
       fullPath: '/music/$trackId'
       preLoaderRoute: typeof AuthenticatedMusicTrackIdRouteImport
-      parentRoute: typeof AuthenticatedMusicRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/artist/$username_/playlist/$slug': {
       id: '/artist/$username_/playlist/$slug'
@@ -1107,32 +1107,6 @@ declare module '@tanstack/react-router' {
     }
   }
 }
-
-interface AuthenticatedMusicRouteChildren {
-  AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
-}
-
-const AuthenticatedMusicRouteChildren: AuthenticatedMusicRouteChildren = {
-  AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
-}
-
-const AuthenticatedMusicRouteWithChildren =
-  AuthenticatedMusicRoute._addFileChildren(AuthenticatedMusicRouteChildren)
-
-interface AuthenticatedPlaylistsRouteChildren {
-  AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
-}
-
-const AuthenticatedPlaylistsRouteChildren: AuthenticatedPlaylistsRouteChildren =
-  {
-    AuthenticatedPlaylistsPlaylistIdRoute:
-      AuthenticatedPlaylistsPlaylistIdRoute,
-  }
-
-const AuthenticatedPlaylistsRouteWithChildren =
-  AuthenticatedPlaylistsRoute._addFileChildren(
-    AuthenticatedPlaylistsRouteChildren,
-  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
@@ -1146,15 +1120,17 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedListenRoute: typeof AuthenticatedListenRoute
   AuthenticatedMerchRoute: typeof AuthenticatedMerchRoute
-  AuthenticatedMusicRoute: typeof AuthenticatedMusicRouteWithChildren
+  AuthenticatedMusicRoute: typeof AuthenticatedMusicRoute
   AuthenticatedMyVybeRoute: typeof AuthenticatedMyVybeRoute
   AuthenticatedPlayRoute: typeof AuthenticatedPlayRoute
-  AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRouteWithChildren
+  AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReadRoute: typeof AuthenticatedReadRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
+  AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
+  AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1169,15 +1145,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedListenRoute: AuthenticatedListenRoute,
   AuthenticatedMerchRoute: AuthenticatedMerchRoute,
-  AuthenticatedMusicRoute: AuthenticatedMusicRouteWithChildren,
+  AuthenticatedMusicRoute: AuthenticatedMusicRoute,
   AuthenticatedMyVybeRoute: AuthenticatedMyVybeRoute,
   AuthenticatedPlayRoute: AuthenticatedPlayRoute,
-  AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRouteWithChildren,
+  AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReadRoute: AuthenticatedReadRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
+  AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
+  AuthenticatedPlaylistsPlaylistIdRoute: AuthenticatedPlaylistsPlaylistIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

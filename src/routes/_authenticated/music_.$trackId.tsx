@@ -37,7 +37,7 @@ import {
 import { formatDuration, MAX_COVER_BYTES, type ContentStatus } from "@/features/music/schema";
 import { readAudioDuration } from "@/services/music/musicService";
 
-export const Route = createFileRoute("/_authenticated/music/$trackId")({
+export const Route = createFileRoute("/_authenticated/music_/$trackId")({
   component: () => (
     <RoleGuard allow={["creator", "admin"]}>
       <SongEditor />
