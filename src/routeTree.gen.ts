@@ -33,14 +33,23 @@ import { Route as AuthRedirectRouteImport } from './routes/auth.redirect'
 import { Route as AuthOnboardingRouteImport } from './routes/auth.onboarding'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as ArtistUsernameRouteImport } from './routes/artist.$username'
+import { Route as AuthenticatedWatchRouteImport } from './routes/_authenticated/watch'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedReadRouteImport } from './routes/_authenticated/read'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPlaylistsRouteImport } from './routes/_authenticated/playlists'
+import { Route as AuthenticatedPlayRouteImport } from './routes/_authenticated/play'
+import { Route as AuthenticatedMyVybeRouteImport } from './routes/_authenticated/my-vybe'
 import { Route as AuthenticatedMusicRouteImport } from './routes/_authenticated/music'
 import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/merch'
+import { Route as AuthenticatedListenRouteImport } from './routes/_authenticated/listen'
+import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedContentRouteImport } from './routes/_authenticated/content'
 import { Route as AuthenticatedConnectionsRouteImport } from './routes/_authenticated/connections'
+import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
@@ -165,9 +174,19 @@ const ArtistUsernameRoute = ArtistUsernameRouteImport.update({
   path: '/artist/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWatchRoute = AuthenticatedWatchRouteImport.update({
+  id: '/watch',
+  path: '/watch',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReadRoute = AuthenticatedReadRouteImport.update({
+  id: '/read',
+  path: '/read',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
@@ -180,6 +199,16 @@ const AuthenticatedPlaylistsRoute = AuthenticatedPlaylistsRouteImport.update({
   path: '/playlists',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPlayRoute = AuthenticatedPlayRouteImport.update({
+  id: '/play',
+  path: '/play',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMyVybeRoute = AuthenticatedMyVybeRouteImport.update({
+  id: '/my-vybe',
+  path: '/my-vybe',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMusicRoute = AuthenticatedMusicRouteImport.update({
   id: '/music',
   path: '/music',
@@ -188,6 +217,21 @@ const AuthenticatedMusicRoute = AuthenticatedMusicRouteImport.update({
 const AuthenticatedMerchRoute = AuthenticatedMerchRouteImport.update({
   id: '/merch',
   path: '/merch',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedListenRoute = AuthenticatedListenRouteImport.update({
+  id: '/listen',
+  path: '/listen',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDiscoverRoute = AuthenticatedDiscoverRouteImport.update({
@@ -200,10 +244,21 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedContentRoute = AuthenticatedContentRouteImport.update({
+  id: '/content',
+  path: '/content',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedConnectionsRoute =
   AuthenticatedConnectionsRouteImport.update({
     id: '/connections',
     path: '/connections',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCommunitiesRoute =
+  AuthenticatedCommunitiesRouteImport.update({
+    id: '/communities',
+    path: '/communities',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -245,14 +300,23 @@ export interface FileRoutesByFullPath {
   '/trust': typeof TrustRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/communities': typeof AuthenticatedCommunitiesRoute
   '/connections': typeof AuthenticatedConnectionsRoute
+  '/content': typeof AuthenticatedContentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
+  '/events': typeof AuthenticatedEventsRoute
+  '/home': typeof AuthenticatedHomeRoute
+  '/listen': typeof AuthenticatedListenRoute
   '/merch': typeof AuthenticatedMerchRoute
   '/music': typeof AuthenticatedMusicRoute
+  '/my-vybe': typeof AuthenticatedMyVybeRoute
+  '/play': typeof AuthenticatedPlayRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/watch': typeof AuthenticatedWatchRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
@@ -282,14 +346,23 @@ export interface FileRoutesByTo {
   '/trust': typeof TrustRoute
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/communities': typeof AuthenticatedCommunitiesRoute
   '/connections': typeof AuthenticatedConnectionsRoute
+  '/content': typeof AuthenticatedContentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
+  '/events': typeof AuthenticatedEventsRoute
+  '/home': typeof AuthenticatedHomeRoute
+  '/listen': typeof AuthenticatedListenRoute
   '/merch': typeof AuthenticatedMerchRoute
   '/music': typeof AuthenticatedMusicRoute
+  '/my-vybe': typeof AuthenticatedMyVybeRoute
+  '/play': typeof AuthenticatedPlayRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/watch': typeof AuthenticatedWatchRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
@@ -321,14 +394,23 @@ export interface FileRoutesById {
   '/trust': typeof TrustRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/communities': typeof AuthenticatedCommunitiesRoute
   '/_authenticated/connections': typeof AuthenticatedConnectionsRoute
+  '/_authenticated/content': typeof AuthenticatedContentRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
+  '/_authenticated/events': typeof AuthenticatedEventsRoute
+  '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/listen': typeof AuthenticatedListenRoute
   '/_authenticated/merch': typeof AuthenticatedMerchRoute
   '/_authenticated/music': typeof AuthenticatedMusicRoute
+  '/_authenticated/my-vybe': typeof AuthenticatedMyVybeRoute
+  '/_authenticated/play': typeof AuthenticatedPlayRoute
   '/_authenticated/playlists': typeof AuthenticatedPlaylistsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/read': typeof AuthenticatedReadRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/watch': typeof AuthenticatedWatchRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/onboarding': typeof AuthOnboardingRoute
@@ -360,14 +442,23 @@ export interface FileRouteTypes {
     | '/trust'
     | '/activity'
     | '/admin'
+    | '/communities'
     | '/connections'
+    | '/content'
     | '/dashboard'
     | '/discover'
+    | '/events'
+    | '/home'
+    | '/listen'
     | '/merch'
     | '/music'
+    | '/my-vybe'
+    | '/play'
     | '/playlists'
     | '/profile'
+    | '/read'
     | '/settings'
+    | '/watch'
     | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
@@ -397,14 +488,23 @@ export interface FileRouteTypes {
     | '/trust'
     | '/activity'
     | '/admin'
+    | '/communities'
     | '/connections'
+    | '/content'
     | '/dashboard'
     | '/discover'
+    | '/events'
+    | '/home'
+    | '/listen'
     | '/merch'
     | '/music'
+    | '/my-vybe'
+    | '/play'
     | '/playlists'
     | '/profile'
+    | '/read'
     | '/settings'
+    | '/watch'
     | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
@@ -435,14 +535,23 @@ export interface FileRouteTypes {
     | '/trust'
     | '/_authenticated/activity'
     | '/_authenticated/admin'
+    | '/_authenticated/communities'
     | '/_authenticated/connections'
+    | '/_authenticated/content'
     | '/_authenticated/dashboard'
     | '/_authenticated/discover'
+    | '/_authenticated/events'
+    | '/_authenticated/home'
+    | '/_authenticated/listen'
     | '/_authenticated/merch'
     | '/_authenticated/music'
+    | '/_authenticated/my-vybe'
+    | '/_authenticated/play'
     | '/_authenticated/playlists'
     | '/_authenticated/profile'
+    | '/_authenticated/read'
     | '/_authenticated/settings'
+    | '/_authenticated/watch'
     | '/artist/$username'
     | '/auth/forgot-password'
     | '/auth/onboarding'
@@ -649,11 +758,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/watch': {
+      id: '/_authenticated/watch'
+      path: '/watch'
+      fullPath: '/watch'
+      preLoaderRoute: typeof AuthenticatedWatchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/read': {
+      id: '/_authenticated/read'
+      path: '/read'
+      fullPath: '/read'
+      preLoaderRoute: typeof AuthenticatedReadRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/profile': {
@@ -670,6 +793,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlaylistsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/play': {
+      id: '/_authenticated/play'
+      path: '/play'
+      fullPath: '/play'
+      preLoaderRoute: typeof AuthenticatedPlayRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-vybe': {
+      id: '/_authenticated/my-vybe'
+      path: '/my-vybe'
+      fullPath: '/my-vybe'
+      preLoaderRoute: typeof AuthenticatedMyVybeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/music': {
       id: '/_authenticated/music'
       path: '/music'
@@ -682,6 +819,27 @@ declare module '@tanstack/react-router' {
       path: '/merch'
       fullPath: '/merch'
       preLoaderRoute: typeof AuthenticatedMerchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/listen': {
+      id: '/_authenticated/listen'
+      path: '/listen'
+      fullPath: '/listen'
+      preLoaderRoute: typeof AuthenticatedListenRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/home': {
+      id: '/_authenticated/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthenticatedHomeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/events': {
+      id: '/_authenticated/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof AuthenticatedEventsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/discover': {
@@ -698,11 +856,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/content': {
+      id: '/_authenticated/content'
+      path: '/content'
+      fullPath: '/content'
+      preLoaderRoute: typeof AuthenticatedContentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/connections': {
       id: '/_authenticated/connections'
       path: '/connections'
       fullPath: '/connections'
       preLoaderRoute: typeof AuthenticatedConnectionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/communities': {
+      id: '/_authenticated/communities'
+      path: '/communities'
+      fullPath: '/communities'
+      preLoaderRoute: typeof AuthenticatedCommunitiesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin': {
@@ -739,28 +911,46 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedCommunitiesRoute: typeof AuthenticatedCommunitiesRoute
   AuthenticatedConnectionsRoute: typeof AuthenticatedConnectionsRoute
+  AuthenticatedContentRoute: typeof AuthenticatedContentRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
+  AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
+  AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedListenRoute: typeof AuthenticatedListenRoute
   AuthenticatedMerchRoute: typeof AuthenticatedMerchRoute
   AuthenticatedMusicRoute: typeof AuthenticatedMusicRoute
+  AuthenticatedMyVybeRoute: typeof AuthenticatedMyVybeRoute
+  AuthenticatedPlayRoute: typeof AuthenticatedPlayRoute
   AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedReadRoute: typeof AuthenticatedReadRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedCommunitiesRoute: AuthenticatedCommunitiesRoute,
   AuthenticatedConnectionsRoute: AuthenticatedConnectionsRoute,
+  AuthenticatedContentRoute: AuthenticatedContentRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
+  AuthenticatedEventsRoute: AuthenticatedEventsRoute,
+  AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedListenRoute: AuthenticatedListenRoute,
   AuthenticatedMerchRoute: AuthenticatedMerchRoute,
   AuthenticatedMusicRoute: AuthenticatedMusicRoute,
+  AuthenticatedMyVybeRoute: AuthenticatedMyVybeRoute,
+  AuthenticatedPlayRoute: AuthenticatedPlayRoute,
   AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedReadRoute: AuthenticatedReadRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedWatchRoute: AuthenticatedWatchRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
 }
 
