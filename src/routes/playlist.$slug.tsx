@@ -130,8 +130,8 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
               </Button>
             ) : (
               <Button asChild size="sm" className="bg-white text-black hover:bg-white/90">
-                <Link to="/auth/sign-up">
-                  Get VYBE <ArrowRight className="ml-2 h-4 w-4" />
+                <Link to="/auth/redirect">
+                  Open VYBE <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             )}
