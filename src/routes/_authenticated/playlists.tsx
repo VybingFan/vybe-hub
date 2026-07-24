@@ -482,7 +482,7 @@ function PlaylistStudio() {
                       className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                       onClick={() => setDeleteTarget(playlist)}
                     >
-                      <Trash2 className="mr-2 h-4 w-4" /> Delete
+                      <Trash2 className="mr-2 h-4 w-4" /> Delete playlist
                     </Button>
                   </div>
 
@@ -492,7 +492,7 @@ function PlaylistStudio() {
                         <div>
                           <p className="font-medium">Songs in this playlist</p>
                           <p className="text-xs text-muted-foreground">
-                            Select your published songs, then save.
+                            Choose Add or Remove for each published song, then save.
                           </p>
                         </div>
                         <span className="text-xs text-muted-foreground">
@@ -530,6 +530,15 @@ function PlaylistStudio() {
                                 </span>
                                 <span className="text-xs text-muted-foreground">
                                   {formatDuration(track.duration_sec)}
+                                </span>
+                                <span
+                                  className={
+                                    checked
+                                      ? "text-xs font-medium text-destructive"
+                                      : "text-xs font-medium text-primary"
+                                  }
+                                >
+                                  {checked ? "Remove" : "Add"}
                                 </span>
                               </button>
                             );
