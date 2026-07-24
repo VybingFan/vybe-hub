@@ -3,7 +3,13 @@ import { useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/common/Logo";
-import { BUILD_ON_VYBE_LINKS, MORE_LINKS, NAV_LINKS } from "@/constants/app";
+import {
+  BUILD_ON_VYBE_LINKS,
+  COMMUNITY_LINKS,
+  EXPERIENCE_LINKS,
+  MORE_LINKS,
+  NAV_LINKS,
+} from "@/constants/app";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,20 +39,11 @@ export function MarketingNav() {
           <Logo />
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex" aria-label="Primary navigation">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.to}
-              href={link.to}
-              className={cn(
-                "text-sm text-muted-foreground transition-colors hover:text-foreground",
-                pathname === link.to && "text-foreground",
-              )}
-            >
-              {link.label}
-            </a>
-          ))}
-
+        <nav className="hidden items-center gap-6 md:flex" aria-label="Primary navigation">
+          <PublicLink link={NAV_LINKS[0]} pathname={pathname} />
+          <NavDropdown label="Explore" items={EXPERIENCE_LINKS} />
+          <NavDropdown label="Community" items={COMMUNITY_LINKS} />
+          <PublicLink link={NAV_LINKS[1]} pathname={pathname} />
           <NavDropdown label="Build on VYBE" items={BUILD_ON_VYBE_LINKS} detailed />
           <NavDropdown label="More" items={MORE_LINKS} />
         </nav>
@@ -82,9 +79,11 @@ export function MarketingNav() {
         <div className="border-t border-border/40 bg-background md:hidden">
           <div className="space-y-5 px-6 py-5">
             <MobileSection
-              title="Explore VYBE"
+              title="Discover"
               items={NAV_LINKS.map((item) => ({ label: item.label, to: item.to }))}
             />
+            <MobileSection title="Explore VYBE" items={EXPERIENCE_LINKS} />
+            <MobileSection title="Community" items={COMMUNITY_LINKS} />
             <MobileSection title="Build on VYBE" items={BUILD_ON_VYBE_LINKS} />
             <MobileSection title="More" items={MORE_LINKS} />
 
@@ -106,6 +105,20 @@ export function MarketingNav() {
         </div>
       )}
     </header>
+  );
+}
+
+function PublicLink({ link, pathname }: { link: { label: string; to: string }; pathname: string }) {
+  return (
+    <a
+      href={link.to}
+      className={cn(
+        "text-sm text-muted-foreground transition-colors hover:text-foreground",
+        pathname === link.to && "text-foreground",
+      )}
+    >
+      {link.label}
+    </a>
   );
 }
 

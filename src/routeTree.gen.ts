@@ -13,6 +13,8 @@ import { Route as TrustRouteImport } from './routes/trust'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as ForWritersPoetsRouteImport } from './routes/for-writers-poets'
+import { Route as ForFilmVideoRouteImport } from './routes/for-film-video'
 import { Route as ForBusinessesRouteImport } from './routes/for-businesses'
 import { Route as ForArtistsRouteImport } from './routes/for-artists'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -24,6 +26,12 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlaylistSlugRouteImport } from './routes/playlist.$slug'
+import { Route as ExperienceWatchRouteImport } from './routes/experience.watch'
+import { Route as ExperienceReadRouteImport } from './routes/experience.read'
+import { Route as ExperiencePlayRouteImport } from './routes/experience.play'
+import { Route as ExperienceListenRouteImport } from './routes/experience.listen'
+import { Route as ExperienceEventsRouteImport } from './routes/experience.events'
+import { Route as ExperienceCommunitiesRouteImport } from './routes/experience.communities'
 import { Route as CreatorUsernameRouteImport } from './routes/creator.$username'
 import { Route as CreatorInviteTokenRouteImport } from './routes/creator-invite.$token'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
@@ -73,6 +81,16 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForWritersPoetsRoute = ForWritersPoetsRouteImport.update({
+  id: '/for-writers-poets',
+  path: '/for-writers-poets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForFilmVideoRoute = ForFilmVideoRouteImport.update({
+  id: '/for-film-video',
+  path: '/for-film-video',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForBusinessesRoute = ForBusinessesRouteImport.update({
@@ -127,6 +145,36 @@ const IndexRoute = IndexRouteImport.update({
 const PlaylistSlugRoute = PlaylistSlugRouteImport.update({
   id: '/playlist/$slug',
   path: '/playlist/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperienceWatchRoute = ExperienceWatchRouteImport.update({
+  id: '/experience/watch',
+  path: '/experience/watch',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperienceReadRoute = ExperienceReadRouteImport.update({
+  id: '/experience/read',
+  path: '/experience/read',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperiencePlayRoute = ExperiencePlayRouteImport.update({
+  id: '/experience/play',
+  path: '/experience/play',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperienceListenRoute = ExperienceListenRouteImport.update({
+  id: '/experience/listen',
+  path: '/experience/listen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperienceEventsRoute = ExperienceEventsRouteImport.update({
+  id: '/experience/events',
+  path: '/experience/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperienceCommunitiesRoute = ExperienceCommunitiesRouteImport.update({
+  id: '/experience/communities',
+  path: '/experience/communities',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreatorUsernameRoute = CreatorUsernameRouteImport.update({
@@ -294,6 +342,8 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
+  '/for-film-video': typeof ForFilmVideoRoute
+  '/for-writers-poets': typeof ForWritersPoetsRoute
   '/help': typeof HelpRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -326,6 +376,12 @@ export interface FileRoutesByFullPath {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
+  '/experience/communities': typeof ExperienceCommunitiesRoute
+  '/experience/events': typeof ExperienceEventsRoute
+  '/experience/listen': typeof ExperienceListenRoute
+  '/experience/play': typeof ExperiencePlayRoute
+  '/experience/read': typeof ExperienceReadRoute
+  '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
@@ -340,6 +396,8 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
+  '/for-film-video': typeof ForFilmVideoRoute
+  '/for-writers-poets': typeof ForWritersPoetsRoute
   '/help': typeof HelpRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -372,6 +430,12 @@ export interface FileRoutesByTo {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
+  '/experience/communities': typeof ExperienceCommunitiesRoute
+  '/experience/events': typeof ExperienceEventsRoute
+  '/experience/listen': typeof ExperienceListenRoute
+  '/experience/play': typeof ExperiencePlayRoute
+  '/experience/read': typeof ExperienceReadRoute
+  '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
@@ -388,6 +452,8 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
   '/for-businesses': typeof ForBusinessesRoute
+  '/for-film-video': typeof ForFilmVideoRoute
+  '/for-writers-poets': typeof ForWritersPoetsRoute
   '/help': typeof HelpRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -420,6 +486,12 @@ export interface FileRoutesById {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
+  '/experience/communities': typeof ExperienceCommunitiesRoute
+  '/experience/events': typeof ExperienceEventsRoute
+  '/experience/listen': typeof ExperienceListenRoute
+  '/experience/play': typeof ExperiencePlayRoute
+  '/experience/read': typeof ExperienceReadRoute
+  '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
   '/artist/$username_/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
@@ -436,6 +508,8 @@ export interface FileRouteTypes {
     | '/faq'
     | '/for-artists'
     | '/for-businesses'
+    | '/for-film-video'
+    | '/for-writers-poets'
     | '/help'
     | '/privacy'
     | '/terms'
@@ -468,6 +542,12 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/creator-invite/$token'
     | '/creator/$username'
+    | '/experience/communities'
+    | '/experience/events'
+    | '/experience/listen'
+    | '/experience/play'
+    | '/experience/read'
+    | '/experience/watch'
     | '/playlist/$slug'
     | '/music/upload'
     | '/artist/$username/playlist/$slug'
@@ -482,6 +562,8 @@ export interface FileRouteTypes {
     | '/faq'
     | '/for-artists'
     | '/for-businesses'
+    | '/for-film-video'
+    | '/for-writers-poets'
     | '/help'
     | '/privacy'
     | '/terms'
@@ -514,6 +596,12 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/creator-invite/$token'
     | '/creator/$username'
+    | '/experience/communities'
+    | '/experience/events'
+    | '/experience/listen'
+    | '/experience/play'
+    | '/experience/read'
+    | '/experience/watch'
     | '/playlist/$slug'
     | '/music/upload'
     | '/artist/$username/playlist/$slug'
@@ -529,6 +617,8 @@ export interface FileRouteTypes {
     | '/faq'
     | '/for-artists'
     | '/for-businesses'
+    | '/for-film-video'
+    | '/for-writers-poets'
     | '/help'
     | '/privacy'
     | '/terms'
@@ -561,6 +651,12 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/creator-invite/$token'
     | '/creator/$username'
+    | '/experience/communities'
+    | '/experience/events'
+    | '/experience/listen'
+    | '/experience/play'
+    | '/experience/read'
+    | '/experience/watch'
     | '/playlist/$slug'
     | '/_authenticated/music_/upload'
     | '/artist/$username_/playlist/$slug'
@@ -577,6 +673,8 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   ForArtistsRoute: typeof ForArtistsRoute
   ForBusinessesRoute: typeof ForBusinessesRoute
+  ForFilmVideoRoute: typeof ForFilmVideoRoute
+  ForWritersPoetsRoute: typeof ForWritersPoetsRoute
   HelpRoute: typeof HelpRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
@@ -584,6 +682,12 @@ export interface RootRouteChildren {
   ArtistUsernameRoute: typeof ArtistUsernameRoute
   CreatorInviteTokenRoute: typeof CreatorInviteTokenRoute
   CreatorUsernameRoute: typeof CreatorUsernameRoute
+  ExperienceCommunitiesRoute: typeof ExperienceCommunitiesRoute
+  ExperienceEventsRoute: typeof ExperienceEventsRoute
+  ExperienceListenRoute: typeof ExperienceListenRoute
+  ExperiencePlayRoute: typeof ExperiencePlayRoute
+  ExperienceReadRoute: typeof ExperienceReadRoute
+  ExperienceWatchRoute: typeof ExperienceWatchRoute
   PlaylistSlugRoute: typeof PlaylistSlugRoute
   ArtistUsernamePlaylistSlugRoute: typeof ArtistUsernamePlaylistSlugRoute
 }
@@ -616,6 +720,20 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-writers-poets': {
+      id: '/for-writers-poets'
+      path: '/for-writers-poets'
+      fullPath: '/for-writers-poets'
+      preLoaderRoute: typeof ForWritersPoetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-film-video': {
+      id: '/for-film-video'
+      path: '/for-film-video'
+      fullPath: '/for-film-video'
+      preLoaderRoute: typeof ForFilmVideoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/for-businesses': {
@@ -693,6 +811,48 @@ declare module '@tanstack/react-router' {
       path: '/playlist/$slug'
       fullPath: '/playlist/$slug'
       preLoaderRoute: typeof PlaylistSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experience/watch': {
+      id: '/experience/watch'
+      path: '/experience/watch'
+      fullPath: '/experience/watch'
+      preLoaderRoute: typeof ExperienceWatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experience/read': {
+      id: '/experience/read'
+      path: '/experience/read'
+      fullPath: '/experience/read'
+      preLoaderRoute: typeof ExperienceReadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experience/play': {
+      id: '/experience/play'
+      path: '/experience/play'
+      fullPath: '/experience/play'
+      preLoaderRoute: typeof ExperiencePlayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experience/listen': {
+      id: '/experience/listen'
+      path: '/experience/listen'
+      fullPath: '/experience/listen'
+      preLoaderRoute: typeof ExperienceListenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experience/events': {
+      id: '/experience/events'
+      path: '/experience/events'
+      fullPath: '/experience/events'
+      preLoaderRoute: typeof ExperienceEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experience/communities': {
+      id: '/experience/communities'
+      path: '/experience/communities'
+      fullPath: '/experience/communities'
+      preLoaderRoute: typeof ExperienceCommunitiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/creator/$username': {
@@ -988,6 +1148,8 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   ForArtistsRoute: ForArtistsRoute,
   ForBusinessesRoute: ForBusinessesRoute,
+  ForFilmVideoRoute: ForFilmVideoRoute,
+  ForWritersPoetsRoute: ForWritersPoetsRoute,
   HelpRoute: HelpRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
@@ -995,6 +1157,12 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistUsernameRoute: ArtistUsernameRoute,
   CreatorInviteTokenRoute: CreatorInviteTokenRoute,
   CreatorUsernameRoute: CreatorUsernameRoute,
+  ExperienceCommunitiesRoute: ExperienceCommunitiesRoute,
+  ExperienceEventsRoute: ExperienceEventsRoute,
+  ExperienceListenRoute: ExperienceListenRoute,
+  ExperiencePlayRoute: ExperiencePlayRoute,
+  ExperienceReadRoute: ExperienceReadRoute,
+  ExperienceWatchRoute: ExperienceWatchRoute,
   PlaylistSlugRoute: PlaylistSlugRoute,
   ArtistUsernamePlaylistSlugRoute: ArtistUsernamePlaylistSlugRoute,
 }
