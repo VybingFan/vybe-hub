@@ -99,7 +99,6 @@ export const Route = createFileRoute("/api/stripe/checkout")({
               : { customer_email: authData.user.email }),
             client_reference_id: userId,
             billing_address_collection: "auto",
-            automatic_tax: { enabled: true },
             allow_promotion_codes: false,
             metadata: {
               vybe_user_id: userId,
