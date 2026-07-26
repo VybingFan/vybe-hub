@@ -57,7 +57,7 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
       </div>
     );
 
-  const artwork = data.cover_url || data.tracks.find((track) => track.cover_url)?.cover_url;
+  const playlistArtwork = data.cover_url || "/branding/vybe-mark.webp";
   const totalSeconds = data.tracks.reduce((total, track) => total + track.duration_sec, 0);
   const minutes = Math.max(1, Math.round(totalSeconds / 60));
   const preferredAppLink = getPreferredAppLink();
@@ -77,20 +77,13 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen overflow-hidden bg-[#070811] text-white">
-      {artwork && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-[46rem] bg-cover bg-center opacity-25 blur-3xl"
-          style={{ backgroundImage: `url(${artwork})` }}
-        />
-      )}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[48rem] bg-[radial-gradient(circle_at_20%_10%,rgba(217,70,239,.28),transparent_34%),radial-gradient(circle_at_85%_16%,rgba(34,211,238,.2),transparent_32%),linear-gradient(to_bottom,transparent,#070811_90%)]" />
 
       {appBarVisible && (
         <div className="relative z-30 border-b border-white/10 bg-[#0a0b14]/90 backdrop-blur-xl">
-          <div className="mx-auto flex min-h-20 max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
+          <div className="mx-auto flex min-h-16 max-w-6xl items-center gap-2 px-3 py-2 sm:min-h-20 sm:gap-3 sm:px-6 sm:py-3">
             <Link to="/" className="shrink-0" aria-label="VYBE home">
-              <Logo />
+              <Logo className="[&_img]:h-8 [&_img]:w-9 [&_span]:text-base sm:[&_img]:h-9 sm:[&_img]:w-11 sm:[&_span]:text-lg" />
             </Link>
             <div className="min-w-0 flex-1 border-l border-white/10 pl-3 sm:pl-5">
               <p className="truncate text-sm font-semibold">Take this VYBE with you</p>
@@ -129,29 +122,25 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
       )}
 
       <main className="relative z-10 mx-auto max-w-6xl px-5 pb-16 pt-10 sm:px-6 md:pt-16">
-        <section className="relative mb-12">
-          <div className="h-44 overflow-hidden rounded-[2rem] border border-white/15 bg-gradient-to-r from-fuchsia-950 via-violet-950 to-cyan-950 sm:h-60">
-            {data.artistBannerUrl && (
-              <img
-                src={data.artistBannerUrl}
-                alt={`${data.artistName} banner`}
-                className="h-full w-full object-cover"
-              />
-            )}
+        <section className="relative mb-9 sm:mb-12">
+          <div className="h-32 overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-r from-fuchsia-950 via-violet-950 to-cyan-950 sm:h-60 sm:rounded-[2rem]">
+            <img
+              src={data.artistBannerUrl || "/banners/default-creator-banner.png"}
+              alt={`${data.artistName} banner`}
+              className="h-full w-full object-cover"
+            />
             <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-t from-[#070811] via-black/15 to-transparent" />
           </div>
-          <div className="-mt-16 flex items-end gap-4 px-5 sm:-mt-20 sm:px-8">
-            {artwork ? (
-              <img
-                src={artwork}
-                alt={`${data.title} playlist cover`}
-                className="relative h-28 w-28 shrink-0 rounded-2xl border-4 border-[#070811] object-cover shadow-2xl sm:h-36 sm:w-36"
-              />
-            ) : (
-              <span className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl border-4 border-[#070811] bg-violet-950 shadow-2xl sm:h-36 sm:w-36">
-                <Headphones className="h-10 w-10 text-fuchsia-200" />
-              </span>
-            )}
+          <div className="-mt-12 flex items-end gap-3 px-4 sm:-mt-20 sm:gap-4 sm:px-8">
+            <img
+              src={playlistArtwork}
+              alt={
+                data.cover_url
+                  ? `${data.title} playlist cover`
+                  : `${data.title} default VYBE playlist cover`
+              }
+              className="relative h-24 w-24 shrink-0 rounded-2xl border-4 border-[#070811] bg-violet-950 object-cover shadow-2xl sm:h-36 sm:w-36"
+            />
             <div className="relative min-w-0 pb-2">
               <p className="truncate text-sm text-white/60">Playlist by</p>
               <p className="truncate text-lg font-semibold sm:text-xl">{data.artistName}</p>
@@ -161,13 +150,13 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
 
         <section className="grid items-center gap-8 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:gap-14">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-fuchsia-300/25 bg-fuchsia-400/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[.18em] text-fuchsia-200">
+            <div className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-fuchsia-300/25 bg-fuchsia-400/10 px-3 py-2 text-[10px] font-semibold uppercase leading-4 tracking-[.12em] text-fuchsia-200 sm:rounded-full sm:py-1.5 sm:text-xs sm:tracking-[.18em]">
               <Sparkles className="h-3.5 w-3.5" /> A personal VYBE from {data.artistName}
             </div>
-            <h1 className="mt-5 text-4xl font-black tracking-[-.04em] sm:text-5xl md:text-7xl">
+            <h1 className="mt-5 break-words text-3xl font-black tracking-[-.035em] sm:text-5xl md:text-7xl">
               {data.title}
             </h1>
-            <p className="mt-5 max-w-xl text-lg leading-8 text-white/70">
+            <p className="mt-4 max-w-xl text-base leading-7 text-white/70 sm:mt-5 sm:text-lg sm:leading-8">
               {data.description || `${data.artistName} chose these songs for this moment.`}
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/55">

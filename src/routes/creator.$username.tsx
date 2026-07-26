@@ -96,7 +96,7 @@ export function PublicArtistHome({
       </div>
       <main>
         <section className="relative">
-          <div className="h-64 overflow-hidden md:h-80">
+          <div className="h-44 overflow-hidden sm:h-56 md:h-80">
             <img
               src={profile.cover_url || "/banners/default-creator-banner.png"}
               alt=""
@@ -104,17 +104,19 @@ export function PublicArtistHome({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
           </div>
-          <div className="relative mx-auto -mt-24 max-w-7xl px-6 pb-10">
+          <div className="relative mx-auto -mt-16 max-w-7xl px-5 pb-8 sm:-mt-20 sm:px-6 md:-mt-24 md:pb-10">
             <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
               <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
                 <img
                   src={profile.avatar_url || "/avatars/default-avatar.png"}
                   alt={name}
-                  className="h-32 w-32 rounded-3xl border-4 border-background object-cover shadow-elevated"
+                  className="h-24 w-24 rounded-2xl border-4 border-background object-cover shadow-elevated sm:h-32 sm:w-32 sm:rounded-3xl"
                 />
                 <div>
                   <p className="text-sm text-primary">@{profile.username}</p>
-                  <h1 className="mt-1 text-4xl font-bold md:text-6xl">{name}</h1>
+                  <h1 className="mt-1 break-words text-3xl font-bold sm:text-4xl md:text-6xl">
+                    {name}
+                  </h1>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {(profile.genres?.length
                       ? profile.genres

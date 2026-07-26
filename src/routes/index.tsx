@@ -59,15 +59,15 @@ function Landing() {
         <section className="relative isolate overflow-hidden">
           <div className="bg-gradient-hero absolute inset-0 -z-20" />
           <div className="absolute inset-x-0 bottom-0 -z-10 h-2/3 bg-gradient-to-t from-background via-background/35 to-transparent" />
-          <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:py-28">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-12 sm:px-6 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:py-28">
             <div>
               <Badge className="mb-6 rounded-full border border-primary/25 bg-primary/10 text-primary">
                 <Sparkles className="mr-2 h-3.5 w-3.5" /> Built around the members
               </Badge>
-              <h1 className="max-w-3xl text-5xl font-bold leading-[1.02] tracking-tight md:text-7xl">
+              <h1 className="max-w-3xl text-4xl font-bold leading-[1.04] tracking-tight sm:text-5xl md:text-7xl">
                 Where music becomes <span className="text-gradient-brand">community.</span>
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
+              <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
                 Discover independent music, get closer to the stories behind it, and build lasting
                 connections with artists and fellow supporters.
               </p>

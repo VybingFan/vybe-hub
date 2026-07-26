@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Check,
@@ -72,6 +72,16 @@ function PlaylistStudio() {
   const [visiblePlaylistCount, setVisiblePlaylistCount] = useState(8);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
   const [playlistCover, setPlaylistCover] = useState<File | null>(null);
+  const playlistCoverPreview = useMemo(
+    () => (playlistCover ? URL.createObjectURL(playlistCover) : null),
+    [playlistCover],
+  );
+  useEffect(
+    () => () => {
+      if (playlistCoverPreview) URL.revokeObjectURL(playlistCoverPreview);
+    },
+    [playlistCoverPreview],
+  );
   const [deleteTarget, setDeleteTarget] = useState<Playlist | null>(null);
   const songGenres = useMemo(
     () =>
@@ -266,9 +276,17 @@ function PlaylistStudio() {
                 htmlFor="playlist-cover"
                 className="mt-2 flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-border p-4 transition hover:border-primary/50 hover:bg-primary/5"
               >
-                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-muted">
-                  <ImagePlus className="h-6 w-6 text-muted-foreground" />
-                </span>
+                {playlistCoverPreview ? (
+                  <img
+                    src={playlistCoverPreview}
+                    alt="Selected playlist cover preview"
+                    className="h-16 w-16 shrink-0 rounded-xl object-cover"
+                  />
+                ) : (
+                  <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-muted">
+                    <ImagePlus className="h-6 w-6 text-muted-foreground" />
+                  </span>
+                )}
                 <span className="min-w-0">
                   <span className="block truncate font-medium">
                     {playlistCover ? playlistCover.name : "Choose cover art"}
