@@ -19,6 +19,8 @@ export interface Playlist {
 export interface SharedPlaylist extends Playlist {
   artistName: string;
   artistUsername: string | null;
+  artistAvatarUrl: string | null;
+  artistBannerUrl: string | null;
   tracks: Track[];
 }
 

@@ -18,10 +18,15 @@ function SignUpPage() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
     const parsed = signUpSchema.safeParse({ displayName, email, password });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
@@ -93,6 +98,18 @@ function SignUpPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <p className="text-xs text-muted-foreground">At least 8 characters.</p>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirm-password">Confirm password</Label>
+          <Input
+            id="confirm-password"
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={8}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
         </div>
         <SubmitButton loading={loading}>Create account</SubmitButton>
       </form>

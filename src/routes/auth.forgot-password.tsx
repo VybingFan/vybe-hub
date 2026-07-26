@@ -40,7 +40,7 @@ function ForgotPasswordPage() {
     return (
       <AuthCard
         title="Check your email"
-        description={`We sent a reset link to ${email}. It may take a minute to arrive.`}
+        description={`We sent a reset link to ${email}. It may take a minute to arrive. After signing in, you can view or change your public username under Public Profile.`}
         footer={
           <Link to="/auth/sign-in" className="text-foreground underline-offset-4 hover:underline">
             Back to sign in
@@ -54,8 +54,8 @@ function ForgotPasswordPage() {
 
   return (
     <AuthCard
-      title="Reset your password"
-      description="Enter the email tied to your VYBE account."
+      title="Recover account access"
+      description="VYBE signs you in with your email, not your public username. Enter your account email to reset your password. Once signed in, you can view or change your username under Public Profile."
       footer={
         <Link to="/auth/sign-in" className="text-foreground underline-offset-4 hover:underline">
           Back to sign in

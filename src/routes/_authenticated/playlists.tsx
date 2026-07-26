@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Check,
   Copy,
+  ImagePlus,
   ListMusic,
   Loader2,
   Pencil,
@@ -36,8 +37,13 @@ import {
 } from "@/components/ui/select";
 import { useUser } from "@/hooks/useUser";
 import { useCreatorTracks, useUpdateTrack } from "@/hooks/useMusic";
-import { useCreatePlaylist, useDeletePlaylist, useMyPlaylists } from "@/hooks/usePlaylists";
-import { formatDuration } from "@/features/music/schema";
+import {
+  useCreatePlaylist,
+  useDeletePlaylist,
+  useMyPlaylists,
+  useReplacePlaylistCover,
+} from "@/hooks/usePlaylists";
+import { formatDuration, MAX_COVER_BYTES } from "@/features/music/schema";
 import { PLAYLIST_PURPOSES, type Playlist } from "@/features/playlists/schema";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 
@@ -56,6 +62,7 @@ function PlaylistStudio() {
   const { data: creatorProfile } = useCreatorProfile(user?.id);
   const { data: playlists = [] } = useMyPlaylists(user?.id);
   const create = useCreatePlaylist(user?.id);
+  const replaceCover = useReplacePlaylistCover(user?.id);
   const deletePlaylist = useDeletePlaylist(user?.id);
   const [selected, setSelected] = useState<string[]>([]);
   const [songQuery, setSongQuery] = useState("");
@@ -64,6 +71,7 @@ function PlaylistStudio() {
   const [playlistSort, setPlaylistSort] = useState<"newest" | "title">("newest");
   const [visiblePlaylistCount, setVisiblePlaylistCount] = useState(8);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
+  const [playlistCover, setPlaylistCover] = useState<File | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Playlist | null>(null);
   const songGenres = useMemo(
     () =>
@@ -123,8 +131,20 @@ function PlaylistStudio() {
       });
       if (!playlist?.slug)
         throw new Error("Playlist published without a share link. Refresh and try again.");
+      if (playlistCover) {
+        try {
+          await replaceCover.mutateAsync({ playlistId: playlist.id, file: playlistCover });
+        } catch (coverError) {
+          toast.error(
+            coverError instanceof Error
+              ? `Playlist created, but its cover was not saved: ${coverError.message}`
+              : "Playlist created, but its cover was not saved. Add it from Manage playlist.",
+          );
+        }
+      }
       setCreatedSlug(playlist.slug);
       setSelected([]);
+      setPlaylistCover(null);
       setSongQuery("");
       formElement.reset();
       toast.success("Playlist published. Your share link is ready.");
@@ -238,6 +258,41 @@ function PlaylistStudio() {
                 name="description"
                 maxLength={600}
                 placeholder="Tell fans why you chose these songs."
+              />
+            </div>
+            <div>
+              <Label htmlFor="playlist-cover">Playlist cover art (optional)</Label>
+              <label
+                htmlFor="playlist-cover"
+                className="mt-2 flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-border p-4 transition hover:border-primary/50 hover:bg-primary/5"
+              >
+                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-muted">
+                  <ImagePlus className="h-6 w-6 text-muted-foreground" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate font-medium">
+                    {playlistCover ? playlistCover.name : "Choose cover art"}
+                  </span>
+                  <span className="mt-1 block text-xs text-muted-foreground">
+                    JPG, PNG, or WebP · up to 2MB
+                  </span>
+                </span>
+              </label>
+              <Input
+                id="playlist-cover"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="sr-only"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null;
+                  if (file && file.size > MAX_COVER_BYTES) {
+                    toast.error("Playlist cover must be 2MB or smaller.");
+                    event.target.value = "";
+                    setPlaylistCover(null);
+                    return;
+                  }
+                  setPlaylistCover(file);
+                }}
               />
             </div>
             <div>
@@ -355,11 +410,11 @@ function PlaylistStudio() {
               </div>
             </div>
             <Button
-              disabled={create.isPending || !selected.length}
+              disabled={create.isPending || replaceCover.isPending || !selected.length}
               size="lg"
               className="bg-gradient-brand text-white"
             >
-              {create.isPending ? (
+              {create.isPending || replaceCover.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <ListMusic className="mr-2 h-4 w-4" />
@@ -404,12 +459,25 @@ function PlaylistStudio() {
               visiblePlaylists.map((playlist) => (
                 <article key={playlist.id} className="rounded-2xl border border-border bg-card p-5">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold">{playlist.title}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {(playlist.trackIds ?? []).length}{" "}
-                        {(playlist.trackIds ?? []).length === 1 ? "song" : "songs"}
-                      </p>
+                    <div className="flex min-w-0 items-start gap-3">
+                      {playlist.cover_url ? (
+                        <img
+                          src={playlist.cover_url}
+                          alt=""
+                          className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-muted">
+                          <ListMusic className="h-5 w-5 text-muted-foreground" />
+                        </span>
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold">{playlist.title}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {(playlist.trackIds ?? []).length}{" "}
+                          {(playlist.trackIds ?? []).length === 1 ? "song" : "songs"}
+                        </p>
+                      </div>
                     </div>
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">

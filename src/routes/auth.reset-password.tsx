@@ -17,6 +17,7 @@ function ResetPasswordPage() {
   const { updatePassword } = useAuth();
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -33,6 +34,10 @@ function ResetPasswordPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
     const parsed = resetPasswordSchema.safeParse({ password });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
@@ -70,6 +75,18 @@ function ResetPasswordPage() {
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirm-password">Confirm new password</Label>
+          <Input
+            id="confirm-password"
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={8}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </div>
         <SubmitButton loading={loading} disabled={!ready}>

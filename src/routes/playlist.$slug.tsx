@@ -129,15 +129,38 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
       )}
 
       <main className="relative z-10 mx-auto max-w-6xl px-5 pb-16 pt-10 sm:px-6 md:pt-16">
-        <section className="grid items-center gap-8 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:gap-14">
-          <div>
-            {data.cover_url && (
+        <section className="relative mb-12">
+          <div className="h-44 overflow-hidden rounded-[2rem] border border-white/15 bg-gradient-to-r from-fuchsia-950 via-violet-950 to-cyan-950 sm:h-60">
+            {data.artistBannerUrl && (
               <img
-                src={data.cover_url}
-                alt={`${data.title} playlist cover`}
-                className="mb-6 h-28 w-28 rounded-2xl border border-white/15 object-cover shadow-2xl sm:h-36 sm:w-36"
+                src={data.artistBannerUrl}
+                alt={`${data.artistName} banner`}
+                className="h-full w-full object-cover"
               />
             )}
+            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-t from-[#070811] via-black/15 to-transparent" />
+          </div>
+          <div className="-mt-16 flex items-end gap-4 px-5 sm:-mt-20 sm:px-8">
+            {artwork ? (
+              <img
+                src={artwork}
+                alt={`${data.title} playlist cover`}
+                className="relative h-28 w-28 shrink-0 rounded-2xl border-4 border-[#070811] object-cover shadow-2xl sm:h-36 sm:w-36"
+              />
+            ) : (
+              <span className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl border-4 border-[#070811] bg-violet-950 shadow-2xl sm:h-36 sm:w-36">
+                <Headphones className="h-10 w-10 text-fuchsia-200" />
+              </span>
+            )}
+            <div className="relative min-w-0 pb-2">
+              <p className="truncate text-sm text-white/60">Playlist by</p>
+              <p className="truncate text-lg font-semibold sm:text-xl">{data.artistName}</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid items-center gap-8 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:gap-14">
+          <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-fuchsia-300/25 bg-fuchsia-400/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[.18em] text-fuchsia-200">
               <Sparkles className="h-3.5 w-3.5" /> A personal VYBE from {data.artistName}
             </div>

@@ -9,6 +9,7 @@ import type {
 
 const AUDIO_BUCKET = "music-audio";
 const COVER_BUCKET = "music-covers";
+const AVATAR_BUCKET = "avatars";
 
 async function signedUrl(bucket: string, path: string | null) {
   if (!path) return null;
@@ -183,7 +184,9 @@ export const playlistService = {
     const [{ data: creator }, { data: items, error: itemsError }] = await Promise.all([
       supabase
         .from("creator_profiles")
-        .select("artist_name, display_name, username")
+        .select(
+          "artist_name, display_name, username, avatar_path, cover_path, avatar_url, cover_url",
+        )
         .eq("user_id", playlist.creator_id)
         .maybeSingle(),
       supabase
@@ -199,6 +202,12 @@ export const playlistService = {
       cover_path: playlist.cover_path ?? null,
       artistName: creator?.artist_name || creator?.display_name || "VYBE Artist",
       artistUsername: creator?.username || null,
+      artistAvatarUrl:
+        (await signedUrl(AVATAR_BUCKET, creator?.avatar_path ?? null)) ||
+        creator?.avatar_url ||
+        null,
+      artistBannerUrl:
+        (await signedUrl(AVATAR_BUCKET, creator?.cover_path ?? null)) || creator?.cover_url || null,
       tracks: await Promise.all(tracks.map(hydrateTrack)),
     });
   },
