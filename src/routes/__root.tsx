@@ -14,6 +14,20 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { Toaster } from "@/components/ui/sonner";
 
+const themeInitializationScript = `
+  (function () {
+    try {
+      var theme = window.localStorage.getItem("vybe:theme") === "light" ? "light" : "dark";
+      var root = document.documentElement;
+      root.classList.remove("light", "dark");
+      root.classList.add(theme);
+      root.style.colorScheme = theme;
+    } catch (error) {
+      document.documentElement.classList.add("dark");
+    }
+  })();
+`;
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -130,8 +144,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitializationScript }} />
         <HeadContent />
       </head>
       <body>
@@ -161,6 +176,7 @@ function ThemePreference() {
     const theme = window.localStorage.getItem("vybe:theme") || "dark";
     document.documentElement.classList.toggle("light", theme === "light");
     document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.style.colorScheme = theme;
   }, []);
   return null;
 }

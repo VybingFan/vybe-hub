@@ -29,3 +29,10 @@
 - Made all four Nova Vale story cards open complete fictional sample articles.
 - Connected Nova Vale music, stories, community, events, and Play with clearer navigation.
 - Requires no Supabase migration and does not alter existing creator accounts.
+
+# V24.10.2 — Saved-theme transition correction
+
+- Applies the saved light or dark theme before styles are painted.
+- Prevents the dark-screen flash when a light-mode visitor opens another VYBE page.
+- Keeps native browser controls aligned with the selected color scheme.
+- Requires no Supabase migration and does not alter existing creator accounts.

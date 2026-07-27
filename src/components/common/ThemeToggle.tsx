@@ -17,6 +17,7 @@ export function ThemeToggle({ showLabel = false }: { showLabel?: boolean }) {
     window.localStorage.setItem("vybe:theme", nextTheme);
     document.documentElement.classList.toggle("light", nextTheme === "light");
     document.documentElement.classList.toggle("dark", nextTheme === "dark");
+    document.documentElement.style.colorScheme = nextTheme;
   }
 
   const nextLabel = theme === "dark" ? "Switch to light mode" : "Switch to dark mode";
