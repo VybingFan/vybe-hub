@@ -63,3 +63,10 @@
 - Kept the administration board read-only until the Knowledge Engine production schema is approved.
 - Kept multiplayer, lyric, audio-recognition, prizes, and persistent streaks in future phases.
 - Requires no Supabase migration and does not alter existing creator accounts.
+
+# V24.12.1 — Play genre action correction
+
+- Makes an available genre selection visibly open its corresponding trivia round.
+- Adds an accessible confirmation message when Mixed VYBE is selected.
+- Respects reduced-motion preferences when moving to the game.
+- Requires no Supabase migration.

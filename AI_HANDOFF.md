@@ -2,7 +2,7 @@
 
 ## Current Verified Play Development Checkpoint
 
-**Branch:** `vybe-daily-play-foundation-v24-12`
+**Branch:** `vybe-play-genre-action-fix-v24-12-1`
 
 **Base:** V24.11 / `e2af041`
 
@@ -27,6 +27,9 @@ read-only until the Knowledge Engine architecture approves the production record
 
 No Play progress, paid entitlement, rewards, multiplayer, or subscription system is active. No
 Supabase migration is required for V24.12.
+
+V24.12.1 corrects the genre-selector interaction: selecting an available genre now confirms the
+selection and moves the visitor directly into that trivia round.
 
 ## Project Status
 

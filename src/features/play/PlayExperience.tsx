@@ -137,6 +137,7 @@ type SurpriseOption = (typeof surpriseOptions)[number];
 
 export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
   const [playGenre, setPlayGenre] = useState<PlayGenre>("Mixed VYBE");
+  const [genreNotice, setGenreNotice] = useState<string | null>(null);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -194,6 +195,13 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
     if (!AVAILABLE_PLAY_GENRES.includes(genre)) return;
     setPlayGenre(genre);
     restartTrivia();
+    setGenreNotice(`${genre} selected. Opening today’s trivia round.`);
+    window.requestAnimationFrame(() => {
+      document.getElementById("trivia")?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start",
+      });
+    });
   }
 
   return (
@@ -263,10 +271,13 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
               );
             })}
           </div>
-          <p className="mt-4 text-sm text-muted-foreground" aria-live="polite">
-            Today’s game selection:{" "}
-            <span className="font-semibold text-foreground">{playGenre}</span>
-          </p>
+          <div className="mt-4 text-sm text-muted-foreground" aria-live="polite">
+            <p>
+              Today’s game selection:{" "}
+              <span className="font-semibold text-foreground">{playGenre}</span>
+            </p>
+            {genreNotice && <p className="mt-1 font-medium text-primary">{genreNotice}</p>}
+          </div>
         </div>
 
         <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
