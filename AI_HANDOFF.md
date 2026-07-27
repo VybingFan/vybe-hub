@@ -1,5 +1,29 @@
 # VYBE-HUB AI Development Handoff
 
+## Current Verified Play Development Checkpoint
+
+**Branch:** `vybe-unified-play-home-surprise-v24-11`
+
+**Base:** V24.10.4 / `0f7bc5d`
+
+**Play routes:** public `/experience/play`; signed-in `/play`
+
+V24.11 unifies both routes around `src/features/play/PlayExperience.tsx`. Public visitors retain
+the marketing navigation and footer. Signed-in supporters, creators, and administrators use the
+same Play experience inside the authenticated VYBE application shell.
+
+The shared Play experience includes:
+
+- Music Trivia
+- Build Your VYBE
+- Daily VYBE Poll
+- Nova Vale Creator Spotlight
+- Play Home destination cards
+- Surprise Me using approved public-safe destinations
+
+No Play progress, paid entitlement, rewards, or subscription system is active. No Supabase
+migration is required for V24.11.
+
 ## Project Status
 
 **Project:** VYBE-HUB
@@ -273,4 +297,3 @@ Required before testing:
 4. Enable checkout only for controlled verification.
 
 See `STRIPE_V24_8_SETUP.md` for the exact environment variable and webhook checklist.
-

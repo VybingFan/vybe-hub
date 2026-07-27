@@ -36,3 +36,19 @@
 - Prevents the dark-screen flash when a light-mode visitor opens another VYBE page.
 - Keeps native browser controls aligned with the selected color scheme.
 - Requires no Supabase migration and does not alter existing creator accounts.
+
+# V24.11 — Unified Play Home and Surprise Me
+
+- Replaced the older signed-in Play preview with the same functional Play experience available
+  publicly.
+- Extracted Play into a shared feature so `/experience/play` and `/play` stay aligned while using
+  their appropriate public or signed-in VYBE navigation.
+- Added a mobile-first Play Home with Games, Explore Music, Discover, Learn, Spotlight, and
+  Challenges destinations.
+- Added honest Available Now, Demo, and Coming Soon labels.
+- Added Surprise Me using only eligible public activities and destinations.
+- Preserved Music Trivia, Build Your VYBE, Daily VYBE Poll, Nova Vale Spotlight, theme behavior,
+  and public no-account access.
+- Kept member progress, saved scores, paid access, rewards, and subscriptions clearly identified
+  as future phases.
+- Requires no Supabase migration and does not alter existing creator accounts.
