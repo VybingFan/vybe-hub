@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
+  CalendarDays,
   CheckCircle2,
   Compass,
   Gamepad2,
@@ -16,6 +17,12 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  AVAILABLE_PLAY_GENRES,
+  DAILY_PLAY_ITEMS,
+  PLAY_GENRES,
+  type PlayGenre,
+} from "@/features/play/content";
 
 const trivia = [
   {
@@ -129,6 +136,7 @@ const surpriseOptions = [
 type SurpriseOption = (typeof surpriseOptions)[number];
 
 export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
+  const [playGenre, setPlayGenre] = useState<PlayGenre>("Mixed VYBE");
   const [questionIndex, setQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -182,6 +190,12 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
     setSurprise(next);
   }
 
+  function chooseGenre(genre: PlayGenre) {
+    if (!AVAILABLE_PLAY_GENRES.includes(genre)) return;
+    setPlayGenre(genre);
+    restartTrivia();
+  }
+
   return (
     <main>
       <section className="border-b border-border/60 bg-gradient-hero">
@@ -209,6 +223,49 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
           </div>
           <p className="max-w-lg text-sm text-muted-foreground">
             Live activities open now. Preview destinations are labeled clearly while VYBE grows.
+          </p>
+        </div>
+
+        <div className="mt-8 rounded-[2rem] border border-border/70 bg-card p-6 sm:p-8">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-sm font-medium text-primary">Choose your game VYBE</p>
+              <h2 className="mt-1 text-2xl font-semibold">Play by genre—or mix it up</h2>
+            </div>
+            <p className="max-w-lg text-sm leading-6 text-muted-foreground">
+              Mixed VYBE is open for the pilot. Individual genres activate only after their
+              Knowledge Engine content is reviewed and deep enough to avoid repetition.
+            </p>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label="Play genre">
+            {PLAY_GENRES.map((genre) => {
+              const available = AVAILABLE_PLAY_GENRES.includes(genre);
+              const active = playGenre === genre;
+              return (
+                <button
+                  key={genre}
+                  type="button"
+                  onClick={() => chooseGenre(genre)}
+                  disabled={!available}
+                  aria-pressed={active}
+                  title={available ? `Play ${genre}` : `${genre} content is being prepared`}
+                  className={`rounded-full border px-4 py-2 text-sm transition ${
+                    active
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : available
+                        ? "border-border bg-background hover:border-primary/50"
+                        : "cursor-not-allowed border-border/60 bg-muted/30 text-muted-foreground"
+                  }`}
+                >
+                  {genre}
+                  {!available && <span className="ml-2 text-[10px] uppercase">Soon</span>}
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-4 text-sm text-muted-foreground" aria-live="polite">
+            Today’s game selection:{" "}
+            <span className="font-semibold text-foreground">{playGenre}</span>
           </p>
         </div>
 
@@ -284,6 +341,40 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
         </div>
       </section>
 
+      <section className="border-y border-border/60 bg-surface/40">
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-sm font-medium text-primary">Daily VYBE</p>
+              <h2 className="mt-1 text-3xl font-semibold">A fresh reason to return</h2>
+            </div>
+            <p className="max-w-lg text-sm leading-6 text-muted-foreground">
+              Quick activities use approved VYBE knowledge and creator-authorized material. Saved
+              streaks and history come in a later account phase.
+            </p>
+          </div>
+          <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {DAILY_PLAY_ITEMS.map((item) => (
+              <a
+                key={item.id}
+                href={item.href}
+                className="rounded-3xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/40"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <CalendarDays className="h-5 w-5 text-primary" />
+                  <Badge variant="outline">{item.cadence}</Badge>
+                </div>
+                <h3 className="mt-5 font-semibold">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p>
+                <p className="mt-4 text-xs font-medium uppercase tracking-wider text-primary">
+                  {item.status}
+                </p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr]">
           <article
@@ -296,6 +387,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
                   Available now
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold">VYBE Music Trivia</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{playGenre} pilot round</p>
               </div>
               <Badge variant="outline">
                 Question {finished ? trivia.length : questionIndex + 1} of {trivia.length}

@@ -72,6 +72,7 @@ import { Route as ApiStripeCheckoutRouteImport } from './routes/api.stripe.check
 import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_authenticated/playlists_.$playlistId'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
 import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authenticated/music_.$trackId'
+import { Route as AuthenticatedAdminPlayRouteImport } from './routes/_authenticated/admin_.play'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 
 const TrustRoute = TrustRouteImport.update({
@@ -393,6 +394,11 @@ const AuthenticatedMusicTrackIdRoute =
     path: '/music/$trackId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminPlayRoute = AuthenticatedAdminPlayRouteImport.update({
+  id: '/admin_/play',
+  path: '/admin/play',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const ArtistUsernamePlaylistSlugRoute =
   ArtistUsernamePlaylistSlugRouteImport.update({
     id: '/artist/$username_/playlist/$slug',
@@ -456,6 +462,7 @@ export interface FileRoutesByFullPath {
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -521,6 +528,7 @@ export interface FileRoutesByTo {
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -588,6 +596,7 @@ export interface FileRoutesById {
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/_authenticated/admin_/play': typeof AuthenticatedAdminPlayRoute
   '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
   '/_authenticated/playlists_/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -655,6 +664,7 @@ export interface FileRouteTypes {
     | '/experience/watch'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/admin/play'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -720,6 +730,7 @@ export interface FileRouteTypes {
     | '/experience/watch'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/admin/play'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -786,6 +797,7 @@ export interface FileRouteTypes {
     | '/experience/watch'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/_authenticated/admin_/play'
     | '/_authenticated/music_/$trackId'
     | '/_authenticated/music_/upload'
     | '/_authenticated/playlists_/$playlistId'
@@ -1277,6 +1289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMusicTrackIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/play': {
+      id: '/_authenticated/admin_/play'
+      path: '/admin/play'
+      fullPath: '/admin/play'
+      preLoaderRoute: typeof AuthenticatedAdminPlayRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/artist/$username_/playlist/$slug': {
       id: '/artist/$username_/playlist/$slug'
       path: '/artist/$username/playlist/$slug'
@@ -1308,6 +1327,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
+  AuthenticatedAdminPlayRoute: typeof AuthenticatedAdminPlayRoute
   AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
   AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -1334,6 +1354,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
+  AuthenticatedAdminPlayRoute: AuthenticatedAdminPlayRoute,
   AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
   AuthenticatedPlaylistsPlaylistIdRoute: AuthenticatedPlaylistsPlaylistIdRoute,

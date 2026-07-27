@@ -2,9 +2,9 @@
 
 ## Current Verified Play Development Checkpoint
 
-**Branch:** `vybe-unified-play-home-surprise-v24-11`
+**Branch:** `vybe-daily-play-foundation-v24-12`
 
-**Base:** V24.10.4 / `0f7bc5d`
+**Base:** V24.11 / `e2af041`
 
 **Play routes:** public `/experience/play`; signed-in `/play`
 
@@ -21,8 +21,12 @@ The shared Play experience includes:
 - Play Home destination cards
 - Surprise Me using approved public-safe destinations
 
-No Play progress, paid entitlement, rewards, or subscription system is active. No Supabase
-migration is required for V24.11.
+V24.12 adds the Daily VYBE operating foundation, an honest Mixed VYBE-first genre selector, a
+shared Play content registry, and an administrator-only `/admin/play` release board. The board is
+read-only until the Knowledge Engine architecture approves the production record template.
+
+No Play progress, paid entitlement, rewards, multiplayer, or subscription system is active. No
+Supabase migration is required for V24.12.
 
 ## Project Status
 
@@ -47,11 +51,11 @@ The long-term vision is to create a SaaS platform where multiple organizations c
 
 Completed:
 
-* React application created
-* TypeScript configured
-* Vite development environment established
-* Dependencies installed successfully
-* Development server tested successfully
+- React application created
+- TypeScript configured
+- Vite development environment established
+- Dependencies installed successfully
+- Development server tested successfully
 
 Current status:
 
@@ -63,23 +67,23 @@ Application loads correctly in the browser.
 
 ## Frontend
 
-* React
-* TypeScript
-* Vite
+- React
+- TypeScript
+- Vite
 
 ## Styling
 
 Planned/Current:
 
-* Tailwind CSS
-* shadcn/ui component system
+- Tailwind CSS
+- shadcn/ui component system
 
 ## Data Management
 
 Planned:
 
-* TanStack Query for server state
-* TanStack Router for scalable routing
+- TanStack Query for server state
+- TanStack Router for scalable routing
 
 ## Backend
 
@@ -87,11 +91,11 @@ Supabase configured as the backend platform.
 
 Supabase will provide:
 
-* Authentication
-* Database
-* Storage
-* API services
-* Row Level Security
+- Authentication
+- Database
+- Storage
+- API services
+- Row Level Security
 
 ---
 
@@ -167,11 +171,11 @@ Components should be reusable and designed for future expansion.
 
 The application should eventually support:
 
-* Multiple organizations
-* Different branding
-* Separate user communities
-* Organization-specific content
-* Subscription-based access
+- Multiple organizations
+- Different branding
+- Separate user communities
+- Organization-specific content
+- Subscription-based access
 
 ---
 
@@ -209,28 +213,28 @@ Next tasks:
 
 Planned:
 
-* User authentication
-* Profiles
-* Roles
-* Permissions
+- User authentication
+- Profiles
+- Roles
+- Permissions
 
 ## Phase 4: Community Features
 
 Planned:
 
-* Communities
-* Fan groups
-* Creator pages
-* Engagement tools
+- Communities
+- Fan groups
+- Creator pages
+- Engagement tools
 
 ## Phase 5: SaaS Features
 
 Planned:
 
-* Organization accounts
-* Subscription management
-* Admin dashboards
-* Analytics
+- Organization accounts
+- Subscription management
+- Admin dashboards
+- Analytics
 
 ---
 
@@ -240,10 +244,10 @@ Do not rebuild existing architecture without reviewing this document first.
 
 Preserve:
 
-* Current folder organization
-* Technology choices
-* Scalability goals
-* SaaS direction
+- Current folder organization
+- Technology choices
+- Scalability goals
+- SaaS direction
 
 When making changes:
 

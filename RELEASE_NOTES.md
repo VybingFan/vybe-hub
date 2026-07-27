@@ -52,3 +52,14 @@
 - Kept member progress, saved scores, paid access, rewards, and subscriptions clearly identified
   as future phases.
 - Requires no Supabase migration and does not alter existing creator accounts.
+
+# V24.12 — Daily VYBE operating foundation
+
+- Added an honest genre-selection experience with Mixed VYBE active for the pilot.
+- Added planned genre choices that remain clearly labeled until approved content is deep enough.
+- Added a stronger Daily VYBE area for trivia, polls, Spotlight, and weekly discovery.
+- Added a shared Play content registry so public Play and the administration view use one definition.
+- Added an admin-only Play release board with inventory, release gates, and build dependencies.
+- Kept the administration board read-only until the Knowledge Engine production schema is approved.
+- Kept multiplayer, lyric, audio-recognition, prizes, and persistent streaks in future phases.
+- Requires no Supabase migration and does not alter existing creator accounts.

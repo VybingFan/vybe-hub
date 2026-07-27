@@ -110,7 +110,10 @@ export function AppSidebar() {
         {hasAnyRole(["admin"]) && (
           <NavGroup
             label="Administration"
-            items={[{ title: "Admin", url: "/admin", icon: ShieldCheck, allow: ["admin"] }]}
+            items={[
+              { title: "Admin", url: "/admin", icon: ShieldCheck, allow: ["admin"] },
+              { title: "Play Admin", url: "/admin/play", icon: Gamepad2, allow: ["admin"] },
+            ]}
             isActive={isActive}
           />
         )}
