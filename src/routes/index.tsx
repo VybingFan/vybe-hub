@@ -37,16 +37,22 @@ const connectionCards = [
     icon: Headphones,
     title: "Discover your next favorite",
     body: "Follow sounds, scenes, and people—not an algorithmic mold.",
+    to: "/explore",
+    status: "Available now",
   },
   {
     icon: MessageCircle,
     title: "Join the conversation",
-    body: "React, comment, share stories, and belong to the moments around the music.",
+    body: "Preview how creator-led conversations and communities can grow around the music.",
+    to: "/experience/communities",
+    status: "Experience preview",
   },
   {
     icon: CalendarDays,
     title: "Show up together",
-    body: "Find listening parties, local showcases, drops, and member-only events.",
+    body: "Preview listening parties, local showcases, drops, and member events.",
+    to: "/experience/events",
+    status: "Experience preview",
   },
 ];
 
@@ -62,7 +68,7 @@ function Landing() {
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-12 sm:px-6 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:py-28">
             <div>
               <Badge className="mb-6 rounded-full border border-primary/25 bg-primary/10 text-primary">
-                <Sparkles className="mr-2 h-3.5 w-3.5" /> Built around the members
+                <Sparkles className="mr-2 h-3.5 w-3.5" /> Built around creators and fans
               </Badge>
               <h1 className="max-w-3xl text-4xl font-bold leading-[1.04] tracking-tight sm:text-5xl md:text-7xl">
                 Where music becomes <span className="text-gradient-brand">community.</span>
@@ -77,8 +83,8 @@ function Landing() {
                   size="lg"
                   className="bg-gradient-brand text-primary-foreground shadow-glow"
                 >
-                  <Link to="/auth/sign-up">
-                    Join the community <ArrowRight className="ml-2 h-4 w-4" />
+                  <Link to="/explore" search={{ q: "" }}>
+                    Explore VYBE <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
                 <Button
@@ -109,17 +115,22 @@ function Landing() {
                 className="h-[470px] w-full rounded-[2rem] object-cover shadow-elevated"
               />
               <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-t from-background/90 via-transparent to-transparent" />
-              <div className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 rounded-2xl border border-white/10 bg-background/65 p-5 backdrop-blur-xl">
+              <Link
+                to="/demo/creator"
+                hash="music"
+                className="group absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 rounded-2xl border border-white/10 bg-background/65 p-5 backdrop-blur-xl transition hover:border-primary/40"
+                aria-label="Play music from the VYBE demo creator"
+              >
                 <div>
                   <p className="text-xs font-medium uppercase tracking-[0.2em] text-genre-country">
                     Your music world
                   </p>
                   <h2 className="mt-1 text-xl font-semibold">Discover. Connect. Belong.</h2>
                 </div>
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-background">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-background transition group-hover:scale-105">
                   <Play className="ml-0.5 h-5 w-5 fill-current" />
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </section>
@@ -183,9 +194,11 @@ function Landing() {
             </div>
             <div className="mt-10 grid gap-4 md:grid-cols-3">
               {connectionCards.map((item, index) => (
-                <article
+                <Link
                   key={item.title}
-                  className="rounded-3xl border border-border/70 bg-card/75 p-7"
+                  to={item.to}
+                  search={item.to === "/explore" ? { q: "" } : undefined}
+                  className="group rounded-3xl border border-border/70 bg-card/75 p-7 transition hover:-translate-y-0.5 hover:border-primary/40"
                 >
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/12 text-primary">
                     <item.icon className="h-5 w-5" />
@@ -193,7 +206,11 @@ function Landing() {
                   <p className="mt-7 text-xs text-muted-foreground">0{index + 1}</p>
                   <h3 className="mt-2 text-xl font-semibold">{item.title}</h3>
                   <p className="mt-3 leading-7 text-muted-foreground">{item.body}</p>
-                </article>
+                  <div className="mt-5 flex items-center justify-between text-xs font-medium text-primary">
+                    <span>{item.status}</span>
+                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -220,7 +237,7 @@ function Landing() {
               into a song.
             </p>
             <Button asChild variant="outline" size="lg" className="mt-7 rounded-full">
-              <Link to="/auth/sign-up">
+              <Link to="/demo/creator" hash="stories">
                 Explore artist stories <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -248,7 +265,7 @@ function Landing() {
               drops, and unexpected pieces that carry an artist's story into your world.
             </p>
             <Button asChild size="lg" className="mt-7 rounded-full bg-gradient-brand">
-              <Link to="/auth/sign-up">
+              <Link to="/demo/creator" hash="merch">
                 <ShoppingBag className="mr-2 h-4 w-4" /> Explore artist merch
               </Link>
             </Button>
@@ -267,7 +284,7 @@ function Landing() {
                 </h2>
               </div>
               <Button asChild size="lg" variant="secondary" className="shrink-0 rounded-full">
-                <Link to="/auth/sign-up">
+                <Link to="/for-artists">
                   <Music2 className="mr-2 h-4 w-4" /> Create your VYBE
                 </Link>
               </Button>

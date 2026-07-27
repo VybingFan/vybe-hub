@@ -34,6 +34,7 @@ import { Route as ExperiencePlayRouteImport } from './routes/experience.play'
 import { Route as ExperienceListenRouteImport } from './routes/experience.listen'
 import { Route as ExperienceEventsRouteImport } from './routes/experience.events'
 import { Route as ExperienceCommunitiesRouteImport } from './routes/experience.communities'
+import { Route as DemoCreatorRouteImport } from './routes/demo.creator'
 import { Route as CreatorUsernameRouteImport } from './routes/creator.$username'
 import { Route as CreatorInviteTokenRouteImport } from './routes/creator-invite.$token'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
@@ -194,6 +195,11 @@ const ExperienceEventsRoute = ExperienceEventsRouteImport.update({
 const ExperienceCommunitiesRoute = ExperienceCommunitiesRouteImport.update({
   id: '/experience/communities',
   path: '/experience/communities',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoCreatorRoute = DemoCreatorRouteImport.update({
+  id: '/demo/creator',
+  path: '/demo/creator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreatorUsernameRoute = CreatorUsernameRouteImport.update({
@@ -435,6 +441,7 @@ export interface FileRoutesByFullPath {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
+  '/demo/creator': typeof DemoCreatorRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/events': typeof ExperienceEventsRoute
   '/experience/listen': typeof ExperienceListenRoute
@@ -498,6 +505,7 @@ export interface FileRoutesByTo {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
+  '/demo/creator': typeof DemoCreatorRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/events': typeof ExperienceEventsRoute
   '/experience/listen': typeof ExperienceListenRoute
@@ -563,6 +571,7 @@ export interface FileRoutesById {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
+  '/demo/creator': typeof DemoCreatorRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/events': typeof ExperienceEventsRoute
   '/experience/listen': typeof ExperienceListenRoute
@@ -628,6 +637,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/creator-invite/$token'
     | '/creator/$username'
+    | '/demo/creator'
     | '/experience/communities'
     | '/experience/events'
     | '/experience/listen'
@@ -691,6 +701,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/creator-invite/$token'
     | '/creator/$username'
+    | '/demo/creator'
     | '/experience/communities'
     | '/experience/events'
     | '/experience/listen'
@@ -755,6 +766,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/creator-invite/$token'
     | '/creator/$username'
+    | '/demo/creator'
     | '/experience/communities'
     | '/experience/events'
     | '/experience/listen'
@@ -794,6 +806,7 @@ export interface RootRouteChildren {
   ArtistUsernameRoute: typeof ArtistUsernameRoute
   CreatorInviteTokenRoute: typeof CreatorInviteTokenRoute
   CreatorUsernameRoute: typeof CreatorUsernameRoute
+  DemoCreatorRoute: typeof DemoCreatorRoute
   ExperienceCommunitiesRoute: typeof ExperienceCommunitiesRoute
   ExperienceEventsRoute: typeof ExperienceEventsRoute
   ExperienceListenRoute: typeof ExperienceListenRoute
@@ -983,6 +996,13 @@ declare module '@tanstack/react-router' {
       path: '/experience/communities'
       fullPath: '/experience/communities'
       preLoaderRoute: typeof ExperienceCommunitiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/creator': {
+      id: '/demo/creator'
+      path: '/demo/creator'
+      fullPath: '/demo/creator'
+      preLoaderRoute: typeof DemoCreatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/creator/$username': {
@@ -1344,6 +1364,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtistUsernameRoute: ArtistUsernameRoute,
   CreatorInviteTokenRoute: CreatorInviteTokenRoute,
   CreatorUsernameRoute: CreatorUsernameRoute,
+  DemoCreatorRoute: DemoCreatorRoute,
   ExperienceCommunitiesRoute: ExperienceCommunitiesRoute,
   ExperienceEventsRoute: ExperienceEventsRoute,
   ExperienceListenRoute: ExperienceListenRoute,
