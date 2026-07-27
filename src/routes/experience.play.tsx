@@ -49,7 +49,7 @@ function PlayExperience() {
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [finished, setFinished] = useState(false);
-  const [vibe, setVibe] = useState<number | null>(null);
+  const [vibes, setVibes] = useState<number[]>([]);
   const [poll, setPoll] = useState<string | null>(null);
   const question = trivia[questionIndex];
   const pollTotal = 126 + (poll ? 1 : 0);
@@ -83,13 +83,21 @@ function PlayExperience() {
     setFinished(false);
   }
 
+  function toggleVibe(index: number) {
+    setVibes((current) => {
+      if (current.includes(index)) return current.filter((choice) => choice !== index);
+      if (current.length === 3) return current;
+      return [...current, index];
+    });
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <MarketingNav />
       <main>
         <section className="border-b border-border/60 bg-gradient-hero">
           <div className="mx-auto max-w-6xl px-6 py-16 text-center md:py-24">
-            <Badge className="border-lime-300/30 bg-lime-300/10 text-lime-300">
+            <Badge className="border-lime-700/40 bg-lime-100 text-lime-900 dark:border-lime-300/30 dark:bg-lime-300/10 dark:text-lime-200">
               <Sparkles className="mr-2 h-3.5 w-3.5" />
               Play on VYBE · First experience
             </Badge>
@@ -183,18 +191,21 @@ function PlayExperience() {
               </p>
               <h2 className="mt-2 text-2xl font-semibold">Build Your VYBE</h2>
               <p className="mt-3 text-muted-foreground">
-                Choose the discovery style that feels most like you.
+                Choose up to three discovery styles that feel most like you.
               </p>
+              <p className="mt-2 text-sm font-medium text-primary">{vibes.length} of 3 selected</p>
               <div className="mt-6 grid gap-3">
                 {vibeChoices.map((choice, index) => (
                   <button
                     key={choice.label}
                     type="button"
-                    onClick={() => setVibe(index)}
+                    onClick={() => toggleVibe(index)}
+                    aria-pressed={vibes.includes(index)}
+                    disabled={vibes.length === 3 && !vibes.includes(index)}
                     className={`rounded-2xl border p-4 text-left transition ${
-                      vibe === index
+                      vibes.includes(index)
                         ? "border-primary bg-primary/10"
-                        : "border-border bg-background/50 hover:border-primary/40"
+                        : "border-border bg-background/50 hover:border-primary/40 disabled:cursor-not-allowed disabled:opacity-50"
                     }`}
                   >
                     <span className="font-semibold">{choice.label}</span>
@@ -204,11 +215,15 @@ function PlayExperience() {
                   </button>
                 ))}
               </div>
-              {vibe !== null && (
+              {vibes.length > 0 && (
                 <div className="mt-5 rounded-2xl bg-gradient-brand p-5 text-white">
-                  <p className="text-sm text-white/75">Your current VYBE</p>
-                  <p className="mt-1 text-xl font-semibold">{vibeChoices[vibe].label}</p>
-                  <p className="mt-2 text-sm text-white/85">{vibeChoices[vibe].detail}</p>
+                  <p className="text-sm text-white/75">Your current VYBE blend</p>
+                  <p className="mt-1 text-xl font-semibold">
+                    {vibes.map((index) => vibeChoices[index].label).join(" · ")}
+                  </p>
+                  <p className="mt-2 text-sm text-white/85">
+                    Your selections can shape future creator, story, event, and playlist discovery.
+                  </p>
                 </div>
               )}
             </article>

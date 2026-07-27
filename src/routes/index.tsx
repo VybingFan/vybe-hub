@@ -118,7 +118,7 @@ function Landing() {
               <Link
                 to="/demo/creator"
                 hash="music"
-                className="group absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 rounded-2xl border border-white/10 bg-background/65 p-5 backdrop-blur-xl transition hover:border-primary/40"
+                className="group absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 rounded-2xl border border-border bg-card/95 p-5 shadow-elevated backdrop-blur-xl transition hover:border-primary/60"
                 aria-label="Play music from the VYBE demo creator"
               >
                 <div>
@@ -127,7 +127,7 @@ function Landing() {
                   </p>
                   <h2 className="mt-1 text-xl font-semibold">Discover. Connect. Belong.</h2>
                 </div>
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-background transition group-hover:scale-105">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-foreground text-background shadow-md transition group-hover:scale-105">
                   <Play className="ml-0.5 h-5 w-5 fill-current" />
                 </div>
               </Link>

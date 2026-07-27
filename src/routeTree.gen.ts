@@ -65,6 +65,7 @@ import { Route as AuthenticatedConnectionsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
+import { Route as DemoStorySlugRouteImport } from './routes/demo.story.$slug'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api.stripe.webhook'
 import { Route as ApiStripePortalRouteImport } from './routes/api.stripe.portal'
 import { Route as ApiStripeCheckoutRouteImport } from './routes/api.stripe.checkout'
@@ -354,6 +355,11 @@ const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const DemoStorySlugRoute = DemoStorySlugRouteImport.update({
+  id: '/demo/story/$slug',
+  path: '/demo/story/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
   id: '/api/stripe/webhook',
   path: '/api/stripe/webhook',
@@ -456,6 +462,7 @@ export interface FileRoutesByFullPath {
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/demo/story/$slug': typeof DemoStorySlugRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRoutesByTo {
@@ -520,6 +527,7 @@ export interface FileRoutesByTo {
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/demo/story/$slug': typeof DemoStorySlugRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRoutesById {
@@ -586,6 +594,7 @@ export interface FileRoutesById {
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/demo/story/$slug': typeof DemoStorySlugRoute
   '/artist/$username_/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRouteTypes {
@@ -652,6 +661,7 @@ export interface FileRouteTypes {
     | '/api/stripe/checkout'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
+    | '/demo/story/$slug'
     | '/artist/$username/playlist/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -716,6 +726,7 @@ export interface FileRouteTypes {
     | '/api/stripe/checkout'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
+    | '/demo/story/$slug'
     | '/artist/$username/playlist/$slug'
   id:
     | '__root__'
@@ -781,6 +792,7 @@ export interface FileRouteTypes {
     | '/api/stripe/checkout'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
+    | '/demo/story/$slug'
     | '/artist/$username_/playlist/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -818,6 +830,7 @@ export interface RootRouteChildren {
   ApiStripeCheckoutRoute: typeof ApiStripeCheckoutRoute
   ApiStripePortalRoute: typeof ApiStripePortalRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
+  DemoStorySlugRoute: typeof DemoStorySlugRoute
   ArtistUsernamePlaylistSlugRoute: typeof ArtistUsernamePlaylistSlugRoute
 }
 
@@ -1215,6 +1228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedActivityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/demo/story/$slug': {
+      id: '/demo/story/$slug'
+      path: '/demo/story/$slug'
+      fullPath: '/demo/story/$slug'
+      preLoaderRoute: typeof DemoStorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/stripe/webhook': {
       id: '/api/stripe/webhook'
       path: '/api/stripe/webhook'
@@ -1376,6 +1396,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiStripeCheckoutRoute: ApiStripeCheckoutRoute,
   ApiStripePortalRoute: ApiStripePortalRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
+  DemoStorySlugRoute: DemoStorySlugRoute,
   ArtistUsernamePlaylistSlugRoute: ArtistUsernamePlaylistSlugRoute,
 }
 export const routeTree = rootRouteImport

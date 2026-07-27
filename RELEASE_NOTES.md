@@ -17,3 +17,15 @@
 - Activated public Play with music trivia, Build Your VYBE, a daily poll, and a creator spotlight.
 - Kept future subscriptions, saved scores, comments, purchases, and rewards clearly labeled.
 - Requires no Supabase migration and does not alter existing creator accounts.
+
+# V24.10.1 — Functional demo experiences and light-mode refinement
+
+- Added a public light/dark theme control to desktop and mobile marketing navigation.
+- Strengthened light-mode contrast for the homepage music-world panel, play control, and Play
+  experience label.
+- Expanded Build Your VYBE from one choice to a selectable blend of up to three choices.
+- Turned Community into a readable Nova Vale sample discussion with account-gated participation.
+- Turned Events into three realistic fictional examples with account-gated saving and reservations.
+- Made all four Nova Vale story cards open complete fictional sample articles.
+- Connected Nova Vale music, stories, community, events, and Play with clearer navigation.
+- Requires no Supabase migration and does not alter existing creator accounts.

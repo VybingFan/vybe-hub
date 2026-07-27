@@ -187,6 +187,12 @@ function DemoCreatorPage() {
                 “After the Signal” demonstrates the one song Nova chose to introduce her public
                 profile.
               </p>
+              <Button asChild variant="outline" className="mt-5 rounded-full">
+                <Link to="/experience/play">
+                  Explore Play on VYBE
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
             </div>
           </aside>
         </section>
@@ -282,21 +288,29 @@ function DemoCreatorPage() {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {[
-                ["The story behind “After the Signal”", "Behind the song"],
-                ["Five sounds that shaped Nova Vale", "Influences"],
-                ["From voice memo to finished record", "Creative process"],
-                ["Meet the musicians behind the session", "Credits"],
-              ].map(([title, label]) => (
-                <article key={title} className="rounded-3xl border border-border bg-card p-6">
+                ["The story behind “After the Signal”", "Behind the song", "after-the-signal"],
+                ["Five sounds that shaped Nova Vale", "Influences", "five-sounds"],
+                ["From voice memo to finished record", "Creative process", "voice-memo"],
+                ["Meet the musicians behind the session", "Credits", "session-musicians"],
+              ].map(([title, label, slug]) => (
+                <a
+                  key={title}
+                  href={`/demo/story/${slug}`}
+                  className="group rounded-3xl border border-border bg-card p-6 transition hover:border-amber-500/60 hover:shadow-elevated"
+                >
                   <p className="text-xs font-semibold uppercase tracking-[.16em] text-amber-300">
                     {label}
                   </p>
                   <h3 className="mt-3 text-xl font-semibold">{title}</h3>
                   <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                    Sample editorial content showing how a creator can add meaning and context to
-                    the work.
+                    Open this complete sample story to see how a creator can add meaning and context
+                    to the work.
                   </p>
-                </article>
+                  <p className="mt-4 flex items-center text-sm font-medium text-foreground">
+                    Read story
+                    <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" />
+                  </p>
+                </a>
               ))}
             </div>
           </div>
@@ -384,14 +398,25 @@ function DemoCreatorPage() {
           <h2 className="mt-2 text-3xl font-semibold">Give people a reason to return</h2>
           <div className="mt-7 grid gap-4 md:grid-cols-3">
             {[
-              ["Listening Room: After the Signal", "Event preview", CalendarDays],
-              ["Nova’s Studio Notes", "Community preview", MessageCircle],
-              ["Founding Listeners", "Follower space preview", Users],
-            ].map(([title, label, Icon]) => {
+              [
+                "Listening Room: After the Signal",
+                "Event demonstration",
+                CalendarDays,
+                "/experience/events",
+              ],
+              [
+                "Nova’s Studio Notes",
+                "Community demonstration",
+                MessageCircle,
+                "/experience/communities",
+              ],
+              ["Founding Listeners", "Follower space preview", Users, "/auth/sign-up"],
+            ].map(([title, label, Icon, href]) => {
               const CardIcon = Icon as typeof Users;
               return (
-                <article
+                <a
                   key={title as string}
+                  href={href as string}
                   className="rounded-3xl border border-border bg-card p-6"
                 >
                   <CardIcon className="h-7 w-7 text-lime-300" />
@@ -400,9 +425,13 @@ function DemoCreatorPage() {
                   </Badge>
                   <h3 className="mt-3 text-xl font-semibold">{title as string}</h3>
                   <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                    A clearly labeled preview of how creator-led participation could appear later.
+                    Open a clearly labeled example of how creator-led participation could work.
                   </p>
-                </article>
+                  <p className="mt-4 flex items-center text-sm font-medium">
+                    Open experience
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </p>
+                </a>
               );
             })}
           </div>

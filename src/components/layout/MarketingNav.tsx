@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/common/Logo";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import {
   BUILD_ON_VYBE_LINKS,
   COMMUNITY_LINKS,
@@ -49,6 +50,7 @@ export function MarketingNav() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
+          <ThemeToggle />
           {!isLoading && user ? (
             <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
               <a href={defaultRoute}>{appLabel}</a>
@@ -86,6 +88,9 @@ export function MarketingNav() {
             <MobileSection title="Community" items={COMMUNITY_LINKS} />
             <MobileSection title="Build on VYBE" items={BUILD_ON_VYBE_LINKS} />
             <MobileSection title="More" items={MORE_LINKS} />
+            <div className="border-t border-border/50 pt-4">
+              <ThemeToggle showLabel />
+            </div>
 
             {!isLoading && user ? (
               <Button asChild className="w-full bg-gradient-brand text-primary-foreground">
