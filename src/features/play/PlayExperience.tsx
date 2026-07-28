@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -14,6 +14,8 @@ import {
   Sparkles,
   Star,
   Trophy,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +25,11 @@ import {
   PLAY_GENRES,
   type PlayGenre,
 } from "@/features/play/content";
+import {
+  loadOfflinePlayProgress,
+  saveOfflinePlayProgress,
+  syncOfflinePlayProgress,
+} from "@/features/play/offlineProgress";
 
 const trivia = [
   {
@@ -136,15 +143,24 @@ const surpriseOptions = [
 type SurpriseOption = (typeof surpriseOptions)[number];
 
 export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
-  const [playGenre, setPlayGenre] = useState<PlayGenre>("Mixed VYBE");
+  const [initialProgress] = useState(loadOfflinePlayProgress);
+  const [playGenre, setPlayGenre] = useState<PlayGenre>(initialProgress.playGenre);
   const [genreNotice, setGenreNotice] = useState<string | null>(null);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [finished, setFinished] = useState(false);
-  const [vibes, setVibes] = useState<number[]>([]);
-  const [poll, setPoll] = useState<string | null>(null);
-  const [surprise, setSurprise] = useState<SurpriseOption | null>(null);
+  const [questionIndex, setQuestionIndex] = useState(initialProgress.questionIndex);
+  const [score, setScore] = useState(initialProgress.score);
+  const [selected, setSelected] = useState<number | null>(initialProgress.selected);
+  const [finished, setFinished] = useState(initialProgress.finished);
+  const [vibes, setVibes] = useState<number[]>(initialProgress.vibes);
+  const [poll, setPoll] = useState<string | null>(initialProgress.poll);
+  const [surprise, setSurprise] = useState<SurpriseOption | null>(
+    surpriseOptions.find((option) => option.title === initialProgress.surpriseTitle) ?? null,
+  );
+  const [online, setOnline] = useState(() =>
+    typeof navigator === "undefined" ? true : navigator.onLine,
+  );
+  const [syncState, setSyncState] = useState<"saved" | "pending" | "synced" | "local">(
+    online ? "saved" : "pending",
+  );
   const question = trivia[questionIndex];
   const pollTotal = 126 + (poll ? 1 : 0);
   const pollResults = useMemo(
@@ -154,6 +170,41 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
     }),
     [poll, pollTotal],
   );
+
+  useEffect(() => {
+    const onOnline = () => setOnline(true);
+    const onOffline = () => setOnline(false);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      const saved = saveOfflinePlayProgress({
+        playGenre,
+        questionIndex,
+        score,
+        selected,
+        finished,
+        vibes,
+        poll,
+        surpriseTitle: surprise?.title ?? null,
+      });
+      if (!online) {
+        setSyncState("pending");
+        return;
+      }
+      setSyncState("saved");
+      void syncOfflinePlayProgress(saved)
+        .then((result) => setSyncState(result))
+        .catch(() => setSyncState("pending"));
+    }, 500);
+    return () => window.clearTimeout(timeout);
+  }, [finished, online, playGenre, poll, questionIndex, score, selected, surprise, vibes]);
 
   function chooseTrivia(choice: number) {
     if (selected !== null) return;
@@ -217,9 +268,27 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
             {isMember
-              ? "Play the same VYBE activities available publicly. Saved history and personalized progress are planned for a later member phase."
-              : "Try VYBE activities without creating an account. Join later when you want saved history, participation, and personalization."}
+              ? "Play progress is saved on this device and synchronized after reconnection. Offline results remain casual and unverified."
+              : "Try VYBE activities without an account. Casual progress stays on this device, including while you are offline."}
           </p>
+          <div className="mt-6 flex justify-center">
+            <div className="flex items-center gap-2 rounded-full border border-border bg-background/80 px-4 py-2 text-sm">
+              {online ? (
+                <Wifi className="h-4 w-4 text-lime-600 dark:text-lime-300" />
+              ) : (
+                <WifiOff className="h-4 w-4 text-amber-600 dark:text-amber-300" />
+              )}
+              <span className="font-medium">{online ? "Online" : "Offline Play"}</span>
+              <span className="text-muted-foreground">
+                ·{" "}
+                {syncState === "synced"
+                  ? "Progress synced"
+                  : syncState === "pending"
+                    ? "Saved here · waiting to sync"
+                    : "Progress saved on this device"}
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -412,8 +481,9 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
                   You scored {score} of {trivia.length}
                 </h3>
                 <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
-                  This public version does not save results. A future free VYBE account can keep
-                  scores, badges, and daily progress.
+                  This casual result is saved on this device. Signed-in progress synchronizes after
+                  reconnection, but offline scores are never treated as verified competition
+                  results.
                 </p>
                 <Button onClick={restartTrivia} className="mt-6 rounded-full">
                   <RotateCcw className="mr-2 h-4 w-4" />
@@ -518,8 +588,8 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
             </p>
             <h2 className="mt-2 text-3xl font-semibold">Studio version or live version?</h2>
             <p className="mt-3 leading-7 text-muted-foreground">
-              Vote once in this demonstration. Future signed-in members can join recurring polls,
-              see history, and compare results across creator communities.
+              Vote once in this demonstration. Offline choices are saved on this device and
+              synchronized for signed-in members after reconnection.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">

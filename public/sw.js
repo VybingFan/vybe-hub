@@ -1,6 +1,8 @@
-const CACHE_NAME = "vybe-creator-v24-13";
+const CACHE_NAME = "vybe-creator-v24-18";
 const OFFLINE_URL = "/offline.html";
+const OFFLINE_PLAY_URL = "/experience/play";
 const SAFE_STATIC_PREFIXES = ["/assets/", "/branding/", "/pwa/"];
+const OFFLINE_PLAY_PATHS = ["/play", "/experience/play"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -13,9 +15,12 @@ self.addEventListener("install", (event) => {
           "/pwa/icon-512.png",
           "/pwa/icon-maskable-512.png",
         ]),
-      )
-      .then(() => self.skipWaiting()),
+      ),
   );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
@@ -25,6 +30,17 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))),
       )
+      .then(async () => {
+        try {
+          const response = await fetch(OFFLINE_PLAY_URL);
+          if (response.ok) {
+            const cache = await caches.open(CACHE_NAME);
+            await cache.put(OFFLINE_PLAY_URL, response);
+          }
+        } catch {
+          // The public Play page will be cached the next time it is visited online.
+        }
+      })
       .then(() => self.clients.claim()),
   );
 });
@@ -37,7 +53,23 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin || url.pathname.startsWith("/api/")) return;
 
   if (request.mode === "navigate") {
-    event.respondWith(fetch(request).catch(() => caches.match(OFFLINE_URL)));
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok && url.pathname === OFFLINE_PLAY_URL) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(OFFLINE_PLAY_URL, copy));
+          }
+          return response;
+        })
+        .catch(async () => {
+          if (OFFLINE_PLAY_PATHS.includes(url.pathname)) {
+            const cachedPlay = await caches.match(OFFLINE_PLAY_URL);
+            if (cachedPlay) return cachedPlay;
+          }
+          return caches.match(OFFLINE_URL);
+        }),
+    );
     return;
   }
 

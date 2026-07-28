@@ -42,16 +42,30 @@
         color: #b7afc6;
         line-height: 1.6;
       }
-      button {
+      .actions {
         margin-top: 24px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+      }
+      button,
+      a {
         border: 0;
         border-radius: 999px;
         padding: 12px 20px;
         font: inherit;
         font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      button {
         color: #16051f;
         background: linear-gradient(135deg, #b768ff, #e77cff);
-        cursor: pointer;
+      }
+      a {
+        color: #f8f7fb;
+        background: #211a2d;
       }
     </style>
   </head>
@@ -59,8 +73,14 @@
     <main>
       <img src="/pwa/icon-192.png" alt="" />
       <h1>VYBE Creator is offline</h1>
-      <p>Reconnect to continue managing your music, stories, playlists, and creator community.</p>
-      <button type="button" onclick="window.location.reload()">Try again</button>
+      <p>
+        Creator tools need a connection. If you previously opened Play online, its casual activities
+        can continue offline.
+      </p>
+      <div class="actions">
+        <a href="/experience/play">Open Offline Play</a>
+        <button type="button" onclick="window.location.reload()">Try again</button>
+      </div>
     </main>
   </body>
 </html>
