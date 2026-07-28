@@ -70,3 +70,17 @@
 - Adds an accessible confirmation message when Mixed VYBE is selected.
 - Respects reduced-motion preferences when moving to the game.
 - Requires no Supabase migration.
+
+# V24.13 — VYBE Creator installable app foundation
+
+- Adds an installable Progressive Web App identity named VYBE Creator on the existing VYBE domain.
+- Launches installed sessions through `/auth/redirect`, preserving sign-in, invitations, onboarding,
+  and creator routing to `/dashboard`.
+- Shows installation guidance only inside signed-in creator experiences.
+- Supports the native install prompt in compatible Chromium browsers and Add to Home Screen
+  guidance on iPhone and iPad.
+- Adds VYBE app icons, standalone display metadata, a safe service worker, and an offline screen.
+- Caches only same-origin static application assets and deliberately excludes API responses,
+  Supabase authentication, private creator data, and audio.
+- Preserves the public website and fan browsing experience.
+- Requires no Supabase migration, new domain, or app-store account.

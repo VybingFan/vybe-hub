@@ -1,0 +1,33 @@
+{
+  "id": "/auth/redirect?source=pwa",
+  "name": "VYBE Creator",
+  "short_name": "VYBE Creator",
+  "description": "Your VYBE Creator Studio for sharing music, stories, playlists, video, merchandise, and community.",
+  "start_url": "/auth/redirect?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#08070d",
+  "theme_color": "#08070d",
+  "categories": ["music", "social", "entertainment"],
+  "icons": [
+    {
+      "src": "/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

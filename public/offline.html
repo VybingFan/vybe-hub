@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#08070d" />
+    <title>VYBE Creator — Offline</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, system-ui, sans-serif;
+        background: #08070d;
+        color: #f8f7fb;
+      }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        box-sizing: border-box;
+      }
+      main {
+        width: min(100%, 460px);
+        padding: 32px;
+        border: 1px solid #30283d;
+        border-radius: 24px;
+        background: #100d18;
+        text-align: center;
+      }
+      img {
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+      }
+      h1 {
+        margin: 20px 0 8px;
+        font-size: 24px;
+      }
+      p {
+        margin: 0;
+        color: #b7afc6;
+        line-height: 1.6;
+      }
+      button {
+        margin-top: 24px;
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 20px;
+        font: inherit;
+        font-weight: 700;
+        color: #16051f;
+        background: linear-gradient(135deg, #b768ff, #e77cff);
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/pwa/icon-192.png" alt="" />
+      <h1>VYBE Creator is offline</h1>
+      <p>Reconnect to continue managing your music, stories, playlists, and creator community.</p>
+      <button type="button" onclick="window.location.reload()">Try again</button>
+    </main>
+  </body>
+</html>

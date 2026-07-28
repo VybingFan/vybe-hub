@@ -1,12 +1,23 @@
 # VYBE-HUB AI Development Handoff
 
-## Current Verified Play Development Checkpoint
+## Current Verified Development Checkpoint
 
-**Branch:** `vybe-play-genre-action-fix-v24-12-1`
+**Branch:** `vybe-creator-pwa-foundation-v24-13`
 
-**Base:** V24.11 / `e2af041`
+**Base:** V24.12.1 / `573baac`
 
 **Play routes:** public `/experience/play`; signed-in `/play`
+
+V24.13 adds the first installable VYBE Creator Progressive Web App foundation without separating
+the platform onto a new domain. The manifest launches through `/auth/redirect`, so an authenticated
+creator reaches `/dashboard` while expired sessions, invitations, and onboarding continue through
+the existing role-aware flow.
+
+The creator-only installation message supports native browser installation where available and
+Add to Home Screen guidance on iPhone and iPad. The service worker provides a branded offline
+screen and caches only same-origin static application assets. It does not cache API responses,
+Supabase authentication, private creator data, or audio. Public fan browsing remains unchanged.
+No Supabase migration is required.
 
 V24.11 unifies both routes around `src/features/play/PlayExperience.tsx`. Public visitors retain
 the marketing navigation and footer. Signed-in supporters, creators, and administrators use the
