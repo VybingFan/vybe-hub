@@ -19,6 +19,10 @@ screen and caches only same-origin static application assets. It does not cache 
 Supabase authentication, private creator data, or audio. Public fan browsing remains unchanged.
 No Supabase migration is required.
 
+V24.13.1 moves browser install-event capture to a root-level provider. This preserves the event
+across public navigation, sign-in, and the transition into Creator Studio so the creator-only
+installation banner can appear reliably on the dashboard.
+
 V24.11 unifies both routes around `src/features/play/PlayExperience.tsx`. Public visitors retain
 the marketing navigation and footer. Signed-in supporters, creators, and administrators use the
 same Play experience inside the authenticated VYBE application shell.

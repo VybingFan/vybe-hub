@@ -84,3 +84,11 @@
   Supabase authentication, private creator data, and audio.
 - Preserves the public website and fan browsing experience.
 - Requires no Supabase migration, new domain, or app-store account.
+
+# V24.13.1 — Creator install prompt continuity
+
+- Captures the browser installation event at the application root before sign-in.
+- Preserves the event while the creator moves from the public homepage into Creator Studio.
+- Makes the creator-only VYBE installation banner available without relying on a dashboard refresh.
+- Does not change the manifest, service worker cache policy, public fan experience, or production
+  routing.

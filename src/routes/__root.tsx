@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { PwaRegistration } from "@/components/pwa/PwaRegistration";
+import { PwaInstallProvider } from "@/components/pwa/PwaInstallProvider";
 
 const themeInitializationScript = `
   (function () {
@@ -173,10 +174,12 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemePreference />
       <PwaRegistration />
-      <AuthProvider>
-        <Outlet />
-        <Toaster />
-      </AuthProvider>
+      <PwaInstallProvider>
+        <AuthProvider>
+          <Outlet />
+          <Toaster />
+        </AuthProvider>
+      </PwaInstallProvider>
     </QueryClientProvider>
   );
 }
