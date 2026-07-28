@@ -1,0 +1,1 @@
+"""VYBE rights-processing worker."""
