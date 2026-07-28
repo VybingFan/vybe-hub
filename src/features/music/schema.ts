@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MUSIC_RIGHTS_VALUES } from "@/constants/legal";
 
 export const CONTENT_STATUSES = ["draft", "published"] as const;
 export type ContentStatus = (typeof CONTENT_STATUSES)[number];
@@ -26,6 +27,10 @@ export const trackSchema = z.object({
   status: z.enum(CONTENT_STATUSES),
   track_number: z.number().int().min(1).max(999).optional().nullable(),
   album_id: z.string().uuid().optional().nullable(),
+  rights_basis: z.enum(MUSIC_RIGHTS_VALUES),
+  rights_confirmed: z.boolean(),
+  rights_policy_version: z.string().min(1).nullable(),
+  rights_confirmed_at: z.string().datetime().nullable(),
 });
 
 export type TrackInput = z.infer<typeof trackSchema>;

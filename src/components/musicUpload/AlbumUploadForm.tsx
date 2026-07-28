@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/select";
 import { ProfileCard } from "@/components/profile/ProfileCard";
 import { SubmitButton } from "@/components/auth/SubmitButton";
+import { RightsCertification } from "@/components/musicUpload/RightsCertification";
+import type { MusicRightsBasis } from "@/constants/legal";
 import {
   ACCEPTED_AUDIO,
   ACCEPTED_IMAGE,
@@ -39,6 +41,8 @@ export interface AlbumUploadValues {
   status: ContentStatus;
   cover: File | null;
   tracks: AlbumTrackDraft[];
+  rights_basis: MusicRightsBasis;
+  rights_confirmed: boolean;
 }
 
 interface Props {
@@ -56,6 +60,8 @@ const empty: AlbumUploadValues = {
   status: "draft",
   cover: null,
   tracks: [],
+  rights_basis: "entirely_original",
+  rights_confirmed: false,
 };
 
 export function AlbumUploadForm({ onSubmit, submitting }: Props) {
@@ -97,6 +103,8 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
     if (!values.title.trim()) return toast.error("Album title is required");
     if (!values.primary_artist_name.trim()) return toast.error("Primary artist is required");
     if (values.tracks.length === 0) return toast.error("Add at least one track");
+    if (!values.rights_confirmed)
+      return toast.error("Confirm that you have the rights needed to share this album");
     try {
       await onSubmit(values);
       setValues(empty);
@@ -232,6 +240,13 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
           </ol>
         )}
       </ProfileCard>
+
+      <RightsCertification
+        basis={values.rights_basis}
+        confirmed={values.rights_confirmed}
+        onBasisChange={(basis) => update("rights_basis", basis)}
+        onConfirmedChange={(confirmed) => update("rights_confirmed", confirmed)}
+      />
 
       <div className="flex justify-end">
         <SubmitButton loading={submitting} className="w-auto px-8">

@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { ProfileCard } from "@/components/profile/ProfileCard";
 import { SubmitButton } from "@/components/auth/SubmitButton";
+import { RightsCertification } from "@/components/musicUpload/RightsCertification";
+import type { MusicRightsBasis } from "@/constants/legal";
 import {
   ACCEPTED_AUDIO,
   ACCEPTED_IMAGE,
@@ -36,6 +38,8 @@ export interface SingleUploadValues {
   audio: File | null;
   cover: File | null;
   duration_sec: number;
+  rights_basis: MusicRightsBasis;
+  rights_confirmed: boolean;
 }
 
 interface Props {
@@ -55,6 +59,8 @@ const empty: SingleUploadValues = {
   audio: null,
   cover: null,
   duration_sec: 0,
+  rights_basis: "entirely_original",
+  rights_confirmed: false,
 };
 
 export function MusicUploadForm({ onSubmit, submitting }: Props) {
@@ -88,6 +94,8 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
     if (!values.audio) return toast.error("Please select an audio file");
     if (!values.title.trim()) return toast.error("Title is required");
     if (!values.primary_artist_name.trim()) return toast.error("Primary artist is required");
+    if (!values.rights_confirmed)
+      return toast.error("Confirm that you have the rights needed to share this music");
     try {
       await onSubmit(values);
       setValues(empty);
@@ -200,6 +208,13 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
           <Switch checked={values.is_featured} onCheckedChange={(c) => update("is_featured", c)} />
         </div>
       </ProfileCard>
+
+      <RightsCertification
+        basis={values.rights_basis}
+        confirmed={values.rights_confirmed}
+        onBasisChange={(basis) => update("rights_basis", basis)}
+        onConfirmedChange={(confirmed) => update("rights_confirmed", confirmed)}
+      />
 
       <div className="flex justify-end">
         <SubmitButton loading={submitting} className="w-auto px-8">

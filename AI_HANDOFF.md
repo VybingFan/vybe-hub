@@ -29,6 +29,14 @@ iOS Add to Home Screen guide, and an overview of creator tools. Creator-facing n
 homepage creator CTA now lead to this page. Creator intent is preserved through sign-up and
 onboarding. No Supabase migration is required.
 
+V24.15 establishes VYBE's first database-backed legal and content-rights workflow. Policy acceptance
+is versioned and recorded for both new and existing users. Music uploads require a rights category
+and explicit certification, and published tracks are protected by a database constraint. A public
+copyright-report form feeds an administrator-only review queue with preserved status and private
+notes. The four legal pages contain substantive interim beta drafts but explicitly remain subject to
+attorney review. Apply `20260728210000_legal_rights_foundation_v24_15.sql` before deploying the app
+code. No ACR vendor or DMCA-agent registration is included.
+
 V24.11 unifies both routes around `src/features/play/PlayExperience.tsx`. Public visitors retain
 the marketing navigation and footer. Signed-in supporters, creators, and administrators use the
 same Play experience inside the authenticated VYBE application shell.

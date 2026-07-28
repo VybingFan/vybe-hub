@@ -104,3 +104,23 @@
 - Clarifies that the iOS Studio banner is an instruction because Apple requires installation
   through the Share menu.
 - Keeps fan browsing on the existing public website and requires no Supabase migration.
+
+# V24.15 — Legal and content rights foundation
+
+- Replaces placeholder Terms, Privacy, Copyright, and Community Guidelines pages with substantive
+  interim beta policies that are visibly identified as pending attorney review.
+- Requires new users to affirmatively accept the versioned policy set during account creation and
+  records that acceptance through the signup trigger.
+- Requires existing signed-in users to review and accept the same versioned policy set before
+  continuing into authenticated VYBE areas.
+- Adds required rights classification and certification to single-track and album uploads.
+- Records the selected rights basis, confirmation, policy version, and confirmation time on every
+  new track and prevents uncertified tracks from being published.
+- Adds a public `/copyright/report` intake form with good-faith, accuracy, and electronic-signature
+  statements.
+- Adds an administrator-only `/admin/rights` queue for reviewing reports and preserving private
+  workflow notes.
+- Adds the `20260728210000_legal_rights_foundation_v24_15.sql` Supabase migration. This migration
+  must be applied before deploying the V24.15 application code.
+- Does not add automatic content recognition, paid rights vendors, legal verification, or a
+  registered DMCA agent.

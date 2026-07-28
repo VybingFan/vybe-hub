@@ -3,8 +3,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { SubmitButton } from "@/components/auth/SubmitButton";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LEGAL_POLICY_VERSION } from "@/constants/legal";
 import { useAuth } from "@/hooks/useAuth";
 import { signUpSchema } from "@/features/auth/roles";
 import { z } from "zod";
@@ -26,12 +28,17 @@ function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptedPolicies, setAcceptedPolicies] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (password !== confirmPassword) {
       toast.error("Passwords do not match.");
+      return;
+    }
+    if (!acceptedPolicies) {
+      toast.error("Accept the Terms, Privacy Policy, Community Guidelines, and Copyright Policy.");
       return;
     }
     const parsed = signUpSchema.safeParse({ displayName, email, password });
@@ -41,7 +48,12 @@ function SignUpPage() {
     }
     setLoading(true);
     try {
-      await signUp(parsed.data.email, parsed.data.password, parsed.data.displayName);
+      await signUp(
+        parsed.data.email,
+        parsed.data.password,
+        parsed.data.displayName,
+        LEGAL_POLICY_VERSION,
+      );
       const pendingInvite = window.localStorage.getItem("vybe:pending-creator-invite");
       toast.success(
         pendingInvite ? "Account created. Continue your creator invitation." : "Account created.",
@@ -121,6 +133,37 @@ function SignUpPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
+        </div>
+        <div className="flex items-start gap-3 rounded-xl border border-border/70 bg-muted/25 p-3">
+          <Checkbox
+            id="legal-policies"
+            checked={acceptedPolicies}
+            onCheckedChange={(checked) => setAcceptedPolicies(checked === true)}
+            aria-describedby="legal-policy-description"
+          />
+          <Label
+            htmlFor="legal-policies"
+            id="legal-policy-description"
+            className="text-xs font-normal leading-5 text-muted-foreground"
+          >
+            I agree to the{" "}
+            <Link to="/terms" target="_blank" className="text-foreground underline">
+              Terms
+            </Link>
+            ,{" "}
+            <Link to="/privacy" target="_blank" className="text-foreground underline">
+              Privacy Policy
+            </Link>
+            ,{" "}
+            <Link to="/community-guidelines" target="_blank" className="text-foreground underline">
+              Community Guidelines
+            </Link>
+            , and{" "}
+            <Link to="/copyright" target="_blank" className="text-foreground underline">
+              Copyright Policy
+            </Link>
+            . Version {LEGAL_POLICY_VERSION}.
+          </Label>
         </div>
         <SubmitButton loading={loading}>Create account</SubmitButton>
       </form>

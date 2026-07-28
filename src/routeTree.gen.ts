@@ -38,6 +38,7 @@ import { Route as ExperienceCommunitiesRouteImport } from './routes/experience.c
 import { Route as DemoCreatorRouteImport } from './routes/demo.creator'
 import { Route as CreatorUsernameRouteImport } from './routes/creator.$username'
 import { Route as CreatorInviteTokenRouteImport } from './routes/creator-invite.$token'
+import { Route as CopyrightReportRouteImport } from './routes/copyright_.report'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
@@ -73,6 +74,7 @@ import { Route as ApiStripeCheckoutRouteImport } from './routes/api.stripe.check
 import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_authenticated/playlists_.$playlistId'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
 import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authenticated/music_.$trackId'
+import { Route as AuthenticatedAdminRightsRouteImport } from './routes/_authenticated/admin_.rights'
 import { Route as AuthenticatedAdminPlayRouteImport } from './routes/_authenticated/admin_.play'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 
@@ -218,6 +220,11 @@ const CreatorUsernameRoute = CreatorUsernameRouteImport.update({
 const CreatorInviteTokenRoute = CreatorInviteTokenRouteImport.update({
   id: '/creator-invite/$token',
   path: '/creator-invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CopyrightReportRoute = CopyrightReportRouteImport.update({
+  id: '/copyright_/report',
+  path: '/copyright/report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
@@ -400,6 +407,12 @@ const AuthenticatedMusicTrackIdRoute =
     path: '/music/$trackId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminRightsRoute =
+  AuthenticatedAdminRightsRouteImport.update({
+    id: '/admin_/rights',
+    path: '/admin/rights',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminPlayRoute = AuthenticatedAdminPlayRouteImport.update({
   id: '/admin_/play',
   path: '/admin/play',
@@ -458,6 +471,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/copyright/report': typeof CopyrightReportRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
   '/demo/creator': typeof DemoCreatorRoute
@@ -470,6 +484,7 @@ export interface FileRoutesByFullPath {
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
+  '/admin/rights': typeof AuthenticatedAdminRightsRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -525,6 +540,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/copyright/report': typeof CopyrightReportRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
   '/demo/creator': typeof DemoCreatorRoute
@@ -537,6 +553,7 @@ export interface FileRoutesByTo {
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
+  '/admin/rights': typeof AuthenticatedAdminRightsRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -594,6 +611,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/copyright_/report': typeof CopyrightReportRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
   '/demo/creator': typeof DemoCreatorRoute
@@ -606,6 +624,7 @@ export interface FileRoutesById {
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/_authenticated/admin_/play': typeof AuthenticatedAdminPlayRoute
+  '/_authenticated/admin_/rights': typeof AuthenticatedAdminRightsRoute
   '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
   '/_authenticated/playlists_/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -663,6 +682,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/copyright/report'
     | '/creator-invite/$token'
     | '/creator/$username'
     | '/demo/creator'
@@ -675,6 +695,7 @@ export interface FileRouteTypes {
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/admin/play'
+    | '/admin/rights'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -730,6 +751,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/copyright/report'
     | '/creator-invite/$token'
     | '/creator/$username'
     | '/demo/creator'
@@ -742,6 +764,7 @@ export interface FileRouteTypes {
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/admin/play'
+    | '/admin/rights'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -798,6 +821,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/copyright_/report'
     | '/creator-invite/$token'
     | '/creator/$username'
     | '/demo/creator'
@@ -810,6 +834,7 @@ export interface FileRouteTypes {
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/_authenticated/admin_/play'
+    | '/_authenticated/admin_/rights'
     | '/_authenticated/music_/$trackId'
     | '/_authenticated/music_/upload'
     | '/_authenticated/playlists_/$playlistId'
@@ -841,6 +866,7 @@ export interface RootRouteChildren {
   TrustRoute: typeof TrustRoute
   ApiVideoUploadUrlRoute: typeof ApiVideoUploadUrlRoute
   ArtistUsernameRoute: typeof ArtistUsernameRoute
+  CopyrightReportRoute: typeof CopyrightReportRoute
   CreatorInviteTokenRoute: typeof CreatorInviteTokenRoute
   CreatorUsernameRoute: typeof CreatorUsernameRoute
   DemoCreatorRoute: typeof DemoCreatorRoute
@@ -1062,6 +1088,13 @@ declare module '@tanstack/react-router' {
       path: '/creator-invite/$token'
       fullPath: '/creator-invite/$token'
       preLoaderRoute: typeof CreatorInviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/copyright_/report': {
+      id: '/copyright_/report'
+      path: '/copyright/report'
+      fullPath: '/copyright/report'
+      preLoaderRoute: typeof CopyrightReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/sign-up': {
@@ -1309,6 +1342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMusicTrackIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/rights': {
+      id: '/_authenticated/admin_/rights'
+      path: '/admin/rights'
+      fullPath: '/admin/rights'
+      preLoaderRoute: typeof AuthenticatedAdminRightsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/play': {
       id: '/_authenticated/admin_/play'
       path: '/admin/play'
@@ -1348,6 +1388,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
   AuthenticatedAdminPlayRoute: typeof AuthenticatedAdminPlayRoute
+  AuthenticatedAdminRightsRoute: typeof AuthenticatedAdminRightsRoute
   AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
   AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -1375,6 +1416,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
   AuthenticatedAdminPlayRoute: AuthenticatedAdminPlayRoute,
+  AuthenticatedAdminRightsRoute: AuthenticatedAdminRightsRoute,
   AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
   AuthenticatedPlaylistsPlaylistIdRoute: AuthenticatedPlaylistsPlaylistIdRoute,
@@ -1424,6 +1466,7 @@ const rootRouteChildren: RootRouteChildren = {
   TrustRoute: TrustRoute,
   ApiVideoUploadUrlRoute: ApiVideoUploadUrlRoute,
   ArtistUsernameRoute: ArtistUsernameRoute,
+  CopyrightReportRoute: CopyrightReportRoute,
   CreatorInviteTokenRoute: CreatorInviteTokenRoute,
   CreatorUsernameRoute: CreatorUsernameRoute,
   DemoCreatorRoute: DemoCreatorRoute,

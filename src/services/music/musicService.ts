@@ -83,6 +83,13 @@ export const musicService = {
   },
 
   async createTrack(params: UploadTrackParams): Promise<Track> {
+    if (
+      !params.input.rights_confirmed ||
+      !params.input.rights_policy_version ||
+      !params.input.rights_confirmed_at
+    ) {
+      throw new Error("Confirm that you have the rights needed to share this music.");
+    }
     const audioPath = await this.uploadAudio(params.userId, params.audio);
     const coverPath = params.cover ? await this.uploadCover(params.userId, params.cover) : null;
 
@@ -101,6 +108,10 @@ export const musicService = {
       album_id: params.albumId ?? params.input.album_id ?? null,
       audio_url: audioPath,
       cover_url: coverPath,
+      rights_basis: params.input.rights_basis,
+      rights_confirmed: params.input.rights_confirmed,
+      rights_policy_version: params.input.rights_policy_version,
+      rights_confirmed_at: params.input.rights_confirmed_at,
     };
 
     const { data, error } = await supabase.from("tracks").insert(insert).select("*").single();

@@ -28,7 +28,12 @@ interface AuthContextValue {
   hasAnyRole: (roles: AppRole[]) => boolean;
   refresh: () => Promise<void>;
   signIn: (email: string, password: string, rememberMe: boolean) => Promise<void>;
-  signUp: (email: string, password: string, displayName: string) => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    displayName: string,
+    legalPolicyVersion: string,
+  ) => Promise<void>;
   signOut: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
@@ -116,8 +121,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn: async (email, password, rememberMe) => {
         await authService.signIn(email, password, rememberMe);
       },
-      signUp: async (email, password, displayName) => {
-        await authService.signUp(email, password, displayName);
+      signUp: async (email, password, displayName, legalPolicyVersion) => {
+        await authService.signUp(email, password, displayName, legalPolicyVersion);
       },
       signOut: async () => {
         await authService.signOut();

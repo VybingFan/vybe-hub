@@ -11,6 +11,7 @@ import { musicService } from "@/services/music/musicService";
 import { useMembership } from "@/hooks/useMembership";
 import { UsageMeter } from "@/components/membership/UsageMeter";
 import { Card, CardContent } from "@/components/ui/card";
+import { MUSIC_RIGHTS_POLICY_VERSION } from "@/constants/legal";
 
 export const Route = createFileRoute("/_authenticated/music_/upload")({
   component: () => (
@@ -50,6 +51,10 @@ function UploadPage() {
         status: values.status,
         track_number: null,
         album_id: null,
+        rights_basis: values.rights_basis,
+        rights_confirmed: true,
+        rights_policy_version: MUSIC_RIGHTS_POLICY_VERSION,
+        rights_confirmed_at: new Date().toISOString(),
       },
       audio: values.audio,
       cover: values.cover,
@@ -105,6 +110,10 @@ function UploadPage() {
           status: values.status,
           track_number: i + 1,
           album_id: album.id,
+          rights_basis: values.rights_basis,
+          rights_confirmed: true,
+          rights_policy_version: MUSIC_RIGHTS_POLICY_VERSION,
+          rights_confirmed_at: new Date().toISOString(),
         },
       });
     }

@@ -20,13 +20,17 @@ export const authService = {
     return data;
   },
 
-  async signUp(email: string, password: string, displayName: string) {
+  async signUp(email: string, password: string, displayName: string, legalPolicyVersion: string) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/dashboard`,
-        data: { display_name: displayName },
+        data: {
+          display_name: displayName,
+          legal_accepted: true,
+          legal_policy_version: legalPolicyVersion,
+        },
       },
     });
     if (error) throw error;

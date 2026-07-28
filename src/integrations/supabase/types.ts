@@ -574,6 +574,84 @@ export type Database = {
           },
         ];
       };
+      copyright_reports: {
+        Row: {
+          accuracy_statement: boolean;
+          content_url: string;
+          created_at: string;
+          good_faith_statement: boolean;
+          id: string;
+          internal_notes: string;
+          original_work_description: string;
+          reporter_email: string;
+          reporter_name: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          rights_owner_name: string;
+          signature: string;
+          status: string;
+        };
+        Insert: {
+          accuracy_statement: boolean;
+          content_url: string;
+          created_at?: string;
+          good_faith_statement: boolean;
+          id?: string;
+          internal_notes?: string;
+          original_work_description: string;
+          reporter_email: string;
+          reporter_name: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          rights_owner_name: string;
+          signature: string;
+          status?: string;
+        };
+        Update: {
+          accuracy_statement?: boolean;
+          content_url?: string;
+          created_at?: string;
+          good_faith_statement?: boolean;
+          id?: string;
+          internal_notes?: string;
+          original_work_description?: string;
+          reporter_email?: string;
+          reporter_name?: string;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          rights_owner_name?: string;
+          signature?: string;
+          status?: string;
+        };
+        Relationships: [];
+      };
+      user_policy_acceptances: {
+        Row: {
+          acceptance_source: string;
+          accepted_at: string;
+          id: string;
+          policy_key: string;
+          policy_version: string;
+          user_id: string;
+        };
+        Insert: {
+          acceptance_source?: string;
+          accepted_at?: string;
+          id?: string;
+          policy_key: string;
+          policy_version: string;
+          user_id: string;
+        };
+        Update: {
+          acceptance_source?: string;
+          accepted_at?: string;
+          id?: string;
+          policy_key?: string;
+          policy_version?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       tracks: {
         Row: {
           album_id: string | null;
@@ -590,6 +668,17 @@ export type Database = {
           primary_artist_name: string;
           featured_artist_names: string[];
           release_date: string | null;
+          rights_basis:
+            | "entirely_original"
+            | "licensed_beat"
+            | "collaboration_permission"
+            | "cover_song"
+            | "contains_samples"
+            | "public_domain"
+            | "other_licensed";
+          rights_confirmed: boolean;
+          rights_confirmed_at: string | null;
+          rights_policy_version: string | null;
           status: Database["public"]["Enums"]["content_status"];
           title: string;
           track_number: number | null;
@@ -610,6 +699,17 @@ export type Database = {
           primary_artist_name?: string;
           featured_artist_names?: string[];
           release_date?: string | null;
+          rights_basis?:
+            | "entirely_original"
+            | "licensed_beat"
+            | "collaboration_permission"
+            | "cover_song"
+            | "contains_samples"
+            | "public_domain"
+            | "other_licensed";
+          rights_confirmed?: boolean;
+          rights_confirmed_at?: string | null;
+          rights_policy_version?: string | null;
           status?: Database["public"]["Enums"]["content_status"];
           title: string;
           track_number?: number | null;
@@ -630,6 +730,17 @@ export type Database = {
           primary_artist_name?: string;
           featured_artist_names?: string[];
           release_date?: string | null;
+          rights_basis?:
+            | "entirely_original"
+            | "licensed_beat"
+            | "collaboration_permission"
+            | "cover_song"
+            | "contains_samples"
+            | "public_domain"
+            | "other_licensed";
+          rights_confirmed?: boolean;
+          rights_confirmed_at?: string | null;
+          rights_policy_version?: string | null;
           status?: Database["public"]["Enums"]["content_status"];
           title?: string;
           track_number?: number | null;

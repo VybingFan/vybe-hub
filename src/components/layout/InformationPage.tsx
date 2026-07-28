@@ -1,5 +1,6 @@
 import { MarketingNav } from "@/components/layout/MarketingNav";
 import { Footer } from "@/components/layout/Footer";
+import type { ReactNode } from "react";
 
 export type InformationSection = {
   id?: string;
@@ -12,11 +13,13 @@ export function InformationPage({
   title,
   description,
   sections,
+  action,
 }: {
   eyebrow: string;
   title: string;
   description: string;
   sections: InformationSection[];
+  action?: ReactNode;
 }) {
   return (
     <div className="min-h-screen bg-background">
@@ -31,6 +34,7 @@ export function InformationPage({
               {title}
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">{description}</p>
+            {action ? <div className="mt-7">{action}</div> : null}
           </div>
         </section>
         <section className="mx-auto grid max-w-5xl gap-5 px-4 py-12 sm:px-6 sm:py-16 md:grid-cols-2">

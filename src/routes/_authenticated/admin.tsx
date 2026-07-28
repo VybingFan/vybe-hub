@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { Check, Clipboard, KeyRound, RefreshCw, ShieldCheck, X } from "lucide-react";
+import { Check, Clipboard, Copyright, KeyRound, RefreshCw, ShieldCheck, X } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Badge } from "@/components/ui/badge";
@@ -104,6 +104,22 @@ function AdminPage() {
             expires, and can be redeemed once.
           </p>
         </header>
+
+        <Card className="border-primary/25">
+          <CardContent className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center">
+            <div>
+              <p className="font-medium">Copyright and rights review</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Review submitted claims, preserve private notes, and record workflow status.
+              </p>
+            </div>
+            <Button asChild variant="outline">
+              <Link to="/admin/rights">
+                <Copyright className="mr-2 h-4 w-4" /> Open rights queue
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
