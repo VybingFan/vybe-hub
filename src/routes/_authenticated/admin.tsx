@@ -1,6 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { Check, Clipboard, Copyright, KeyRound, RefreshCw, ShieldCheck, X } from "lucide-react";
+import {
+  Activity,
+  AlertTriangle,
+  ArrowRight,
+  Check,
+  Clipboard,
+  Copyright,
+  Gamepad2,
+  KeyRound,
+  Library,
+  RefreshCw,
+  ShieldCheck,
+  Users,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +27,7 @@ import {
   type CreatorInvite,
   type CreatorPlan,
 } from "@/services/invitations/invitationService";
+import { adminService, type BackOfficeSummary } from "@/services/admin/adminService";
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: AdminPage });
 
@@ -26,6 +41,7 @@ const PLAN_LABELS: Record<CreatorPlan, string> = {
 
 function AdminPage() {
   const [invites, setInvites] = useState<CreatorInvite[]>([]);
+  const [summary, setSummary] = useState<BackOfficeSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [email, setEmail] = useState("");
@@ -37,7 +53,12 @@ function AdminPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setInvites(await invitationService.list());
+      const [invitationRecords, operatingSummary] = await Promise.all([
+        invitationService.list(),
+        adminService.getSummary(),
+      ]);
+      setInvites(invitationRecords);
+      setSummary(operatingSummary);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not load invitations");
     } finally {
@@ -94,40 +115,76 @@ function AdminPage() {
       <div className="mx-auto max-w-6xl space-y-8">
         <header>
           <div className="flex items-center gap-2 text-primary">
-            <ShieldCheck className="h-5 w-5" /> VYBE administration
+            <ShieldCheck className="h-5 w-5" /> Owner and administrator only
           </div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-            Creator invitations
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Only an administrator can issue Creator Studio access. Every link is bound to one email,
-            expires, and can be redeemed once.
+          <div className="mt-2 flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+            <div>
+              <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+                VYBE Back Office
+              </h1>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+                One operating center for accounts, creators, content, rights, memberships,
+                invitations, and release readiness.
+              </p>
+            </div>
+            <Button variant="outline" size="icon" onClick={() => void load()} aria-label="Refresh">
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            {summary
+              ? `Database summary refreshed ${new Date(summary.generated_at).toLocaleString()}`
+              : loading
+                ? "Loading operating summary…"
+                : "Operating summary unavailable"}
           </p>
         </header>
 
-        <Card className="border-primary/25">
-          <CardContent className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center">
-            <div>
-              <p className="font-medium">Copyright and rights review</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Review submitted claims, preserve private notes, and record workflow status.
-              </p>
-            </div>
-            <Button asChild variant="outline">
-              <Link to="/admin/rights">
-                <Copyright className="mr-2 h-4 w-4" /> Open rights queue
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+        {summary ? <BackOfficeOverview summary={summary} /> : null}
 
-        <Card>
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-xl font-semibold">Work areas</h2>
+            <p className="text-sm text-muted-foreground">
+              Move directly to the part of VYBE that needs attention.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <WorkAreaCard
+              icon={Users}
+              title="Creator operations"
+              description="Search accounts, review roles, plans, and catalog activity."
+              to="/admin/creators"
+              action="Open directory"
+            />
+            <WorkAreaCard
+              icon={Copyright}
+              title="Rights and moderation"
+              description="Monitor scanning, review cases, and manage copyright reports."
+              to="/admin/rights"
+              action="Open rights workspace"
+            />
+            <WorkAreaCard
+              icon={Gamepad2}
+              title="Play operations"
+              description="Review live experiences, release gates, and the Play roadmap."
+              to="/admin/play"
+              action="Open Play board"
+            />
+          </div>
+        </section>
+
+        <Card id="invitation-management">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <KeyRound className="h-5 w-5" /> Create a personal invitation
+              <KeyRound className="h-5 w-5" /> Creator access and invitations
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <p className="mb-5 max-w-3xl text-sm leading-6 text-muted-foreground">
+              Issue Creator Studio access. Every link is bound to one email, expires, and can be
+              redeemed once.
+            </p>
             <form onSubmit={createInvite} className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="invite-name">Recipient name</Label>
@@ -258,5 +315,194 @@ function AdminPage() {
         </Card>
       </div>
     </RoleGuard>
+  );
+}
+
+function BackOfficeOverview({ summary }: { summary: BackOfficeSummary }) {
+  const attentionTotal =
+    summary.attention.rights_jobs_queued +
+    summary.attention.rights_jobs_failed +
+    summary.attention.rights_jobs_flagged +
+    summary.attention.moderation_cases_open +
+    summary.attention.copyright_reports_open;
+
+  return (
+    <section className="space-y-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <OperatingMetric
+          icon={Users}
+          label="Accounts"
+          value={summary.accounts.total}
+          note={`${summary.accounts.creators} creators · ${summary.accounts.supporters} supporters`}
+        />
+        <OperatingMetric
+          icon={Library}
+          label="Published songs"
+          value={summary.content.tracks_published}
+          note={`${summary.content.tracks_draft} drafts · ${summary.content.tracks_total} total`}
+        />
+        <OperatingMetric
+          icon={Library}
+          label="Published playlists"
+          value={summary.content.playlists_published}
+          note={`${summary.content.playlists_total} total playlists`}
+        />
+        <OperatingMetric
+          icon={attentionTotal ? AlertTriangle : Activity}
+          label="Attention queue"
+          value={attentionTotal}
+          note={attentionTotal ? "Items need review" : "No active review signals"}
+          attention={attentionTotal > 0}
+        />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[1.25fr_1fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Operational attention</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3 sm:grid-cols-2">
+            <AttentionItem
+              label="Queued audio scans"
+              value={summary.attention.rights_jobs_queued}
+            />
+            <AttentionItem
+              label="Failed audio scans"
+              value={summary.attention.rights_jobs_failed}
+              urgent={summary.attention.rights_jobs_failed > 0}
+            />
+            <AttentionItem
+              label="Flagged audio scans"
+              value={summary.attention.rights_jobs_flagged}
+              urgent={summary.attention.rights_jobs_flagged > 0}
+            />
+            <AttentionItem
+              label="Open moderation cases"
+              value={summary.attention.moderation_cases_open}
+              urgent={summary.attention.moderation_cases_open > 0}
+            />
+            <AttentionItem
+              label="Open copyright reports"
+              value={summary.attention.copyright_reports_open}
+              urgent={summary.attention.copyright_reports_open > 0}
+            />
+            <AttentionItem
+              label="Ready creator invitations"
+              value={summary.attention.invitations_ready}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Platform inventory</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <InventoryRow
+              label="Videos"
+              value={`${summary.content.videos_published} published · ${summary.content.videos_total} total`}
+            />
+            <InventoryRow
+              label="Merchandise"
+              value={`${summary.content.merch_active} active · ${summary.content.merch_total} total`}
+            />
+            <InventoryRow
+              label="New accounts"
+              value={`${summary.accounts.new_last_7_days} in the last 7 days`}
+            />
+            <InventoryRow
+              label="Active memberships"
+              value={
+                Object.entries(summary.memberships)
+                  .map(([plan, count]) => `${plan.replaceAll("_", " ")} ${count}`)
+                  .join(" · ") || "No active entitlements"
+              }
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  );
+}
+
+function OperatingMetric({
+  icon: Icon,
+  label,
+  value,
+  note,
+  attention = false,
+}: {
+  icon: typeof Users;
+  label: string;
+  value: number;
+  note: string;
+  attention?: boolean;
+}) {
+  return (
+    <Card className={attention ? "border-amber-500/40 bg-amber-500/5" : undefined}>
+      <CardContent className="p-5">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">{label}</p>
+          <Icon className={`h-5 w-5 ${attention ? "text-amber-600" : "text-primary"}`} />
+        </div>
+        <p className="mt-3 text-3xl font-semibold">{value}</p>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">{note}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function AttentionItem({
+  label,
+  value,
+  urgent = false,
+}: {
+  label: string;
+  value: number;
+  urgent?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-xl border p-3">
+      <span className="text-sm">{label}</span>
+      <Badge variant={urgent ? "destructive" : "secondary"}>{value}</Badge>
+    </div>
+  );
+}
+
+function InventoryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col justify-between gap-1 rounded-xl border p-3 sm:flex-row">
+      <span className="font-medium">{label}</span>
+      <span className="text-muted-foreground sm:text-right">{value}</span>
+    </div>
+  );
+}
+
+function WorkAreaCard({
+  icon: Icon,
+  title,
+  description,
+  to,
+  action,
+}: {
+  icon: typeof Users;
+  title: string;
+  description: string;
+  to: "/admin/creators" | "/admin/rights" | "/admin/play";
+  action: string;
+}) {
+  return (
+    <Card className="flex h-full flex-col">
+      <CardContent className="flex h-full flex-col p-5">
+        <Icon className="h-6 w-6 text-primary" />
+        <p className="mt-4 font-semibold">{title}</p>
+        <p className="mt-2 flex-1 text-sm leading-6 text-muted-foreground">{description}</p>
+        <Button asChild variant="outline" className="mt-5">
+          <Link to={to}>
+            {action} <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

@@ -111,7 +111,19 @@ export function AppSidebar() {
           <NavGroup
             label="Administration"
             items={[
-              { title: "Admin", url: "/admin", icon: ShieldCheck, allow: ["admin"] },
+              { title: "Back Office", url: "/admin", icon: ShieldCheck, allow: ["admin"] },
+              {
+                title: "Creator Operations",
+                url: "/admin/creators",
+                icon: UsersRound,
+                allow: ["admin"],
+              },
+              {
+                title: "Rights Monitoring",
+                url: "/admin/rights",
+                icon: LibraryBig,
+                allow: ["admin"],
+              },
               { title: "Play Admin", url: "/admin/play", icon: Gamepad2, allow: ["admin"] },
             ]}
             isActive={isActive}
