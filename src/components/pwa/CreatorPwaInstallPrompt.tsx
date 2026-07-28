@@ -21,10 +21,12 @@ export function CreatorPwaInstallPrompt() {
             {isIos ? <Share className="h-4 w-4" /> : <Download className="h-4 w-4" />}
           </div>
           <div>
-            <p className="text-sm font-semibold">Install VYBE Creator</p>
+            <p className="text-sm font-semibold">
+              {isIos ? "Install from the Share menu" : "Install VYBE Creator"}
+            </p>
             <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
               {isIos
-                ? "Tap Share, then choose Add to Home Screen to install your Creator Studio."
+                ? "This message is a guide: tap Share above, choose Add to Home Screen, then tap Add."
                 : "Add your Creator Studio to this device for faster access from your home screen."}
             </p>
           </div>

@@ -21,6 +21,11 @@ export const COMMUNITY_LINKS = [
 
 export const BUILD_ON_VYBE_LINKS = [
   {
+    label: "Creator Start",
+    description: "Create an account, sign in, open Studio, or install the VYBE Creator app.",
+    to: "/creator",
+  },
+  {
     label: "For Music Creators",
     description: "Share music, playlists, merchandise, stories, and your creator home.",
     to: "/for-artists",

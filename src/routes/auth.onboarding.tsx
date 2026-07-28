@@ -9,8 +9,14 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useUser } from "@/hooks/useUser";
 import { SELECTABLE_ROLES, type SelectableRole } from "@/features/auth/roles";
+import { z } from "zod";
+
+const onboardingSearchSchema = z.object({
+  role: z.enum(["creator", "supporter"]).optional(),
+});
 
 export const Route = createFileRoute("/auth/onboarding")({
+  validateSearch: onboardingSearchSchema,
   component: OnboardingPage,
 });
 
@@ -29,13 +35,14 @@ const ROLE_META: Record<SelectableRole, { title: string; body: string; icon: typ
   };
 
 function OnboardingPage() {
+  const { role } = Route.useSearch();
   const { assignInitialRole } = useAuth();
   const { isLoading, isAuthenticated, primaryRole, defaultRoute } = {
     ...useUser(),
     isAuthenticated: useAuth().isAuthenticated,
   };
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<SelectableRole>("creator");
+  const [selected, setSelected] = useState<SelectableRole>(role ?? "creator");
   const [saving, setSaving] = useState(false);
 
   if (isLoading) {
@@ -113,8 +120,8 @@ function OnboardingPage() {
         <div className="flex gap-3 rounded-xl border border-border/60 bg-muted/30 p-4 text-sm text-muted-foreground">
           <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <p>
-            Have a personal Founding Creator invitation? Open that link after creating your account to
-            activate its expanded access.
+            Have a personal Founding Creator invitation? Open that link after creating your account
+            to activate its expanded access.
           </p>
         </div>
         <SubmitButton loading={saving}>Continue</SubmitButton>

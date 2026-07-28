@@ -23,6 +23,12 @@ V24.13.1 moves browser install-event capture to a root-level provider. This pres
 across public navigation, sign-in, and the transition into Creator Studio so the creator-only
 installation banner can appear reliably on the dashboard.
 
+V24.14 adds `/creator` as the designated creator entry point. It offers direct creator account
+creation, creator sign-in, Studio access for authenticated creators, install controls, an explicit
+iOS Add to Home Screen guide, and an overview of creator tools. Creator-facing navigation and the
+homepage creator CTA now lead to this page. Creator intent is preserved through sign-up and
+onboarding. No Supabase migration is required.
+
 V24.11 unifies both routes around `src/features/play/PlayExperience.tsx`. Public visitors retain
 the marketing navigation and footer. Signed-in supporters, creators, and administrators use the
 same Play experience inside the authenticated VYBE application shell.

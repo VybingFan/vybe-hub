@@ -7,12 +7,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { signUpSchema } from "@/features/auth/roles";
+import { z } from "zod";
+
+const signUpSearchSchema = z.object({
+  role: z.enum(["creator", "supporter"]).optional(),
+});
 
 export const Route = createFileRoute("/auth/sign-up")({
+  validateSearch: signUpSearchSchema,
   component: SignUpPage,
 });
 
 function SignUpPage() {
+  const { role } = Route.useSearch();
   const { signUp } = useAuth();
   const navigate = useNavigate();
   const [displayName, setDisplayName] = useState("");
@@ -42,7 +49,7 @@ function SignUpPage() {
       if (pendingInvite) {
         navigate({ to: "/creator-invite/$token", params: { token: pendingInvite } });
       } else {
-        navigate({ to: "/auth/onboarding" });
+        navigate({ to: "/auth/onboarding", search: { role } });
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create account");
@@ -53,8 +60,12 @@ function SignUpPage() {
 
   return (
     <AuthCard
-      title="Create your VYBE"
-      description="Join as a supporter or begin with the Creator Free plan."
+      title={role === "creator" ? "Create your creator account" : "Create your VYBE"}
+      description={
+        role === "creator"
+          ? "Begin with Creator Free and build your public creator home."
+          : "Join as a supporter or begin with the Creator Free plan."
+      }
       footer={
         <>
           Already have an account?{" "}

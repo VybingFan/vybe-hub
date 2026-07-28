@@ -24,6 +24,7 @@ export function Footer() {
         <FooterCol
           title="Build on VYBE"
           links={[
+            ["Creator Start", "/creator"],
             ["For Creators", "/for-artists"],
             ["Creator Memberships", "/creator-memberships"],
             ["For Businesses", "/for-businesses"],

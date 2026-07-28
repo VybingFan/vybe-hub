@@ -92,3 +92,15 @@
 - Makes the creator-only VYBE installation banner available without relying on a dashboard refresh.
 - Does not change the manifest, service worker cache policy, public fan experience, or production
   routing.
+
+# V24.14 — Direct creator entry
+
+- Adds `/creator` as the designated public starting point for creator account creation, sign-in,
+  Studio access, and VYBE Creator installation.
+- Adds a direct Creators link to desktop navigation and Creator Start to mobile navigation, the
+  Build on VYBE menu, the homepage creator CTA, and the footer.
+- Carries creator intent into sign-up and onboarding so Creator is already selected.
+- Gives iPhone and iPad creators a visible three-step Add to Home Screen guide.
+- Clarifies that the iOS Studio banner is an instruction because Apple requires installation
+  through the Share menu.
+- Keeps fan browsing on the existing public website and requires no Supabase migration.

@@ -284,7 +284,7 @@ function Landing() {
                 </h2>
               </div>
               <Button asChild size="lg" variant="secondary" className="shrink-0 rounded-full">
-                <Link to="/for-artists">
+                <Link to="/creator">
                   <Music2 className="mr-2 h-4 w-4" /> Create your VYBE
                 </Link>
               </Button>

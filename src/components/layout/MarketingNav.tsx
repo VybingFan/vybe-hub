@@ -58,6 +58,9 @@ export function MarketingNav() {
           ) : !isLoading ? (
             <>
               <Button asChild variant="ghost">
+                <Link to="/creator">Creators</Link>
+              </Button>
+              <Button asChild variant="ghost">
                 <Link to="/auth/sign-in">Sign in</Link>
               </Button>
               <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
@@ -97,13 +100,18 @@ export function MarketingNav() {
                 <a href={defaultRoute}>{appLabel}</a>
               </Button>
             ) : !isLoading ? (
-              <div className="grid grid-cols-1 gap-2 border-t border-border/50 pt-4 min-[360px]:grid-cols-2">
-                <Button asChild variant="outline">
-                  <Link to="/auth/sign-in">Sign in</Link>
+              <div className="space-y-2 border-t border-border/50 pt-4">
+                <Button asChild variant="outline" className="w-full">
+                  <Link to="/creator">Creator Start</Link>
                 </Button>
-                <Button asChild className="bg-gradient-brand text-primary-foreground">
-                  <Link to="/auth/sign-up">Join VYBE</Link>
-                </Button>
+                <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
+                  <Button asChild variant="outline">
+                    <Link to="/auth/sign-in">Sign in</Link>
+                  </Button>
+                  <Button asChild className="bg-gradient-brand text-primary-foreground">
+                    <Link to="/auth/sign-up">Join VYBE</Link>
+                  </Button>
+                </div>
               </div>
             ) : null}
           </div>
