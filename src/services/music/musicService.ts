@@ -10,6 +10,7 @@ import {
   EMPTY_TRACK_DISCOVERY_METADATA,
   MAX_AUDIO_BYTES,
   MAX_COVER_BYTES,
+  trackDiscoveryMetadataSchema,
 } from "@/features/music/schema";
 import { membershipService } from "@/services/membership/membershipService";
 
@@ -29,9 +30,13 @@ async function signedUrl(bucket: string, path: string | null): Promise<string | 
 }
 
 async function hydrateTrack(row: Track): Promise<Track> {
+  const parsedDiscovery = trackDiscoveryMetadataSchema.safeParse(row.discovery_metadata ?? {});
+
   return {
     ...row,
-    discovery_metadata: row.discovery_metadata ?? EMPTY_TRACK_DISCOVERY_METADATA,
+    discovery_metadata: parsedDiscovery.success
+      ? parsedDiscovery.data
+      : { ...EMPTY_TRACK_DISCOVERY_METADATA },
     audio_url: (await signedUrl(AUDIO_BUCKET, row.audio_url)) ?? "",
     cover_url: await signedUrl(COVER_BUCKET, row.cover_url),
   };
