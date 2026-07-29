@@ -1,5 +1,5 @@
 export const LEGAL_POLICY_VERSION = "2026-07-28-v1";
-export const MUSIC_RIGHTS_POLICY_VERSION = "2026-07-28-music-v1";
+export const MUSIC_RIGHTS_POLICY_VERSION = "2026-07-29-music-v2";
 
 export const MUSIC_RIGHTS_VALUES = [
   "entirely_original",

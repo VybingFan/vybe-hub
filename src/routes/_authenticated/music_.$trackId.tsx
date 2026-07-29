@@ -1,6 +1,15 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, FileAudio, ImagePlus, Loader2, Save, Star, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  FileAudio,
+  FileText,
+  ImagePlus,
+  Loader2,
+  Save,
+  Star,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
@@ -34,7 +43,13 @@ import {
   useSetProfileLead,
   useUpdateTrack,
 } from "@/hooks/useMusic";
-import { formatDuration, MAX_COVER_BYTES, type ContentStatus } from "@/features/music/schema";
+import {
+  EMPTY_TRACK_DISCOVERY_METADATA,
+  formatDuration,
+  MAX_COVER_BYTES,
+  type ContentStatus,
+  type TrackDiscoveryMetadata,
+} from "@/features/music/schema";
 import { readAudioDuration } from "@/services/music/musicService";
 
 export const Route = createFileRoute("/_authenticated/music_/$trackId")({
@@ -63,6 +78,9 @@ function SongEditor() {
   const [description, setDescription] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
   const [status, setStatus] = useState<ContentStatus>("draft");
+  const [discovery, setDiscovery] = useState<TrackDiscoveryMetadata>(
+    EMPTY_TRACK_DISCOVERY_METADATA,
+  );
   const [replacementAudio, setReplacementAudio] = useState<{
     file: File;
     durationSec: number;
@@ -78,6 +96,7 @@ function SongEditor() {
     setDescription(track.description || "");
     setReleaseDate(track.release_date || "");
     setStatus(track.status);
+    setDiscovery(track.discovery_metadata || EMPTY_TRACK_DISCOVERY_METADATA);
     setReplacementAudio(null);
     setReplacementDetailsReviewed(false);
   }, [track]);
@@ -106,6 +125,7 @@ function SongEditor() {
           description: description.trim(),
           release_date: releaseDate,
           status,
+          discovery_metadata: discovery,
         },
       });
       if (replacementAudio) {
@@ -193,6 +213,11 @@ function SongEditor() {
         <p className="mt-2 text-muted-foreground">
           Manage its audio, artwork, credits, publishing status, and profile placement.
         </p>
+        <Button asChild variant="outline" className="mt-5">
+          <Link to="/music/$trackId/lyrics" params={{ trackId }}>
+            <FileText className="mr-2 h-4 w-4" /> Add or refine lyrics
+          </Link>
+        </Button>
       </header>
 
       <form onSubmit={save} className="grid gap-8 lg:grid-cols-[20rem_minmax(0,1fr)]">
@@ -331,6 +356,91 @@ function SongEditor() {
                   value={description}
                   maxLength={1000}
                   onChange={(event) => setDescription(event.target.value)}
+                />
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-3xl border border-border bg-card p-6 md:p-8">
+            <h2 className="text-2xl font-semibold">Discovery information</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              These optional details help listeners find the song when they remember a mood,
+              location, movie, show, video, or scene instead of the title.
+            </p>
+            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="song-moods">Mood tags</Label>
+                <Input
+                  id="song-moods"
+                  className="mt-2"
+                  value={discovery.mood_tags.join(", ")}
+                  placeholder="Reflective, energetic, late night"
+                  onChange={(event) =>
+                    setDiscovery((current) => ({
+                      ...current,
+                      mood_tags: event.target.value
+                        .split(",")
+                        .map((item) => item.trim())
+                        .filter(Boolean)
+                        .slice(0, 12),
+                    }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="song-location">Artist or song location</Label>
+                <Input
+                  id="song-location"
+                  className="mt-2"
+                  value={discovery.location}
+                  placeholder="Philadelphia, PA"
+                  onChange={(event) =>
+                    setDiscovery((current) => ({ ...current, location: event.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="placement-platform">Where the song appeared</Label>
+                <Input
+                  id="placement-platform"
+                  className="mt-2"
+                  value={discovery.placement_platform}
+                  placeholder="Tubi, YouTube, podcast, advertisement"
+                  onChange={(event) =>
+                    setDiscovery((current) => ({
+                      ...current,
+                      placement_platform: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="placement-title">Movie, show, video, or project title</Label>
+                <Input
+                  id="placement-title"
+                  className="mt-2"
+                  value={discovery.placement_title}
+                  onChange={(event) =>
+                    setDiscovery((current) => ({
+                      ...current,
+                      placement_title: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <Label htmlFor="placement-details">Scene, episode, or placement details</Label>
+                <Textarea
+                  id="placement-details"
+                  className="mt-2 min-h-24"
+                  value={discovery.placement_details}
+                  placeholder="Episode, scene, timestamp, or anything a listener may remember"
+                  onChange={(event) =>
+                    setDiscovery((current) => ({
+                      ...current,
+                      placement_details: event.target.value,
+                    }))
+                  }
                 />
               </div>
             </div>

@@ -15,14 +15,16 @@ import {
 } from "@/components/ui/select";
 import { ProfileCard } from "@/components/profile/ProfileCard";
 import { SubmitButton } from "@/components/auth/SubmitButton";
-import { RightsCertification } from "@/components/musicUpload/RightsCertification";
 import type { MusicRightsBasis } from "@/constants/legal";
+import { MUSIC_RIGHTS_BASES } from "@/constants/legal";
 import {
   ACCEPTED_AUDIO,
   ACCEPTED_IMAGE,
   CONTENT_STATUSES,
   formatDuration,
+  EMPTY_TRACK_DISCOVERY_METADATA,
   type ContentStatus,
+  type TrackDiscoveryMetadata,
 } from "@/features/music/schema";
 import { readAudioDuration } from "@/services/music/musicService";
 
@@ -40,14 +42,16 @@ export interface SingleUploadValues {
   duration_sec: number;
   rights_basis: MusicRightsBasis;
   rights_confirmed: boolean;
+  discovery_metadata: TrackDiscoveryMetadata;
 }
 
 interface Props {
   onSubmit: (values: SingleUploadValues) => Promise<void>;
   submitting?: boolean;
+  defaultRightsBasis: MusicRightsBasis;
 }
 
-const empty: SingleUploadValues = {
+const empty = (defaultRightsBasis: MusicRightsBasis): SingleUploadValues => ({
   title: "",
   primary_artist_name: "",
   featured_artists: "",
@@ -59,13 +63,21 @@ const empty: SingleUploadValues = {
   audio: null,
   cover: null,
   duration_sec: 0,
-  rights_basis: "entirely_original",
-  rights_confirmed: false,
-};
+  rights_basis: defaultRightsBasis,
+  rights_confirmed: true,
+  discovery_metadata: EMPTY_TRACK_DISCOVERY_METADATA,
+});
 
-export function MusicUploadForm({ onSubmit, submitting }: Props) {
-  const [values, setValues] = useState<SingleUploadValues>(empty);
+export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Props) {
+  const [values, setValues] = useState<SingleUploadValues>(() => empty(defaultRightsBasis));
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [optional, setOptional] = useState({
+    credits: false,
+    discovery: false,
+    release: false,
+    promotion: false,
+    rights: false,
+  });
 
   const update = <K extends keyof SingleUploadValues>(key: K, val: SingleUploadValues[K]) =>
     setValues((v) => ({ ...v, [key]: val }));
@@ -94,11 +106,9 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
     if (!values.audio) return toast.error("Please select an audio file");
     if (!values.title.trim()) return toast.error("Title is required");
     if (!values.primary_artist_name.trim()) return toast.error("Primary artist is required");
-    if (!values.rights_confirmed)
-      return toast.error("Confirm that you have the rights needed to share this music");
     try {
       await onSubmit(values);
-      setValues(empty);
+      setValues(empty(defaultRightsBasis));
       if (coverPreview) URL.revokeObjectURL(coverPreview);
       setCoverPreview(null);
       toast.success("Track uploaded");
@@ -109,7 +119,10 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
 
   return (
     <form onSubmit={submit} className="space-y-6">
-      <ProfileCard title="Files" description="Upload the audio and cover art.">
+      <ProfileCard
+        title="Start with the essentials"
+        description="Only the audio file, song title, and primary artist are required. Add everything else now or return later."
+      >
         <div className="grid gap-4 md:grid-cols-2">
           <FilePicker
             label="Audio file"
@@ -135,7 +148,7 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
         </div>
       </ProfileCard>
 
-      <ProfileCard title="Details">
+      <ProfileCard title="Required song information">
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="Title">
             <Input
@@ -149,27 +162,6 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
               value={values.primary_artist_name}
               onChange={(e) => update("primary_artist_name", e.target.value)}
               placeholder="e.g. Poppa"
-            />
-          </Field>
-          <Field label="Additional / featured artists">
-            <Input
-              value={values.featured_artists}
-              onChange={(e) => update("featured_artists", e.target.value)}
-              placeholder="Jerzo, Calliope Slim"
-            />
-          </Field>
-          <Field label="Genre">
-            <Input
-              value={values.genre}
-              onChange={(e) => update("genre", e.target.value)}
-              placeholder="e.g. Indie"
-            />
-          </Field>
-          <Field label="Release date">
-            <Input
-              type="date"
-              value={values.release_date}
-              onChange={(e) => update("release_date", e.target.value)}
             />
           </Field>
           <Field label="Status">
@@ -190,31 +182,175 @@ export function MusicUploadForm({ onSubmit, submitting }: Props) {
             </Select>
           </Field>
         </div>
-        <Field label="Description">
-          <Textarea
-            rows={4}
-            value={values.description}
-            onChange={(e) => update("description", e.target.value)}
-            placeholder="Tell listeners about this song…"
-          />
-        </Field>
-        <div className="flex items-center justify-between rounded-md border border-border/50 p-3">
-          <div>
-            <Label className="text-sm">Make this my profile lead</Label>
-            <p className="text-xs text-muted-foreground">
-              It will replace the current lead song on your public page.
-            </p>
-          </div>
-          <Switch checked={values.is_featured} onCheckedChange={(c) => update("is_featured", c)} />
-        </div>
       </ProfileCard>
 
-      <RightsCertification
-        basis={values.rights_basis}
-        confirmed={values.rights_confirmed}
-        onBasisChange={(basis) => update("rights_basis", basis)}
-        onConfirmedChange={(confirmed) => update("rights_confirmed", confirmed)}
-      />
+      <ProfileCard
+        title="Optional information"
+        description="Choose only the sections you want to complete. Blank sections can be added from your Music Library later."
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          {[
+            ["credits", "Credits and collaborators"],
+            ["discovery", "Genre and discovery"],
+            ["release", "Release information"],
+            ["promotion", "Story and profile promotion"],
+            ["rights", "Different rights category for this song"],
+          ].map(([key, label]) => (
+            <label
+              key={key}
+              className="flex cursor-pointer items-center gap-3 rounded-xl border border-border/70 p-3 text-sm"
+            >
+              <input
+                type="checkbox"
+                className="h-4 w-4 accent-primary"
+                checked={optional[key as keyof typeof optional]}
+                onChange={(event) =>
+                  setOptional((current) => ({ ...current, [key]: event.target.checked }))
+                }
+              />
+              {label}
+            </label>
+          ))}
+        </div>
+
+        {optional.credits && (
+          <Field label="Additional / featured artists">
+            <Input
+              value={values.featured_artists}
+              onChange={(e) => update("featured_artists", e.target.value)}
+              placeholder="Jerzo, Calliope Slim"
+            />
+          </Field>
+        )}
+        {optional.discovery && (
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Genre">
+              <Input
+                value={values.genre}
+                onChange={(e) => update("genre", e.target.value)}
+                placeholder="e.g. Indie"
+              />
+            </Field>
+            <Field label="Mood tags">
+              <Input
+                value={values.discovery_metadata.mood_tags.join(", ")}
+                onChange={(event) =>
+                  update("discovery_metadata", {
+                    ...values.discovery_metadata,
+                    mood_tags: event.target.value
+                      .split(",")
+                      .map((item) => item.trim())
+                      .filter(Boolean)
+                      .slice(0, 12),
+                  })
+                }
+                placeholder="Reflective, energetic, late night"
+              />
+            </Field>
+            <Field label="Artist or song location">
+              <Input
+                value={values.discovery_metadata.location}
+                onChange={(event) =>
+                  update("discovery_metadata", {
+                    ...values.discovery_metadata,
+                    location: event.target.value,
+                  })
+                }
+                placeholder="Philadelphia, PA"
+              />
+            </Field>
+            <Field label="Where the song appeared">
+              <Input
+                value={values.discovery_metadata.placement_platform}
+                onChange={(event) =>
+                  update("discovery_metadata", {
+                    ...values.discovery_metadata,
+                    placement_platform: event.target.value,
+                  })
+                }
+                placeholder="Tubi, YouTube, podcast, advertisement"
+              />
+            </Field>
+            <Field label="Movie, show, video, or project title">
+              <Input
+                value={values.discovery_metadata.placement_title}
+                onChange={(event) =>
+                  update("discovery_metadata", {
+                    ...values.discovery_metadata,
+                    placement_title: event.target.value,
+                  })
+                }
+                placeholder="Title of the production"
+              />
+            </Field>
+            <Field label="Scene, episode, or placement details">
+              <Textarea
+                rows={3}
+                value={values.discovery_metadata.placement_details}
+                onChange={(event) =>
+                  update("discovery_metadata", {
+                    ...values.discovery_metadata,
+                    placement_details: event.target.value,
+                  })
+                }
+                placeholder="Episode, scene, timestamp, or anything a listener may remember"
+              />
+            </Field>
+          </div>
+        )}
+        {optional.release && (
+          <Field label="Release date">
+            <Input
+              type="date"
+              value={values.release_date}
+              onChange={(e) => update("release_date", e.target.value)}
+            />
+          </Field>
+        )}
+        {optional.promotion && (
+          <>
+            <Field label="Description">
+              <Textarea
+                rows={4}
+                value={values.description}
+                onChange={(e) => update("description", e.target.value)}
+                placeholder="Tell listeners about this song…"
+              />
+            </Field>
+            <div className="flex items-center justify-between rounded-md border border-border/50 p-3">
+              <div>
+                <Label className="text-sm">Make this my profile lead</Label>
+                <p className="text-xs text-muted-foreground">
+                  It will replace the current lead song on your public page.
+                </p>
+              </div>
+              <Switch
+                checked={values.is_featured}
+                onCheckedChange={(c) => update("is_featured", c)}
+              />
+            </div>
+          </>
+        )}
+        {optional.rights && (
+          <Field label="Rights category for this song">
+            <Select
+              value={values.rights_basis}
+              onValueChange={(value) => update("rights_basis", value as MusicRightsBasis)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {MUSIC_RIGHTS_BASES.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+        )}
+      </ProfileCard>
 
       <div className="flex justify-end">
         <SubmitButton loading={submitting} className="w-auto px-8">

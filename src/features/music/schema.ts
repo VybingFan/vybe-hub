@@ -4,6 +4,24 @@ import { MUSIC_RIGHTS_VALUES } from "@/constants/legal";
 export const CONTENT_STATUSES = ["draft", "published"] as const;
 export type ContentStatus = (typeof CONTENT_STATUSES)[number];
 
+export const trackDiscoveryMetadataSchema = z.object({
+  mood_tags: z.array(z.string().trim().min(1).max(60)).max(12).default([]),
+  location: z.string().trim().max(160).default(""),
+  placement_platform: z.string().trim().max(120).default(""),
+  placement_title: z.string().trim().max(200).default(""),
+  placement_details: z.string().trim().max(1000).default(""),
+});
+
+export type TrackDiscoveryMetadata = z.infer<typeof trackDiscoveryMetadataSchema>;
+
+export const EMPTY_TRACK_DISCOVERY_METADATA: TrackDiscoveryMetadata = {
+  mood_tags: [],
+  location: "",
+  placement_platform: "",
+  placement_title: "",
+  placement_details: "",
+};
+
 const optionalDate = z
   .string()
   .trim()
@@ -31,6 +49,7 @@ export const trackSchema = z.object({
   rights_confirmed: z.boolean(),
   rights_policy_version: z.string().min(1).nullable(),
   rights_confirmed_at: z.string().datetime().nullable(),
+  discovery_metadata: trackDiscoveryMetadataSchema.default(EMPTY_TRACK_DISCOVERY_METADATA),
 });
 
 export type TrackInput = z.infer<typeof trackSchema>;

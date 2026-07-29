@@ -78,6 +78,7 @@ import { Route as AuthenticatedAdminRightsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminPlayRouteImport } from './routes/_authenticated/admin_.play'
 import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin_.creators'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
+import { Route as AuthenticatedMusicTrackIdLyricsRouteImport } from './routes/_authenticated/music_.$trackId.lyrics'
 
 const TrustRoute = TrustRouteImport.update({
   id: '/trust',
@@ -431,6 +432,12 @@ const ArtistUsernamePlaylistSlugRoute =
     path: '/artist/$username/playlist/$slug',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedMusicTrackIdLyricsRoute =
+  AuthenticatedMusicTrackIdLyricsRouteImport.update({
+    id: '/lyrics',
+    path: '/lyrics',
+    getParentRoute: () => AuthenticatedMusicTrackIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -493,13 +500,14 @@ export interface FileRoutesByFullPath {
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
-  '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
+  '/music/$trackId': typeof AuthenticatedMusicTrackIdRouteWithChildren
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
+  '/music/$trackId/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRoutesByTo {
@@ -563,13 +571,14 @@ export interface FileRoutesByTo {
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
-  '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
+  '/music/$trackId': typeof AuthenticatedMusicTrackIdRouteWithChildren
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
+  '/music/$trackId/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRoutesById {
@@ -635,13 +644,14 @@ export interface FileRoutesById {
   '/_authenticated/admin_/creators': typeof AuthenticatedAdminCreatorsRoute
   '/_authenticated/admin_/play': typeof AuthenticatedAdminPlayRoute
   '/_authenticated/admin_/rights': typeof AuthenticatedAdminRightsRoute
-  '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRoute
+  '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRouteWithChildren
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
   '/_authenticated/playlists_/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
+  '/_authenticated/music_/$trackId/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username_/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
 export interface FileRouteTypes {
@@ -714,6 +724,7 @@ export interface FileRouteTypes {
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
+    | '/music/$trackId/lyrics'
     | '/artist/$username/playlist/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -784,6 +795,7 @@ export interface FileRouteTypes {
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
+    | '/music/$trackId/lyrics'
     | '/artist/$username/playlist/$slug'
   id:
     | '__root__'
@@ -855,6 +867,7 @@ export interface FileRouteTypes {
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
+    | '/_authenticated/music_/$trackId/lyrics'
     | '/artist/$username_/playlist/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -1383,8 +1396,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistUsernamePlaylistSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/music_/$trackId/lyrics': {
+      id: '/_authenticated/music_/$trackId/lyrics'
+      path: '/lyrics'
+      fullPath: '/music/$trackId/lyrics'
+      preLoaderRoute: typeof AuthenticatedMusicTrackIdLyricsRouteImport
+      parentRoute: typeof AuthenticatedMusicTrackIdRoute
+    }
   }
 }
+
+interface AuthenticatedMusicTrackIdRouteChildren {
+  AuthenticatedMusicTrackIdLyricsRoute: typeof AuthenticatedMusicTrackIdLyricsRoute
+}
+
+const AuthenticatedMusicTrackIdRouteChildren: AuthenticatedMusicTrackIdRouteChildren =
+  {
+    AuthenticatedMusicTrackIdLyricsRoute: AuthenticatedMusicTrackIdLyricsRoute,
+  }
+
+const AuthenticatedMusicTrackIdRouteWithChildren =
+  AuthenticatedMusicTrackIdRoute._addFileChildren(
+    AuthenticatedMusicTrackIdRouteChildren,
+  )
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
@@ -1410,7 +1444,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
   AuthenticatedAdminPlayRoute: typeof AuthenticatedAdminPlayRoute
   AuthenticatedAdminRightsRoute: typeof AuthenticatedAdminRightsRoute
-  AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
+  AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRouteWithChildren
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
   AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
 }
@@ -1439,7 +1473,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
   AuthenticatedAdminPlayRoute: AuthenticatedAdminPlayRoute,
   AuthenticatedAdminRightsRoute: AuthenticatedAdminRightsRoute,
-  AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
+  AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRouteWithChildren,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
   AuthenticatedPlaylistsPlaylistIdRoute: AuthenticatedPlaylistsPlaylistIdRoute,
 }

@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ChevronLeft } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ChevronLeft, Loader2, ShieldCheck } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -12,6 +13,8 @@ import { useMembership } from "@/hooks/useMembership";
 import { UsageMeter } from "@/components/membership/UsageMeter";
 import { Card, CardContent } from "@/components/ui/card";
 import { MUSIC_RIGHTS_POLICY_VERSION } from "@/constants/legal";
+import { creatorRightsService } from "@/services/rights/creatorRightsService";
+import { CreatorRightsCertificationGate } from "@/components/musicUpload/CreatorRightsCertificationGate";
 
 export const Route = createFileRoute("/_authenticated/music_/upload")({
   component: () => (
@@ -27,6 +30,13 @@ function UploadPage() {
   const upload = useUploadTrack(user?.id);
   const createAlbum = useCreateAlbum(user?.id);
   const { data: membership } = useMembership(!!user?.id);
+  const queryClient = useQueryClient();
+  const rightsStatus = useQuery({
+    queryKey: ["creator-music-rights-status", user?.id],
+    queryFn: () => creatorRightsService.getMusicStatus(),
+    enabled: !!user?.id,
+  });
+  const activeRights = rightsStatus.data?.active === true ? rightsStatus.data : null;
 
   const submitSingle = async (values: SingleUploadValues) => {
     if (!values.audio) throw new Error("Audio file required");
@@ -54,16 +64,23 @@ function UploadPage() {
         rights_basis: values.rights_basis,
         rights_confirmed: true,
         rights_policy_version: MUSIC_RIGHTS_POLICY_VERSION,
-        rights_confirmed_at: new Date().toISOString(),
+        rights_confirmed_at: activeRights?.certified_at ?? new Date().toISOString(),
+        discovery_metadata: values.discovery_metadata,
       },
       audio: values.audio,
       cover: values.cover,
     });
+    await queryClient.invalidateQueries({ queryKey: ["creator-music-rights-status", user?.id] });
     navigate({ to: "/music" });
   };
 
   const submitAlbum = async (values: AlbumUploadValues) => {
     if (!user?.id) throw new Error("Not authenticated");
+    if (activeRights && values.tracks.length > activeRights.uploads_until_renewal) {
+      throw new Error(
+        `Your current certification covers ${activeRights.uploads_until_renewal} more songs. Renew it before uploading this ${values.tracks.length}-song album.`,
+      );
+    }
     if (membership) {
       const remaining = membership.limits.uploaded_tracks - membership.usage.uploaded_tracks;
       if (values.tracks.length > remaining)
@@ -113,10 +130,18 @@ function UploadPage() {
           rights_basis: values.rights_basis,
           rights_confirmed: true,
           rights_policy_version: MUSIC_RIGHTS_POLICY_VERSION,
-          rights_confirmed_at: new Date().toISOString(),
+          rights_confirmed_at: activeRights?.certified_at ?? new Date().toISOString(),
+          discovery_metadata: {
+            mood_tags: [],
+            location: "",
+            placement_platform: "",
+            placement_title: "",
+            placement_details: "",
+          },
         },
       });
     }
+    await queryClient.invalidateQueries({ queryKey: ["creator-music-rights-status", user?.id] });
     navigate({ to: "/music" });
   };
 
@@ -159,18 +184,58 @@ function UploadPage() {
         </Card>
       )}
 
-      <Tabs defaultValue="single">
-        <TabsList>
-          <TabsTrigger value="single">Single</TabsTrigger>
-          <TabsTrigger value="album">Album</TabsTrigger>
-        </TabsList>
-        <TabsContent value="single" className="mt-6">
-          <MusicUploadForm onSubmit={submitSingle} submitting={upload.isPending} />
-        </TabsContent>
-        <TabsContent value="album" className="mt-6">
-          <AlbumUploadForm onSubmit={submitAlbum} submitting={createAlbum.isPending} />
-        </TabsContent>
-      </Tabs>
+      {rightsStatus.isLoading ? (
+        <Card>
+          <CardContent className="flex items-center gap-3 p-5 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Checking your music upload certification…
+          </CardContent>
+        </Card>
+      ) : activeRights ? (
+        <div className="flex items-start gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+          <div>
+            <p className="font-medium">Your music upload certification is active.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              You confirm that you own or have permission or licenses for every song you upload.
+              VYBE will ask you to renew after {activeRights.uploads_until_renewal} more{" "}
+              {activeRights.uploads_until_renewal === 1 ? "song" : "songs"}.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <CreatorRightsCertificationGate
+          renewing={!!rightsStatus.data}
+          onCertify={async (basis) => {
+            await creatorRightsService.certifyMusic(basis);
+            await queryClient.invalidateQueries({
+              queryKey: ["creator-music-rights-status", user?.id],
+            });
+          }}
+        />
+      )}
+
+      {!rightsStatus.isLoading && activeRights && (
+        <Tabs defaultValue="single">
+          <TabsList>
+            <TabsTrigger value="single">Single</TabsTrigger>
+            <TabsTrigger value="album">Album</TabsTrigger>
+          </TabsList>
+          <TabsContent value="single" className="mt-6">
+            <MusicUploadForm
+              onSubmit={submitSingle}
+              submitting={upload.isPending}
+              defaultRightsBasis={activeRights.default_rights_basis}
+            />
+          </TabsContent>
+          <TabsContent value="album" className="mt-6">
+            <AlbumUploadForm
+              onSubmit={submitAlbum}
+              submitting={createAlbum.isPending}
+              defaultRightsBasis={activeRights.default_rights_basis}
+            />
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 }

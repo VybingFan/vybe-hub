@@ -6,7 +6,11 @@ import type {
   Track,
   TrackInput,
 } from "@/features/music/schema";
-import { MAX_AUDIO_BYTES, MAX_COVER_BYTES } from "@/features/music/schema";
+import {
+  EMPTY_TRACK_DISCOVERY_METADATA,
+  MAX_AUDIO_BYTES,
+  MAX_COVER_BYTES,
+} from "@/features/music/schema";
 import { membershipService } from "@/services/membership/membershipService";
 
 const AUDIO_BUCKET = "music-audio";
@@ -27,6 +31,7 @@ async function signedUrl(bucket: string, path: string | null): Promise<string | 
 async function hydrateTrack(row: Track): Promise<Track> {
   return {
     ...row,
+    discovery_metadata: row.discovery_metadata ?? EMPTY_TRACK_DISCOVERY_METADATA,
     audio_url: (await signedUrl(AUDIO_BUCKET, row.audio_url)) ?? "",
     cover_url: await signedUrl(COVER_BUCKET, row.cover_url),
   };
@@ -112,9 +117,14 @@ export const musicService = {
       rights_confirmed: params.input.rights_confirmed,
       rights_policy_version: params.input.rights_policy_version,
       rights_confirmed_at: params.input.rights_confirmed_at,
+      discovery_metadata: params.input.discovery_metadata,
     };
 
-    const { data, error } = await supabase.from("tracks").insert(insert).select("*").single();
+    const { data, error } = await supabase
+      .from("tracks")
+      .insert(insert as never)
+      .select("*")
+      .single();
     if (error) {
       await this.removeStorage(AUDIO_BUCKET, audioPath);
       if (coverPath) await this.removeStorage(COVER_BUCKET, coverPath);
@@ -127,7 +137,7 @@ export const musicService = {
       if (leadError) throw leadError;
       data.is_featured = true;
     }
-    return hydrateTrack(data);
+    return hydrateTrack(data as unknown as Track);
   },
 
   async setProfileLead(trackId: string | null): Promise<void> {
@@ -145,7 +155,7 @@ export const musicService = {
       .select("*")
       .single();
     if (error) throw error;
-    return hydrateTrack(data);
+    return hydrateTrack(data as unknown as Track);
   },
 
   async replaceTrackCover(userId: string, id: string, file: File): Promise<Track> {
@@ -173,7 +183,7 @@ export const musicService = {
     if (previousPath && previousPath !== coverPath) {
       await this.removeStorage(COVER_BUCKET, previousPath);
     }
-    return hydrateTrack(data);
+    return hydrateTrack(data as unknown as Track);
   },
 
   async replaceTrackAudio(
@@ -206,7 +216,7 @@ export const musicService = {
     if (previousPath && previousPath !== newPath) {
       await this.removeStorage(AUDIO_BUCKET, previousPath);
     }
-    return hydrateTrack(data);
+    return hydrateTrack(data as unknown as Track);
   },
 
   async deleteTrack(id: string): Promise<void> {
@@ -230,7 +240,7 @@ export const musicService = {
       .eq("creator_id", userId)
       .order("created_at", { ascending: false });
     if (error) throw error;
-    return Promise.all((data ?? []).map(hydrateTrack));
+    return Promise.all((data ?? []).map((row) => hydrateTrack(row as unknown as Track)));
   },
 
   async listCreatorAlbums(userId: string): Promise<Album[]> {
@@ -306,7 +316,7 @@ export const musicService = {
     const hydrated = await hydrateAlbum(album);
     return {
       ...hydrated,
-      tracks: await Promise.all((tracks ?? []).map(hydrateTrack)),
+      tracks: await Promise.all((tracks ?? []).map((row) => hydrateTrack(row as unknown as Track))),
     };
   },
 };

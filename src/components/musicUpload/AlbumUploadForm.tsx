@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/select";
 import { ProfileCard } from "@/components/profile/ProfileCard";
 import { SubmitButton } from "@/components/auth/SubmitButton";
-import { RightsCertification } from "@/components/musicUpload/RightsCertification";
 import type { MusicRightsBasis } from "@/constants/legal";
+import { MUSIC_RIGHTS_BASES } from "@/constants/legal";
 import {
   ACCEPTED_AUDIO,
   ACCEPTED_IMAGE,
@@ -48,9 +48,10 @@ export interface AlbumUploadValues {
 interface Props {
   onSubmit: (values: AlbumUploadValues) => Promise<void>;
   submitting?: boolean;
+  defaultRightsBasis: MusicRightsBasis;
 }
 
-const empty: AlbumUploadValues = {
+const empty = (defaultRightsBasis: MusicRightsBasis): AlbumUploadValues => ({
   title: "",
   primary_artist_name: "",
   featured_artists: "",
@@ -60,13 +61,15 @@ const empty: AlbumUploadValues = {
   status: "draft",
   cover: null,
   tracks: [],
-  rights_basis: "entirely_original",
-  rights_confirmed: false,
-};
+  rights_basis: defaultRightsBasis,
+  rights_confirmed: true,
+});
 
-export function AlbumUploadForm({ onSubmit, submitting }: Props) {
-  const [values, setValues] = useState<AlbumUploadValues>(empty);
+export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Props) {
+  const [values, setValues] = useState<AlbumUploadValues>(() => empty(defaultRightsBasis));
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [showOptional, setShowOptional] = useState(false);
+  const [showRightsCategory, setShowRightsCategory] = useState(false);
 
   const update = <K extends keyof AlbumUploadValues>(key: K, val: AlbumUploadValues[K]) =>
     setValues((v) => ({ ...v, [key]: val }));
@@ -103,11 +106,9 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
     if (!values.title.trim()) return toast.error("Album title is required");
     if (!values.primary_artist_name.trim()) return toast.error("Primary artist is required");
     if (values.tracks.length === 0) return toast.error("Add at least one track");
-    if (!values.rights_confirmed)
-      return toast.error("Confirm that you have the rights needed to share this album");
     try {
       await onSubmit(values);
-      setValues(empty);
+      setValues(empty(defaultRightsBasis));
       if (coverPreview) URL.revokeObjectURL(coverPreview);
       setCoverPreview(null);
       toast.success("Album uploaded");
@@ -118,15 +119,14 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
 
   return (
     <form onSubmit={submit} className="space-y-6">
-      <ProfileCard title="Album details">
+      <ProfileCard
+        title="Album essentials"
+        description="Start with the album title, primary artist, and audio files. Complete other information now or later."
+      >
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-1.5">
             <Label>Title</Label>
             <Input value={values.title} onChange={(e) => update("title", e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Genre</Label>
-            <Input value={values.genre} onChange={(e) => update("genre", e.target.value)} />
           </div>
           <div className="space-y-1.5">
             <Label>Primary performing artist</Label>
@@ -134,22 +134,6 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
               value={values.primary_artist_name}
               onChange={(e) => update("primary_artist_name", e.target.value)}
               placeholder="Artist or group name"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Additional / featured artists</Label>
-            <Input
-              value={values.featured_artists}
-              onChange={(e) => update("featured_artists", e.target.value)}
-              placeholder="Separate names with commas"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Release date</Label>
-            <Input
-              type="date"
-              value={values.release_date}
-              onChange={(e) => update("release_date", e.target.value)}
             />
           </div>
           <div className="space-y-1.5">
@@ -171,14 +155,6 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
             </Select>
           </div>
         </div>
-        <div className="space-y-1.5">
-          <Label>Description</Label>
-          <Textarea
-            rows={4}
-            value={values.description}
-            onChange={(e) => update("description", e.target.value)}
-          />
-        </div>
         <label className="flex cursor-pointer flex-col gap-2 rounded-md border border-dashed border-border/70 p-4">
           <div className="flex items-center gap-2 text-sm font-medium">
             <ImageIcon className="h-5 w-5" /> Cover art
@@ -194,6 +170,84 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
             <span>{values.cover ? "Replace" : "Choose file"}</span>
           </Button>
         </label>
+      </ProfileCard>
+
+      <ProfileCard
+        title="Optional album information"
+        description="Open only the sections you want to complete."
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border/70 p-3 text-sm">
+            <input
+              type="checkbox"
+              className="h-4 w-4 accent-primary"
+              checked={showOptional}
+              onChange={(event) => setShowOptional(event.target.checked)}
+            />
+            Credits, genre, date, and description
+          </label>
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border/70 p-3 text-sm">
+            <input
+              type="checkbox"
+              className="h-4 w-4 accent-primary"
+              checked={showRightsCategory}
+              onChange={(event) => setShowRightsCategory(event.target.checked)}
+            />
+            Different rights category for this album
+          </label>
+        </div>
+        {showOptional && (
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Additional / featured artists</Label>
+              <Input
+                value={values.featured_artists}
+                onChange={(e) => update("featured_artists", e.target.value)}
+                placeholder="Separate names with commas"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Genre</Label>
+              <Input value={values.genre} onChange={(e) => update("genre", e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Release date</Label>
+              <Input
+                type="date"
+                value={values.release_date}
+                onChange={(e) => update("release_date", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5 md:col-span-2">
+              <Label>Description</Label>
+              <Textarea
+                rows={4}
+                value={values.description}
+                onChange={(e) => update("description", e.target.value)}
+              />
+            </div>
+          </div>
+        )}
+        {showRightsCategory && (
+          <div className="space-y-1.5">
+            <Label>Rights category for this album</Label>
+            <Select
+              value={values.rights_basis}
+              onValueChange={(value) => update("rights_basis", value as MusicRightsBasis)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {MUSIC_RIGHTS_BASES.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </ProfileCard>
 
       <ProfileCard
@@ -240,13 +294,6 @@ export function AlbumUploadForm({ onSubmit, submitting }: Props) {
           </ol>
         )}
       </ProfileCard>
-
-      <RightsCertification
-        basis={values.rights_basis}
-        confirmed={values.rights_confirmed}
-        onBasisChange={(basis) => update("rights_basis", basis)}
-        onConfirmedChange={(confirmed) => update("rights_confirmed", confirmed)}
-      />
 
       <div className="flex justify-end">
         <SubmitButton loading={submitting} className="w-auto px-8">
