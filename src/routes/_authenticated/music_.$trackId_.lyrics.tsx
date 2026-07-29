@@ -15,7 +15,7 @@ import {
   type TrackLyrics,
 } from "@/services/music/lyricsService";
 
-export const Route = createFileRoute("/_authenticated/music_/$trackId/lyrics")({
+export const Route = createFileRoute("/_authenticated/music_/$trackId_/lyrics")({
   component: () => (
     <RoleGuard allow={["creator", "admin"]}>
       <LyricsWorkspace />
