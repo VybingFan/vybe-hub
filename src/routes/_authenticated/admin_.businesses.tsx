@@ -69,7 +69,8 @@ function BusinessOperationsPage() {
 
   async function createBusiness(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     setSavingBusiness(true);
     try {
       await businessAdminService.createBusiness({
@@ -81,7 +82,7 @@ function BusinessOperationsPage() {
         websiteUrl: String(form.get("websiteUrl") ?? ""),
         packageCode: String(form.get("packageCode")) as keyof typeof packageLabels,
       });
-      event.currentTarget.reset();
+      formElement.reset();
       toast.success("Business partner record created");
       await load();
     } catch (error) {
@@ -93,7 +94,8 @@ function BusinessOperationsPage() {
 
   async function createCampaign(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     setSavingCampaign(true);
     try {
       await businessAdminService.createCampaign({
@@ -101,7 +103,7 @@ function BusinessOperationsPage() {
         name: String(form.get("name") ?? ""),
         objective: String(form.get("objective") ?? ""),
       });
-      event.currentTarget.reset();
+      formElement.reset();
       toast.success("Draft campaign created");
       await load();
     } catch (error) {
@@ -187,8 +189,20 @@ function BusinessOperationsPage() {
                   label="URL slug"
                   placeholder="business-name"
                   pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+                  title="Use lowercase letters, numbers, and hyphens only."
+                  onInput={(event) => {
+                    event.currentTarget.value = event.currentTarget.value
+                      .toLowerCase()
+                      .trim()
+                      .replace(/[^a-z0-9]+/g, "-")
+                      .replace(/^-+|-+$/g, "");
+                  }}
                   required
                 />
+                <p className="-mt-2 text-xs text-muted-foreground sm:col-span-2">
+                  URL format: lowercase letters, numbers, and hyphens only. Example:
+                  bagg-lady-business
+                </p>
                 <Field name="category" label="Category" placeholder="Recording studio" required />
                 <Field name="contactName" label="Contact person" />
                 <Field name="contactEmail" label="Private contact email" type="email" required />

@@ -38,9 +38,10 @@ function CampaignOperationsPage() {
     message: string,
   ) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     try {
-      await action(new FormData(event.currentTarget));
-      event.currentTarget.reset();
+      await action(new FormData(formElement));
+      formElement.reset();
       toast.success(message);
       await load();
     } catch (error) {
