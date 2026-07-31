@@ -11,6 +11,7 @@ import {
   RefreshCw,
   ShieldCheck,
   TicketCheck,
+  Workflow,
 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
@@ -150,9 +151,21 @@ function BusinessOperationsPage() {
                 keep the records required to support every promise.
               </p>
             </div>
-            <Button variant="outline" size="icon" onClick={() => void load()} aria-label="Refresh">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild variant="default">
+                <Link to="/admin/business-pilot">
+                  <Workflow className="mr-2 h-4 w-4" /> Open business pilot
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => void load()}
+                aria-label="Refresh"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
             {summary

@@ -86,6 +86,7 @@ import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_authenticated/admin_.memberships'
 import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin_.creators'
 import { Route as AuthenticatedAdminBusinessesRouteImport } from './routes/_authenticated/admin_.businesses'
+import { Route as AuthenticatedAdminBusinessPilotRouteImport } from './routes/_authenticated/admin_.business-pilot'
 import { Route as AuthenticatedAdminAccountsRouteImport } from './routes/_authenticated/admin_.accounts'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 import { Route as AuthenticatedMusicTrackIdLyricsRouteImport } from './routes/_authenticated/music_.$trackId_.lyrics'
@@ -491,6 +492,12 @@ const AuthenticatedAdminBusinessesRoute =
     path: '/admin/businesses',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminBusinessPilotRoute =
+  AuthenticatedAdminBusinessPilotRouteImport.update({
+    id: '/admin_/business-pilot',
+    path: '/admin/business-pilot',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminAccountsRoute =
   AuthenticatedAdminAccountsRouteImport.update({
     id: '/admin_/accounts',
@@ -582,6 +589,7 @@ export interface FileRoutesByFullPath {
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
+  '/admin/business-pilot': typeof AuthenticatedAdminBusinessPilotRoute
   '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
@@ -665,6 +673,7 @@ export interface FileRoutesByTo {
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
+  '/admin/business-pilot': typeof AuthenticatedAdminBusinessPilotRoute
   '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
@@ -750,6 +759,7 @@ export interface FileRoutesById {
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/_authenticated/admin_/accounts': typeof AuthenticatedAdminAccountsRoute
+  '/_authenticated/admin_/business-pilot': typeof AuthenticatedAdminBusinessPilotRoute
   '/_authenticated/admin_/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/_authenticated/admin_/creators': typeof AuthenticatedAdminCreatorsRoute
   '/_authenticated/admin_/memberships': typeof AuthenticatedAdminMembershipsRoute
@@ -835,6 +845,7 @@ export interface FileRouteTypes {
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/admin/accounts'
+    | '/admin/business-pilot'
     | '/admin/businesses'
     | '/admin/creators'
     | '/admin/memberships'
@@ -918,6 +929,7 @@ export interface FileRouteTypes {
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/admin/accounts'
+    | '/admin/business-pilot'
     | '/admin/businesses'
     | '/admin/creators'
     | '/admin/memberships'
@@ -1002,6 +1014,7 @@ export interface FileRouteTypes {
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/_authenticated/admin_/accounts'
+    | '/_authenticated/admin_/business-pilot'
     | '/_authenticated/admin_/businesses'
     | '/_authenticated/admin_/creators'
     | '/_authenticated/admin_/memberships'
@@ -1607,6 +1620,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBusinessesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/business-pilot': {
+      id: '/_authenticated/admin_/business-pilot'
+      path: '/admin/business-pilot'
+      fullPath: '/admin/business-pilot'
+      preLoaderRoute: typeof AuthenticatedAdminBusinessPilotRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/accounts': {
       id: '/_authenticated/admin_/accounts'
       path: '/admin/accounts'
@@ -1668,6 +1688,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
   AuthenticatedAdminAccountsRoute: typeof AuthenticatedAdminAccountsRoute
+  AuthenticatedAdminBusinessPilotRoute: typeof AuthenticatedAdminBusinessPilotRoute
   AuthenticatedAdminBusinessesRoute: typeof AuthenticatedAdminBusinessesRoute
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
   AuthenticatedAdminMembershipsRoute: typeof AuthenticatedAdminMembershipsRoute
@@ -1710,6 +1731,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
   AuthenticatedAdminAccountsRoute: AuthenticatedAdminAccountsRoute,
+  AuthenticatedAdminBusinessPilotRoute: AuthenticatedAdminBusinessPilotRoute,
   AuthenticatedAdminBusinessesRoute: AuthenticatedAdminBusinessesRoute,
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
   AuthenticatedAdminMembershipsRoute: AuthenticatedAdminMembershipsRoute,

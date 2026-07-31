@@ -28,6 +28,7 @@ import {
   Gift,
   Activity,
   FolderKanban,
+  Workflow,
 } from "lucide-react";
 import {
   Sidebar,
@@ -177,6 +178,12 @@ export function AppSidebar() {
                   title: "Business Operations",
                   url: "/admin/businesses",
                   icon: BriefcaseBusiness,
+                  allow: ["admin"],
+                },
+                {
+                  title: "Business Pilot",
+                  url: "/admin/business-pilot",
+                  icon: Workflow,
                   allow: ["admin"],
                 },
                 {
