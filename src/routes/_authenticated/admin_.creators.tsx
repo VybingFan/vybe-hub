@@ -29,7 +29,8 @@ function AdminCreatorsPage() {
   const load = useCallback(async (query = "") => {
     setLoading(true);
     try {
-      setRecords(await adminService.listCreators(query));
+      const accounts = await adminService.listCreators(query);
+      setRecords(accounts.filter((record) => record.roles.includes("creator")));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not load creator operations");
     } finally {
@@ -50,12 +51,12 @@ function AdminCreatorsPage() {
           </Link>
         </Button>
         <div className="mt-3 flex items-center gap-2 text-primary">
-          <Users className="h-5 w-5" /> Account operations
+          <Users className="h-5 w-5" /> Creator operations
         </div>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Creator directory</h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-          Search accounts and review roles, membership state, and catalog activity. This first
-          release is read-only so account changes cannot happen accidentally.
+          Review creator roles, membership state, and catalog activity. Supporter-only accounts are
+          managed separately under Members & Accounts.
         </p>
       </header>
 
@@ -91,7 +92,7 @@ function AdminCreatorsPage() {
       {!loading && records.length === 0 ? (
         <Card>
           <CardContent className="p-7 text-sm text-muted-foreground">
-            No accounts match this search.
+            No creators match this search.
           </CardContent>
         </Card>
       ) : null}
@@ -105,7 +106,6 @@ function AdminCreatorsPage() {
 }
 
 function CreatorRecordCard({ record }: { record: AdminCreatorRecord }) {
-  const isCreator = record.roles.includes("creator");
   return (
     <Card>
       <CardContent className="space-y-5 p-5">
@@ -127,36 +127,28 @@ function CreatorRecordCard({ record }: { record: AdminCreatorRecord }) {
             ) : (
               <Badge variant="outline">role incomplete</Badge>
             )}
-            {isCreator ? (
-              <Badge variant="outline">
-                {record.plan_code.replaceAll("_", " ")} · {record.entitlement_status}
-              </Badge>
-            ) : null}
+            <Badge variant="outline">
+              {record.plan_code.replaceAll("_", " ")} · {record.entitlement_status}
+            </Badge>
           </div>
         </div>
 
-        {isCreator ? (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <CatalogMetric
-              icon={Library}
-              label="Songs"
-              value={`${record.published_track_count}/${record.track_count}`}
-              note="published / total"
-            />
-            <CatalogMetric
-              icon={Library}
-              label="Playlists"
-              value={record.playlist_count}
-              note="total"
-            />
-            <CatalogMetric icon={Video} label="Videos" value={record.video_count} note="total" />
-            <CatalogMetric icon={Package} label="Merch" value={record.merch_count} note="items" />
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            Supporter or incomplete account; no Creator Studio catalog is expected.
-          </p>
-        )}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <CatalogMetric
+            icon={Library}
+            label="Songs"
+            value={`${record.published_track_count}/${record.track_count}`}
+            note="published / total"
+          />
+          <CatalogMetric
+            icon={Library}
+            label="Playlists"
+            value={record.playlist_count}
+            note="total"
+          />
+          <CatalogMetric icon={Video} label="Videos" value={record.video_count} note="total" />
+          <CatalogMetric icon={Package} label="Merch" value={record.merch_count} note="items" />
+        </div>
       </CardContent>
     </Card>
   );

@@ -76,10 +76,15 @@ import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
 import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authenticated/music_.$trackId'
 import { Route as AuthenticatedAdminWorkQueueRouteImport } from './routes/_authenticated/admin_.work-queue'
+import { Route as AuthenticatedAdminSystemHealthRouteImport } from './routes/_authenticated/admin_.system-health'
+import { Route as AuthenticatedAdminSearchRouteImport } from './routes/_authenticated/admin_.search'
 import { Route as AuthenticatedAdminRightsRouteImport } from './routes/_authenticated/admin_.rights'
 import { Route as AuthenticatedAdminPlayRouteImport } from './routes/_authenticated/admin_.play'
+import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenticated/admin_.offers'
+import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_authenticated/admin_.memberships'
 import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin_.creators'
 import { Route as AuthenticatedAdminBusinessesRouteImport } from './routes/_authenticated/admin_.businesses'
+import { Route as AuthenticatedAdminAccountsRouteImport } from './routes/_authenticated/admin_.accounts'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 import { Route as AuthenticatedMusicTrackIdLyricsRouteImport } from './routes/_authenticated/music_.$trackId_.lyrics'
 import { Route as AuthenticatedAdminCampaignsCampaignIdRouteImport } from './routes/_authenticated/admin_.campaigns_.$campaignId'
@@ -424,6 +429,18 @@ const AuthenticatedAdminWorkQueueRoute =
     path: '/admin/work-queue',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminSystemHealthRoute =
+  AuthenticatedAdminSystemHealthRouteImport.update({
+    id: '/admin_/system-health',
+    path: '/admin/system-health',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminSearchRoute =
+  AuthenticatedAdminSearchRouteImport.update({
+    id: '/admin_/search',
+    path: '/admin/search',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRightsRoute =
   AuthenticatedAdminRightsRouteImport.update({
     id: '/admin_/rights',
@@ -435,6 +452,18 @@ const AuthenticatedAdminPlayRoute = AuthenticatedAdminPlayRouteImport.update({
   path: '/admin/play',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminOffersRoute =
+  AuthenticatedAdminOffersRouteImport.update({
+    id: '/admin_/offers',
+    path: '/admin/offers',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminMembershipsRoute =
+  AuthenticatedAdminMembershipsRouteImport.update({
+    id: '/admin_/memberships',
+    path: '/admin/memberships',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCreatorsRoute =
   AuthenticatedAdminCreatorsRouteImport.update({
     id: '/admin_/creators',
@@ -445,6 +474,12 @@ const AuthenticatedAdminBusinessesRoute =
   AuthenticatedAdminBusinessesRouteImport.update({
     id: '/admin_/businesses',
     path: '/admin/businesses',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminAccountsRoute =
+  AuthenticatedAdminAccountsRouteImport.update({
+    id: '/admin_/accounts',
+    path: '/admin/accounts',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const ArtistUsernamePlaylistSlugRoute =
@@ -525,10 +560,15 @@ export interface FileRoutesByFullPath {
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
   '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
+  '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
+  '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
+  '/admin/search': typeof AuthenticatedAdminSearchRoute
+  '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
@@ -600,10 +640,15 @@ export interface FileRoutesByTo {
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
   '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
+  '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
+  '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
+  '/admin/search': typeof AuthenticatedAdminSearchRoute
+  '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
@@ -677,10 +722,15 @@ export interface FileRoutesById {
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/_authenticated/admin_/accounts': typeof AuthenticatedAdminAccountsRoute
   '/_authenticated/admin_/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/_authenticated/admin_/creators': typeof AuthenticatedAdminCreatorsRoute
+  '/_authenticated/admin_/memberships': typeof AuthenticatedAdminMembershipsRoute
+  '/_authenticated/admin_/offers': typeof AuthenticatedAdminOffersRoute
   '/_authenticated/admin_/play': typeof AuthenticatedAdminPlayRoute
   '/_authenticated/admin_/rights': typeof AuthenticatedAdminRightsRoute
+  '/_authenticated/admin_/search': typeof AuthenticatedAdminSearchRoute
+  '/_authenticated/admin_/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/_authenticated/admin_/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
@@ -754,10 +804,15 @@ export interface FileRouteTypes {
     | '/experience/watch'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/admin/accounts'
     | '/admin/businesses'
     | '/admin/creators'
+    | '/admin/memberships'
+    | '/admin/offers'
     | '/admin/play'
     | '/admin/rights'
+    | '/admin/search'
+    | '/admin/system-health'
     | '/admin/work-queue'
     | '/music/$trackId'
     | '/music/upload'
@@ -829,10 +884,15 @@ export interface FileRouteTypes {
     | '/experience/watch'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/admin/accounts'
     | '/admin/businesses'
     | '/admin/creators'
+    | '/admin/memberships'
+    | '/admin/offers'
     | '/admin/play'
     | '/admin/rights'
+    | '/admin/search'
+    | '/admin/system-health'
     | '/admin/work-queue'
     | '/music/$trackId'
     | '/music/upload'
@@ -905,10 +965,15 @@ export interface FileRouteTypes {
     | '/experience/watch'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/_authenticated/admin_/accounts'
     | '/_authenticated/admin_/businesses'
     | '/_authenticated/admin_/creators'
+    | '/_authenticated/admin_/memberships'
+    | '/_authenticated/admin_/offers'
     | '/_authenticated/admin_/play'
     | '/_authenticated/admin_/rights'
+    | '/_authenticated/admin_/search'
+    | '/_authenticated/admin_/system-health'
     | '/_authenticated/admin_/work-queue'
     | '/_authenticated/music_/$trackId'
     | '/_authenticated/music_/upload'
@@ -1433,6 +1498,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminWorkQueueRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/system-health': {
+      id: '/_authenticated/admin_/system-health'
+      path: '/admin/system-health'
+      fullPath: '/admin/system-health'
+      preLoaderRoute: typeof AuthenticatedAdminSystemHealthRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin_/search': {
+      id: '/_authenticated/admin_/search'
+      path: '/admin/search'
+      fullPath: '/admin/search'
+      preLoaderRoute: typeof AuthenticatedAdminSearchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/rights': {
       id: '/_authenticated/admin_/rights'
       path: '/admin/rights'
@@ -1447,6 +1526,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPlayRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/offers': {
+      id: '/_authenticated/admin_/offers'
+      path: '/admin/offers'
+      fullPath: '/admin/offers'
+      preLoaderRoute: typeof AuthenticatedAdminOffersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin_/memberships': {
+      id: '/_authenticated/admin_/memberships'
+      path: '/admin/memberships'
+      fullPath: '/admin/memberships'
+      preLoaderRoute: typeof AuthenticatedAdminMembershipsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/creators': {
       id: '/_authenticated/admin_/creators'
       path: '/admin/creators'
@@ -1459,6 +1552,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/businesses'
       fullPath: '/admin/businesses'
       preLoaderRoute: typeof AuthenticatedAdminBusinessesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin_/accounts': {
+      id: '/_authenticated/admin_/accounts'
+      path: '/admin/accounts'
+      fullPath: '/admin/accounts'
+      preLoaderRoute: typeof AuthenticatedAdminAccountsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/artist/$username_/playlist/$slug': {
@@ -1507,10 +1607,15 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
+  AuthenticatedAdminAccountsRoute: typeof AuthenticatedAdminAccountsRoute
   AuthenticatedAdminBusinessesRoute: typeof AuthenticatedAdminBusinessesRoute
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
+  AuthenticatedAdminMembershipsRoute: typeof AuthenticatedAdminMembershipsRoute
+  AuthenticatedAdminOffersRoute: typeof AuthenticatedAdminOffersRoute
   AuthenticatedAdminPlayRoute: typeof AuthenticatedAdminPlayRoute
   AuthenticatedAdminRightsRoute: typeof AuthenticatedAdminRightsRoute
+  AuthenticatedAdminSearchRoute: typeof AuthenticatedAdminSearchRoute
+  AuthenticatedAdminSystemHealthRoute: typeof AuthenticatedAdminSystemHealthRoute
   AuthenticatedAdminWorkQueueRoute: typeof AuthenticatedAdminWorkQueueRoute
   AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
@@ -1541,10 +1646,15 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
+  AuthenticatedAdminAccountsRoute: AuthenticatedAdminAccountsRoute,
   AuthenticatedAdminBusinessesRoute: AuthenticatedAdminBusinessesRoute,
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
+  AuthenticatedAdminMembershipsRoute: AuthenticatedAdminMembershipsRoute,
+  AuthenticatedAdminOffersRoute: AuthenticatedAdminOffersRoute,
   AuthenticatedAdminPlayRoute: AuthenticatedAdminPlayRoute,
   AuthenticatedAdminRightsRoute: AuthenticatedAdminRightsRoute,
+  AuthenticatedAdminSearchRoute: AuthenticatedAdminSearchRoute,
+  AuthenticatedAdminSystemHealthRoute: AuthenticatedAdminSystemHealthRoute,
   AuthenticatedAdminWorkQueueRoute: AuthenticatedAdminWorkQueueRoute,
   AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,

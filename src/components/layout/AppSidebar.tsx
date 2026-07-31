@@ -24,6 +24,9 @@ import {
   Upload,
   ClipboardList,
   ExternalLink,
+  CreditCard,
+  Gift,
+  Activity,
 } from "lucide-react";
 import {
   Sidebar,
@@ -164,6 +167,12 @@ export function AppSidebar() {
                   badge: pendingWork,
                 },
                 {
+                  title: "Members & Accounts",
+                  url: "/admin/accounts",
+                  icon: ContactRound,
+                  allow: ["admin"],
+                },
+                {
                   title: "Business Operations",
                   url: "/admin/businesses",
                   icon: BriefcaseBusiness,
@@ -188,7 +197,25 @@ export function AppSidebar() {
             <NavGroup
               label="Management"
               items={[
+                {
+                  title: "Memberships & Packages",
+                  url: "/admin/memberships",
+                  icon: CreditCard,
+                  allow: ["admin"],
+                },
+                {
+                  title: "Offers & Promotions",
+                  url: "/admin/offers",
+                  icon: Gift,
+                  allow: ["admin"],
+                },
                 { title: "Analytics & Reports", url: "/admin", icon: BarChart3, allow: ["admin"] },
+                {
+                  title: "System Health",
+                  url: "/admin/system-health",
+                  icon: Activity,
+                  allow: ["admin"],
+                },
                 { title: "System Settings", url: "/settings", icon: Settings, allow: ["admin"] },
               ]}
               isActive={isActive}
