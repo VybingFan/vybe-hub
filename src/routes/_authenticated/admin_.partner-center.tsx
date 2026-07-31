@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   CheckCircle2,
   ExternalLink,
+  FileDown,
   FileClock,
   FilePlus2,
   FolderKanban,
@@ -56,6 +57,64 @@ const PACKAGE_OPTIONS = [
   ["founding_preview", "Founding Business Preview · Free / 60 days"],
   ["founding_partner", "Founding Business Partner · $499 / year"],
   ["custom_campaign", "Custom Campaign or Sponsorship"],
+] as const;
+
+const PARTNER_MATERIALS = [
+  {
+    title: "Founding Partner One-Sheet",
+    description: "Shareable overview of the free preview and $499 annual package.",
+    href: "/partner-materials/01-vybe-founding-partner-one-sheet.pdf",
+  },
+  {
+    title: "Application & Qualification",
+    description: "Business intake and internal qualification checklist.",
+    href: "/partner-materials/02-partner-application-and-qualification.pdf",
+  },
+  {
+    title: "Preview Terms Template",
+    description: "Working terms for the free 60-day founding preview.",
+    href: "/partner-materials/03-founding-preview-terms-template.pdf",
+  },
+  {
+    title: "Annual Agreement Template",
+    description: "Working agreement for the $499 annual founding package.",
+    href: "/partner-materials/04-founding-annual-agreement-template.pdf",
+  },
+  {
+    title: "Campaign Brief",
+    description: "Objectives, audience, message, boundaries, and approval gates.",
+    href: "/partner-materials/05-campaign-brief-template.pdf",
+  },
+  {
+    title: "Asset Checklist",
+    description: "Required business, offer, creative, rights, and destination assets.",
+    href: "/partner-materials/06-campaign-asset-checklist.pdf",
+  },
+  {
+    title: "Tracking Plan",
+    description: "Valid measures, event definitions, and reconciliation rules.",
+    href: "/partner-materials/07-campaign-tracking-plan.pdf",
+  },
+  {
+    title: "Campaign Report",
+    description: "Verified totals, context, limitations, and recommended next action.",
+    href: "/partner-materials/08-campaign-report-template.pdf",
+  },
+  {
+    title: "Case Study Approval",
+    description: "Permission controls for names, logos, quotes, metrics, and channels.",
+    href: "/partner-materials/09-case-study-approval.pdf",
+  },
+  {
+    title: "Roadmap & Feature Status",
+    description: "Available, assisted, and under-construction capabilities.",
+    href: "/partner-materials/10-partner-roadmap-and-feature-status.pdf",
+  },
+  {
+    title: "Partner Brand Use Guide",
+    description: "Positioning, visual direction, disclosure, and approval rules.",
+    href: "/partner-materials/11-vybe-partner-brand-use-guide.pdf",
+  },
 ] as const;
 
 function PartnerCenterRoute() {
@@ -408,6 +467,36 @@ function PartnerCenter() {
           </CardContent>
         </Card>
       )}
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-xl font-semibold">Partner Materials Library</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Download approved working materials, then record the completed or shared version against
+            the correct business.
+          </p>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {PARTNER_MATERIALS.map((material) => (
+            <Card key={material.href}>
+              <CardContent className="flex h-full flex-col p-5">
+                <FileDown className="h-5 w-5 text-primary" />
+                <p className="mt-3 font-semibold">{material.title}</p>
+                <p className="mt-1 flex-1 text-sm text-muted-foreground">{material.description}</p>
+                <Button asChild variant="outline" size="sm" className="mt-4">
+                  <a href={material.href} download>
+                    <FileDown className="mr-2 h-4 w-4" /> Download PDF
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Preview terms and agreement files are business templates and require final legal review
+          before external use.
+        </p>
+      </section>
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Document register</h2>
