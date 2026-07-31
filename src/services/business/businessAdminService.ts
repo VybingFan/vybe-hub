@@ -48,6 +48,7 @@ export type CampaignRecord = {
   starts_at: string | null;
   ends_at: string | null;
   created_at: string;
+  conversion_tracking_status?: "not_connected" | "testing" | "connected";
   business_profiles: { public_name: string } | null;
 };
 
@@ -87,6 +88,71 @@ export type PartnerDocumentRecord = {
   updated_at: string;
   business_profiles: { public_name: string } | null;
   business_campaigns: { name: string } | null;
+};
+
+export type CampaignAnalytics = {
+  generated_at: string;
+  campaign_id: string;
+  campaign_name: string;
+  business_id: string;
+  business_name: string;
+  range_start: string;
+  range_end: string;
+  conversion_tracking_status: "not_connected" | "testing" | "connected";
+  metrics: {
+    impressions: number;
+    clicks: number;
+    click_through_rate: number;
+    offer_claims: number;
+    redemptions: number;
+    conversions: number;
+  };
+  quality: {
+    events_total: number;
+    events_valid: number;
+    events_internal: number;
+    events_invalid: number;
+  };
+  invalid_reasons: Record<string, number>;
+  daily: Array<{
+    date: string;
+    impressions: number;
+    clicks: number;
+    offer_claims: number;
+    redemptions: number;
+    conversions: number;
+  }>;
+};
+
+export type CampaignEventRecord = {
+  id: number;
+  event_type: string;
+  session_id: string;
+  referrer_path: string | null;
+  device_category: string | null;
+  is_internal: boolean;
+  is_valid: boolean;
+  invalid_reason: string | null;
+  occurred_at: string;
+};
+
+export type CampaignReportRecord = {
+  id: string;
+  range_start: string;
+  range_end: string;
+  metrics: CampaignAnalytics["metrics"];
+  methodology: Record<string, unknown>;
+  status: "draft" | "released" | "superseded";
+  released_at: string | null;
+  created_at: string;
+};
+
+export type AdminCampaignReportRecord = CampaignReportRecord & {
+  campaign_id: string;
+  business_campaigns: {
+    name: string;
+    business_profiles: { public_name: string } | null;
+  } | null;
 };
 
 type NewBusiness = {
@@ -131,7 +197,7 @@ export const businessAdminService = {
     const { data, error } = await (supabase as any)
       .from("business_campaigns")
       .select(
-        "id,business_id,name,objective,status,starts_at,ends_at,created_at,business_profiles(public_name)",
+        "id,business_id,name,objective,status,starts_at,ends_at,created_at,conversion_tracking_status,business_profiles(public_name)",
       )
       .order("created_at", { ascending: false });
     if (error) throw error;
@@ -464,6 +530,159 @@ export const businessAdminService = {
       })
       .eq("id", campaignId);
     if (error) throw error;
+  },
+
+  async getCampaignAnalytics(
+    campaignId: string,
+    rangeStart: string,
+    rangeEnd: string,
+  ): Promise<CampaignAnalytics> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any).rpc("get_admin_campaign_analytics", {
+      requested_campaign_id: campaignId,
+      requested_start: rangeStart,
+      requested_end: rangeEnd,
+    });
+    if (error) throw error;
+    return data as CampaignAnalytics;
+  },
+
+  async listCampaignEvents(campaignId: string): Promise<CampaignEventRecord[]> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from("business_campaign_events")
+      .select(
+        "id,event_type,session_id,referrer_path,device_category,is_internal,is_valid,invalid_reason,occurred_at",
+      )
+      .eq("campaign_id", campaignId)
+      .order("occurred_at", { ascending: false })
+      .limit(100);
+    if (error) throw error;
+    return (data ?? []) as CampaignEventRecord[];
+  },
+
+  async setEventValidity(eventId: number, isValid: boolean, invalidReason?: string): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = supabase as any;
+    const { data: event, error: eventError } = await client
+      .from("business_campaign_events")
+      .select("campaign_id,business_id,is_valid,invalid_reason")
+      .eq("id", eventId)
+      .single();
+    if (eventError) throw eventError;
+    const { error } = await client
+      .from("business_campaign_events")
+      .update({
+        is_valid: isValid,
+        invalid_reason: isValid ? null : invalidReason?.trim() || "admin_excluded",
+      })
+      .eq("id", eventId);
+    if (error) throw error;
+    await client.from("business_audit_log").insert({
+      business_id: event.business_id,
+      campaign_id: event.campaign_id,
+      action: isValid ? "campaign_event_restored" : "campaign_event_excluded",
+      entity_type: "business_campaign_event",
+      entity_id: String(eventId),
+      details: {
+        previous_is_valid: event.is_valid,
+        previous_invalid_reason: event.invalid_reason,
+        is_valid: isValid,
+        invalid_reason: isValid ? null : invalidReason?.trim() || "admin_excluded",
+      },
+    });
+  },
+
+  async setConversionTrackingStatus(
+    campaignId: string,
+    status: "not_connected" | "testing" | "connected",
+  ): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = supabase as any;
+    const { data: campaign, error: campaignError } = await client
+      .from("business_campaigns")
+      .select("business_id,conversion_tracking_status")
+      .eq("id", campaignId)
+      .single();
+    if (campaignError) throw campaignError;
+    const { error } = await client
+      .from("business_campaigns")
+      .update({ conversion_tracking_status: status, updated_at: new Date().toISOString() })
+      .eq("id", campaignId);
+    if (error) throw error;
+    await client.from("business_audit_log").insert({
+      business_id: campaign.business_id,
+      campaign_id: campaignId,
+      action: "conversion_tracking_status_changed",
+      entity_type: "business_campaign",
+      entity_id: campaignId,
+      details: {
+        previous_status: campaign.conversion_tracking_status,
+        status,
+      },
+    });
+  },
+
+  async listCampaignReports(campaignId: string): Promise<CampaignReportRecord[]> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from("business_campaign_reports")
+      .select("id,range_start,range_end,metrics,methodology,status,released_at,created_at")
+      .eq("campaign_id", campaignId)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as CampaignReportRecord[];
+  },
+
+  async listAllCampaignReports(): Promise<AdminCampaignReportRecord[]> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from("business_campaign_reports")
+      .select(
+        "id,campaign_id,range_start,range_end,metrics,methodology,status,released_at,created_at,business_campaigns(name,business_profiles(public_name))",
+      )
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as AdminCampaignReportRecord[];
+  },
+
+  async releaseCampaignReport(analytics: CampaignAnalytics): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = supabase as any;
+    const releasedAt = new Date().toISOString();
+    const { data, error } = await client
+      .from("business_campaign_reports")
+      .insert({
+        campaign_id: analytics.campaign_id,
+        business_id: analytics.business_id,
+        range_start: analytics.range_start,
+        range_end: analytics.range_end,
+        metrics: analytics.metrics,
+        methodology: {
+          generated_at: analytics.generated_at,
+          quality: analytics.quality,
+          invalid_reasons: analytics.invalid_reasons,
+          conversion_tracking_status: analytics.conversion_tracking_status,
+          source: "valid_non_internal_vybe_events",
+        },
+        status: "released",
+        released_at: releasedAt,
+      })
+      .select("id")
+      .single();
+    if (error) throw error;
+    await client.from("business_audit_log").insert({
+      business_id: analytics.business_id,
+      campaign_id: analytics.campaign_id,
+      action: "campaign_report_released",
+      entity_type: "business_campaign_report",
+      entity_id: data.id,
+      details: {
+        range_start: analytics.range_start,
+        range_end: analytics.range_end,
+        metrics: analytics.metrics,
+      },
+    });
   },
 
   async approveCreative(creativeId: string): Promise<void> {

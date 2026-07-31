@@ -79,6 +79,7 @@ import { Route as AuthenticatedAdminWorkQueueRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminSystemHealthRouteImport } from './routes/_authenticated/admin_.system-health'
 import { Route as AuthenticatedAdminSearchRouteImport } from './routes/_authenticated/admin_.search'
 import { Route as AuthenticatedAdminRightsRouteImport } from './routes/_authenticated/admin_.rights'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin_.reports'
 import { Route as AuthenticatedAdminPlayRouteImport } from './routes/_authenticated/admin_.play'
 import { Route as AuthenticatedAdminPartnerCenterRouteImport } from './routes/_authenticated/admin_.partner-center'
 import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenticated/admin_.offers'
@@ -89,6 +90,7 @@ import { Route as AuthenticatedAdminAccountsRouteImport } from './routes/_authen
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 import { Route as AuthenticatedMusicTrackIdLyricsRouteImport } from './routes/_authenticated/music_.$trackId_.lyrics'
 import { Route as AuthenticatedAdminCampaignsCampaignIdRouteImport } from './routes/_authenticated/admin_.campaigns_.$campaignId'
+import { Route as AuthenticatedAdminCampaignsCampaignIdAnalyticsRouteImport } from './routes/_authenticated/admin_.campaigns_.$campaignId_.analytics'
 
 const TrustRoute = TrustRouteImport.update({
   id: '/trust',
@@ -448,6 +450,12 @@ const AuthenticatedAdminRightsRoute =
     path: '/admin/rights',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/admin_/reports',
+    path: '/admin/reports',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminPlayRoute = AuthenticatedAdminPlayRouteImport.update({
   id: '/admin_/play',
   path: '/admin/play',
@@ -505,6 +513,12 @@ const AuthenticatedAdminCampaignsCampaignIdRoute =
   AuthenticatedAdminCampaignsCampaignIdRouteImport.update({
     id: '/admin_/campaigns_/$campaignId',
     path: '/admin/campaigns/$campaignId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminCampaignsCampaignIdAnalyticsRoute =
+  AuthenticatedAdminCampaignsCampaignIdAnalyticsRouteImport.update({
+    id: '/admin_/campaigns_/$campaignId_/analytics',
+    path: '/admin/campaigns/$campaignId/analytics',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -574,6 +588,7 @@ export interface FileRoutesByFullPath {
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/partner-center': typeof AuthenticatedAdminPartnerCenterRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
   '/admin/search': typeof AuthenticatedAdminSearchRoute
   '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
@@ -588,6 +603,7 @@ export interface FileRoutesByFullPath {
   '/admin/campaigns/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/music/$trackId/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
+  '/admin/campaigns/$campaignId/analytics': typeof AuthenticatedAdminCampaignsCampaignIdAnalyticsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -655,6 +671,7 @@ export interface FileRoutesByTo {
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/partner-center': typeof AuthenticatedAdminPartnerCenterRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
   '/admin/search': typeof AuthenticatedAdminSearchRoute
   '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
@@ -669,6 +686,7 @@ export interface FileRoutesByTo {
   '/admin/campaigns/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/music/$trackId/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
+  '/admin/campaigns/$campaignId/analytics': typeof AuthenticatedAdminCampaignsCampaignIdAnalyticsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -738,6 +756,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/offers': typeof AuthenticatedAdminOffersRoute
   '/_authenticated/admin_/partner-center': typeof AuthenticatedAdminPartnerCenterRoute
   '/_authenticated/admin_/play': typeof AuthenticatedAdminPlayRoute
+  '/_authenticated/admin_/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin_/rights': typeof AuthenticatedAdminRightsRoute
   '/_authenticated/admin_/search': typeof AuthenticatedAdminSearchRoute
   '/_authenticated/admin_/system-health': typeof AuthenticatedAdminSystemHealthRoute
@@ -752,6 +771,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/campaigns_/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/_authenticated/music_/$trackId_/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username_/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
+  '/_authenticated/admin_/campaigns_/$campaignId_/analytics': typeof AuthenticatedAdminCampaignsCampaignIdAnalyticsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -821,6 +841,7 @@ export interface FileRouteTypes {
     | '/admin/offers'
     | '/admin/partner-center'
     | '/admin/play'
+    | '/admin/reports'
     | '/admin/rights'
     | '/admin/search'
     | '/admin/system-health'
@@ -835,6 +856,7 @@ export interface FileRouteTypes {
     | '/admin/campaigns/$campaignId'
     | '/music/$trackId/lyrics'
     | '/artist/$username/playlist/$slug'
+    | '/admin/campaigns/$campaignId/analytics'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -902,6 +924,7 @@ export interface FileRouteTypes {
     | '/admin/offers'
     | '/admin/partner-center'
     | '/admin/play'
+    | '/admin/reports'
     | '/admin/rights'
     | '/admin/search'
     | '/admin/system-health'
@@ -916,6 +939,7 @@ export interface FileRouteTypes {
     | '/admin/campaigns/$campaignId'
     | '/music/$trackId/lyrics'
     | '/artist/$username/playlist/$slug'
+    | '/admin/campaigns/$campaignId/analytics'
   id:
     | '__root__'
     | '/'
@@ -984,6 +1008,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/offers'
     | '/_authenticated/admin_/partner-center'
     | '/_authenticated/admin_/play'
+    | '/_authenticated/admin_/reports'
     | '/_authenticated/admin_/rights'
     | '/_authenticated/admin_/search'
     | '/_authenticated/admin_/system-health'
@@ -998,6 +1023,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/campaigns_/$campaignId'
     | '/_authenticated/music_/$trackId_/lyrics'
     | '/artist/$username_/playlist/$slug'
+    | '/_authenticated/admin_/campaigns_/$campaignId_/analytics'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1532,6 +1558,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRightsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/reports': {
+      id: '/_authenticated/admin_/reports'
+      path: '/admin/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/play': {
       id: '/_authenticated/admin_/play'
       path: '/admin/play'
@@ -1602,6 +1635,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCampaignsCampaignIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/campaigns_/$campaignId_/analytics': {
+      id: '/_authenticated/admin_/campaigns_/$campaignId_/analytics'
+      path: '/admin/campaigns/$campaignId/analytics'
+      fullPath: '/admin/campaigns/$campaignId/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminCampaignsCampaignIdAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -1634,6 +1674,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminOffersRoute: typeof AuthenticatedAdminOffersRoute
   AuthenticatedAdminPartnerCenterRoute: typeof AuthenticatedAdminPartnerCenterRoute
   AuthenticatedAdminPlayRoute: typeof AuthenticatedAdminPlayRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminRightsRoute: typeof AuthenticatedAdminRightsRoute
   AuthenticatedAdminSearchRoute: typeof AuthenticatedAdminSearchRoute
   AuthenticatedAdminSystemHealthRoute: typeof AuthenticatedAdminSystemHealthRoute
@@ -1643,6 +1684,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
   AuthenticatedAdminCampaignsCampaignIdRoute: typeof AuthenticatedAdminCampaignsCampaignIdRoute
   AuthenticatedMusicTrackIdLyricsRoute: typeof AuthenticatedMusicTrackIdLyricsRoute
+  AuthenticatedAdminCampaignsCampaignIdAnalyticsRoute: typeof AuthenticatedAdminCampaignsCampaignIdAnalyticsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1674,6 +1716,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminOffersRoute: AuthenticatedAdminOffersRoute,
   AuthenticatedAdminPartnerCenterRoute: AuthenticatedAdminPartnerCenterRoute,
   AuthenticatedAdminPlayRoute: AuthenticatedAdminPlayRoute,
+  AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminRightsRoute: AuthenticatedAdminRightsRoute,
   AuthenticatedAdminSearchRoute: AuthenticatedAdminSearchRoute,
   AuthenticatedAdminSystemHealthRoute: AuthenticatedAdminSystemHealthRoute,
@@ -1684,6 +1727,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCampaignsCampaignIdRoute:
     AuthenticatedAdminCampaignsCampaignIdRoute,
   AuthenticatedMusicTrackIdLyricsRoute: AuthenticatedMusicTrackIdLyricsRoute,
+  AuthenticatedAdminCampaignsCampaignIdAnalyticsRoute:
+    AuthenticatedAdminCampaignsCampaignIdAnalyticsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

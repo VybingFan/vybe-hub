@@ -1,6 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, BarChart3, CalendarClock, FileText, Megaphone, Tag } from "lucide-react";
+import {
+  ArrowLeft,
+  BarChart3,
+  CalendarClock,
+  FileText,
+  Megaphone,
+  ShieldCheck,
+  Tag,
+} from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Badge } from "@/components/ui/badge";
@@ -68,6 +76,11 @@ function CampaignOperationsPage() {
           <h1 className="mt-3 text-3xl font-semibold tracking-tight">{campaign.name}</h1>
           <p className="mt-2 max-w-3xl text-muted-foreground">{campaign.objective}</p>
           <div className="mt-4 flex flex-wrap gap-2">
+            <Button asChild size="sm">
+              <Link to="/admin/campaigns/$campaignId/analytics" params={{ campaignId }}>
+                <ShieldCheck className="mr-2 h-4 w-4" /> Verified analytics
+              </Link>
+            </Button>
             {[
               "submitted",
               "under_review",

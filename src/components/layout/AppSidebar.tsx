@@ -216,7 +216,12 @@ export function AppSidebar() {
                   icon: Gift,
                   allow: ["admin"],
                 },
-                { title: "Analytics & Reports", url: "/admin", icon: BarChart3, allow: ["admin"] },
+                {
+                  title: "Analytics & Reports",
+                  url: "/admin/reports",
+                  icon: BarChart3,
+                  allow: ["admin"],
+                },
                 {
                   title: "System Health",
                   url: "/admin/system-health",
