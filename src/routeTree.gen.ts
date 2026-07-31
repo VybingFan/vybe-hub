@@ -77,6 +77,7 @@ import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminRightsRouteImport } from './routes/_authenticated/admin_.rights'
 import { Route as AuthenticatedAdminPlayRouteImport } from './routes/_authenticated/admin_.play'
 import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin_.creators'
+import { Route as AuthenticatedAdminBusinessesRouteImport } from './routes/_authenticated/admin_.businesses'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 import { Route as AuthenticatedMusicTrackIdLyricsRouteImport } from './routes/_authenticated/music_.$trackId_.lyrics'
 
@@ -426,6 +427,12 @@ const AuthenticatedAdminCreatorsRoute =
     path: '/admin/creators',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminBusinessesRoute =
+  AuthenticatedAdminBusinessesRouteImport.update({
+    id: '/admin_/businesses',
+    path: '/admin/businesses',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ArtistUsernamePlaylistSlugRoute =
   ArtistUsernamePlaylistSlugRouteImport.update({
     id: '/artist/$username_/playlist/$slug',
@@ -497,6 +504,7 @@ export interface FileRoutesByFullPath {
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
@@ -568,6 +576,7 @@ export interface FileRoutesByTo {
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
@@ -641,6 +650,7 @@ export interface FileRoutesById {
   '/experience/watch': typeof ExperienceWatchRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/_authenticated/admin_/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/_authenticated/admin_/creators': typeof AuthenticatedAdminCreatorsRoute
   '/_authenticated/admin_/play': typeof AuthenticatedAdminPlayRoute
   '/_authenticated/admin_/rights': typeof AuthenticatedAdminRightsRoute
@@ -714,6 +724,7 @@ export interface FileRouteTypes {
     | '/experience/watch'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/admin/businesses'
     | '/admin/creators'
     | '/admin/play'
     | '/admin/rights'
@@ -785,6 +796,7 @@ export interface FileRouteTypes {
     | '/experience/watch'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/admin/businesses'
     | '/admin/creators'
     | '/admin/play'
     | '/admin/rights'
@@ -857,6 +869,7 @@ export interface FileRouteTypes {
     | '/experience/watch'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/_authenticated/admin_/businesses'
     | '/_authenticated/admin_/creators'
     | '/_authenticated/admin_/play'
     | '/_authenticated/admin_/rights'
@@ -1389,6 +1402,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCreatorsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/businesses': {
+      id: '/_authenticated/admin_/businesses'
+      path: '/admin/businesses'
+      fullPath: '/admin/businesses'
+      preLoaderRoute: typeof AuthenticatedAdminBusinessesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/artist/$username_/playlist/$slug': {
       id: '/artist/$username_/playlist/$slug'
       path: '/artist/$username/playlist/$slug'
@@ -1427,6 +1447,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
+  AuthenticatedAdminBusinessesRoute: typeof AuthenticatedAdminBusinessesRoute
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
   AuthenticatedAdminPlayRoute: typeof AuthenticatedAdminPlayRoute
   AuthenticatedAdminRightsRoute: typeof AuthenticatedAdminRightsRoute
@@ -1457,6 +1478,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
+  AuthenticatedAdminBusinessesRoute: AuthenticatedAdminBusinessesRoute,
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
   AuthenticatedAdminPlayRoute: AuthenticatedAdminPlayRoute,
   AuthenticatedAdminRightsRoute: AuthenticatedAdminRightsRoute,

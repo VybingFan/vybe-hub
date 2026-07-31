@@ -6,6 +6,7 @@ import {
   ArrowRight,
   Check,
   Clipboard,
+  BriefcaseBusiness,
   Copyright,
   Gamepad2,
   KeyRound,
@@ -170,6 +171,13 @@ function AdminPage() {
               description="Review live experiences, release gates, and the Play roadmap."
               to="/admin/play"
               action="Open Play board"
+            />
+            <WorkAreaCard
+              icon={BriefcaseBusiness}
+              title="Business operations"
+              description="Qualify partners, manage campaigns, verify analytics, and maintain records."
+              to="/admin/businesses"
+              action="Open business workspace"
             />
           </div>
         </section>
