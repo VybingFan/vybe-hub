@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Headphones, Loader2, Music2, Sparkles } from "lucide-react";
+import { BriefcaseBusiness, Headphones, Loader2, Music2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { SubmitButton } from "@/components/auth/SubmitButton";
@@ -12,7 +12,7 @@ import { SELECTABLE_ROLES, type SelectableRole } from "@/features/auth/roles";
 import { z } from "zod";
 
 const onboardingSearchSchema = z.object({
-  role: z.enum(["creator", "supporter"]).optional(),
+  role: z.enum(["creator", "supporter", "business"]).optional(),
 });
 
 export const Route = createFileRoute("/auth/onboarding")({
@@ -31,6 +31,11 @@ const ROLE_META: Record<SelectableRole, { title: string; body: string; icon: typ
       title: "I'm a Supporter",
       body: "Follow creators, discover new music, and support the artists you love.",
       icon: Headphones,
+    },
+    business: {
+      title: "I'm a Business",
+      body: "Apply to partner with VYBE, prepare member offers, and build campaigns in Business Studio.",
+      icon: BriefcaseBusiness,
     },
   };
 

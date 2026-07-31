@@ -85,7 +85,9 @@ export const authService = {
 
   async assignInitialRole(userId: string, role: SelectableRole) {
     if (!userId) throw new Error("Not signed in");
-    const { error } = await supabase.rpc("select_initial_role", { _role: role });
+    // Generated database types are refreshed after the business-role migration is remote.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).rpc("select_initial_role", { _role: role });
     if (error) throw error;
   },
 };

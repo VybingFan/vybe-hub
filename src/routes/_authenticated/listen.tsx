@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_authenticated/listen")({ component: List
 
 function ListenPage() {
   return (
-    <RoleGuard allow={["supporter", "creator", "admin"]}>
+    <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
       <ExperiencePreviewPage
         eyebrow="Listen on VYBE"
         title="Hear the work. Then meet the person behind it."

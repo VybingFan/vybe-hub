@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/read")({ component: ReadPa
 
 function ReadPage() {
   return (
-    <RoleGuard allow={["supporter", "creator", "admin"]}>
+    <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
       <ExperiencePreviewPage
         eyebrow="Read on VYBE · Preview"
         title="Words deserve a stage, too."

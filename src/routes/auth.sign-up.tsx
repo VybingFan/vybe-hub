@@ -12,7 +12,7 @@ import { signUpSchema } from "@/features/auth/roles";
 import { z } from "zod";
 
 const signUpSearchSchema = z.object({
-  role: z.enum(["creator", "supporter"]).optional(),
+  role: z.enum(["creator", "supporter", "business"]).optional(),
 });
 
 export const Route = createFileRoute("/auth/sign-up")({
@@ -72,11 +72,19 @@ function SignUpPage() {
 
   return (
     <AuthCard
-      title={role === "creator" ? "Create your creator account" : "Create your VYBE"}
+      title={
+        role === "creator"
+          ? "Create your creator account"
+          : role === "business"
+            ? "Create your business account"
+            : "Create your VYBE"
+      }
       description={
         role === "creator"
           ? "Begin with Creator Free and build your public creator home."
-          : "Join as a supporter or begin with the Creator Free plan."
+          : role === "business"
+            ? "Apply to partner with VYBE and prepare for Business Studio."
+            : "Join as a supporter or begin with the Creator Free plan."
       }
       footer={
         <>

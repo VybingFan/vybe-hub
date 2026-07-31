@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_authenticated/communities")({ component:
 
 function CommunitiesPage() {
   return (
-    <RoleGuard allow={["supporter", "creator", "admin"]}>
+    <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
       <ExperiencePreviewPage
         eyebrow="VYBE Communities · Preview"
         title="The relationship continues after the work is shared."

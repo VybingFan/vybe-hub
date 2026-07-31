@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_authenticated/home")({ component: HomePa
 
 function HomePage() {
   return (
-    <RoleGuard allow={["supporter", "creator", "admin"]}>
+    <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
       <ExperiencePreviewPage
         eyebrow="Your member home"
         title="Something worth returning to—every day."

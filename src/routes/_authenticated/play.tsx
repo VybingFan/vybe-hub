@@ -6,7 +6,7 @@ export const Route = createFileRoute("/_authenticated/play")({ component: PlayPa
 
 function PlayPage() {
   return (
-    <RoleGuard allow={["supporter", "creator", "admin"]}>
+    <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
       <PlayExperience isMember />
     </RoleGuard>
   );

@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-export const APP_ROLES = ["creator", "supporter", "admin"] as const;
+export const APP_ROLES = ["creator", "supporter", "business", "admin"] as const;
 export type AppRole = (typeof APP_ROLES)[number];
 
 /** Public onboarding offers Supporter and the limited Creator Free plan. */
-export const SELECTABLE_ROLES = ["creator", "supporter"] as const;
+export const SELECTABLE_ROLES = ["creator", "supporter", "business"] as const;
 export type SelectableRole = (typeof SELECTABLE_ROLES)[number];
 
 export const emailSchema = z.string().trim().email({ message: "Enter a valid email" }).max(255);
@@ -42,6 +42,7 @@ export type SignUpInput = z.infer<typeof signUpSchema>;
 export const DEFAULT_ROUTE_FOR_ROLE: Record<AppRole, string> = {
   creator: "/dashboard",
   supporter: "/discover",
+  business: "/business",
   admin: "/admin",
 };
 
@@ -50,5 +51,6 @@ export const ROUTE_ROLE_ACCESS = {
   dashboard: ["creator", "admin"],
   discover: ["supporter", "creator", "admin"],
   admin: ["admin"],
-  settings: ["creator", "supporter", "admin"],
+  settings: ["creator", "supporter", "business", "admin"],
+  business: ["business", "admin"],
 } satisfies Record<string, AppRole[]>;

@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/watch")({ component: Watch
 
 function WatchPage() {
   return (
-    <RoleGuard allow={["supporter", "creator", "admin"]}>
+    <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
       <WatchLibrary />
     </RoleGuard>
   );

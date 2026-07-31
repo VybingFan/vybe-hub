@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_authenticated/events")({ component: Even
 
 function EventsPage() {
   return (
-    <RoleGuard allow={["supporter", "creator", "admin"]}>
+    <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
       <ExperiencePreviewPage
         eyebrow="VYBE Events · Preview"
         title="Show up for the moments surrounding the work."

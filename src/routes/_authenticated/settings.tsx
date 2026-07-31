@@ -34,7 +34,7 @@ export const Route = createFileRoute("/_authenticated/settings")({ component: Se
 
 function SettingsPage() {
   return (
-    <RoleGuard allow={["creator", "supporter", "admin"]}>
+    <RoleGuard allow={["creator", "supporter", "business", "admin"]}>
       <SettingsContent />
     </RoleGuard>
   );

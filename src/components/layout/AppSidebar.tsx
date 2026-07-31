@@ -44,20 +44,55 @@ interface NavItem {
 }
 
 const exploreItems: NavItem[] = [
-  { title: "Home", url: "/home", icon: Home, allow: ["supporter", "creator", "admin"] },
-  { title: "Discover", url: "/discover", icon: Compass, allow: ["supporter", "creator", "admin"] },
-  { title: "Listen", url: "/listen", icon: Music2, allow: ["supporter", "creator", "admin"] },
-  { title: "Watch", url: "/watch", icon: Clapperboard, allow: ["supporter", "creator", "admin"] },
-  { title: "Read", url: "/read", icon: BookOpenText, allow: ["supporter", "creator", "admin"] },
-  { title: "Play", url: "/play", icon: Gamepad2, allow: ["supporter", "creator", "admin"] },
+  { title: "Home", url: "/home", icon: Home, allow: ["supporter", "creator", "business", "admin"] },
+  {
+    title: "Discover",
+    url: "/discover",
+    icon: Compass,
+    allow: ["supporter", "creator", "business", "admin"],
+  },
+  {
+    title: "Listen",
+    url: "/listen",
+    icon: Music2,
+    allow: ["supporter", "creator", "business", "admin"],
+  },
+  {
+    title: "Watch",
+    url: "/watch",
+    icon: Clapperboard,
+    allow: ["supporter", "creator", "business", "admin"],
+  },
+  {
+    title: "Read",
+    url: "/read",
+    icon: BookOpenText,
+    allow: ["supporter", "creator", "business", "admin"],
+  },
+  {
+    title: "Play",
+    url: "/play",
+    icon: Gamepad2,
+    allow: ["supporter", "creator", "business", "admin"],
+  },
   {
     title: "Communities",
     url: "/communities",
     icon: UsersRound,
-    allow: ["supporter", "creator", "admin"],
+    allow: ["supporter", "creator", "business", "admin"],
   },
-  { title: "Events", url: "/events", icon: CalendarDays, allow: ["supporter", "creator", "admin"] },
-  { title: "My VYBE", url: "/my-vybe", icon: Heart, allow: ["supporter", "creator", "admin"] },
+  {
+    title: "Events",
+    url: "/events",
+    icon: CalendarDays,
+    allow: ["supporter", "creator", "business", "admin"],
+  },
+  {
+    title: "My VYBE",
+    url: "/my-vybe",
+    icon: Heart,
+    allow: ["supporter", "creator", "business", "admin"],
+  },
 ];
 
 const creatorItems: NavItem[] = [
@@ -97,6 +132,20 @@ export function AppSidebar() {
         <NavGroup label="Explore VYBE" items={visibleExplore} isActive={isActive} />
         {visibleCreator.length > 0 && (
           <NavGroup label="Creator Studio" items={visibleCreator} isActive={isActive} />
+        )}
+        {hasAnyRole(["business", "admin"]) && (
+          <NavGroup
+            label="Business Studio"
+            items={[
+              {
+                title: "Business Dashboard",
+                url: "/business",
+                icon: BriefcaseBusiness,
+                allow: ["business", "admin"],
+              },
+            ]}
+            isActive={isActive}
+          />
         )}
         {hasAnyRole(["supporter"]) && !hasAnyRole(["creator", "admin"]) && (
           <NavGroup

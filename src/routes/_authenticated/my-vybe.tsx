@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_authenticated/my-vybe")({ component: MyV
 
 function MyVybePage() {
   return (
-    <RoleGuard allow={["supporter", "creator", "admin"]}>
+    <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
       <ExperiencePreviewPage
         eyebrow="My VYBE · Preview"
         title="Keep what moves you close."

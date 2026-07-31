@@ -18,7 +18,7 @@ const genres = [
 
 function DiscoverPage() {
   return (
-    <RoleGuard allow={["supporter", "creator", "admin"]}>
+    <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
       <div className="mx-auto max-w-7xl space-y-12">
         <header className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
