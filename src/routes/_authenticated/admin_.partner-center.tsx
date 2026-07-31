@@ -51,6 +51,13 @@ const DOCUMENT_STATUSES: PartnerDocumentRecord["status"][] = [
   "archived",
 ];
 
+const PACKAGE_OPTIONS = [
+  ["", "No package · Prospect"],
+  ["founding_preview", "Founding Business Preview · Free / 60 days"],
+  ["founding_partner", "Founding Business Partner · $499 / year"],
+  ["custom_campaign", "Custom Campaign or Sponsorship"],
+] as const;
+
 function PartnerCenterRoute() {
   return (
     <RoleGuard allow={["admin"]}>
@@ -64,6 +71,9 @@ function PartnerCenter() {
   const [campaigns, setCampaigns] = useState<CampaignRecord[]>([]);
   const [documents, setDocuments] = useState<PartnerDocumentRecord[]>([]);
   const [selectedBusinessId, setSelectedBusinessId] = useState("");
+  const [selectedPackage, setSelectedPackage] = useState<
+    "" | "founding_preview" | "founding_partner" | "custom_campaign"
+  >("");
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -83,6 +93,14 @@ function PartnerCenter() {
   }, []);
 
   useEffect(() => void load(), [load]);
+
+  useEffect(() => {
+    const business = businesses.find((item) => item.id === selectedBusinessId);
+    setSelectedPackage(
+      (business?.package_code as
+        "" | "founding_preview" | "founding_partner" | "custom_campaign") || "",
+    );
+  }, [businesses, selectedBusinessId]);
 
   const selectedBusiness = businesses.find((item) => item.id === selectedBusinessId);
   const selectedDocuments = useMemo(
@@ -145,6 +163,20 @@ function PartnerCenter() {
     }
   }
 
+  async function assignPackage() {
+    if (!selectedBusiness) return;
+    setSaving(true);
+    try {
+      await businessAdminService.assignBusinessPackage(selectedBusiness, selectedPackage);
+      toast.success(selectedPackage ? "Business package assigned" : "Business package removed");
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not update business package");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       <header>
@@ -186,7 +218,9 @@ function PartnerCenter() {
             id="partner-business"
             className="mt-2 h-10 w-full rounded-md border bg-background px-3 text-sm"
             value={selectedBusinessId}
-            onChange={(event) => setSelectedBusinessId(event.target.value)}
+            onChange={(event) => {
+              setSelectedBusinessId(event.target.value);
+            }}
           >
             {businesses.map((business) => (
               <option key={business.id} value={business.id}>
@@ -195,14 +229,48 @@ function PartnerCenter() {
             ))}
           </select>
           {selectedBusiness ? (
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Badge>{selectedBusiness.verification_status}</Badge>
-              <Badge variant="secondary">{selectedBusiness.partner_status}</Badge>
-              <Badge variant="outline">{selectedBusiness.package_code || "No package"}</Badge>
-              {selectedBusiness.package_ends_at ? (
-                <Badge variant="outline">
-                  Ends {new Date(selectedBusiness.package_ends_at).toLocaleDateString()}
-                </Badge>
+            <div className="mt-4 space-y-4">
+              <div className="flex flex-wrap gap-2">
+                <Badge>{selectedBusiness.verification_status}</Badge>
+                <Badge variant="secondary">{selectedBusiness.partner_status}</Badge>
+                <Badge variant="outline">{selectedBusiness.package_code || "No package"}</Badge>
+                {selectedBusiness.package_ends_at ? (
+                  <Badge variant="outline">
+                    Ends {new Date(selectedBusiness.package_ends_at).toLocaleDateString()}
+                  </Badge>
+                ) : null}
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <select
+                  aria-label="Partner package"
+                  className="h-10 flex-1 rounded-md border bg-background px-3 text-sm"
+                  value={selectedPackage}
+                  onChange={(event) =>
+                    setSelectedPackage(
+                      event.target.value as
+                        "" | "founding_preview" | "founding_partner" | "custom_campaign",
+                    )
+                  }
+                >
+                  {PACKAGE_OPTIONS.map(([value, label]) => (
+                    <option key={value || "none"} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={saving || selectedBusiness.verification_status !== "verified"}
+                  onClick={() => void assignPackage()}
+                >
+                  Apply package
+                </Button>
+              </div>
+              {selectedBusiness.verification_status !== "verified" ? (
+                <p className="text-xs text-amber-600">
+                  Verify this business before assigning a package.
+                </p>
               ) : null}
             </div>
           ) : null}
@@ -384,6 +452,11 @@ function PartnerCenter() {
                 {document.status === "received" ? (
                   <Button size="sm" onClick={() => void updateStatus(document, "approved")}>
                     Approve
+                  </Button>
+                ) : null}
+                {document.status === "requested" ? (
+                  <Button size="sm" onClick={() => void updateStatus(document, "received")}>
+                    Mark received
                   </Button>
                 ) : null}
                 {document.status === "approved" ? (

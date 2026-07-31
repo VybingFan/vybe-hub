@@ -292,6 +292,55 @@ export const businessAdminService = {
       .in("status", ["unread", "read"]);
   },
 
+  async assignBusinessPackage(
+    business: BusinessRecord,
+    packageCode: "founding_preview" | "founding_partner" | "custom_campaign" | "",
+  ): Promise<void> {
+    if (business.verification_status !== "verified") {
+      throw new Error("Verify the business before assigning a partner package.");
+    }
+    const now = new Date();
+    const durationDays =
+      packageCode === "founding_preview" ? 60 : packageCode === "founding_partner" ? 365 : null;
+    const packageEndsAt = durationDays
+      ? new Date(now.getTime() + durationDays * 86_400_000).toISOString()
+      : null;
+    const partnerStatus =
+      packageCode === "founding_preview"
+        ? "preview"
+        : packageCode === "founding_partner"
+          ? "annual"
+          : packageCode === "custom_campaign"
+            ? "custom"
+            : "prospect";
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = supabase as any;
+    const { error } = await client
+      .from("business_profiles")
+      .update({
+        package_code: packageCode || null,
+        partner_status: partnerStatus,
+        package_started_at: packageCode ? now.toISOString() : null,
+        package_ends_at: packageEndsAt,
+        founding_partner: packageCode === "founding_partner",
+        updated_at: now.toISOString(),
+      })
+      .eq("id", business.id);
+    if (error) throw error;
+    await client.from("business_audit_log").insert({
+      business_id: business.id,
+      action: packageCode ? "business_package_assigned" : "business_package_removed",
+      entity_type: "business_profile",
+      entity_id: business.id,
+      details: {
+        previous_package_code: business.package_code,
+        package_code: packageCode || null,
+        partner_status: partnerStatus,
+        package_ends_at: packageEndsAt,
+      },
+    });
+  },
+
   async createCampaign(input: NewCampaign): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: business, error: businessError } = await (supabase as any)
