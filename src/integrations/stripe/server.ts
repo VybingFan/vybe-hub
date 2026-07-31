@@ -10,7 +10,10 @@ export type StripePriceSelection = {
   priceId: string;
 };
 
-type EntitlementUpdate = Database["public"]["Tables"]["account_entitlements"]["Update"];
+type EntitlementUpdate = Omit<
+  Database["public"]["Tables"]["account_entitlements"]["Insert"],
+  "user_id"
+>;
 
 let stripeClient: Stripe | undefined;
 

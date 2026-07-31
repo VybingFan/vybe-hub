@@ -88,7 +88,7 @@ export const adminService = {
   async getSummary(): Promise<BackOfficeSummary> {
     // Generated Supabase types are refreshed after this migration reaches the remote project.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).rpc("get_admin_back_office_summary");
+    const { data, error } = await supabase.rpc("get_admin_back_office_summary");
     if (error) throw error;
     return data as BackOfficeSummary;
   },
@@ -96,8 +96,8 @@ export const adminService = {
   async listCreators(searchText = ""): Promise<AdminCreatorRecord[]> {
     // Generated Supabase types are refreshed after this migration reaches the remote project.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).rpc("get_admin_creator_directory", {
-      search_text: searchText || null,
+    const { data, error } = await supabase.rpc("get_admin_creator_directory", {
+      search_text: searchText || undefined,
       result_limit: 100,
     });
     if (error) throw error;
@@ -106,7 +106,7 @@ export const adminService = {
 
   async listMemberships(): Promise<AdminMembershipRecord[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("account_entitlements")
       .select(
         "user_id,plan_code,status,billing_interval,stripe_subscription_status,current_period_end,cancel_at_period_end",
@@ -118,7 +118,7 @@ export const adminService = {
 
   async listBusinessPackages(): Promise<BusinessPackageRecord[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_packages")
       .select(
         "code,name,price_cents,billing_interval,duration_days,active_campaign_limit,is_public",
@@ -130,7 +130,7 @@ export const adminService = {
 
   async listBusinessOffers(): Promise<BusinessOfferRecord[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_offers")
       .select(
         "id,title,description,offer_code,status,starts_at,ends_at,max_redemptions,business_profiles(public_name)",
@@ -144,13 +144,13 @@ export const adminService = {
     const [{ data: jobs, error: jobsError }, { count, error: notificationError }] =
       await Promise.all([
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (supabase as any)
+        supabase
           .from("audio_processing_jobs")
           .select("status,completed_at,processor_version")
           .order("updated_at", { ascending: false })
           .limit(500),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (supabase as any)
+        supabase
           .from("admin_notifications")
           .select("id", { count: "exact", head: true })
           .eq("status", "unread"),

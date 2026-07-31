@@ -23,7 +23,7 @@ export const businessStudioService = {
     if (!auth.user) throw new Error("Sign in required");
     // Types are regenerated after the migration reaches the remote project.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_profiles")
       .select(
         "id,public_name,slug,category,description,website_url,contact_name,contact_email,service_area,target_audience,verification_status,partner_status,package_code,package_ends_at",
@@ -48,7 +48,7 @@ export const businessStudioService = {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) throw new Error("Sign in required");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).from("business_profiles").insert({
+    const { error } = await supabase.from("business_profiles").insert({
       owner_user_id: auth.user.id,
       created_by: auth.user.id,
       public_name: input.publicName.trim(),
@@ -68,7 +68,7 @@ export const businessStudioService = {
 
   async listCampaigns(businessId: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_campaigns")
       .select("id,name,objective,status,starts_at,ends_at,created_at")
       .eq("business_id", businessId)

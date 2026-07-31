@@ -27,14 +27,14 @@ export const adminNotificationService = {
   async summary(): Promise<WorkQueueSummary> {
     // Generated types refresh after the migration reaches the remote project.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).rpc("get_admin_work_queue_summary");
+    const { data, error } = await supabase.rpc("get_admin_work_queue_summary");
     if (error) throw error;
     return data as WorkQueueSummary;
   },
 
   async list(): Promise<AdminNotification[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("admin_notifications")
       .select(
         "id,category,priority,title,message,entity_type,entity_id,action_path,status,created_at",
@@ -48,7 +48,7 @@ export const adminNotificationService = {
 
   async markRead(id: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("admin_notifications")
       .update({ status: "read", read_at: new Date().toISOString() })
       .eq("id", id)
@@ -58,7 +58,7 @@ export const adminNotificationService = {
 
   async resolve(id: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("admin_notifications")
       .update({ status: "resolved", resolved_at: new Date().toISOString() })
       .eq("id", id);

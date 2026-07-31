@@ -83,7 +83,7 @@ function RightsReviewPage() {
     setLoading(true);
     // Generated Supabase types are updated after migrations reach the remote project.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const database = supabase as any;
+    const database = supabase;
     const [reportResult, jobResult, caseResult] = await Promise.all([
       database
         .from("copyright_reports")

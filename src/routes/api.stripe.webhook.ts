@@ -152,6 +152,7 @@ async function syncSubscription(subscription: Stripe.Subscription, eventCreated:
 
   const { error } = await supabaseAdmin.from("account_entitlements").upsert({
     user_id: userId,
+    plan_code: selection.planCode,
     billing_provider: "stripe",
     billing_customer_ref: customerRef,
     billing_subscription_ref: subscription.id,

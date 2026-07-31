@@ -71,7 +71,7 @@ export const businessPilotService = {
   async dashboard(): Promise<PilotDashboard> {
     // Generated database types are refreshed after the migration reaches Supabase.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).rpc("get_business_pilot_dashboard");
+    const { data, error } = await supabase.rpc("get_business_pilot_dashboard");
     if (error) throw error;
     return data as PilotDashboard;
   },
@@ -80,7 +80,7 @@ export const businessPilotService = {
     const { data: authData, error: authError } = await supabase.auth.getUser();
     if (authError) throw authError;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("business_pilot_records")
       .insert({ business_id: businessId, assigned_to: authData.user.id });
     if (error) throw error;
@@ -113,7 +113,7 @@ export const businessPilotService = {
   ): Promise<void> {
     const completedAt = patch.stage === "completed" ? new Date().toISOString() : undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("business_pilot_records")
       .update({
         ...patch,
@@ -126,7 +126,7 @@ export const businessPilotService = {
 
   async activities(pilotId: string): Promise<PilotActivity[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_pilot_activities")
       .select("id,pilot_id,activity_type,summary,occurred_at,next_action,follow_up_at,created_at")
       .eq("pilot_id", pilotId)
@@ -144,7 +144,7 @@ export const businessPilotService = {
     followUpAt?: string;
   }): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client = supabase as any;
+    const client = supabase;
     const followUpAt = input.followUpAt ? new Date(input.followUpAt).toISOString() : null;
     const { error } = await client.from("business_pilot_activities").insert({
       pilot_id: input.pilotId,

@@ -175,14 +175,14 @@ export const businessAdminService = {
   async getSummary(): Promise<BusinessSummary> {
     // Types are regenerated after this migration reaches the remote project.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).rpc("get_admin_business_summary");
+    const { data, error } = await supabase.rpc("get_admin_business_summary");
     if (error) throw error;
     return data as BusinessSummary;
   },
 
   async listBusinesses(): Promise<BusinessRecord[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_profiles")
       .select(
         "id,public_name,slug,category,contact_name,contact_email,website_url,verification_status,partner_status,package_code,founding_partner,package_ends_at,created_at",
@@ -194,7 +194,7 @@ export const businessAdminService = {
 
   async listCampaigns(): Promise<CampaignRecord[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_campaigns")
       .select(
         "id,business_id,name,objective,status,starts_at,ends_at,created_at,conversion_tracking_status,business_profiles(public_name)",
@@ -206,7 +206,7 @@ export const businessAdminService = {
 
   async listPartnerDocuments(): Promise<PartnerDocumentRecord[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_partner_documents")
       .select(
         "id,business_id,campaign_id,document_type,title,storage_path,external_url,version_label,visibility,status,effective_at,expires_at,created_at,updated_at,business_profiles(public_name),business_campaigns(name)",
@@ -229,7 +229,7 @@ export const businessAdminService = {
     expiresAt?: string;
   }): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client = supabase as any;
+    const client = supabase;
     const { data, error } = await client
       .from("business_partner_documents")
       .insert({
@@ -267,7 +267,7 @@ export const businessAdminService = {
     >,
   ): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client = supabase as any;
+    const client = supabase;
     const { error } = await client
       .from("business_partner_documents")
       .update({ ...patch, updated_at: new Date().toISOString() })
@@ -300,7 +300,7 @@ export const businessAdminService = {
           : "custom";
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_profiles")
       .insert({
         public_name: input.publicName.trim(),
@@ -320,7 +320,7 @@ export const businessAdminService = {
     if (error) throw error;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from("business_audit_log").insert({
+    await supabase.from("business_audit_log").insert({
       business_id: data.id,
       action: "business_created",
       entity_type: "business_profile",
@@ -331,14 +331,14 @@ export const businessAdminService = {
 
   async verifyBusiness(businessId: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("business_profiles")
       .update({ verification_status: "verified", updated_at: new Date().toISOString() })
       .eq("id", businessId);
     if (error) throw error;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from("business_audit_log").insert({
+    await supabase.from("business_audit_log").insert({
       business_id: businessId,
       action: "business_verified",
       entity_type: "business_profile",
@@ -347,7 +347,7 @@ export const businessAdminService = {
 
     // Resolve the application alert after the administrator verifies the business.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
+    await supabase
       .from("admin_notifications")
       .update({
         status: "resolved",
@@ -380,7 +380,7 @@ export const businessAdminService = {
             ? "custom"
             : "prospect";
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client = supabase as any;
+    const client = supabase;
     const { error } = await client
       .from("business_profiles")
       .update({
@@ -409,7 +409,7 @@ export const businessAdminService = {
 
   async createCampaign(input: NewCampaign): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: business, error: businessError } = await (supabase as any)
+    const { data: business, error: businessError } = await supabase
       .from("business_profiles")
       .select("package_code")
       .eq("id", input.businessId)
@@ -417,7 +417,7 @@ export const businessAdminService = {
     if (businessError) throw businessError;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_campaigns")
       .insert({
         business_id: input.businessId,
@@ -430,7 +430,7 @@ export const businessAdminService = {
     if (error) throw error;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from("business_audit_log").insert({
+    await supabase.from("business_audit_log").insert({
       business_id: input.businessId,
       campaign_id: data.id,
       action: "campaign_created",
@@ -441,7 +441,7 @@ export const businessAdminService = {
 
   async getCampaignWorkspace(campaignId: string): Promise<CampaignWorkspace> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client = supabase as any;
+    const client = supabase;
     const [
       campaignResult,
       offersResult,
@@ -502,6 +502,9 @@ export const businessAdminService = {
     ]) {
       if (result.error) throw result.error;
     }
+    if (!campaignResult.data) {
+      throw new Error("Campaign workspace was not found.");
+    }
     const events = (eventsResult.data ?? []).reduce(
       (totals: Record<string, number>, event: { event_type: string }) => {
         totals[event.event_type] = (totals[event.event_type] ?? 0) + 1;
@@ -521,7 +524,7 @@ export const businessAdminService = {
 
   async setCampaignStatus(campaignId: string, status: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("business_campaigns")
       .update({
         status,
@@ -538,7 +541,7 @@ export const businessAdminService = {
     rangeEnd: string,
   ): Promise<CampaignAnalytics> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).rpc("get_admin_campaign_analytics", {
+    const { data, error } = await supabase.rpc("get_admin_campaign_analytics", {
       requested_campaign_id: campaignId,
       requested_start: rangeStart,
       requested_end: rangeEnd,
@@ -549,7 +552,7 @@ export const businessAdminService = {
 
   async listCampaignEvents(campaignId: string): Promise<CampaignEventRecord[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_campaign_events")
       .select(
         "id,event_type,session_id,referrer_path,device_category,is_internal,is_valid,invalid_reason,occurred_at",
@@ -563,7 +566,7 @@ export const businessAdminService = {
 
   async setEventValidity(eventId: number, isValid: boolean, invalidReason?: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client = supabase as any;
+    const client = supabase;
     const { data: event, error: eventError } = await client
       .from("business_campaign_events")
       .select("campaign_id,business_id,is_valid,invalid_reason")
@@ -598,7 +601,7 @@ export const businessAdminService = {
     status: "not_connected" | "testing" | "connected",
   ): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client = supabase as any;
+    const client = supabase;
     const { data: campaign, error: campaignError } = await client
       .from("business_campaigns")
       .select("business_id,conversion_tracking_status")
@@ -625,7 +628,7 @@ export const businessAdminService = {
 
   async listCampaignReports(campaignId: string): Promise<CampaignReportRecord[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_campaign_reports")
       .select("id,range_start,range_end,metrics,methodology,status,released_at,created_at")
       .eq("campaign_id", campaignId)
@@ -636,7 +639,7 @@ export const businessAdminService = {
 
   async listAllCampaignReports(): Promise<AdminCampaignReportRecord[]> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("business_campaign_reports")
       .select(
         "id,campaign_id,range_start,range_end,metrics,methodology,status,released_at,created_at,business_campaigns(name,business_profiles(public_name))",
@@ -648,7 +651,7 @@ export const businessAdminService = {
 
   async releaseCampaignReport(analytics: CampaignAnalytics): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client = supabase as any;
+    const client = supabase;
     const releasedAt = new Date().toISOString();
     const { data, error } = await client
       .from("business_campaign_reports")
@@ -687,7 +690,7 @@ export const businessAdminService = {
 
   async approveCreative(creativeId: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("business_campaign_creatives")
       .update({ status: "approved", approved_at: new Date().toISOString() })
       .eq("id", creativeId);
@@ -696,7 +699,7 @@ export const businessAdminService = {
 
   async approveOffer(offerId: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("business_offers")
       .update({ status: "approved", approved_at: new Date().toISOString() })
       .eq("id", offerId);
@@ -705,7 +708,7 @@ export const businessAdminService = {
 
   async approvePlacement(placementId: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("business_campaign_placements")
       .update({ status: "approved", approved_at: new Date().toISOString() })
       .eq("id", placementId);
@@ -720,7 +723,7 @@ export const businessAdminService = {
     offerCode?: string;
   }): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const client = supabase as any;
+    const client = supabase;
     const { data, error } = await client
       .from("business_offers")
       .insert({
@@ -749,7 +752,7 @@ export const businessAdminService = {
     destinationUrl?: string;
   }): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).from("business_campaign_creatives").insert({
+    const { error } = await supabase.from("business_campaign_creatives").insert({
       campaign_id: input.campaignId,
       format: input.format,
       headline: input.headline.trim(),
@@ -769,7 +772,7 @@ export const businessAdminService = {
     externalUrl?: string;
   }): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).from("business_partner_documents").insert({
+    const { error } = await supabase.from("business_partner_documents").insert({
       campaign_id: input.campaignId,
       business_id: input.businessId,
       document_type: input.documentType,
@@ -789,7 +792,7 @@ export const businessAdminService = {
     endsAt: string;
   }): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).from("business_campaign_placements").insert({
+    const { error } = await supabase.from("business_campaign_placements").insert({
       campaign_id: input.campaignId,
       creative_id: input.creativeId,
       surface: input.surface,
