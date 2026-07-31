@@ -27,6 +27,7 @@ import {
   CreditCard,
   Gift,
   Activity,
+  FolderKanban,
 } from "lucide-react";
 import {
   Sidebar,
@@ -176,6 +177,12 @@ export function AppSidebar() {
                   title: "Business Operations",
                   url: "/admin/businesses",
                   icon: BriefcaseBusiness,
+                  allow: ["admin"],
+                },
+                {
+                  title: "Partner Center",
+                  url: "/admin/partner-center",
+                  icon: FolderKanban,
                   allow: ["admin"],
                 },
                 {

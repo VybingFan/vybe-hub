@@ -70,6 +70,25 @@ export type CampaignWorkspace = {
   events: Record<string, number>;
 };
 
+export type PartnerDocumentRecord = {
+  id: string;
+  business_id: string;
+  campaign_id: string | null;
+  document_type: string;
+  title: string;
+  storage_path: string | null;
+  external_url: string | null;
+  version_label: string | null;
+  visibility: "internal" | "partner";
+  status: "draft" | "requested" | "received" | "approved" | "signed" | "expired" | "archived";
+  effective_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+  updated_at: string;
+  business_profiles: { public_name: string } | null;
+  business_campaigns: { name: string } | null;
+};
+
 type NewBusiness = {
   publicName: string;
   slug: string;
@@ -117,6 +136,85 @@ export const businessAdminService = {
       .order("created_at", { ascending: false });
     if (error) throw error;
     return (data ?? []) as CampaignRecord[];
+  },
+
+  async listPartnerDocuments(): Promise<PartnerDocumentRecord[]> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from("business_partner_documents")
+      .select(
+        "id,business_id,campaign_id,document_type,title,storage_path,external_url,version_label,visibility,status,effective_at,expires_at,created_at,updated_at,business_profiles(public_name),business_campaigns(name)",
+      )
+      .order("updated_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as PartnerDocumentRecord[];
+  },
+
+  async createPartnerDocument(input: {
+    businessId: string;
+    campaignId?: string;
+    documentType: string;
+    title: string;
+    externalUrl?: string;
+    versionLabel?: string;
+    visibility: "internal" | "partner";
+    status: PartnerDocumentRecord["status"];
+    effectiveAt?: string;
+    expiresAt?: string;
+  }): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = supabase as any;
+    const { data, error } = await client
+      .from("business_partner_documents")
+      .insert({
+        business_id: input.businessId,
+        campaign_id: input.campaignId || null,
+        document_type: input.documentType,
+        title: input.title.trim(),
+        external_url: input.externalUrl?.trim() || null,
+        version_label: input.versionLabel?.trim() || null,
+        visibility: input.visibility,
+        status: input.status,
+        effective_at: input.effectiveAt ? new Date(input.effectiveAt).toISOString() : null,
+        expires_at: input.expiresAt ? new Date(input.expiresAt).toISOString() : null,
+      })
+      .select("id")
+      .single();
+    if (error) throw error;
+    await client.from("business_audit_log").insert({
+      business_id: input.businessId,
+      campaign_id: input.campaignId || null,
+      action: "partner_document_created",
+      entity_type: "business_partner_document",
+      entity_id: data.id,
+      details: { document_type: input.documentType, status: input.status },
+    });
+  },
+
+  async updatePartnerDocument(
+    document: PartnerDocumentRecord,
+    patch: Partial<
+      Pick<
+        PartnerDocumentRecord,
+        "status" | "visibility" | "external_url" | "version_label" | "expires_at"
+      >
+    >,
+  ): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = supabase as any;
+    const { error } = await client
+      .from("business_partner_documents")
+      .update({ ...patch, updated_at: new Date().toISOString() })
+      .eq("id", document.id);
+    if (error) throw error;
+    await client.from("business_audit_log").insert({
+      business_id: document.business_id,
+      campaign_id: document.campaign_id,
+      action: "partner_document_updated",
+      entity_type: "business_partner_document",
+      entity_id: document.id,
+      details: patch,
+    });
   },
 
   async createBusiness(input: NewBusiness): Promise<void> {

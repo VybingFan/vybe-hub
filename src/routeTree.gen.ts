@@ -80,6 +80,7 @@ import { Route as AuthenticatedAdminSystemHealthRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminSearchRouteImport } from './routes/_authenticated/admin_.search'
 import { Route as AuthenticatedAdminRightsRouteImport } from './routes/_authenticated/admin_.rights'
 import { Route as AuthenticatedAdminPlayRouteImport } from './routes/_authenticated/admin_.play'
+import { Route as AuthenticatedAdminPartnerCenterRouteImport } from './routes/_authenticated/admin_.partner-center'
 import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenticated/admin_.offers'
 import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_authenticated/admin_.memberships'
 import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin_.creators'
@@ -452,6 +453,12 @@ const AuthenticatedAdminPlayRoute = AuthenticatedAdminPlayRouteImport.update({
   path: '/admin/play',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminPartnerCenterRoute =
+  AuthenticatedAdminPartnerCenterRouteImport.update({
+    id: '/admin_/partner-center',
+    path: '/admin/partner-center',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminOffersRoute =
   AuthenticatedAdminOffersRouteImport.update({
     id: '/admin_/offers',
@@ -565,6 +572,7 @@ export interface FileRoutesByFullPath {
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
+  '/admin/partner-center': typeof AuthenticatedAdminPartnerCenterRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
   '/admin/search': typeof AuthenticatedAdminSearchRoute
@@ -645,6 +653,7 @@ export interface FileRoutesByTo {
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
+  '/admin/partner-center': typeof AuthenticatedAdminPartnerCenterRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
   '/admin/search': typeof AuthenticatedAdminSearchRoute
@@ -727,6 +736,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/creators': typeof AuthenticatedAdminCreatorsRoute
   '/_authenticated/admin_/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/_authenticated/admin_/offers': typeof AuthenticatedAdminOffersRoute
+  '/_authenticated/admin_/partner-center': typeof AuthenticatedAdminPartnerCenterRoute
   '/_authenticated/admin_/play': typeof AuthenticatedAdminPlayRoute
   '/_authenticated/admin_/rights': typeof AuthenticatedAdminRightsRoute
   '/_authenticated/admin_/search': typeof AuthenticatedAdminSearchRoute
@@ -809,6 +819,7 @@ export interface FileRouteTypes {
     | '/admin/creators'
     | '/admin/memberships'
     | '/admin/offers'
+    | '/admin/partner-center'
     | '/admin/play'
     | '/admin/rights'
     | '/admin/search'
@@ -889,6 +900,7 @@ export interface FileRouteTypes {
     | '/admin/creators'
     | '/admin/memberships'
     | '/admin/offers'
+    | '/admin/partner-center'
     | '/admin/play'
     | '/admin/rights'
     | '/admin/search'
@@ -970,6 +982,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/creators'
     | '/_authenticated/admin_/memberships'
     | '/_authenticated/admin_/offers'
+    | '/_authenticated/admin_/partner-center'
     | '/_authenticated/admin_/play'
     | '/_authenticated/admin_/rights'
     | '/_authenticated/admin_/search'
@@ -1526,6 +1539,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminPlayRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/partner-center': {
+      id: '/_authenticated/admin_/partner-center'
+      path: '/admin/partner-center'
+      fullPath: '/admin/partner-center'
+      preLoaderRoute: typeof AuthenticatedAdminPartnerCenterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/offers': {
       id: '/_authenticated/admin_/offers'
       path: '/admin/offers'
@@ -1612,6 +1632,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
   AuthenticatedAdminMembershipsRoute: typeof AuthenticatedAdminMembershipsRoute
   AuthenticatedAdminOffersRoute: typeof AuthenticatedAdminOffersRoute
+  AuthenticatedAdminPartnerCenterRoute: typeof AuthenticatedAdminPartnerCenterRoute
   AuthenticatedAdminPlayRoute: typeof AuthenticatedAdminPlayRoute
   AuthenticatedAdminRightsRoute: typeof AuthenticatedAdminRightsRoute
   AuthenticatedAdminSearchRoute: typeof AuthenticatedAdminSearchRoute
@@ -1651,6 +1672,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
   AuthenticatedAdminMembershipsRoute: AuthenticatedAdminMembershipsRoute,
   AuthenticatedAdminOffersRoute: AuthenticatedAdminOffersRoute,
+  AuthenticatedAdminPartnerCenterRoute: AuthenticatedAdminPartnerCenterRoute,
   AuthenticatedAdminPlayRoute: AuthenticatedAdminPlayRoute,
   AuthenticatedAdminRightsRoute: AuthenticatedAdminRightsRoute,
   AuthenticatedAdminSearchRoute: AuthenticatedAdminSearchRoute,
