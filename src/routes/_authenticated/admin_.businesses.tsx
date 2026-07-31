@@ -336,8 +336,10 @@ function BusinessOperationsPage() {
             ) : (
               <div className="space-y-3">
                 {campaigns.map((campaign) => (
-                  <div
+                  <Link
                     key={campaign.id}
+                    to="/admin/campaigns/$campaignId"
+                    params={{ campaignId: campaign.id }}
                     className="flex flex-col justify-between gap-3 rounded-2xl border p-4 sm:flex-row"
                   >
                     <div>
@@ -350,7 +352,7 @@ function BusinessOperationsPage() {
                     <Badge className="h-fit w-fit" variant="outline">
                       {campaign.status.replaceAll("_", " ")}
                     </Badge>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

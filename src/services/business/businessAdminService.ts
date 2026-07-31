@@ -51,6 +51,25 @@ export type CampaignRecord = {
   business_profiles: { public_name: string } | null;
 };
 
+export type CampaignWorkspace = {
+  campaign: CampaignRecord & {
+    disclosure_text: string;
+    business_profiles: { public_name: string; verification_status: string } | null;
+  };
+  offers: Array<{ id: string; title: string; status: string; offer_code: string | null }>;
+  creatives: Array<{ id: string; headline: string; format: string; status: string }>;
+  placements: Array<{
+    id: string;
+    surface: string;
+    slot_key: string;
+    starts_at: string;
+    ends_at: string;
+    status: string;
+  }>;
+  documents: Array<{ id: string; title: string; document_type: string; status: string }>;
+  events: Record<string, number>;
+};
+
 type NewBusiness = {
   publicName: string;
   slug: string;
@@ -193,5 +212,214 @@ export const businessAdminService = {
       entity_type: "business_campaign",
       entity_id: data.id,
     });
+  },
+
+  async getCampaignWorkspace(campaignId: string): Promise<CampaignWorkspace> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = supabase as any;
+    const [
+      campaignResult,
+      offersResult,
+      creativesResult,
+      placementsResult,
+      documentsResult,
+      eventsResult,
+    ] = await Promise.all([
+      client
+        .from("business_campaigns")
+        .select(
+          "id,business_id,name,objective,status,starts_at,ends_at,created_at,disclosure_text,business_profiles(public_name,verification_status)",
+        )
+        .eq("id", campaignId)
+        .single(),
+      client
+        .from("business_offers")
+        .select("id,title,status,offer_code")
+        .eq(
+          "business_id",
+          (
+            await client
+              .from("business_campaigns")
+              .select("business_id")
+              .eq("id", campaignId)
+              .single()
+          ).data?.business_id ?? "",
+        ),
+      client
+        .from("business_campaign_creatives")
+        .select("id,headline,format,status")
+        .eq("campaign_id", campaignId)
+        .order("created_at"),
+      client
+        .from("business_campaign_placements")
+        .select("id,surface,slot_key,starts_at,ends_at,status")
+        .eq("campaign_id", campaignId)
+        .order("starts_at"),
+      client
+        .from("business_partner_documents")
+        .select("id,title,document_type,status")
+        .eq("campaign_id", campaignId)
+        .order("created_at"),
+      client
+        .from("business_campaign_events")
+        .select("event_type")
+        .eq("campaign_id", campaignId)
+        .eq("is_valid", true)
+        .eq("is_internal", false),
+    ]);
+    for (const result of [
+      campaignResult,
+      offersResult,
+      creativesResult,
+      placementsResult,
+      documentsResult,
+      eventsResult,
+    ]) {
+      if (result.error) throw result.error;
+    }
+    const events = (eventsResult.data ?? []).reduce(
+      (totals: Record<string, number>, event: { event_type: string }) => {
+        totals[event.event_type] = (totals[event.event_type] ?? 0) + 1;
+        return totals;
+      },
+      {},
+    );
+    return {
+      campaign: campaignResult.data,
+      offers: offersResult.data ?? [],
+      creatives: creativesResult.data ?? [],
+      placements: placementsResult.data ?? [],
+      documents: documentsResult.data ?? [],
+      events,
+    };
+  },
+
+  async setCampaignStatus(campaignId: string, status: string): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
+      .from("business_campaigns")
+      .update({
+        status,
+        approved_at: status === "approved" ? new Date().toISOString() : undefined,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", campaignId);
+    if (error) throw error;
+  },
+
+  async approveCreative(creativeId: string): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
+      .from("business_campaign_creatives")
+      .update({ status: "approved", approved_at: new Date().toISOString() })
+      .eq("id", creativeId);
+    if (error) throw error;
+  },
+
+  async approveOffer(offerId: string): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
+      .from("business_offers")
+      .update({ status: "approved", approved_at: new Date().toISOString() })
+      .eq("id", offerId);
+    if (error) throw error;
+  },
+
+  async approvePlacement(placementId: string): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
+      .from("business_campaign_placements")
+      .update({ status: "approved", approved_at: new Date().toISOString() })
+      .eq("id", placementId);
+    if (error) throw error;
+  },
+
+  async createOffer(input: {
+    campaignId: string;
+    businessId: string;
+    title: string;
+    description: string;
+    offerCode?: string;
+  }): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = supabase as any;
+    const { data, error } = await client
+      .from("business_offers")
+      .insert({
+        business_id: input.businessId,
+        title: input.title.trim(),
+        description: input.description.trim(),
+        offer_code: input.offerCode?.trim() || null,
+        status: "draft",
+      })
+      .select("id")
+      .single();
+    if (error) throw error;
+    const { error: linkError } = await client
+      .from("business_campaigns")
+      .update({ offer_id: data.id, updated_at: new Date().toISOString() })
+      .eq("id", input.campaignId);
+    if (linkError) throw linkError;
+  },
+
+  async createCreative(input: {
+    campaignId: string;
+    format: string;
+    headline: string;
+    body: string;
+    callToAction?: string;
+    destinationUrl?: string;
+  }): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("business_campaign_creatives").insert({
+      campaign_id: input.campaignId,
+      format: input.format,
+      headline: input.headline.trim(),
+      body: input.body.trim(),
+      call_to_action: input.callToAction?.trim() || null,
+      destination_url: input.destinationUrl?.trim() || null,
+      status: "draft",
+    });
+    if (error) throw error;
+  },
+
+  async createDocument(input: {
+    campaignId: string;
+    businessId: string;
+    documentType: string;
+    title: string;
+    externalUrl?: string;
+  }): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("business_partner_documents").insert({
+      campaign_id: input.campaignId,
+      business_id: input.businessId,
+      document_type: input.documentType,
+      title: input.title.trim(),
+      external_url: input.externalUrl?.trim() || null,
+      status: input.externalUrl ? "received" : "requested",
+    });
+    if (error) throw error;
+  },
+
+  async createPlacement(input: {
+    campaignId: string;
+    creativeId: string;
+    surface: string;
+    slotKey: string;
+    startsAt: string;
+    endsAt: string;
+  }): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("business_campaign_placements").insert({
+      campaign_id: input.campaignId,
+      creative_id: input.creativeId,
+      surface: input.surface,
+      slot_key: input.slotKey.trim(),
+      starts_at: new Date(input.startsAt).toISOString(),
+      ends_at: new Date(input.endsAt).toISOString(),
+      status: "draft",
+    });
+    if (error) throw error;
   },
 };

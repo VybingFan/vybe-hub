@@ -80,6 +80,7 @@ import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminBusinessesRouteImport } from './routes/_authenticated/admin_.businesses'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 import { Route as AuthenticatedMusicTrackIdLyricsRouteImport } from './routes/_authenticated/music_.$trackId_.lyrics'
+import { Route as AuthenticatedAdminCampaignsCampaignIdRouteImport } from './routes/_authenticated/admin_.campaigns_.$campaignId'
 
 const TrustRoute = TrustRouteImport.update({
   id: '/trust',
@@ -445,6 +446,12 @@ const AuthenticatedMusicTrackIdLyricsRoute =
     path: '/music/$trackId/lyrics',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminCampaignsCampaignIdRoute =
+  AuthenticatedAdminCampaignsCampaignIdRouteImport.update({
+    id: '/admin_/campaigns_/$campaignId',
+    path: '/admin/campaigns/$campaignId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -515,6 +522,7 @@ export interface FileRoutesByFullPath {
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
+  '/admin/campaigns/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/music/$trackId/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
@@ -587,6 +595,7 @@ export interface FileRoutesByTo {
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
+  '/admin/campaigns/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/music/$trackId/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
@@ -661,6 +670,7 @@ export interface FileRoutesById {
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
+  '/_authenticated/admin_/campaigns_/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/_authenticated/music_/$trackId_/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username_/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
 }
@@ -735,6 +745,7 @@ export interface FileRouteTypes {
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
+    | '/admin/campaigns/$campaignId'
     | '/music/$trackId/lyrics'
     | '/artist/$username/playlist/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -807,6 +818,7 @@ export interface FileRouteTypes {
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
+    | '/admin/campaigns/$campaignId'
     | '/music/$trackId/lyrics'
     | '/artist/$username/playlist/$slug'
   id:
@@ -880,6 +892,7 @@ export interface FileRouteTypes {
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
+    | '/_authenticated/admin_/campaigns_/$campaignId'
     | '/_authenticated/music_/$trackId_/lyrics'
     | '/artist/$username_/playlist/$slug'
   fileRoutesById: FileRoutesById
@@ -1423,6 +1436,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMusicTrackIdLyricsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/campaigns_/$campaignId': {
+      id: '/_authenticated/admin_/campaigns_/$campaignId'
+      path: '/admin/campaigns/$campaignId'
+      fullPath: '/admin/campaigns/$campaignId'
+      preLoaderRoute: typeof AuthenticatedAdminCampaignsCampaignIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -1454,6 +1474,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
   AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
+  AuthenticatedAdminCampaignsCampaignIdRoute: typeof AuthenticatedAdminCampaignsCampaignIdRoute
   AuthenticatedMusicTrackIdLyricsRoute: typeof AuthenticatedMusicTrackIdLyricsRoute
 }
 
@@ -1485,6 +1506,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
   AuthenticatedPlaylistsPlaylistIdRoute: AuthenticatedPlaylistsPlaylistIdRoute,
+  AuthenticatedAdminCampaignsCampaignIdRoute:
+    AuthenticatedAdminCampaignsCampaignIdRoute,
   AuthenticatedMusicTrackIdLyricsRoute: AuthenticatedMusicTrackIdLyricsRoute,
 }
 
