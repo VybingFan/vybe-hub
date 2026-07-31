@@ -142,6 +142,724 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_approvals: {
+        Row: {
+          created_at: string
+          decision: string
+          generation_id: string
+          id: string
+          policy_version: string
+          reason: string | null
+          reviewed_at: string
+          reviewer_role: Database["public"]["Enums"]["app_role"]
+          reviewer_subject: string
+          reviewer_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          decision: string
+          generation_id: string
+          id?: string
+          policy_version: string
+          reason?: string | null
+          reviewed_at?: string
+          reviewer_role?: Database["public"]["Enums"]["app_role"]
+          reviewer_subject: string
+          reviewer_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          decision?: string
+          generation_id?: string
+          id?: string
+          policy_version?: string
+          reason?: string | null
+          reviewed_at?: string
+          reviewer_role?: Database["public"]["Enums"]["app_role"]
+          reviewer_subject?: string
+          reviewer_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_approvals_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: true
+            referencedRelation: "ai_generations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_generations: {
+        Row: {
+          created_at: string
+          estimated_cost_usd: number
+          failure_code: string | null
+          failure_message: string | null
+          id: string
+          input_hash: string
+          input_tokens: number
+          latency_ms: number | null
+          model: string
+          output_schema_version: string
+          output_tokens: number
+          policy_escalation_approved: boolean
+          policy_version: string
+          pricing_version: string
+          prompt_version: string
+          provider: string
+          provider_request_id: string | null
+          reasoning_effort: string
+          request_id: string
+          service_tier: string
+          status: string
+          structured_output: Json | null
+          version_number: number
+        }
+        Insert: {
+          created_at?: string
+          estimated_cost_usd?: number
+          failure_code?: string | null
+          failure_message?: string | null
+          id?: string
+          input_hash: string
+          input_tokens?: number
+          latency_ms?: number | null
+          model: string
+          output_schema_version: string
+          output_tokens?: number
+          policy_escalation_approved?: boolean
+          policy_version: string
+          pricing_version: string
+          prompt_version: string
+          provider?: string
+          provider_request_id?: string | null
+          reasoning_effort?: string
+          request_id: string
+          service_tier: string
+          status: string
+          structured_output?: Json | null
+          version_number: number
+        }
+        Update: {
+          created_at?: string
+          estimated_cost_usd?: number
+          failure_code?: string | null
+          failure_message?: string | null
+          id?: string
+          input_hash?: string
+          input_tokens?: number
+          latency_ms?: number | null
+          model?: string
+          output_schema_version?: string
+          output_tokens?: number
+          policy_escalation_approved?: boolean
+          policy_version?: string
+          pricing_version?: string
+          prompt_version?: string
+          provider?: string
+          provider_request_id?: string | null
+          reasoning_effort?: string
+          request_id?: string
+          service_tier?: string
+          status?: string
+          structured_output?: Json | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_generations_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "ai_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_request_sources: {
+        Row: {
+          added_by_subject: string
+          added_by_user_id: string | null
+          authorization_scope: string
+          campaign_id: string | null
+          campaign_report_id: string | null
+          created_at: string
+          creative_id: string | null
+          id: string
+          offer_id: string | null
+          partner_document_id: string | null
+          request_id: string
+          source_deleted_at: string | null
+          source_kind: string
+          source_record_id: string
+          source_snapshot_hash: string
+          source_state: string
+          source_updated_at: string | null
+        }
+        Insert: {
+          added_by_subject: string
+          added_by_user_id?: string | null
+          authorization_scope: string
+          campaign_id?: string | null
+          campaign_report_id?: string | null
+          created_at?: string
+          creative_id?: string | null
+          id?: string
+          offer_id?: string | null
+          partner_document_id?: string | null
+          request_id: string
+          source_deleted_at?: string | null
+          source_kind: string
+          source_record_id: string
+          source_snapshot_hash: string
+          source_state?: string
+          source_updated_at?: string | null
+        }
+        Update: {
+          added_by_subject?: string
+          added_by_user_id?: string | null
+          authorization_scope?: string
+          campaign_id?: string | null
+          campaign_report_id?: string | null
+          created_at?: string
+          creative_id?: string | null
+          id?: string
+          offer_id?: string | null
+          partner_document_id?: string | null
+          request_id?: string
+          source_deleted_at?: string | null
+          source_kind?: string
+          source_record_id?: string
+          source_snapshot_hash?: string
+          source_state?: string
+          source_updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_request_sources_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "business_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_request_sources_campaign_report_id_fkey"
+            columns: ["campaign_report_id"]
+            isOneToOne: false
+            referencedRelation: "business_campaign_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_request_sources_creative_id_fkey"
+            columns: ["creative_id"]
+            isOneToOne: false
+            referencedRelation: "business_campaign_creatives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_request_sources_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "business_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_request_sources_partner_document_id_fkey"
+            columns: ["partner_document_id"]
+            isOneToOne: false
+            referencedRelation: "business_partner_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_request_sources_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "ai_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_requests: {
+        Row: {
+          actor_role: Database["public"]["Enums"]["app_role"]
+          actor_subject: string
+          actor_user_id: string | null
+          authorization_context: Json
+          business_id: string
+          completed_at: string | null
+          created_at: string
+          default_model: string
+          default_reasoning_effort: string
+          emergency_stop_cost_usd: number
+          expires_at: string | null
+          id: string
+          idempotency_expires_at: string
+          input_hash: string
+          invocation_idempotency_key: string
+          invocation_idempotency_namespace: string
+          invocation_idempotency_scope: string
+          max_estimated_cost_usd: number
+          max_generations: number
+          max_input_tokens: number
+          max_luna_output_tokens: number
+          max_terra_output_tokens: number
+          pilot_context_used: boolean
+          pilot_id: string | null
+          policy_snapshot: Json
+          policy_version: string
+          purpose: string
+          request_payload: Json
+          requested_at: string
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          actor_role: Database["public"]["Enums"]["app_role"]
+          actor_subject: string
+          actor_user_id?: string | null
+          authorization_context?: Json
+          business_id: string
+          completed_at?: string | null
+          created_at?: string
+          default_model?: string
+          default_reasoning_effort?: string
+          emergency_stop_cost_usd?: number
+          expires_at?: string | null
+          id?: string
+          idempotency_expires_at: string
+          input_hash: string
+          invocation_idempotency_key: string
+          invocation_idempotency_namespace?: string
+          invocation_idempotency_scope: string
+          max_estimated_cost_usd?: number
+          max_generations?: number
+          max_input_tokens?: number
+          max_luna_output_tokens?: number
+          max_terra_output_tokens?: number
+          pilot_context_used?: boolean
+          pilot_id?: string | null
+          policy_snapshot: Json
+          policy_version: string
+          purpose: string
+          request_payload?: Json
+          requested_at?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          actor_role?: Database["public"]["Enums"]["app_role"]
+          actor_subject?: string
+          actor_user_id?: string | null
+          authorization_context?: Json
+          business_id?: string
+          completed_at?: string | null
+          created_at?: string
+          default_model?: string
+          default_reasoning_effort?: string
+          emergency_stop_cost_usd?: number
+          expires_at?: string | null
+          id?: string
+          idempotency_expires_at?: string
+          input_hash?: string
+          invocation_idempotency_key?: string
+          invocation_idempotency_namespace?: string
+          invocation_idempotency_scope?: string
+          max_estimated_cost_usd?: number
+          max_generations?: number
+          max_input_tokens?: number
+          max_luna_output_tokens?: number
+          max_terra_output_tokens?: number
+          pilot_context_used?: boolean
+          pilot_id?: string | null
+          policy_snapshot?: Json
+          policy_version?: string
+          purpose?: string
+          request_payload?: Json
+          requested_at?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_requests_pilot_id_fkey"
+            columns: ["pilot_id"]
+            isOneToOne: false
+            referencedRelation: "business_pilot_records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_retention_records: {
+        Row: {
+          approval_id: string | null
+          changed_by_subject: string
+          changed_by_user_id: string
+          created_at: string
+          deleted_at: string | null
+          deletion_status: string
+          generation_id: string | null
+          id: string
+          last_checked_at: string | null
+          legal_hold: boolean
+          legal_hold_reason: string | null
+          provider_retention_status: string
+          request_id: string
+          retain_until: string | null
+          retention_class: string
+          safety_event_id: string | null
+          source_deletion_state: string
+          target_type: string
+          updated_at: string
+          usage_ledger_id: string | null
+          user_decision_id: string | null
+        }
+        Insert: {
+          approval_id?: string | null
+          changed_by_subject: string
+          changed_by_user_id: string
+          created_at?: string
+          deleted_at?: string | null
+          deletion_status?: string
+          generation_id?: string | null
+          id?: string
+          last_checked_at?: string | null
+          legal_hold?: boolean
+          legal_hold_reason?: string | null
+          provider_retention_status?: string
+          request_id: string
+          retain_until?: string | null
+          retention_class: string
+          safety_event_id?: string | null
+          source_deletion_state?: string
+          target_type: string
+          updated_at?: string
+          usage_ledger_id?: string | null
+          user_decision_id?: string | null
+        }
+        Update: {
+          approval_id?: string | null
+          changed_by_subject?: string
+          changed_by_user_id?: string
+          created_at?: string
+          deleted_at?: string | null
+          deletion_status?: string
+          generation_id?: string | null
+          id?: string
+          last_checked_at?: string | null
+          legal_hold?: boolean
+          legal_hold_reason?: string | null
+          provider_retention_status?: string
+          request_id?: string
+          retain_until?: string | null
+          retention_class?: string
+          safety_event_id?: string | null
+          source_deletion_state?: string
+          target_type?: string
+          updated_at?: string
+          usage_ledger_id?: string | null
+          user_decision_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_retention_records_approval_id_fkey"
+            columns: ["approval_id"]
+            isOneToOne: false
+            referencedRelation: "ai_approvals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_retention_records_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_generations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_retention_records_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "ai_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_retention_records_safety_event_id_fkey"
+            columns: ["safety_event_id"]
+            isOneToOne: false
+            referencedRelation: "ai_safety_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_retention_records_usage_ledger_id_fkey"
+            columns: ["usage_ledger_id"]
+            isOneToOne: false
+            referencedRelation: "ai_usage_ledger"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_retention_records_user_decision_id_fkey"
+            columns: ["user_decision_id"]
+            isOneToOne: false
+            referencedRelation: "ai_user_decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_safety_events: {
+        Row: {
+          created_at: string
+          details: Json
+          disposition: string
+          escalation_status: string
+          generation_id: string | null
+          id: string
+          minimal_excerpt: string | null
+          recorded_by_subject: string
+          recorded_by_user_id: string
+          request_id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by_subject: string | null
+          resolved_by_user_id: string | null
+          rule_id: string
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          disposition: string
+          escalation_status?: string
+          generation_id?: string | null
+          id?: string
+          minimal_excerpt?: string | null
+          recorded_by_subject: string
+          recorded_by_user_id: string
+          request_id: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by_subject?: string | null
+          resolved_by_user_id?: string | null
+          rule_id: string
+          severity: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          disposition?: string
+          escalation_status?: string
+          generation_id?: string | null
+          id?: string
+          minimal_excerpt?: string | null
+          recorded_by_subject?: string
+          recorded_by_user_id?: string
+          request_id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by_subject?: string | null
+          resolved_by_user_id?: string | null
+          rule_id?: string
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_safety_events_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_generations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_safety_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "ai_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_usage_ledger: {
+        Row: {
+          business_id: string
+          correction_of_ledger_id: string | null
+          cost_state: string
+          cost_usd: number
+          created_at: string
+          currency: string
+          generation_id: string | null
+          id: string
+          input_units: number
+          model: string
+          occurred_at: string
+          output_units: number
+          pricing_version: string
+          provider: string
+          provider_billable: boolean
+          request_id: string
+          service_tier: string
+        }
+        Insert: {
+          business_id: string
+          correction_of_ledger_id?: string | null
+          cost_state: string
+          cost_usd?: number
+          created_at?: string
+          currency?: string
+          generation_id?: string | null
+          id?: string
+          input_units?: number
+          model: string
+          occurred_at?: string
+          output_units?: number
+          pricing_version: string
+          provider?: string
+          provider_billable?: boolean
+          request_id: string
+          service_tier: string
+        }
+        Update: {
+          business_id?: string
+          correction_of_ledger_id?: string | null
+          cost_state?: string
+          cost_usd?: number
+          created_at?: string
+          currency?: string
+          generation_id?: string | null
+          id?: string
+          input_units?: number
+          model?: string
+          occurred_at?: string
+          output_units?: number
+          pricing_version?: string
+          provider?: string
+          provider_billable?: boolean
+          request_id?: string
+          service_tier?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_usage_ledger_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_usage_ledger_correction_of_ledger_id_fkey"
+            columns: ["correction_of_ledger_id"]
+            isOneToOne: false
+            referencedRelation: "ai_usage_ledger"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_usage_ledger_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_generations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_usage_ledger_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "ai_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_user_decisions: {
+        Row: {
+          actor_subject: string
+          actor_user_id: string | null
+          created_at: string
+          decided_at: string
+          decision: string
+          decision_sequence: number
+          generation_id: string
+          id: string
+          reason: string | null
+          save_idempotency_key: string | null
+          save_idempotency_namespace: string | null
+          save_idempotency_scope: string | null
+          saved_campaign_id: string | null
+          saved_creative_id: string | null
+          saved_offer_id: string | null
+        }
+        Insert: {
+          actor_subject: string
+          actor_user_id?: string | null
+          created_at?: string
+          decided_at?: string
+          decision: string
+          decision_sequence: number
+          generation_id: string
+          id?: string
+          reason?: string | null
+          save_idempotency_key?: string | null
+          save_idempotency_namespace?: string | null
+          save_idempotency_scope?: string | null
+          saved_campaign_id?: string | null
+          saved_creative_id?: string | null
+          saved_offer_id?: string | null
+        }
+        Update: {
+          actor_subject?: string
+          actor_user_id?: string | null
+          created_at?: string
+          decided_at?: string
+          decision?: string
+          decision_sequence?: number
+          generation_id?: string
+          id?: string
+          reason?: string | null
+          save_idempotency_key?: string | null
+          save_idempotency_namespace?: string | null
+          save_idempotency_scope?: string | null
+          saved_campaign_id?: string | null
+          saved_creative_id?: string | null
+          saved_offer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_user_decisions_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "ai_generations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_user_decisions_saved_campaign_id_fkey"
+            columns: ["saved_campaign_id"]
+            isOneToOne: false
+            referencedRelation: "business_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_user_decisions_saved_creative_id_fkey"
+            columns: ["saved_creative_id"]
+            isOneToOne: false
+            referencedRelation: "business_campaign_creatives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_user_decisions_saved_offer_id_fkey"
+            columns: ["saved_offer_id"]
+            isOneToOne: false
+            referencedRelation: "business_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       albums: {
         Row: {
           cover_url: string | null
@@ -2393,6 +3111,22 @@ export type Database = {
     }
     Functions: {
       active_creator_plan: { Args: { _user_id: string }; Returns: string }
+      allocate_ai_generation_version: {
+        Args: { target_request_id: string }
+        Returns: number
+      }
+      allocate_ai_user_decision_sequence: {
+        Args: { target_generation_id: string }
+        Returns: number
+      }
+      can_access_business_ai: {
+        Args: { target_business_id: string }
+        Returns: boolean
+      }
+      can_read_ai_request: {
+        Args: { target_request_id: string }
+        Returns: boolean
+      }
       certify_creator_music_rights: {
         Args: {
           requested_default_basis: string
