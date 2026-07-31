@@ -180,6 +180,18 @@ export const businessAdminService = {
       entity_type: "business_profile",
       entity_id: businessId,
     });
+
+    // Resolve the application alert after the administrator verifies the business.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from("admin_notifications")
+      .update({
+        status: "resolved",
+        resolved_at: new Date().toISOString(),
+      })
+      .eq("category", "business_application")
+      .eq("entity_id", businessId)
+      .in("status", ["unread", "read"]);
   },
 
   async createCampaign(input: NewCampaign): Promise<void> {

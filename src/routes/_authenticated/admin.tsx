@@ -7,6 +7,7 @@ import {
   Check,
   Clipboard,
   BriefcaseBusiness,
+  BellRing,
   Copyright,
   Gamepad2,
   KeyRound,
@@ -29,6 +30,10 @@ import {
   type CreatorPlan,
 } from "@/services/invitations/invitationService";
 import { adminService, type BackOfficeSummary } from "@/services/admin/adminService";
+import {
+  adminNotificationService,
+  type WorkQueueSummary,
+} from "@/services/admin/adminNotificationService";
 
 export const Route = createFileRoute("/_authenticated/admin")({ component: AdminPage });
 
@@ -43,6 +48,7 @@ const PLAN_LABELS: Record<CreatorPlan, string> = {
 function AdminPage() {
   const [invites, setInvites] = useState<CreatorInvite[]>([]);
   const [summary, setSummary] = useState<BackOfficeSummary | null>(null);
+  const [workQueue, setWorkQueue] = useState<WorkQueueSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [email, setEmail] = useState("");
@@ -54,12 +60,14 @@ function AdminPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [invitationRecords, operatingSummary] = await Promise.all([
+      const [invitationRecords, operatingSummary, queueSummary] = await Promise.all([
         invitationService.list(),
         adminService.getSummary(),
+        adminNotificationService.summary(),
       ]);
       setInvites(invitationRecords);
       setSummary(operatingSummary);
+      setWorkQueue(queueSummary);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not load invitations");
     } finally {
@@ -142,6 +150,32 @@ function AdminPage() {
         </header>
 
         {summary ? <BackOfficeOverview summary={summary} /> : null}
+
+        {workQueue && workQueue.unread > 0 ? (
+          <Card className="border-primary/40 bg-primary/5">
+            <CardContent className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center">
+              <div className="flex gap-3">
+                <BellRing className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                <div>
+                  <p className="font-semibold">
+                    {workQueue.unread} item{workQueue.unread === 1 ? "" : "s"} need attention
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {workQueue.business_applications} pending business application
+                    {workQueue.business_applications === 1 ? "" : "s"} ·{" "}
+                    {workQueue.campaign_reviews} campaign review
+                    {workQueue.campaign_reviews === 1 ? "" : "s"}
+                  </p>
+                </div>
+              </div>
+              <Button asChild>
+                <Link to="/admin/work-queue">
+                  Open work queue <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        ) : null}
 
         <section className="space-y-4">
           <div>

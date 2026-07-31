@@ -1,5 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
+  BarChart3,
   Home,
   Compass,
   User,
@@ -20,6 +22,8 @@ import {
   LibraryBig,
   UsersRound,
   Upload,
+  ClipboardList,
+  ExternalLink,
 } from "lucide-react";
 import {
   Sidebar,
@@ -35,12 +39,14 @@ import {
 import { Logo } from "@/components/common/Logo";
 import { useUser } from "@/hooks/useUser";
 import type { AppRole } from "@/features/auth/roles";
+import { adminNotificationService } from "@/services/admin/adminNotificationService";
 
 interface NavItem {
   title: string;
   url: string;
   icon: typeof Home;
   allow: AppRole[];
+  badge?: number;
 }
 
 const exploreItems: NavItem[] = [
@@ -117,9 +123,19 @@ const creatorItems: NavItem[] = [
 export function AppSidebar() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const { hasAnyRole } = useUser();
+  const isAdmin = hasAnyRole(["admin"]);
+  const [pendingWork, setPendingWork] = useState(0);
   const isActive = (url: string) => pathname === url || pathname.startsWith(url + "/");
   const visibleExplore = exploreItems.filter((item) => hasAnyRole(item.allow));
   const visibleCreator = creatorItems.filter((item) => hasAnyRole(item.allow));
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    void adminNotificationService
+      .summary()
+      .then((summary) => setPendingWork(summary.unread))
+      .catch(() => undefined);
+  }, [isAdmin, pathname]);
 
   return (
     <Sidebar collapsible="icon">
@@ -129,11 +145,76 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <NavGroup label="Explore VYBE" items={visibleExplore} isActive={isActive} />
-        {visibleCreator.length > 0 && (
+        {isAdmin ? (
+          <>
+            <NavGroup
+              label="Back Office"
+              items={[
+                {
+                  title: "Operations Overview",
+                  url: "/admin",
+                  icon: LayoutDashboard,
+                  allow: ["admin"],
+                },
+                {
+                  title: "Work Queue",
+                  url: "/admin/work-queue",
+                  icon: ClipboardList,
+                  allow: ["admin"],
+                  badge: pendingWork,
+                },
+                {
+                  title: "Business Operations",
+                  url: "/admin/businesses",
+                  icon: BriefcaseBusiness,
+                  allow: ["admin"],
+                },
+                {
+                  title: "Creator Operations",
+                  url: "/admin/creators",
+                  icon: UsersRound,
+                  allow: ["admin"],
+                },
+                {
+                  title: "Rights & Moderation",
+                  url: "/admin/rights",
+                  icon: ShieldCheck,
+                  allow: ["admin"],
+                },
+                { title: "Play Operations", url: "/admin/play", icon: Gamepad2, allow: ["admin"] },
+              ]}
+              isActive={isActive}
+            />
+            <NavGroup
+              label="Management"
+              items={[
+                { title: "Analytics & Reports", url: "/admin", icon: BarChart3, allow: ["admin"] },
+                { title: "System Settings", url: "/settings", icon: Settings, allow: ["admin"] },
+              ]}
+              isActive={isActive}
+            />
+            <NavGroup
+              label="View VYBE"
+              items={[
+                { title: "Explore VYBE", url: "/home", icon: ExternalLink, allow: ["admin"] },
+                { title: "Creator Studio", url: "/dashboard", icon: Music2, allow: ["admin"] },
+                {
+                  title: "Business Studio",
+                  url: "/business",
+                  icon: BriefcaseBusiness,
+                  allow: ["admin"],
+                },
+              ]}
+              isActive={isActive}
+            />
+          </>
+        ) : (
+          <NavGroup label="Explore VYBE" items={visibleExplore} isActive={isActive} />
+        )}
+        {!isAdmin && visibleCreator.length > 0 && (
           <NavGroup label="Creator Studio" items={visibleCreator} isActive={isActive} />
         )}
-        {hasAnyRole(["business", "admin"]) && (
+        {!isAdmin && hasAnyRole(["business"]) && (
           <NavGroup
             label="Business Studio"
             items={[
@@ -153,34 +234,6 @@ export function AppSidebar() {
             items={[
               { title: "Profile", url: "/profile", icon: User, allow: ["supporter"] },
               { title: "Settings", url: "/settings", icon: Settings, allow: ["supporter"] },
-            ]}
-            isActive={isActive}
-          />
-        )}
-        {hasAnyRole(["admin"]) && (
-          <NavGroup
-            label="Administration"
-            items={[
-              { title: "Back Office", url: "/admin", icon: ShieldCheck, allow: ["admin"] },
-              {
-                title: "Creator Operations",
-                url: "/admin/creators",
-                icon: UsersRound,
-                allow: ["admin"],
-              },
-              {
-                title: "Rights Monitoring",
-                url: "/admin/rights",
-                icon: LibraryBig,
-                allow: ["admin"],
-              },
-              {
-                title: "Business Operations",
-                url: "/admin/businesses",
-                icon: BriefcaseBusiness,
-                allow: ["admin"],
-              },
-              { title: "Play Admin", url: "/admin/play", icon: Gamepad2, allow: ["admin"] },
             ]}
             isActive={isActive}
           />
@@ -210,6 +263,11 @@ function NavGroup({
                 <Link to={item.url} className="flex items-center gap-2">
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
+                  {item.badge ? (
+                    <span className="ml-auto rounded-full bg-destructive px-2 py-0.5 text-xs font-semibold text-destructive-foreground">
+                      {item.badge > 99 ? "99+" : item.badge}
+                    </span>
+                  ) : null}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

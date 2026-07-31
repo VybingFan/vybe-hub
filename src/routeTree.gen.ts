@@ -75,6 +75,7 @@ import { Route as ApiStripeCheckoutRouteImport } from './routes/api.stripe.check
 import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_authenticated/playlists_.$playlistId'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
 import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authenticated/music_.$trackId'
+import { Route as AuthenticatedAdminWorkQueueRouteImport } from './routes/_authenticated/admin_.work-queue'
 import { Route as AuthenticatedAdminRightsRouteImport } from './routes/_authenticated/admin_.rights'
 import { Route as AuthenticatedAdminPlayRouteImport } from './routes/_authenticated/admin_.play'
 import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin_.creators'
@@ -417,6 +418,12 @@ const AuthenticatedMusicTrackIdRoute =
     path: '/music/$trackId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminWorkQueueRoute =
+  AuthenticatedAdminWorkQueueRouteImport.update({
+    id: '/admin_/work-queue',
+    path: '/admin/work-queue',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminRightsRoute =
   AuthenticatedAdminRightsRouteImport.update({
     id: '/admin_/rights',
@@ -522,6 +529,7 @@ export interface FileRoutesByFullPath {
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
+  '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -596,6 +604,7 @@ export interface FileRoutesByTo {
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/play': typeof AuthenticatedAdminPlayRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
+  '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -672,6 +681,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/creators': typeof AuthenticatedAdminCreatorsRoute
   '/_authenticated/admin_/play': typeof AuthenticatedAdminPlayRoute
   '/_authenticated/admin_/rights': typeof AuthenticatedAdminRightsRoute
+  '/_authenticated/admin_/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
   '/_authenticated/playlists_/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -748,6 +758,7 @@ export interface FileRouteTypes {
     | '/admin/creators'
     | '/admin/play'
     | '/admin/rights'
+    | '/admin/work-queue'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -822,6 +833,7 @@ export interface FileRouteTypes {
     | '/admin/creators'
     | '/admin/play'
     | '/admin/rights'
+    | '/admin/work-queue'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -897,6 +909,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/creators'
     | '/_authenticated/admin_/play'
     | '/_authenticated/admin_/rights'
+    | '/_authenticated/admin_/work-queue'
     | '/_authenticated/music_/$trackId'
     | '/_authenticated/music_/upload'
     | '/_authenticated/playlists_/$playlistId'
@@ -1413,6 +1426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMusicTrackIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/work-queue': {
+      id: '/_authenticated/admin_/work-queue'
+      path: '/admin/work-queue'
+      fullPath: '/admin/work-queue'
+      preLoaderRoute: typeof AuthenticatedAdminWorkQueueRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/rights': {
       id: '/_authenticated/admin_/rights'
       path: '/admin/rights'
@@ -1491,6 +1511,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
   AuthenticatedAdminPlayRoute: typeof AuthenticatedAdminPlayRoute
   AuthenticatedAdminRightsRoute: typeof AuthenticatedAdminRightsRoute
+  AuthenticatedAdminWorkQueueRoute: typeof AuthenticatedAdminWorkQueueRoute
   AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
   AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -1524,6 +1545,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
   AuthenticatedAdminPlayRoute: AuthenticatedAdminPlayRoute,
   AuthenticatedAdminRightsRoute: AuthenticatedAdminRightsRoute,
+  AuthenticatedAdminWorkQueueRoute: AuthenticatedAdminWorkQueueRoute,
   AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
   AuthenticatedPlaylistsPlaylistIdRoute: AuthenticatedPlaylistsPlaylistIdRoute,
