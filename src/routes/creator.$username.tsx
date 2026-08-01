@@ -22,6 +22,7 @@ import { MERCH_AVAILABILITY } from "@/features/merch/schema";
 import { VIDEO_TYPES } from "@/features/video/schema";
 import { CreatorActions } from "@/components/engagement/CreatorActions";
 import { CreatorComments } from "@/components/engagement/CreatorComments";
+import { FollowCreatorButton } from "@/components/engagement/FollowCreatorButton";
 
 export const Route = createFileRoute("/creator/$username")({ component: CreatorPage });
 
@@ -140,12 +141,7 @@ export function PublicArtistHome({
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button asChild className="bg-gradient-brand text-white">
-                  <Link to="/auth/sign-up">
-                    <Heart className="mr-2 h-4 w-4" />
-                    Follow
-                  </Link>
-                </Button>
+                <FollowCreatorButton creatorUserId={profile.user_id} />
                 <Button variant="outline" onClick={share}>
                   <Share2 className="mr-2 h-4 w-4" />
                   Share
@@ -296,5 +292,6 @@ export function PublicArtistHome({
     </div>
   );
 }
+
 
 
