@@ -20,6 +20,15 @@ function RedirectPage() {
       navigate({ to: "/auth/sign-in", replace: true });
       return;
     }
+    const pendingAdminInvite = window.localStorage.getItem("vybe:pending-admin-invite");
+    if (pendingAdminInvite) {
+      navigate({
+        to: "/admin-invite/$token",
+        params: { token: pendingAdminInvite },
+        replace: true,
+      });
+      return;
+    }
     const pendingInvite = window.localStorage.getItem("vybe:pending-creator-invite");
     if (pendingInvite) {
       navigate({ to: "/creator-invite/$token", params: { token: pendingInvite }, replace: true });

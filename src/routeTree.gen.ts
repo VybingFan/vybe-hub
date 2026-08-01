@@ -47,6 +47,8 @@ import { Route as AuthOnboardingRouteImport } from './routes/auth.onboarding'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as ArtistUsernameRouteImport } from './routes/artist.$username'
 import { Route as ApiVideoUploadUrlRouteImport } from './routes/api.video-upload-url'
+import { Route as ApiAdminTeamInviteRouteImport } from './routes/api.admin-team-invite'
+import { Route as AdminInviteTokenRouteImport } from './routes/admin-invite.$token'
 import { Route as AuthenticatedWatchRouteImport } from './routes/_authenticated/watch'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -76,6 +78,7 @@ import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
 import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authenticated/music_.$trackId'
 import { Route as AuthenticatedAdminWorkQueueRouteImport } from './routes/_authenticated/admin_.work-queue'
+import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin_.team'
 import { Route as AuthenticatedAdminSystemHealthRouteImport } from './routes/_authenticated/admin_.system-health'
 import { Route as AuthenticatedAdminSearchRouteImport } from './routes/_authenticated/admin_.search'
 import { Route as AuthenticatedAdminRightsRouteImport } from './routes/_authenticated/admin_.rights'
@@ -282,6 +285,16 @@ const ApiVideoUploadUrlRoute = ApiVideoUploadUrlRouteImport.update({
   path: '/api/video-upload-url',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminTeamInviteRoute = ApiAdminTeamInviteRouteImport.update({
+  id: '/api/admin-team-invite',
+  path: '/api/admin-team-invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminInviteTokenRoute = AdminInviteTokenRouteImport.update({
+  id: '/admin-invite/$token',
+  path: '/admin-invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedWatchRoute = AuthenticatedWatchRouteImport.update({
   id: '/watch',
   path: '/watch',
@@ -433,6 +446,11 @@ const AuthenticatedAdminWorkQueueRoute =
     path: '/admin/work-queue',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminTeamRoute = AuthenticatedAdminTeamRouteImport.update({
+  id: '/admin_/team',
+  path: '/admin/team',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminSystemHealthRoute =
   AuthenticatedAdminSystemHealthRouteImport.update({
     id: '/admin_/system-health',
@@ -568,6 +586,8 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
+  '/admin-invite/$token': typeof AdminInviteTokenRoute
+  '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
   '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -600,6 +620,7 @@ export interface FileRoutesByFullPath {
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
   '/admin/search': typeof AuthenticatedAdminSearchRoute
   '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
+  '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
@@ -652,6 +673,8 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
+  '/admin-invite/$token': typeof AdminInviteTokenRoute
+  '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
   '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -684,6 +707,7 @@ export interface FileRoutesByTo {
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
   '/admin/search': typeof AuthenticatedAdminSearchRoute
   '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
+  '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
@@ -738,6 +762,8 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_authenticated/watch': typeof AuthenticatedWatchRoute
+  '/admin-invite/$token': typeof AdminInviteTokenRoute
+  '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
   '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -770,6 +796,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/rights': typeof AuthenticatedAdminRightsRoute
   '/_authenticated/admin_/search': typeof AuthenticatedAdminSearchRoute
   '/_authenticated/admin_/system-health': typeof AuthenticatedAdminSystemHealthRoute
+  '/_authenticated/admin_/team': typeof AuthenticatedAdminTeamRoute
   '/_authenticated/admin_/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
@@ -824,6 +851,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/videos'
     | '/watch'
+    | '/admin-invite/$token'
+    | '/api/admin-team-invite'
     | '/api/video-upload-url'
     | '/artist/$username'
     | '/auth/forgot-password'
@@ -856,6 +885,7 @@ export interface FileRouteTypes {
     | '/admin/rights'
     | '/admin/search'
     | '/admin/system-health'
+    | '/admin/team'
     | '/admin/work-queue'
     | '/music/$trackId'
     | '/music/upload'
@@ -908,6 +938,8 @@ export interface FileRouteTypes {
     | '/settings'
     | '/videos'
     | '/watch'
+    | '/admin-invite/$token'
+    | '/api/admin-team-invite'
     | '/api/video-upload-url'
     | '/artist/$username'
     | '/auth/forgot-password'
@@ -940,6 +972,7 @@ export interface FileRouteTypes {
     | '/admin/rights'
     | '/admin/search'
     | '/admin/system-health'
+    | '/admin/team'
     | '/admin/work-queue'
     | '/music/$trackId'
     | '/music/upload'
@@ -993,6 +1026,8 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/videos'
     | '/_authenticated/watch'
+    | '/admin-invite/$token'
+    | '/api/admin-team-invite'
     | '/api/video-upload-url'
     | '/artist/$username'
     | '/auth/forgot-password'
@@ -1025,6 +1060,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/rights'
     | '/_authenticated/admin_/search'
     | '/_authenticated/admin_/system-health'
+    | '/_authenticated/admin_/team'
     | '/_authenticated/admin_/work-queue'
     | '/_authenticated/music_/$trackId'
     | '/_authenticated/music_/upload'
@@ -1058,6 +1094,8 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   TrustRoute: typeof TrustRoute
+  AdminInviteTokenRoute: typeof AdminInviteTokenRoute
+  ApiAdminTeamInviteRoute: typeof ApiAdminTeamInviteRoute
   ApiVideoUploadUrlRoute: typeof ApiVideoUploadUrlRoute
   ArtistUsernameRoute: typeof ArtistUsernameRoute
   CopyrightReportRoute: typeof CopyrightReportRoute
@@ -1347,6 +1385,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiVideoUploadUrlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin-team-invite': {
+      id: '/api/admin-team-invite'
+      path: '/api/admin-team-invite'
+      fullPath: '/api/admin-team-invite'
+      preLoaderRoute: typeof ApiAdminTeamInviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-invite/$token': {
+      id: '/admin-invite/$token'
+      path: '/admin-invite/$token'
+      fullPath: '/admin-invite/$token'
+      preLoaderRoute: typeof AdminInviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/watch': {
       id: '/_authenticated/watch'
       path: '/watch'
@@ -1550,6 +1602,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminWorkQueueRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/team': {
+      id: '/_authenticated/admin_/team'
+      path: '/admin/team'
+      fullPath: '/admin/team'
+      preLoaderRoute: typeof AuthenticatedAdminTeamRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/system-health': {
       id: '/_authenticated/admin_/system-health'
       path: '/admin/system-health'
@@ -1699,6 +1758,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRightsRoute: typeof AuthenticatedAdminRightsRoute
   AuthenticatedAdminSearchRoute: typeof AuthenticatedAdminSearchRoute
   AuthenticatedAdminSystemHealthRoute: typeof AuthenticatedAdminSystemHealthRoute
+  AuthenticatedAdminTeamRoute: typeof AuthenticatedAdminTeamRoute
   AuthenticatedAdminWorkQueueRoute: typeof AuthenticatedAdminWorkQueueRoute
   AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
@@ -1742,6 +1802,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRightsRoute: AuthenticatedAdminRightsRoute,
   AuthenticatedAdminSearchRoute: AuthenticatedAdminSearchRoute,
   AuthenticatedAdminSystemHealthRoute: AuthenticatedAdminSystemHealthRoute,
+  AuthenticatedAdminTeamRoute: AuthenticatedAdminTeamRoute,
   AuthenticatedAdminWorkQueueRoute: AuthenticatedAdminWorkQueueRoute,
   AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
@@ -1795,6 +1856,8 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   TrustRoute: TrustRoute,
+  AdminInviteTokenRoute: AdminInviteTokenRoute,
+  ApiAdminTeamInviteRoute: ApiAdminTeamInviteRoute,
   ApiVideoUploadUrlRoute: ApiVideoUploadUrlRoute,
   ArtistUsernameRoute: ArtistUsernameRoute,
   CopyrightReportRoute: CopyrightReportRoute,

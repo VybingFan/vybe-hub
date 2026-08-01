@@ -15,6 +15,7 @@ import {
   RefreshCw,
   ShieldCheck,
   Users,
+  UserCog,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -30,6 +31,7 @@ import {
   type CreatorPlan,
 } from "@/services/invitations/invitationService";
 import { adminService, type BackOfficeSummary } from "@/services/admin/adminService";
+import { adminTeamService } from "@/services/admin/adminTeamService";
 import {
   adminNotificationService,
   type WorkQueueSummary,
@@ -56,18 +58,23 @@ function AdminPage() {
   const [plan, setPlan] = useState<CreatorPlan>("founding_beta");
   const [days, setDays] = useState(7);
   const [createdLink, setCreatedLink] = useState<string | null>(null);
+  const [canManageAdminTeam, setCanManageAdminTeam] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [invitationRecords, operatingSummary, queueSummary] = await Promise.all([
+      const [invitationRecords, operatingSummary, queueSummary, adminAccess] = await Promise.all([
         invitationService.list(),
         adminService.getSummary(),
         adminNotificationService.summary(),
+        adminTeamService.getMyAccess(),
       ]);
       setInvites(invitationRecords);
       setSummary(operatingSummary);
       setWorkQueue(queueSummary);
+      setCanManageAdminTeam(
+        adminAccess.status === "active" && adminAccess.permissions.includes("admin.team.manage"),
+      );
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not load invitations");
     } finally {
@@ -213,6 +220,15 @@ function AdminPage() {
               to="/admin/businesses"
               action="Open business workspace"
             />
+            {canManageAdminTeam ? (
+              <WorkAreaCard
+                icon={UserCog}
+                title="Administrator team"
+                description="Invite administrators and assign only the operational roles they need."
+                to="/admin/team"
+                action="Manage administrator access"
+              />
+            ) : null}
           </div>
         </section>
 
@@ -530,7 +546,7 @@ function WorkAreaCard({
   icon: typeof Users;
   title: string;
   description: string;
-  to: "/admin/creators" | "/admin/rights" | "/admin/play";
+  to: "/admin/creators" | "/admin/rights" | "/admin/play" | "/admin/businesses" | "/admin/team";
   action: string;
 }) {
   return (
