@@ -125,19 +125,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:image",
         content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7ade1289-5de5-4f15-ad77-1526772a3359/id-preview-803cbbfa--e20a765a-783b-4e37-bf58-361d910e4bfd.lovable.app-1783265185219.png",
+          "https://vybewithvybe.com/pwa/icon-512-v24-38.png",
       },
       {
         name: "twitter:image",
         content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7ade1289-5de5-4f15-ad77-1526772a3359/id-preview-803cbbfa--e20a765a-783b-4e37-bf58-361d910e4bfd.lovable.app-1783265185219.png",
+          "https://vybewithvybe.com/pwa/icon-512-v24-38.png",
       },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico?v=24.10.4", type: "image/x-icon" },
+      { rel: "canonical", href: "https://vybewithvybe.com/" },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/pwa/icon-192-v24-38.png", type: "image/png", sizes: "192x192" },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/pwa/icon-192.png" },
+      { rel: "apple-touch-icon", href: "/pwa/icon-192-v24-38.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
       {
@@ -193,3 +195,4 @@ function ThemePreference() {
   }, []);
   return null;
 }
+
