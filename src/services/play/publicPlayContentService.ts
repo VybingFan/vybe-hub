@@ -25,6 +25,13 @@ export const publicPlayContentService = {
       .eq("experience_type", experienceType)
       .order("published_at", { ascending: false });
     if (error) throw new Error(error.message);
-    return data ?? [];
+    const now = Date.now();
+    return (data ?? []).filter((item) => {
+      const releaseStatus = item.status === "active" || item.status === "scheduled";
+      const started =
+        !item.scheduled_start_at || new Date(item.scheduled_start_at).getTime() <= now;
+      const notEnded = !item.scheduled_end_at || new Date(item.scheduled_end_at).getTime() > now;
+      return releaseStatus && item.visibility === "public" && started && notEnded;
+    });
   },
 };
