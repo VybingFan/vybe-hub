@@ -30,8 +30,9 @@ import {
   saveOfflinePlayProgress,
   syncOfflinePlayProgress,
 } from "@/features/play/offlineProgress";
+import { publicPlayContentService } from "@/services/play/publicPlayContentService";
 
-const trivia = [
+const demoTrivia = [
   {
     question: "Which role is primarily responsible for shaping the overall sound of a recording?",
     choices: ["Music producer", "Tour manager", "Booking agent", "Photographer"],
@@ -161,7 +162,8 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
   const [syncState, setSyncState] = useState<"saved" | "pending" | "synced" | "local">(
     online ? "saved" : "pending",
   );
-  const question = trivia[questionIndex];
+  const [triviaItems, setTriviaItems] = useState(demoTrivia);
+  const question = triviaItems[Math.min(questionIndex, triviaItems.length - 1)];
   const pollTotal = 126 + (poll ? 1 : 0);
   const pollResults = useMemo(
     () => ({
@@ -170,6 +172,31 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
     }),
     [poll, pollTotal],
   );
+
+  useEffect(() => {
+    let active = true;
+    void publicPlayContentService
+      .listReleased("beat_blitz")
+      .then((items) => {
+        const released = items.flatMap((item) => {
+          const choices = item.payload.choices ?? [];
+          const answer = choices.indexOf(item.payload.answer ?? "");
+          if (choices.length < 2 || answer < 0) return [];
+          return [{ question: item.prompt, choices, answer, explanation: item.explanation }];
+        });
+        if (active && released.length) {
+          setTriviaItems(released);
+          setQuestionIndex(0);
+          setSelected(null);
+          setScore(0);
+          setFinished(false);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const onOnline = () => setOnline(true);
@@ -213,7 +240,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
   }
 
   function nextQuestion() {
-    if (questionIndex === trivia.length - 1) {
+    if (questionIndex === triviaItems.length - 1) {
       setFinished(true);
       return;
     }
@@ -470,7 +497,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
                 <p className="mt-1 text-sm text-muted-foreground">{playGenre} pilot round</p>
               </div>
               <Badge variant="outline">
-                Question {finished ? trivia.length : questionIndex + 1} of {trivia.length}
+                Question {finished ? triviaItems.length : questionIndex + 1} of {triviaItems.length}
               </Badge>
             </div>
 
@@ -478,7 +505,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
               <div className="py-10 text-center">
                 <Trophy className="mx-auto h-14 w-14 text-lime-300" />
                 <h3 className="mt-5 text-3xl font-semibold">
-                  You scored {score} of {trivia.length}
+                  You scored {score} of {triviaItems.length}
                 </h3>
                 <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
                   This casual result is saved on this device. Signed-in progress synchronizes after
@@ -525,7 +552,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">{question.explanation}</p>
                     <Button onClick={nextQuestion} className="mt-4 rounded-full">
-                      {questionIndex === trivia.length - 1 ? "See score" : "Next question"}
+                      {questionIndex === triviaItems.length - 1 ? "See score" : "Next question"}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
