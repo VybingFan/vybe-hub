@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       account_entitlements: {
@@ -87,6 +112,71 @@ export type Database = {
             columns: ["source_invite_id"]
             isOneToOne: false
             referencedRelation: "creator_invites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      account_identities: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+          identity_type: string
+          owner_user_id: string
+          status: string
+          subject_user_id: string | null
+          updated_at: string
+          verified: boolean
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name: string
+          id?: string
+          identity_type: string
+          owner_user_id: string
+          status?: string
+          subject_user_id?: string | null
+          updated_at?: string
+          verified?: boolean
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          identity_type?: string
+          owner_user_id?: string
+          status?: string
+          subject_user_id?: string | null
+          updated_at?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      account_identity_preferences: {
+        Row: {
+          active_identity_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_identity_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_identity_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_identity_preferences_active_identity_id_fkey"
+            columns: ["active_identity_id"]
+            isOneToOne: false
+            referencedRelation: "account_identities"
             referencedColumns: ["id"]
           },
         ]
@@ -2653,6 +2743,157 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_organization_members: {
+        Row: {
+          created_at: string
+          creator_user_id: string | null
+          department: string | null
+          display_order: number
+          featured: boolean
+          genres: string[]
+          id: string
+          name: string
+          organization_id: string
+          photo_url: string | null
+          role: string
+          short_bio: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          creator_user_id?: string | null
+          department?: string | null
+          display_order?: number
+          featured?: boolean
+          genres?: string[]
+          id?: string
+          name: string
+          organization_id: string
+          photo_url?: string | null
+          role: string
+          short_bio?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          creator_user_id?: string | null
+          department?: string | null
+          display_order?: number
+          featured?: boolean
+          genres?: string[]
+          id?: string
+          name?: string
+          organization_id?: string
+          photo_url?: string | null
+          role?: string
+          short_bio?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_organization_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "creator_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_organization_relationships: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          organization_id: string
+          relationship_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          organization_id: string
+          relationship_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          organization_id?: string
+          relationship_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_organization_relationships_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "creator_organization_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_organization_relationships_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "creator_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_organizations: {
+        Row: {
+          biography: string | null
+          brand_story: string | null
+          contact_email: string | null
+          created_at: string
+          creator_type: string
+          id: string
+          identity_id: string | null
+          logo_url: string | null
+          mission_statement: string | null
+          name: string
+          owner_user_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          biography?: string | null
+          brand_story?: string | null
+          contact_email?: string | null
+          created_at?: string
+          creator_type: string
+          id?: string
+          identity_id?: string | null
+          logo_url?: string | null
+          mission_statement?: string | null
+          name: string
+          owner_user_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          biography?: string | null
+          brand_story?: string | null
+          contact_email?: string | null
+          created_at?: string
+          creator_type?: string
+          id?: string
+          identity_id?: string | null
+          logo_url?: string | null
+          mission_statement?: string | null
+          name?: string
+          owner_user_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_organizations_identity_id_fkey"
+            columns: ["identity_id"]
+            isOneToOne: true
+            referencedRelation: "account_identities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_plan_definitions: {
         Row: {
           active_connection_limit: number
@@ -2987,6 +3228,47 @@ export type Database = {
         }
         Relationships: []
       }
+      engagement_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reporter_identity_id: string
+          status: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reporter_identity_id: string
+          status?: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reporter_identity_id?: string
+          status?: string
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_reports_reporter_identity_id_fkey"
+            columns: ["reporter_identity_id"]
+            isOneToOne: false
+            referencedRelation: "account_identities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       follows: {
         Row: {
           created_at: string
@@ -3004,6 +3286,220 @@ export type Database = {
           follower_id?: string
         }
         Relationships: []
+      }
+      identity_action_audit: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json
+          id: number
+          identity_id: string
+          target_id: string | null
+          target_type: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json
+          id?: never
+          identity_id: string
+          target_id?: string | null
+          target_type?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json
+          id?: never
+          identity_id?: string
+          target_id?: string | null
+          target_type?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "identity_action_audit_identity_id_fkey"
+            columns: ["identity_id"]
+            isOneToOne: false
+            referencedRelation: "account_identities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      identity_comments: {
+        Row: {
+          body: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          identity_id: string
+          parent_comment_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          identity_id: string
+          parent_comment_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          identity_id?: string
+          parent_comment_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "identity_comments_identity_id_fkey"
+            columns: ["identity_id"]
+            isOneToOne: false
+            referencedRelation: "account_identities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "identity_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "identity_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      identity_follows: {
+        Row: {
+          created_at: string
+          follower_identity_id: string
+          id: string
+          target_identity_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_identity_id: string
+          id?: string
+          target_identity_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_identity_id?: string
+          id?: string
+          target_identity_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "identity_follows_follower_identity_id_fkey"
+            columns: ["follower_identity_id"]
+            isOneToOne: false
+            referencedRelation: "account_identities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "identity_follows_target_identity_id_fkey"
+            columns: ["target_identity_id"]
+            isOneToOne: false
+            referencedRelation: "account_identities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      identity_notifications: {
+        Row: {
+          actor_identity_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          notification_type: string
+          payload: Json
+          read_at: string | null
+          recipient_identity_id: string
+        }
+        Insert: {
+          actor_identity_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          notification_type: string
+          payload?: Json
+          read_at?: string | null
+          recipient_identity_id: string
+        }
+        Update: {
+          actor_identity_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          notification_type?: string
+          payload?: Json
+          read_at?: string | null
+          recipient_identity_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "identity_notifications_actor_identity_id_fkey"
+            columns: ["actor_identity_id"]
+            isOneToOne: false
+            referencedRelation: "account_identities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "identity_notifications_recipient_identity_id_fkey"
+            columns: ["recipient_identity_id"]
+            isOneToOne: false
+            referencedRelation: "account_identities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      identity_reactions: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          identity_id: string
+          reaction_type: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          identity_id: string
+          reaction_type: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          identity_id?: string
+          reaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "identity_reactions_identity_id_fkey"
+            columns: ["identity_id"]
+            isOneToOne: false
+            referencedRelation: "account_identities"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       listener_connections: {
         Row: {
@@ -3283,6 +3779,246 @@ export type Database = {
           updated_at?: string
           user_id?: string
           verification_status?: string
+        }
+        Relationships: []
+      }
+      play_content_items: {
+        Row: {
+          content_key: string
+          created_at: string
+          created_by: string
+          difficulty: string
+          discovery_url: string | null
+          experience_type: string
+          explanation: string
+          game_pack_id: string | null
+          genre: string
+          id: string
+          payload: Json
+          position: number | null
+          prompt: string
+          published_at: string | null
+          published_by: string | null
+          reviewed_by: string | null
+          rights_status: string
+          scheduled_end_at: string | null
+          scheduled_start_at: string | null
+          source_title: string | null
+          source_url: string | null
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string
+          verification_notes: string
+          version: number
+          visibility: string
+        }
+        Insert: {
+          content_key: string
+          created_at?: string
+          created_by?: string
+          difficulty?: string
+          discovery_url?: string | null
+          experience_type: string
+          explanation?: string
+          game_pack_id?: string | null
+          genre?: string
+          id?: string
+          payload?: Json
+          position?: number | null
+          prompt: string
+          published_at?: string | null
+          published_by?: string | null
+          reviewed_by?: string | null
+          rights_status?: string
+          scheduled_end_at?: string | null
+          scheduled_start_at?: string | null
+          source_title?: string | null
+          source_url?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          updated_by?: string
+          verification_notes?: string
+          version?: number
+          visibility?: string
+        }
+        Update: {
+          content_key?: string
+          created_at?: string
+          created_by?: string
+          difficulty?: string
+          discovery_url?: string | null
+          experience_type?: string
+          explanation?: string
+          game_pack_id?: string | null
+          genre?: string
+          id?: string
+          payload?: Json
+          position?: number | null
+          prompt?: string
+          published_at?: string | null
+          published_by?: string | null
+          reviewed_by?: string | null
+          rights_status?: string
+          scheduled_end_at?: string | null
+          scheduled_start_at?: string | null
+          source_title?: string | null
+          source_url?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string
+          verification_notes?: string
+          version?: number
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_content_items_game_pack_id_fkey"
+            columns: ["game_pack_id"]
+            isOneToOne: false
+            referencedRelation: "play_game_packs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      play_content_revisions: {
+        Row: {
+          change_reason: string
+          changed_at: string
+          changed_by: string | null
+          content_item_id: string
+          id: number
+          snapshot: Json
+          version: number
+        }
+        Insert: {
+          change_reason?: string
+          changed_at?: string
+          changed_by?: string | null
+          content_item_id: string
+          id?: number
+          snapshot: Json
+          version: number
+        }
+        Update: {
+          change_reason?: string
+          changed_at?: string
+          changed_by?: string | null
+          content_item_id?: string
+          id?: number
+          snapshot?: Json
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_content_revisions_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "play_content_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      play_game_pack_revisions: {
+        Row: {
+          change_reason: string
+          changed_at: string
+          changed_by: string | null
+          game_pack_id: string
+          id: number
+          snapshot: Json
+          version: number
+        }
+        Insert: {
+          change_reason?: string
+          changed_at?: string
+          changed_by?: string | null
+          game_pack_id: string
+          id?: number
+          snapshot: Json
+          version: number
+        }
+        Update: {
+          change_reason?: string
+          changed_at?: string
+          changed_by?: string | null
+          game_pack_id?: string
+          id?: number
+          snapshot?: Json
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "play_game_pack_revisions_game_pack_id_fkey"
+            columns: ["game_pack_id"]
+            isOneToOne: false
+            referencedRelation: "play_game_packs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      play_game_packs: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string
+          game_type: string
+          genre: string
+          id: string
+          pack_key: string
+          published_at: string | null
+          published_by: string | null
+          reviewed_by: string | null
+          scheduled_end_at: string | null
+          scheduled_start_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string
+          version: number
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          description?: string
+          game_type: string
+          genre?: string
+          id?: string
+          pack_key: string
+          published_at?: string | null
+          published_by?: string | null
+          reviewed_by?: string | null
+          scheduled_end_at?: string | null
+          scheduled_start_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          updated_by?: string
+          version?: number
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string
+          game_type?: string
+          genre?: string
+          id?: string
+          pack_key?: string
+          published_at?: string | null
+          published_by?: string | null
+          reviewed_by?: string | null
+          scheduled_end_at?: string | null
+          scheduled_start_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string
+          version?: number
+          visibility?: string
         }
         Relationships: []
       }
@@ -3870,6 +4606,27 @@ export type Database = {
         Args: { _limit_name: string; _user_id: string }
         Returns: number
       }
+      ensure_my_identities: {
+        Args: never
+        Returns: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+          identity_type: string
+          owner_user_id: string
+          status: string
+          subject_user_id: string | null
+          updated_at: string
+          verified: boolean
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "account_identities"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       fail_audio_processing_job: {
         Args: { failure: string; target_job_id: string }
         Returns: undefined
@@ -4000,6 +4757,156 @@ export type Database = {
         Args: { _invitation_id: string }
         Returns: undefined
       }
+      save_play_content_item_v24_32: {
+        Args: {
+          _content_key: string
+          _difficulty?: string
+          _discovery_url?: string
+          _experience_type: string
+          _explanation?: string
+          _genre?: string
+          _id: string
+          _payload?: Json
+          _prompt: string
+          _rights_status?: string
+          _scheduled_end_at?: string
+          _scheduled_start_at?: string
+          _source_title?: string
+          _source_url?: string
+          _title: string
+          _verification_notes?: string
+          _visibility?: string
+        }
+        Returns: {
+          content_key: string
+          created_at: string
+          created_by: string
+          difficulty: string
+          discovery_url: string | null
+          experience_type: string
+          explanation: string
+          game_pack_id: string | null
+          genre: string
+          id: string
+          payload: Json
+          position: number | null
+          prompt: string
+          published_at: string | null
+          published_by: string | null
+          reviewed_by: string | null
+          rights_status: string
+          scheduled_end_at: string | null
+          scheduled_start_at: string | null
+          source_title: string | null
+          source_url: string | null
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string
+          verification_notes: string
+          version: number
+          visibility: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "play_content_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      save_play_game_pack_v24_33: {
+        Args: {
+          _description?: string
+          _game_type: string
+          _genre?: string
+          _id: string
+          _pack_key: string
+          _scheduled_end_at?: string
+          _scheduled_start_at?: string
+          _title: string
+          _visibility?: string
+        }
+        Returns: {
+          created_at: string
+          created_by: string
+          description: string
+          game_type: string
+          genre: string
+          id: string
+          pack_key: string
+          published_at: string | null
+          published_by: string | null
+          reviewed_by: string | null
+          scheduled_end_at: string | null
+          scheduled_start_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string
+          version: number
+          visibility: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "play_game_packs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      save_play_pack_item_v24_33: {
+        Args: {
+          _content_key: string
+          _difficulty?: string
+          _discovery_url?: string
+          _explanation?: string
+          _game_pack_id: string
+          _id: string
+          _payload?: Json
+          _position: number
+          _prompt: string
+          _rights_status?: string
+          _source_title?: string
+          _source_url?: string
+          _title: string
+          _verification_notes?: string
+        }
+        Returns: {
+          content_key: string
+          created_at: string
+          created_by: string
+          difficulty: string
+          discovery_url: string | null
+          experience_type: string
+          explanation: string
+          game_pack_id: string | null
+          genre: string
+          id: string
+          payload: Json
+          position: number | null
+          prompt: string
+          published_at: string | null
+          published_by: string | null
+          reviewed_by: string | null
+          rights_status: string
+          scheduled_end_at: string | null
+          scheduled_start_at: string | null
+          source_title: string | null
+          source_url: string | null
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string
+          verification_notes: string
+          version: number
+          visibility: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "play_content_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       select_initial_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -4011,6 +4918,121 @@ export type Database = {
       set_admin_member_status_v24_28: {
         Args: { _status: string; _target_user_id: string }
         Returns: undefined
+      }
+      set_my_active_identity: {
+        Args: { p_identity_id: string }
+        Returns: undefined
+      }
+      set_play_content_rights_status_v24_32: {
+        Args: {
+          _id: string
+          _rights_status: string
+          _verification_notes?: string
+        }
+        Returns: {
+          content_key: string
+          created_at: string
+          created_by: string
+          difficulty: string
+          discovery_url: string | null
+          experience_type: string
+          explanation: string
+          game_pack_id: string | null
+          genre: string
+          id: string
+          payload: Json
+          position: number | null
+          prompt: string
+          published_at: string | null
+          published_by: string | null
+          reviewed_by: string | null
+          rights_status: string
+          scheduled_end_at: string | null
+          scheduled_start_at: string | null
+          source_title: string | null
+          source_url: string | null
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string
+          verification_notes: string
+          version: number
+          visibility: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "play_content_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_play_content_status_v24_32: {
+        Args: { _id: string; _status: string }
+        Returns: {
+          content_key: string
+          created_at: string
+          created_by: string
+          difficulty: string
+          discovery_url: string | null
+          experience_type: string
+          explanation: string
+          game_pack_id: string | null
+          genre: string
+          id: string
+          payload: Json
+          position: number | null
+          prompt: string
+          published_at: string | null
+          published_by: string | null
+          reviewed_by: string | null
+          rights_status: string
+          scheduled_end_at: string | null
+          scheduled_start_at: string | null
+          source_title: string | null
+          source_url: string | null
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string
+          verification_notes: string
+          version: number
+          visibility: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "play_content_items"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_play_game_pack_status_v24_33: {
+        Args: { _id: string; _status: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          description: string
+          game_type: string
+          genre: string
+          id: string
+          pack_key: string
+          published_at: string | null
+          published_by: string | null
+          reviewed_by: string | null
+          scheduled_end_at: string | null
+          scheduled_start_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string
+          version: number
+          visibility: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "play_game_packs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       set_profile_lead_track: { Args: { _track_id?: string }; Returns: string }
       show_limit: { Args: never; Returns: number }
@@ -4187,6 +5209,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: ["creator", "supporter", "admin", "business"],
