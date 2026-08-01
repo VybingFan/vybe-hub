@@ -20,6 +20,7 @@ import { usePublicCreator } from "@/hooks/usePublicCreator";
 import { useUser } from "@/hooks/useUser";
 import { MERCH_AVAILABILITY } from "@/features/merch/schema";
 import { VIDEO_TYPES } from "@/features/video/schema";
+import { CreatorActions } from "@/components/engagement/CreatorActions";
 
 export const Route = createFileRoute("/creator/$username")({ component: CreatorPage });
 
@@ -288,7 +289,9 @@ export function PublicArtistHome({
             </div>
           </section>
         )}
+        <CreatorActions entityId={profile.user_id} />
       </main>
     </div>
   );
 }
+
