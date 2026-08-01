@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -4673,6 +4673,7 @@ export type Database = {
         Args: { p_creator_user_id: string }
         Returns: Json
       }
+      creator_has_full_epk: { Args: { p_user_id: string }; Returns: boolean }
       creator_music_rights_status: {
         Args: never
         Returns: {
@@ -4746,6 +4747,7 @@ export type Database = {
       get_my_admin_access_v24_28: { Args: never; Returns: Json }
       get_my_creator_activity: { Args: { p_days?: number }; Returns: Json }
       get_my_creator_membership: { Args: never; Returns: Json }
+      get_my_epk_tier: { Args: never; Returns: Json }
       get_public_creator_plan: { Args: { p_user_id: string }; Returns: string }
       has_admin_permission: {
         Args: { _permission: string; _user_id: string }
