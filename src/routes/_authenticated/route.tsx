@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { LegalAcceptanceGate } from "@/components/legal/LegalAcceptanceGate";
+import { IdentityModeBar } from "@/components/identity/IdentityModeBar";
 
 /**
  * Integration-managed auth gate. Client-only (ssr:false) because the Supabase
@@ -15,7 +16,9 @@ export const Route = createFileRoute("/_authenticated")({
   },
   component: () => (
     <LegalAcceptanceGate>
+      <IdentityModeBar />
       <Outlet />
     </LegalAcceptanceGate>
   ),
 });
+
