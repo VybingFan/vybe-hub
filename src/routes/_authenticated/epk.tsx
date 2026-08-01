@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@/hooks/useUser";
+import { EpkTierNotice } from "@/components/membership/EpkTierNotice";
 import {
   creatorEpkService,
   type CreatorEpkWorkspace,
@@ -89,6 +90,8 @@ function CreatorEpkWorkspacePage() {
           <p className="text-xs text-muted-foreground">EPK readiness · {readiness.complete}/{readiness.total} areas</p>
         </div>
       </header>
+
+      <EpkTierNotice />
 
       <div className="flex flex-wrap gap-2">
         {([
@@ -273,3 +276,4 @@ function ColorField({ name, label, defaultValue }: { name: string; label: string
 function CheckField({ name, label, defaultChecked }: { name: string; label: string; defaultChecked?: boolean }) { return <label className="flex items-center gap-3 rounded-xl border border-border/70 p-3 text-sm"><input type="checkbox" name={name} defaultChecked={defaultChecked} className="h-4 w-4 accent-primary" />{label}</label>; }
 function SelectField({ name, label, options }: { name: string; label: string; options: [string, string][] }) { return <div><Label htmlFor={name}>{label}</Label><select id={name} name={name} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">{options.map(([value, text]) => <option key={value} value={value}>{text}</option>)}</select></div>; }
 function TrackSelect({ tracks }: { tracks: CreatorEpkWorkspace["tracks"] }) { return <SelectField name="track_id" label="Track" options={tracks.map((track) => [track.id, track.title])} />; }
+
