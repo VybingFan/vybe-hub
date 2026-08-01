@@ -91,6 +91,128 @@ export type Database = {
           },
         ]
       }
+      admin_access_audit: {
+        Row: {
+          action: string
+          actor_user_id: string
+          created_at: string
+          details: Json
+          id: number
+          invitation_id: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id: string
+          created_at?: string
+          details?: Json
+          id?: never
+          invitation_id?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string
+          created_at?: string
+          details?: Json
+          id?: never
+          invitation_id?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_access_audit_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "admin_invitations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_invitation_roles: {
+        Row: {
+          created_at: string
+          invitation_id: string
+          role_code: string
+        }
+        Insert: {
+          created_at?: string
+          invitation_id: string
+          role_code: string
+        }
+        Update: {
+          created_at?: string
+          invitation_id?: string
+          role_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_invitation_roles_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "admin_invitations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_invitation_roles_role_code_fkey"
+            columns: ["role_code"]
+            isOneToOne: false
+            referencedRelation: "admin_roles"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      admin_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          delivered_at: string | null
+          delivery_error_code: string | null
+          delivery_status: string
+          email_normalized: string
+          expires_at: string
+          id: string
+          issued_by: string
+          recipient_name: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          token_hash: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          delivery_error_code?: string | null
+          delivery_status?: string
+          email_normalized: string
+          expires_at?: string
+          id?: string
+          issued_by: string
+          recipient_name?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          token_hash: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          delivery_error_code?: string | null
+          delivery_status?: string
+          email_normalized?: string
+          expires_at?: string
+          id?: string
+          issued_by?: string
+          recipient_name?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          token_hash?: string
+        }
+        Relationships: []
+      }
       admin_notifications: {
         Row: {
           action_path: string
@@ -139,6 +261,153 @@ export type Database = {
           resolved_by?: string | null
           status?: string
           title?: string
+        }
+        Relationships: []
+      }
+      admin_permissions: {
+        Row: {
+          code: string
+          created_at: string
+          description: string
+          name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description: string
+          name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      admin_role_permissions: {
+        Row: {
+          created_at: string
+          permission_code: string
+          role_code: string
+        }
+        Insert: {
+          created_at?: string
+          permission_code: string
+          role_code: string
+        }
+        Update: {
+          created_at?: string
+          permission_code?: string
+          role_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_role_permissions_permission_code_fkey"
+            columns: ["permission_code"]
+            isOneToOne: false
+            referencedRelation: "admin_permissions"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "admin_role_permissions_role_code_fkey"
+            columns: ["role_code"]
+            isOneToOne: false
+            referencedRelation: "admin_roles"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      admin_roles: {
+        Row: {
+          code: string
+          created_at: string
+          description: string
+          is_system: boolean
+          name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description: string
+          is_system?: boolean
+          name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string
+          is_system?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      admin_team_member_roles: {
+        Row: {
+          assigned_at: string
+          assigned_by: string
+          role_code: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by: string
+          role_code: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string
+          role_code?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_team_member_roles_role_code_fkey"
+            columns: ["role_code"]
+            isOneToOne: false
+            referencedRelation: "admin_roles"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "admin_team_member_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_team_members"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      admin_team_members: {
+        Row: {
+          activated_at: string
+          added_by: string
+          created_at: string
+          revoked_at: string | null
+          status: string
+          suspended_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string
+          added_by: string
+          created_at?: string
+          revoked_at?: string | null
+          status?: string
+          suspended_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activated_at?: string
+          added_by?: string
+          created_at?: string
+          revoked_at?: string | null
+          status?: string
+          suspended_at?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1994,6 +2263,315 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_audio_masters: {
+        Row: {
+          bit_depth: number | null
+          content_type: string
+          created_at: string
+          creator_id: string
+          id: string
+          original_filename: string
+          sample_rate_hz: number | null
+          size_bytes: number
+          storage_bucket: string
+          storage_path: string
+          track_id: string
+          updated_at: string
+        }
+        Insert: {
+          bit_depth?: number | null
+          content_type: string
+          created_at?: string
+          creator_id: string
+          id?: string
+          original_filename: string
+          sample_rate_hz?: number | null
+          size_bytes: number
+          storage_bucket?: string
+          storage_path: string
+          track_id: string
+          updated_at?: string
+        }
+        Update: {
+          bit_depth?: number | null
+          content_type?: string
+          created_at?: string
+          creator_id?: string
+          id?: string
+          original_filename?: string
+          sample_rate_hz?: number | null
+          size_bytes?: number
+          storage_bucket?: string
+          storage_path?: string
+          track_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_audio_masters_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_epk_assets: {
+        Row: {
+          alt_text: string
+          asset_type: string
+          caption: string
+          content_type: string
+          created_at: string
+          creator_id: string
+          display_order: number
+          id: string
+          is_featured: boolean
+          is_public: boolean
+          orientation: string | null
+          original_filename: string
+          size_bytes: number
+          storage_bucket: string
+          storage_path: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          alt_text?: string
+          asset_type: string
+          caption?: string
+          content_type: string
+          created_at?: string
+          creator_id: string
+          display_order?: number
+          id?: string
+          is_featured?: boolean
+          is_public?: boolean
+          orientation?: string | null
+          original_filename: string
+          size_bytes: number
+          storage_bucket?: string
+          storage_path: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string
+          asset_type?: string
+          caption?: string
+          content_type?: string
+          created_at?: string
+          creator_id?: string
+          display_order?: number
+          id?: string
+          is_featured?: boolean
+          is_public?: boolean
+          orientation?: string | null
+          original_filename?: string
+          size_bytes?: number
+          storage_bucket?: string
+          storage_path?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      creator_epk_featured_tracks: {
+        Row: {
+          apple_music_url: string
+          bandcamp_url: string
+          created_at: string
+          creator_id: string
+          display_order: number
+          include_credits: boolean
+          include_lyrics: boolean
+          is_public: boolean
+          spotify_url: string
+          track_id: string
+          updated_at: string
+        }
+        Insert: {
+          apple_music_url?: string
+          bandcamp_url?: string
+          created_at?: string
+          creator_id: string
+          display_order?: number
+          include_credits?: boolean
+          include_lyrics?: boolean
+          is_public?: boolean
+          spotify_url?: string
+          track_id: string
+          updated_at?: string
+        }
+        Update: {
+          apple_music_url?: string
+          bandcamp_url?: string
+          created_at?: string
+          creator_id?: string
+          display_order?: number
+          include_credits?: boolean
+          include_lyrics?: boolean
+          is_public?: boolean
+          spotify_url?: string
+          track_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_epk_featured_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_epk_press_highlights: {
+        Row: {
+          asset_id: string | null
+          created_at: string
+          creator_id: string
+          display_order: number
+          highlight_type: string
+          id: string
+          is_public: boolean
+          occurred_on: string | null
+          quote_text: string
+          source_name: string
+          source_url: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          asset_id?: string | null
+          created_at?: string
+          creator_id: string
+          display_order?: number
+          highlight_type: string
+          id?: string
+          is_public?: boolean
+          occurred_on?: string | null
+          quote_text?: string
+          source_name?: string
+          source_url?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          asset_id?: string | null
+          created_at?: string
+          creator_id?: string
+          display_order?: number
+          highlight_type?: string
+          id?: string
+          is_public?: boolean
+          occurred_on?: string | null
+          quote_text?: string
+          source_name?: string
+          source_url?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_epk_press_highlights_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "creator_epk_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_epk_profiles: {
+        Row: {
+          accent_color: string
+          bandcamp_url: string
+          booking_contact_name: string
+          booking_email: string
+          booking_phone: string
+          business_email: string
+          created_at: string
+          creator_id: string
+          long_bio: string
+          management_email: string
+          management_name: string
+          medium_bio: string
+          primary_color: string
+          public_booking_email: boolean
+          public_booking_phone: boolean
+          public_business_email: boolean
+          public_management_contact: boolean
+          public_publicist_contact: boolean
+          publicist_email: string
+          publicist_name: string
+          published_at: string | null
+          secondary_color: string
+          short_bio: string
+          slug: string | null
+          status: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          accent_color?: string
+          bandcamp_url?: string
+          booking_contact_name?: string
+          booking_email?: string
+          booking_phone?: string
+          business_email?: string
+          created_at?: string
+          creator_id: string
+          long_bio?: string
+          management_email?: string
+          management_name?: string
+          medium_bio?: string
+          primary_color?: string
+          public_booking_email?: boolean
+          public_booking_phone?: boolean
+          public_business_email?: boolean
+          public_management_contact?: boolean
+          public_publicist_contact?: boolean
+          publicist_email?: string
+          publicist_name?: string
+          published_at?: string | null
+          secondary_color?: string
+          short_bio?: string
+          slug?: string | null
+          status?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          accent_color?: string
+          bandcamp_url?: string
+          booking_contact_name?: string
+          booking_email?: string
+          booking_phone?: string
+          business_email?: string
+          created_at?: string
+          creator_id?: string
+          long_bio?: string
+          management_email?: string
+          management_name?: string
+          medium_bio?: string
+          primary_color?: string
+          public_booking_email?: boolean
+          public_booking_phone?: boolean
+          public_business_email?: boolean
+          public_management_contact?: boolean
+          public_publicist_contact?: boolean
+          publicist_email?: string
+          publicist_name?: string
+          published_at?: string | null
+          secondary_color?: string
+          short_bio?: string
+          slug?: string | null
+          status?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
       creator_invites: {
         Row: {
           assigned_plan: string
@@ -2301,6 +2879,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "creator_rights_documents_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_track_credits: {
+        Row: {
+          created_at: string
+          creator_id: string
+          credit_role: string
+          credited_name: string
+          details: string
+          display_order: number
+          id: string
+          track_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          credit_role: string
+          credited_name: string
+          details?: string
+          display_order?: number
+          id?: string
+          track_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          credit_role?: string
+          credited_name?: string
+          details?: string
+          display_order?: number
+          id?: string
+          track_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_track_credits_track_id_fkey"
             columns: ["track_id"]
             isOneToOne: false
             referencedRelation: "tracks"
@@ -3110,6 +3732,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_admin_invitation_v24_28: {
+        Args: { _token: string }
+        Returns: string
+      }
       active_creator_plan: { Args: { _user_id: string }; Returns: string }
       allocate_ai_generation_version: {
         Args: { target_request_id: string }
@@ -3189,6 +3815,19 @@ export type Database = {
         }
         Returns: undefined
       }
+      create_admin_invitation_v24_28: {
+        Args: {
+          _email: string
+          _expires_in_days?: number
+          _recipient_name?: string
+          _role_codes: string[]
+        }
+        Returns: {
+          expires_at: string
+          invitation_id: string
+          invitation_token: string
+        }[]
+      }
       create_creator_invite: {
         Args: {
           _assigned_plan?: string
@@ -3202,6 +3841,19 @@ export type Database = {
           invite_id: string
           invite_token: string
         }[]
+      }
+      create_my_business_campaign_draft_v24_27_1: {
+        Args: {
+          p_disclosure_text?: string
+          p_ends_at?: string
+          p_name: string
+          p_objective: string
+          p_starts_at?: string
+          p_target_audience?: string
+          p_target_genres?: string[]
+          p_target_regions?: string[]
+        }
+        Returns: string
       }
       creator_music_rights_status: {
         Args: never
@@ -3249,15 +3901,30 @@ export type Database = {
           video_count: number
         }[]
       }
+      get_admin_team_dashboard_v24_28: { Args: never; Returns: Json }
       get_admin_work_queue_summary: { Args: never; Returns: Json }
       get_business_pilot_dashboard: { Args: never; Returns: Json }
+      get_my_admin_access_v24_28: { Args: never; Returns: Json }
       get_my_creator_membership: { Args: never; Returns: Json }
+      has_admin_permission: {
+        Args: { _permission: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      inspect_admin_invitation_v24_28: {
+        Args: { _token: string }
+        Returns: {
+          expires_at: string
+          invitation_status: string
+          recipient_name: string
+          role_names: string[]
+        }[]
       }
       inspect_creator_invite: {
         Args: { _token: string }
@@ -3267,6 +3934,14 @@ export type Database = {
           invitation_status: string
           recipient_hint: string
         }[]
+      }
+      mark_admin_invitation_delivery_v24_28: {
+        Args: {
+          _delivery_error_code?: string
+          _delivery_status: string
+          _invitation_id: string
+        }
+        Returns: undefined
       }
       queue_track_lyrics_transcription: {
         Args: { target_track_id: string }
@@ -3321,9 +3996,21 @@ export type Database = {
         Args: { _playlist_id: string; _track_ids: string[] }
         Returns: undefined
       }
+      revoke_admin_invitation_v24_28: {
+        Args: { _invitation_id: string }
+        Returns: undefined
+      }
       select_initial_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: Database["public"]["Enums"]["app_role"]
+      }
+      set_admin_member_roles_v24_28: {
+        Args: { _role_codes: string[]; _target_user_id: string }
+        Returns: undefined
+      }
+      set_admin_member_status_v24_28: {
+        Args: { _status: string; _target_user_id: string }
+        Returns: undefined
       }
       set_profile_lead_track: { Args: { _track_id?: string }; Returns: string }
       show_limit: { Args: never; Returns: number }
@@ -3340,7 +4027,37 @@ export type Database = {
         }
         Returns: boolean
       }
+      submit_my_business_campaign_v24_27_1: {
+        Args: { p_campaign_id: string }
+        Returns: undefined
+      }
       sync_business_pilot_notifications: { Args: never; Returns: undefined }
+      update_my_business_campaign_draft_v24_27_1: {
+        Args: {
+          p_campaign_id: string
+          p_disclosure_text?: string
+          p_ends_at?: string
+          p_name: string
+          p_objective: string
+          p_starts_at?: string
+          p_target_audience?: string
+          p_target_genres?: string[]
+          p_target_regions?: string[]
+        }
+        Returns: undefined
+      }
+      upsert_my_business_campaign_offer_v24_27_1: {
+        Args: {
+          p_campaign_id: string
+          p_description: string
+          p_ends_at?: string
+          p_max_redemptions?: number
+          p_starts_at?: string
+          p_terms?: string
+          p_title: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "creator" | "supporter" | "admin" | "business"

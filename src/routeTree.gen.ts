@@ -62,6 +62,7 @@ import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedListenRouteImport } from './routes/_authenticated/listen'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
+import { Route as AuthenticatedEpkRouteImport } from './routes/_authenticated/epk'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedContentRouteImport } from './routes/_authenticated/content'
@@ -360,6 +361,11 @@ const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEpkRoute = AuthenticatedEpkRouteImport.update({
+  id: '/epk',
+  path: '/epk',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDiscoverRoute = AuthenticatedDiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
@@ -573,6 +579,7 @@ export interface FileRoutesByFullPath {
   '/content': typeof AuthenticatedContentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
+  '/epk': typeof AuthenticatedEpkRoute
   '/events': typeof AuthenticatedEventsRoute
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
@@ -660,6 +667,7 @@ export interface FileRoutesByTo {
   '/content': typeof AuthenticatedContentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
+  '/epk': typeof AuthenticatedEpkRoute
   '/events': typeof AuthenticatedEventsRoute
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
@@ -749,6 +757,7 @@ export interface FileRoutesById {
   '/_authenticated/content': typeof AuthenticatedContentRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
+  '/_authenticated/epk': typeof AuthenticatedEpkRoute
   '/_authenticated/events': typeof AuthenticatedEventsRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/listen': typeof AuthenticatedListenRoute
@@ -838,6 +847,7 @@ export interface FileRouteTypes {
     | '/content'
     | '/dashboard'
     | '/discover'
+    | '/epk'
     | '/events'
     | '/home'
     | '/listen'
@@ -925,6 +935,7 @@ export interface FileRouteTypes {
     | '/content'
     | '/dashboard'
     | '/discover'
+    | '/epk'
     | '/events'
     | '/home'
     | '/listen'
@@ -1013,6 +1024,7 @@ export interface FileRouteTypes {
     | '/_authenticated/content'
     | '/_authenticated/dashboard'
     | '/_authenticated/discover'
+    | '/_authenticated/epk'
     | '/_authenticated/events'
     | '/_authenticated/home'
     | '/_authenticated/listen'
@@ -1490,6 +1502,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/epk': {
+      id: '/_authenticated/epk'
+      path: '/epk'
+      fullPath: '/epk'
+      preLoaderRoute: typeof AuthenticatedEpkRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/discover': {
       id: '/_authenticated/discover'
       path: '/discover'
@@ -1733,6 +1752,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedContentRoute: typeof AuthenticatedContentRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
+  AuthenticatedEpkRoute: typeof AuthenticatedEpkRoute
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedListenRoute: typeof AuthenticatedListenRoute
@@ -1777,6 +1797,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedContentRoute: AuthenticatedContentRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
+  AuthenticatedEpkRoute: AuthenticatedEpkRoute,
   AuthenticatedEventsRoute: AuthenticatedEventsRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedListenRoute: AuthenticatedListenRoute,

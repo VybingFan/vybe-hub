@@ -124,6 +124,12 @@ const creatorItems: NavItem[] = [
   { title: "Connections", url: "/connections", icon: ContactRound, allow: ["creator", "admin"] },
   { title: "Merch", url: "/merch", icon: ShoppingBag, allow: ["creator", "admin"] },
   { title: "Public Profile", url: "/profile", icon: User, allow: ["creator", "admin"] },
+  {
+    title: "Industry Kit & EPK",
+    url: "/epk",
+    icon: BriefcaseBusiness,
+    allow: ["creator", "admin"],
+  },
   { title: "Creator Settings", url: "/settings", icon: Settings, allow: ["creator", "admin"] },
 ];
 
