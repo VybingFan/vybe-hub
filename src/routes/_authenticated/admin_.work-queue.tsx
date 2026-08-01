@@ -9,7 +9,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,7 +43,7 @@ function WorkQueuePage() {
   useEffect(() => void load(), [load]);
 
   return (
-    <RoleGuard allow={["admin"]}>
+    <AdminPermissionGuard anyOf={["admin.work_queue.read"]}>
       <div className="mx-auto max-w-6xl space-y-8">
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
           <div>
@@ -134,7 +134,7 @@ function WorkQueuePage() {
           </CardContent>
         </Card>
       </div>
-    </RoleGuard>
+    </AdminPermissionGuard>
   );
 }
 

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Gift, Tags } from "lucide-react";
 import { toast } from "sonner";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,7 +21,7 @@ function OffersRoute() {
       );
   }, []);
   return (
-    <RoleGuard allow={["admin"]}>
+    <AdminPermissionGuard anyOf={["admin.business.read"]}>
       <div className="mx-auto max-w-6xl space-y-7">
         <header>
           <Button variant="ghost" size="sm" asChild>
@@ -83,6 +83,6 @@ function OffersRoute() {
           ))}
         </div>
       </div>
-    </RoleGuard>
+    </AdminPermissionGuard>
   );
 }

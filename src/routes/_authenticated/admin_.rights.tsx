@@ -11,7 +11,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,9 +66,9 @@ const statuses = ["received", "reviewing", "actioned", "rejected", "counter_noti
 
 function RightsReviewRoute() {
   return (
-    <RoleGuard allow={["admin"]}>
+    <AdminPermissionGuard anyOf={["admin.rights.read", "admin.content.read"]}>
       <RightsReviewPage />
-    </RoleGuard>
+    </AdminPermissionGuard>
   );
 }
 

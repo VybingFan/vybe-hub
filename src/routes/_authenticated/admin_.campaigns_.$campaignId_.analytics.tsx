@@ -10,7 +10,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import { toast } from "sonner";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +22,7 @@ import {
   type CampaignEventRecord,
   type CampaignReportRecord,
 } from "@/services/business/businessAdminService";
+import { adminTeamService, type AdminAccess } from "@/services/admin/adminTeamService";
 
 export const Route = createFileRoute("/_authenticated/admin_/campaigns_/$campaignId_/analytics")({
   component: CampaignAnalyticsRoute,
@@ -41,6 +42,9 @@ function CampaignAnalyticsRoute() {
   const [events, setEvents] = useState<CampaignEventRecord[]>([]);
   const [reports, setReports] = useState<CampaignReportRecord[]>([]);
   const [loading, setLoading] = useState(false);
+  const [access, setAccess] = useState<AdminAccess | null>(null);
+  const canManageBusiness = access?.permissions.includes("admin.business.manage") ?? false;
+  const canReleaseReport = access?.permissions.includes("admin.reports.release") ?? false;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -65,6 +69,9 @@ function CampaignAnalyticsRoute() {
   }, [campaignId, rangeEnd, rangeStart]);
 
   useEffect(() => void load(), [load]);
+  useEffect(() => {
+    void adminTeamService.getMyAccess().then(setAccess).catch(() => setAccess(null));
+  }, []);
 
   async function changeTracking(status: "not_connected" | "testing" | "connected") {
     try {
@@ -131,13 +138,17 @@ function CampaignAnalyticsRoute() {
   }
 
   return (
-    <RoleGuard allow={["admin"]}>
+    <AdminPermissionGuard anyOf={["admin.analytics.read", "admin.business.read"]}>
       <div className="mx-auto max-w-7xl space-y-8">
         <header>
           <Button variant="ghost" size="sm" asChild>
-            <Link to="/admin/campaigns/$campaignId" params={{ campaignId }}>
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to campaign
-            </Link>
+            {canManageBusiness ? (
+              <Link to="/admin/campaigns/$campaignId" params={{ campaignId }}>
+                <ArrowLeft className="mr-2 h-4 w-4" /> Back to campaign
+              </Link>
+            ) : (
+              <Link to="/admin/reports"><ArrowLeft className="mr-2 h-4 w-4" /> Back to reports</Link>
+            )}
           </Button>
           <div className="mt-3 flex items-center gap-2 text-primary">
             <BarChart3 className="h-5 w-5" /> Verified event reporting
@@ -211,20 +222,24 @@ function CampaignAnalyticsRoute() {
                 <CardContent className="space-y-5">
                   <div>
                     <Label htmlFor="tracking-state">Conversion tracking</Label>
-                    <select
-                      id="tracking-state"
-                      className="mt-2 h-10 w-full rounded-md border bg-background px-3 text-sm"
-                      value={analytics.conversion_tracking_status}
-                      onChange={(event) =>
-                        void changeTracking(
-                          event.target.value as "not_connected" | "testing" | "connected",
-                        )
-                      }
-                    >
-                      <option value="not_connected">Not connected</option>
-                      <option value="testing">Testing - exclude from partner totals</option>
-                      <option value="connected">Connected and validated</option>
-                    </select>
+                    {canManageBusiness ? (
+                      <select
+                        id="tracking-state"
+                        className="mt-2 h-10 w-full rounded-md border bg-background px-3 text-sm"
+                        value={analytics.conversion_tracking_status}
+                        onChange={(event) =>
+                          void changeTracking(
+                            event.target.value as "not_connected" | "testing" | "connected",
+                          )
+                        }
+                      >
+                        <option value="not_connected">Not connected</option>
+                        <option value="testing">Testing - exclude from partner totals</option>
+                        <option value="connected">Connected and validated</option>
+                      </select>
+                    ) : (
+                      <p className="mt-2 text-sm capitalize text-muted-foreground">{analytics.conversion_tracking_status.replaceAll("_", " ")}</p>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <Quality label="Events received" value={analytics.quality.events_total} />
@@ -261,9 +276,11 @@ function CampaignAnalyticsRoute() {
                     <Button variant="outline" onClick={downloadCsv}>
                       <Download className="mr-2 h-4 w-4" /> Download CSV
                     </Button>
-                    <Button onClick={() => void releaseReport()}>
-                      <FileCheck2 className="mr-2 h-4 w-4" /> Release verified report
-                    </Button>
+                    {canReleaseReport ? (
+                      <Button onClick={() => void releaseReport()}>
+                        <FileCheck2 className="mr-2 h-4 w-4" /> Release verified report
+                      </Button>
+                    ) : null}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Conversion totals remain labeled “Not connected” until a validated conversion
@@ -343,7 +360,7 @@ function CampaignAnalyticsRoute() {
                       {new Date(event.occurred_at).toLocaleString()} · session {event.session_id}
                     </p>
                   </div>
-                  {!event.is_internal ? (
+                  {canManageBusiness && !event.is_internal ? (
                     event.is_valid ? (
                       <Button
                         size="sm"
@@ -403,7 +420,7 @@ function CampaignAnalyticsRoute() {
           </CardContent>
         </Card>
       </div>
-    </RoleGuard>
+    </AdminPermissionGuard>
   );
 }
 

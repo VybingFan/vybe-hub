@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Activity, ArrowLeft, BellRing, Cpu } from "lucide-react";
 import { toast } from "sonner";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,7 +24,7 @@ function SystemHealthRoute() {
   }, []);
   const processorObserved = Boolean(health?.latestCompletedAt || health?.latestProcessorVersion);
   return (
-    <RoleGuard allow={["admin"]}>
+    <AdminPermissionGuard anyOf={["admin.system.read"]}>
       <div className="mx-auto max-w-6xl space-y-7">
         <header>
           <Button variant="ghost" size="sm" asChild>
@@ -85,6 +85,6 @@ function SystemHealthRoute() {
           </Card>
         </div>
       </div>
-    </RoleGuard>
+    </AdminPermissionGuard>
   );
 }

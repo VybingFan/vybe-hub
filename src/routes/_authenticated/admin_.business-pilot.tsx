@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, BriefcaseBusiness, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -90,7 +90,7 @@ function BusinessPilotPage() {
   }
 
   return (
-    <RoleGuard allow={["admin"]}>
+    <AdminPermissionGuard anyOf={["admin.business.pilot"]}>
       <div className="mx-auto max-w-7xl space-y-8">
         <header>
           <Button asChild variant="ghost" className="-ml-3 mb-4">
@@ -208,7 +208,7 @@ function BusinessPilotPage() {
           )}
         </div>
       </div>
-    </RoleGuard>
+    </AdminPermissionGuard>
   );
 }
 

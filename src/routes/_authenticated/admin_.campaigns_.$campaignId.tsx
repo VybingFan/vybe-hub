@@ -10,7 +10,7 @@ import {
   Tag,
 } from "lucide-react";
 import { toast } from "sonner";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,7 +61,7 @@ function CampaignOperationsPage() {
   const { campaign } = workspace;
 
   return (
-    <RoleGuard allow={["admin"]}>
+    <AdminPermissionGuard anyOf={["admin.business.read"]}>
       <div className="mx-auto max-w-6xl space-y-8">
         <header>
           <Button asChild variant="ghost" className="-ml-3 mb-4">
@@ -319,7 +319,7 @@ function CampaignOperationsPage() {
           </EditorCard>
         </div>
       </div>
-    </RoleGuard>
+    </AdminPermissionGuard>
   );
 }
 

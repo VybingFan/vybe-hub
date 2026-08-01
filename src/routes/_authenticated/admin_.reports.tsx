@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { BarChart3, FileCheck2, Megaphone, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +34,7 @@ function AdminReportsRoute() {
   useEffect(() => void load(), [load]);
 
   return (
-    <RoleGuard allow={["admin"]}>
+    <AdminPermissionGuard anyOf={["admin.analytics.read"]}>
       <div className="mx-auto max-w-7xl space-y-8">
         <header className="flex flex-col justify-between gap-3 sm:flex-row">
           <div>
@@ -43,7 +43,7 @@ function AdminReportsRoute() {
             </div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">Analytics & Reports</h1>
             <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-              Open campaign reconciliation workspaces and review every released partner report. Only
+              Review campaign analytics and every released partner report. Only
               valid, non-internal recorded events are reportable.
             </p>
           </div>
@@ -67,7 +67,7 @@ function AdminReportsRoute() {
         </div>
 
         <section className="space-y-3">
-          <h2 className="text-xl font-semibold">Campaign reconciliation</h2>
+          <h2 className="text-xl font-semibold">Campaign analytics</h2>
           {!campaigns.length ? (
             <Card>
               <CardContent className="p-7 text-sm text-muted-foreground">
@@ -105,7 +105,7 @@ function AdminReportsRoute() {
                         to="/admin/campaigns/$campaignId/analytics"
                         params={{ campaignId: campaign.id }}
                       >
-                        <BarChart3 className="mr-2 h-4 w-4" /> Reconcile
+                        <BarChart3 className="mr-2 h-4 w-4" /> View analytics
                       </Link>
                     </Button>
                   </div>
@@ -155,7 +155,7 @@ function AdminReportsRoute() {
           ))}
         </section>
       </div>
-    </RoleGuard>
+    </AdminPermissionGuard>
   );
 }
 

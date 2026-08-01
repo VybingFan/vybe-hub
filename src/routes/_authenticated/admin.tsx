@@ -31,7 +31,7 @@ import {
   type CreatorPlan,
 } from "@/services/invitations/invitationService";
 import { adminService, type BackOfficeSummary } from "@/services/admin/adminService";
-import { adminTeamService } from "@/services/admin/adminTeamService";
+import { adminTeamService, type AdminAccess } from "@/services/admin/adminTeamService";
 import {
   adminNotificationService,
   type WorkQueueSummary,
@@ -59,22 +59,25 @@ function AdminPage() {
   const [days, setDays] = useState(7);
   const [createdLink, setCreatedLink] = useState<string | null>(null);
   const [canManageAdminTeam, setCanManageAdminTeam] = useState(false);
+  const [adminAccess, setAdminAccess] = useState<AdminAccess | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [invitationRecords, operatingSummary, queueSummary, adminAccess] = await Promise.all([
+      const access = await adminTeamService.getMyAccess();
+      setAdminAccess(access);
+      const canManageTeam =
+        access.status === "active" && access.permissions.includes("admin.team.manage");
+      setCanManageAdminTeam(canManageTeam);
+      if (!canManageTeam) return;
+      const [invitationRecords, operatingSummary, queueSummary] = await Promise.all([
         invitationService.list(),
         adminService.getSummary(),
         adminNotificationService.summary(),
-        adminTeamService.getMyAccess(),
       ]);
       setInvites(invitationRecords);
       setSummary(operatingSummary);
       setWorkQueue(queueSummary);
-      setCanManageAdminTeam(
-        adminAccess.status === "active" && adminAccess.permissions.includes("admin.team.manage"),
-      );
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not load invitations");
     } finally {
@@ -124,6 +127,24 @@ function AdminPage() {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not revoke invitation");
     }
+  }
+
+  if (!adminAccess) {
+    return (
+      <RoleGuard allow={["admin"]}>
+        <div className="mx-auto max-w-6xl p-8 text-sm text-muted-foreground">
+          Loading your administrator permissions…
+        </div>
+      </RoleGuard>
+    );
+  }
+
+  if (!loading && adminAccess && !canManageAdminTeam) {
+    return (
+      <RoleGuard allow={["admin"]}>
+        <LimitedAdminHome access={adminAccess} />
+      </RoleGuard>
+    );
   }
 
   return (
@@ -373,6 +394,44 @@ function AdminPage() {
         </Card>
       </div>
     </RoleGuard>
+  );
+}
+
+function LimitedAdminHome({ access }: { access: AdminAccess }) {
+  const workspaceItems = [
+    { permission: "admin.analytics.read", title: "Analytics & Reports", description: "Review platform metrics and released reports.", to: "/admin/reports" as const, icon: Activity },
+    { permission: "admin.accounts.read", title: "Members & Accounts", description: "View member and account records.", to: "/admin/accounts" as const, icon: Users },
+    { permission: "admin.business.read", title: "Business Operations", description: "View business partners, campaigns, and offers.", to: "/admin/businesses" as const, icon: BriefcaseBusiness },
+    { permission: "admin.creator.read", title: "Creator Operations", description: "View creator accounts and catalog activity.", to: "/admin/creators" as const, icon: Library },
+    { permission: "admin.rights.read", title: "Rights & Moderation", description: "View rights records and review activity.", to: "/admin/rights" as const, icon: Copyright },
+    { permission: "admin.content.read", title: "Play Operations", description: "View Play content and moderation activity.", to: "/admin/play" as const, icon: Gamepad2 },
+  ].filter((item) => access.permissions.includes(item.permission));
+
+  return (
+    <div className="mx-auto max-w-6xl space-y-7">
+      <header>
+        <div className="flex items-center gap-2 text-primary"><ShieldCheck className="h-5 w-5" />Permission-aware administrator access</div>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Your administrator workspace</h1>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+          Only the work areas assigned to your operational role are available.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {access.roles.map((role) => <Badge key={role} variant="secondary">{role.replaceAll("_", " ")}</Badge>)}
+        </div>
+      </header>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {workspaceItems.map((item) => (
+          <Card key={item.to} className="flex h-full flex-col">
+            <CardContent className="flex h-full flex-col p-5">
+              <item.icon className="h-6 w-6 text-primary" />
+              <p className="mt-4 font-semibold">{item.title}</p>
+              <p className="mt-2 flex-1 text-sm leading-6 text-muted-foreground">{item.description}</p>
+              <Button asChild variant="outline" className="mt-5"><Link to={item.to}>Open workspace <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 }
 

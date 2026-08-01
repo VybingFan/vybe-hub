@@ -11,7 +11,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -119,9 +119,9 @@ const PARTNER_MATERIALS = [
 
 function PartnerCenterRoute() {
   return (
-    <RoleGuard allow={["admin"]}>
+    <AdminPermissionGuard anyOf={["admin.business.read"]}>
       <PartnerCenter />
-    </RoleGuard>
+    </AdminPermissionGuard>
   );
 }
 

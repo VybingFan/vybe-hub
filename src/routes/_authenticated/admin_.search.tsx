@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { BriefcaseBusiness, Megaphone, Search, Tags, UsersRound } from "lucide-react";
 import { toast } from "sonner";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -74,7 +74,7 @@ function AdminSearchRoute() {
   );
 
   return (
-    <RoleGuard allow={["admin"]}>
+    <AdminPermissionGuard anyOf={["admin.search"]}>
       <div className="mx-auto max-w-6xl space-y-7">
         <header>
           <div className="flex items-center gap-2 text-primary">
@@ -134,7 +134,7 @@ function AdminSearchRoute() {
           }))}
         />
       </div>
-    </RoleGuard>
+    </AdminPermissionGuard>
   );
 }
 

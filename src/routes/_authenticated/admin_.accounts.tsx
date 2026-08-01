@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, RefreshCw, Search, UsersRound } from "lucide-react";
 import { toast } from "sonner";
-import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,9 +15,9 @@ export const Route = createFileRoute("/_authenticated/admin_/accounts")({
 
 function AdminAccountsRoute() {
   return (
-    <RoleGuard allow={["admin"]}>
+    <AdminPermissionGuard anyOf={["admin.accounts.read"]}>
       <AdminAccountsPage />
-    </RoleGuard>
+    </AdminPermissionGuard>
   );
 }
 
