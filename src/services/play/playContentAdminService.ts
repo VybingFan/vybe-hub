@@ -41,6 +41,8 @@ export interface PlayContentItem {
   scheduled_end_at: string | null;
   version: number;
   updated_at: string;
+  game_pack_id: string | null;
+  position: number | null;
 }
 
 export type PlayContentDraft = Omit<PlayContentItem, "id" | "status" | "version" | "updated_at"> & {

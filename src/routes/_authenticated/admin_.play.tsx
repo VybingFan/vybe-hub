@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PLAY_GENRES, PLAY_RELEASE_CHECKS } from "@/features/play/content";
+import { PlayGamePackManager } from "@/features/play/admin/PlayGamePackManager";
 import { adminTeamService, type AdminAccess } from "@/services/admin/adminTeamService";
 import {
   playContentAdminService,
@@ -77,6 +78,8 @@ const emptyDraft: PlayContentDraft = {
   discovery_url: null,
   scheduled_start_at: null,
   scheduled_end_at: null,
+  game_pack_id: null,
+  position: null,
 };
 
 function PlayAdministrationPage() {
@@ -93,6 +96,7 @@ function PlayContentWorkspace() {
   const [draft, setDraft] = useState<PlayContentDraft>(emptyDraft);
   const [choicesText, setChoicesText] = useState("");
   const [answerText, setAnswerText] = useState("");
+  const [matchesText, setMatchesText] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -135,6 +139,7 @@ function PlayContentWorkspace() {
     setDraft(emptyDraft);
     setChoicesText("");
     setAnswerText("");
+    setMatchesText("");
   }
 
   function edit(item: PlayContentItem) {
@@ -156,9 +161,14 @@ function PlayContentWorkspace() {
       discovery_url: item.discovery_url,
       scheduled_start_at: item.scheduled_start_at,
       scheduled_end_at: item.scheduled_end_at,
+      game_pack_id: item.game_pack_id,
+      position: item.position,
     });
     setChoicesText(item.payload.choices?.join("\n") ?? "");
     setAnswerText(item.payload.answer ?? "");
+    setMatchesText(
+      item.payload.matches?.map((match) => `${match.left} => ${match.right}`).join("\n") ?? "",
+    );
     document.getElementById("play-editor")?.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -184,6 +194,14 @@ function PlayContentWorkspace() {
             .map((value) => value.trim())
             .filter(Boolean),
           answer: answerText.trim(),
+          matches:
+            draft.experience_type === "vybe_match"
+              ? matchesText
+                  .split("\n")
+                  .map((line) => line.split("=>").map((value) => value.trim()))
+                  .filter(([left, right]) => Boolean(left && right))
+                  .map(([left, right]) => ({ left, right }))
+              : draft.payload.matches,
         },
       });
       setItems((current) => [saved, ...current.filter((item) => item.id !== saved.id)]);
@@ -278,6 +296,12 @@ function PlayContentWorkspace() {
           </CardContent>
         </Card>
       ) : null}
+
+      <PlayGamePackManager
+        canEdit={canEdit}
+        canPublish={canPublish}
+        onContentChanged={() => void load()}
+      />
 
       <div className="grid gap-8 xl:grid-cols-[1.05fr_0.95fr]">
         <Card>
@@ -465,21 +489,34 @@ function PlayContentWorkspace() {
                 disabled={!canEdit}
               />
             </Field>
-            <Field label="Choices or match entries" hint="Enter one choice per line.">
-              <Textarea
-                rows={4}
-                value={choicesText}
-                onChange={(event) => setChoicesText(event.target.value)}
-                disabled={!canEdit}
-              />
-            </Field>
-            <Field label="Correct answer">
-              <Input
-                value={answerText}
-                onChange={(event) => setAnswerText(event.target.value)}
-                disabled={!canEdit}
-              />
-            </Field>
+            {draft.experience_type === "vybe_match" ? (
+              <Field label="Match pairs" hint="Enter one pair per line as left => right.">
+                <Textarea
+                  rows={6}
+                  value={matchesText}
+                  onChange={(event) => setMatchesText(event.target.value)}
+                  disabled={!canEdit}
+                />
+              </Field>
+            ) : (
+              <>
+                <Field label="Choices" hint="Enter one choice per line.">
+                  <Textarea
+                    rows={4}
+                    value={choicesText}
+                    onChange={(event) => setChoicesText(event.target.value)}
+                    disabled={!canEdit}
+                  />
+                </Field>
+                <Field label="Correct answer">
+                  <Input
+                    value={answerText}
+                    onChange={(event) => setAnswerText(event.target.value)}
+                    disabled={!canEdit}
+                  />
+                </Field>
+              </>
+            )}
             <Field label="Player explanation">
               <Textarea
                 rows={3}

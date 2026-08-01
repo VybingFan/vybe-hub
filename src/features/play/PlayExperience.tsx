@@ -31,6 +31,8 @@ import {
   syncOfflinePlayProgress,
 } from "@/features/play/offlineProgress";
 import { publicPlayContentService } from "@/services/play/publicPlayContentService";
+import { publicPlayGamePackService } from "@/services/play/publicPlayGamePackService";
+import { PublishedGamePacks } from "@/features/play/games/PublishedGamePacks";
 
 const demoTrivia = [
   {
@@ -175,8 +177,12 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
 
   useEffect(() => {
     let active = true;
-    void publicPlayContentService
-      .listReleased("beat_blitz")
+    void publicPlayGamePackService
+      .listReleased()
+      .then((packs) => packs.find((pack) => pack.game_type === "beat_blitz")?.items ?? [])
+      .then(async (packItems) =>
+        packItems.length ? packItems : publicPlayContentService.listReleased("beat_blitz"),
+      )
       .then((items) => {
         const released = items.flatMap((item) => {
           const choices = item.payload.choices ?? [];
@@ -447,6 +453,8 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
           </div>
         </div>
       </section>
+
+      <PublishedGamePacks />
 
       <section className="border-y border-border/60 bg-surface/40">
         <div className="mx-auto max-w-6xl px-6 py-16">
