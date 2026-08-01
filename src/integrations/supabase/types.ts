@@ -3127,6 +3127,84 @@ export type Database = {
           },
         ]
       }
+      creator_stories: {
+        Row: {
+          body: string
+          cover_url: string | null
+          created_at: string
+          creator_user_id: string
+          id: string
+          publish_at: string | null
+          published_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          body: string
+          cover_url?: string | null
+          created_at?: string
+          creator_user_id: string
+          id?: string
+          publish_at?: string | null
+          published_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          body?: string
+          cover_url?: string | null
+          created_at?: string
+          creator_user_id?: string
+          id?: string
+          publish_at?: string | null
+          published_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
+      creator_support_requests: {
+        Row: {
+          category: string
+          created_at: string
+          creator_user_id: string
+          details: string
+          id: string
+          priority: string
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          creator_user_id: string
+          details: string
+          id?: string
+          priority?: string
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          creator_user_id?: string
+          details?: string
+          id?: string
+          priority?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       creator_track_credits: {
         Row: {
           created_at: string
@@ -4591,6 +4669,10 @@ export type Database = {
         }
         Returns: string
       }
+      creator_follow_summary: {
+        Args: { p_creator_user_id: string }
+        Returns: Json
+      }
       creator_music_rights_status: {
         Args: never
         Returns: {
@@ -4662,7 +4744,9 @@ export type Database = {
       get_admin_work_queue_summary: { Args: never; Returns: Json }
       get_business_pilot_dashboard: { Args: never; Returns: Json }
       get_my_admin_access_v24_28: { Args: never; Returns: Json }
+      get_my_creator_activity: { Args: { p_days?: number }; Returns: Json }
       get_my_creator_membership: { Args: never; Returns: Json }
+      get_public_creator_plan: { Args: { p_user_id: string }; Returns: string }
       has_admin_permission: {
         Args: { _permission: string; _user_id: string }
         Returns: boolean
@@ -4699,6 +4783,28 @@ export type Database = {
           _invitation_id: string
         }
         Returns: undefined
+      }
+      public_creator_stories: {
+        Args: { p_creator_user_id: string }
+        Returns: {
+          body: string
+          cover_url: string | null
+          created_at: string
+          creator_user_id: string
+          id: string
+          publish_at: string | null
+          published_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          visibility: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "creator_stories"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       queue_track_lyrics_transcription: {
         Args: { target_track_id: string }
@@ -5054,6 +5160,10 @@ export type Database = {
         Returns: undefined
       }
       sync_business_pilot_notifications: { Args: never; Returns: undefined }
+      toggle_creator_follow: {
+        Args: { p_creator_user_id: string }
+        Returns: Json
+      }
       update_my_business_campaign_draft_v24_27_1: {
         Args: {
           p_campaign_id: string
