@@ -24,6 +24,7 @@ import { CreatorActions } from "@/components/engagement/CreatorActions";
 import { CreatorComments } from "@/components/engagement/CreatorComments";
 import { FollowCreatorButton } from "@/components/engagement/FollowCreatorButton";
 import { CreatorPlanBadge } from "@/components/membership/CreatorPlanBadge";
+import { PublicCreatorStories } from "@/components/stories/PublicCreatorStories";
 
 export const Route = createFileRoute("/creator/$username")({ component: CreatorPage });
 
@@ -288,12 +289,14 @@ export function PublicArtistHome({
             </div>
           </section>
         )}
+        <PublicCreatorStories creatorUserId={profile.user_id} />
         <CreatorActions entityId={profile.user_id} />
         <CreatorComments entityId={profile.user_id} />
       </main>
     </div>
   );
 }
+
 
 
 

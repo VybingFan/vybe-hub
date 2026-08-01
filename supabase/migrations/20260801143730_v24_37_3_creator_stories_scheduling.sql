@@ -1,0 +1,7 @@
+begin;
+create table public.creator_stories(id uuid primary key default gen_random_uuid(),creator_user_id uuid not null references auth.users(id) on delete cascade,title text not null check(char_length(title) between 1 and 140),body text not null check(char_length(body) between 1 and 20000),cover_url text,visibility text not null default 'public' check(visibility in('public','members')),status text not null default 'draft' check(status in('draft','scheduled','published','archived')),publish_at timestamptz,published_at timestamptz,created_at timestamptz not null default now(),updated_at timestamptz not null default now());alter table public.creator_stories enable row level security;
+create policy "creator stories own" on public.creator_stories for all using(creator_user_id=auth.uid()) with check(creator_user_id=auth.uid());
+create policy "public stories read" on public.creator_stories for select using(visibility='public' and ((status='published') or(status='scheduled' and publish_at<=now())));
+create or replace function public.public_creator_stories(p_creator_user_id uuid) returns setof public.creator_stories language sql security definer set search_path=public stable as $$select * from creator_stories where creator_user_id=p_creator_user_id and visibility='public' and(status='published' or(status='scheduled' and publish_at<=now())) order by coalesce(publish_at,published_at,created_at) desc$$;grant execute on function public.public_creator_stories(uuid) to anon,authenticated;
+commit;
+

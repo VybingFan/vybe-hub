@@ -51,6 +51,7 @@ import { Route as ApiAdminTeamInviteRouteImport } from './routes/api.admin-team-
 import { Route as AdminInviteTokenRouteImport } from './routes/admin-invite.$token'
 import { Route as AuthenticatedWatchRouteImport } from './routes/_authenticated/watch'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
+import { Route as AuthenticatedStoriesRouteImport } from './routes/_authenticated/stories'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedReadRouteImport } from './routes/_authenticated/read'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -307,6 +308,11 @@ const AuthenticatedWatchRoute = AuthenticatedWatchRouteImport.update({
 const AuthenticatedVideosRoute = AuthenticatedVideosRouteImport.update({
   id: '/videos',
   path: '/videos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStoriesRoute = AuthenticatedStoriesRouteImport.update({
+  id: '/stories',
+  path: '/stories',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -615,6 +621,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/stories': typeof AuthenticatedStoriesRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
@@ -706,6 +713,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/stories': typeof AuthenticatedStoriesRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
@@ -799,6 +807,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/read': typeof AuthenticatedReadRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/stories': typeof AuthenticatedStoriesRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_authenticated/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
@@ -892,6 +901,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/read'
     | '/settings'
+    | '/stories'
     | '/videos'
     | '/watch'
     | '/admin-invite/$token'
@@ -983,6 +993,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/read'
     | '/settings'
+    | '/stories'
     | '/videos'
     | '/watch'
     | '/admin-invite/$token'
@@ -1075,6 +1086,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/read'
     | '/_authenticated/settings'
+    | '/_authenticated/stories'
     | '/_authenticated/videos'
     | '/_authenticated/watch'
     | '/admin-invite/$token'
@@ -1464,6 +1476,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVideosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/stories': {
+      id: '/_authenticated/stories'
+      path: '/stories'
+      fullPath: '/stories'
+      preLoaderRoute: typeof AuthenticatedStoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -1827,6 +1846,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReadRoute: typeof AuthenticatedReadRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedStoriesRoute: typeof AuthenticatedStoriesRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
   AuthenticatedAdminAccountsRoute: typeof AuthenticatedAdminAccountsRoute
@@ -1875,6 +1895,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReadRoute: AuthenticatedReadRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedStoriesRoute: AuthenticatedStoriesRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
   AuthenticatedAdminAccountsRoute: AuthenticatedAdminAccountsRoute,
