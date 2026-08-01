@@ -56,6 +56,7 @@ import { Route as AuthenticatedReadRouteImport } from './routes/_authenticated/r
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPlaylistsRouteImport } from './routes/_authenticated/playlists'
 import { Route as AuthenticatedPlayRouteImport } from './routes/_authenticated/play'
+import { Route as AuthenticatedOrganizationRouteImport } from './routes/_authenticated/organization'
 import { Route as AuthenticatedMyVybeRouteImport } from './routes/_authenticated/my-vybe'
 import { Route as AuthenticatedMusicRouteImport } from './routes/_authenticated/music'
 import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/merch'
@@ -331,6 +332,12 @@ const AuthenticatedPlayRoute = AuthenticatedPlayRouteImport.update({
   path: '/play',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOrganizationRoute =
+  AuthenticatedOrganizationRouteImport.update({
+    id: '/organization',
+    path: '/organization',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMyVybeRoute = AuthenticatedMyVybeRouteImport.update({
   id: '/my-vybe',
   path: '/my-vybe',
@@ -586,6 +593,7 @@ export interface FileRoutesByFullPath {
   '/merch': typeof AuthenticatedMerchRoute
   '/music': typeof AuthenticatedMusicRoute
   '/my-vybe': typeof AuthenticatedMyVybeRoute
+  '/organization': typeof AuthenticatedOrganizationRoute
   '/play': typeof AuthenticatedPlayRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -674,6 +682,7 @@ export interface FileRoutesByTo {
   '/merch': typeof AuthenticatedMerchRoute
   '/music': typeof AuthenticatedMusicRoute
   '/my-vybe': typeof AuthenticatedMyVybeRoute
+  '/organization': typeof AuthenticatedOrganizationRoute
   '/play': typeof AuthenticatedPlayRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -764,6 +773,7 @@ export interface FileRoutesById {
   '/_authenticated/merch': typeof AuthenticatedMerchRoute
   '/_authenticated/music': typeof AuthenticatedMusicRoute
   '/_authenticated/my-vybe': typeof AuthenticatedMyVybeRoute
+  '/_authenticated/organization': typeof AuthenticatedOrganizationRoute
   '/_authenticated/play': typeof AuthenticatedPlayRoute
   '/_authenticated/playlists': typeof AuthenticatedPlaylistsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -854,6 +864,7 @@ export interface FileRouteTypes {
     | '/merch'
     | '/music'
     | '/my-vybe'
+    | '/organization'
     | '/play'
     | '/playlists'
     | '/profile'
@@ -942,6 +953,7 @@ export interface FileRouteTypes {
     | '/merch'
     | '/music'
     | '/my-vybe'
+    | '/organization'
     | '/play'
     | '/playlists'
     | '/profile'
@@ -1031,6 +1043,7 @@ export interface FileRouteTypes {
     | '/_authenticated/merch'
     | '/_authenticated/music'
     | '/_authenticated/my-vybe'
+    | '/_authenticated/organization'
     | '/_authenticated/play'
     | '/_authenticated/playlists'
     | '/_authenticated/profile'
@@ -1460,6 +1473,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlayRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/organization': {
+      id: '/_authenticated/organization'
+      path: '/organization'
+      fullPath: '/organization'
+      preLoaderRoute: typeof AuthenticatedOrganizationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/my-vybe': {
       id: '/_authenticated/my-vybe'
       path: '/my-vybe'
@@ -1759,6 +1779,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMerchRoute: typeof AuthenticatedMerchRoute
   AuthenticatedMusicRoute: typeof AuthenticatedMusicRoute
   AuthenticatedMyVybeRoute: typeof AuthenticatedMyVybeRoute
+  AuthenticatedOrganizationRoute: typeof AuthenticatedOrganizationRoute
   AuthenticatedPlayRoute: typeof AuthenticatedPlayRoute
   AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -1804,6 +1825,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMerchRoute: AuthenticatedMerchRoute,
   AuthenticatedMusicRoute: AuthenticatedMusicRoute,
   AuthenticatedMyVybeRoute: AuthenticatedMyVybeRoute,
+  AuthenticatedOrganizationRoute: AuthenticatedOrganizationRoute,
   AuthenticatedPlayRoute: AuthenticatedPlayRoute,
   AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
