@@ -494,79 +494,96 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
         <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr]">
           <article
             id="trivia"
-            className="scroll-mt-24 rounded-[2rem] border border-lime-300/25 bg-card p-6 sm:p-8"
+            className="scroll-mt-24 overflow-hidden rounded-[2rem] border border-lime-300/25 bg-card shadow-xl shadow-lime-300/5"
           >
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[.18em] text-lime-300">
-                  Available now
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold">VYBE Music Trivia</h2>
-                <p className="mt-1 text-sm text-muted-foreground">{playGenre} pilot round</p>
-              </div>
-              <Badge variant="outline">
-                Question {finished ? triviaItems.length : questionIndex + 1} of {triviaItems.length}
-              </Badge>
+            <div className="relative aspect-[16/7] overflow-hidden bg-muted">
+              <img
+                src="/images/play/games/beat-blitz-cover-v1.webp"
+                alt=""
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
             </div>
-
-            {finished ? (
-              <div className="py-10 text-center">
-                <Trophy className="mx-auto h-14 w-14 text-lime-300" />
-                <h3 className="mt-5 text-3xl font-semibold">
-                  You scored {score} of {triviaItems.length}
-                </h3>
-                <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
-                  This casual result is saved on this device. Signed-in progress synchronizes after
-                  reconnection, but offline scores are never treated as verified competition
-                  results.
-                </p>
-                <Button onClick={restartTrivia} className="mt-6 rounded-full">
-                  <RotateCcw className="mr-2 h-4 w-4" />
-                  Play again
-                </Button>
-              </div>
-            ) : (
-              <div className="mt-8">
-                <h3 className="text-xl font-semibold leading-8">{question.question}</h3>
-                <div className="mt-5 grid gap-3">
-                  {question.choices.map((choice, index) => {
-                    const correct = selected !== null && index === question.answer;
-                    const wrong = selected === index && index !== question.answer;
-                    return (
-                      <button
-                        key={choice}
-                        type="button"
-                        onClick={() => chooseTrivia(index)}
-                        className={`rounded-2xl border p-4 text-left transition ${
-                          correct
-                            ? "border-lime-300 bg-lime-300/10"
-                            : wrong
-                              ? "border-destructive bg-destructive/10"
-                              : "border-border bg-background/50 hover:border-primary/40"
-                        }`}
-                      >
-                        {choice}
-                      </button>
-                    );
-                  })}
+            <div className="p-6 sm:p-8">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[.18em] text-lime-300">
+                    Available now
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold">VYBE Music Trivia</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">{playGenre} pilot round</p>
                 </div>
-                {selected !== null && (
-                  <div className="mt-5 rounded-2xl border border-border bg-background/60 p-4">
-                    <p className="flex items-center gap-2 font-medium">
-                      <CheckCircle2 className="h-5 w-5 text-lime-300" />
-                      {selected === question.answer
-                        ? "Correct"
-                        : "The correct answer is highlighted"}
-                    </p>
-                    <p className="mt-2 text-sm text-muted-foreground">{question.explanation}</p>
-                    <Button onClick={nextQuestion} className="mt-4 rounded-full">
-                      {questionIndex === triviaItems.length - 1 ? "See score" : "Next question"}
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
+                <Badge variant="outline">
+                  Question {finished ? triviaItems.length : questionIndex + 1} of{" "}
+                  {triviaItems.length}
+                </Badge>
               </div>
-            )}
+
+              {finished ? (
+                <div className="py-10 text-center">
+                  <Trophy className="mx-auto h-14 w-14 text-lime-300" />
+                  <h3 className="mt-5 text-3xl font-semibold">
+                    You scored {score} of {triviaItems.length}
+                  </h3>
+                  <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
+                    This casual result is saved on this device. Signed-in progress synchronizes
+                    after reconnection, but offline scores are never treated as verified competition
+                    results.
+                  </p>
+                  <Button onClick={restartTrivia} className="mt-6 rounded-full">
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    Play again
+                  </Button>
+                </div>
+              ) : (
+                <div className="mt-8">
+                  <div className="mb-6 h-2 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-400 to-lime-400 transition-all duration-500"
+                      style={{ width: `${((questionIndex + 1) / triviaItems.length) * 100}%` }}
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold leading-8">{question.question}</h3>
+                  <div className="mt-5 grid gap-3">
+                    {question.choices.map((choice, index) => {
+                      const correct = selected !== null && index === question.answer;
+                      const wrong = selected === index && index !== question.answer;
+                      return (
+                        <button
+                          key={choice}
+                          type="button"
+                          onClick={() => chooseTrivia(index)}
+                          className={`rounded-2xl border p-4 text-left transition ${
+                            correct
+                              ? "border-lime-300 bg-lime-300/10"
+                              : wrong
+                                ? "border-destructive bg-destructive/10"
+                                : "border-border bg-background/50 hover:border-primary/40"
+                          }`}
+                        >
+                          {choice}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {selected !== null && (
+                    <div className="mt-5 rounded-2xl border border-border bg-background/60 p-4">
+                      <p className="flex items-center gap-2 font-medium">
+                        <CheckCircle2 className="h-5 w-5 text-lime-300" />
+                        {selected === question.answer
+                          ? "Correct"
+                          : "The correct answer is highlighted"}
+                      </p>
+                      <p className="mt-2 text-sm text-muted-foreground">{question.explanation}</p>
+                      <Button onClick={nextQuestion} className="mt-4 rounded-full">
+                        {questionIndex === triviaItems.length - 1 ? "See score" : "Next question"}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </article>
 
           <article

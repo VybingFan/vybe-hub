@@ -15,6 +15,13 @@ import {
   type ReleasedPlayGamePack,
 } from "@/services/play/publicPlayGamePackService";
 
+const GAME_COVERS = {
+  beat_blitz: "/images/play/games/beat-blitz-cover-v1.webp",
+  hidden_gems: "/images/play/games/hidden-gems-cover-v1.webp",
+  vybe_match: "/images/play/games/vybe-match-cover-v1.webp",
+  daily_vybe: "/images/play/games/beat-blitz-cover-v1.webp",
+} as const;
+
 export function PublishedGamePacks() {
   const [packs, setPacks] = useState<ReleasedPlayGamePack[]>([]);
   const [selectedPackId, setSelectedPackId] = useState<string | null>(null);
@@ -82,12 +89,20 @@ export function PublishedGamePacks() {
                 type="button"
                 onClick={() => choosePack(pack)}
                 aria-pressed={selected}
-                className={`rounded-3xl border p-5 text-left transition hover:-translate-y-0.5 ${
+                className={`group overflow-hidden rounded-3xl border p-5 text-left transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/10 ${
                   selected
                     ? "border-primary bg-primary/10"
                     : "border-border bg-card hover:border-primary/50"
                 }`}
               >
+                <div className="-mx-5 -mt-5 mb-5 aspect-video overflow-hidden rounded-t-[1.45rem] bg-muted">
+                  <img
+                    src={GAME_COVERS[pack.game_type]}
+                    alt=""
+                    loading="lazy"
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                </div>
                 <div className="flex items-center justify-between gap-3">
                   <Icon className="h-5 w-5 text-primary" />
                   <Badge variant="outline">{itemCount} to play</Badge>
@@ -149,59 +164,79 @@ function ChoicePlayer({ pack }: { pack: ReleasedPlayGamePack }) {
     setFinished(false);
   }
   return (
-    <article className="rounded-[2rem] border border-primary/25 bg-card p-6 sm:p-8">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <Icon className="h-5 w-5 text-primary" />
-          <h3 className="mt-3 text-2xl font-semibold">{pack.title}</h3>
-          <p className="mt-2 text-sm text-muted-foreground">{pack.description}</p>
-        </div>
-        <Badge variant="outline">{pack.genre}</Badge>
+    <article className="overflow-hidden rounded-[2rem] border border-primary/25 bg-card shadow-xl shadow-primary/5">
+      <div className="relative aspect-[16/7] overflow-hidden bg-muted">
+        <img
+          src={GAME_COVERS[pack.game_type]}
+          alt=""
+          loading="lazy"
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
+        <Badge className="absolute right-4 top-4 border-white/20 bg-black/55 text-white backdrop-blur">
+          Score {score}
+        </Badge>
       </div>
-      {finished ? (
-        <div className="py-8 text-center">
-          <p className="text-2xl font-semibold">
-            {score} of {playable.length}
-          </p>
-          <Button className="mt-5" onClick={restart}>
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Play again
-          </Button>
-        </div>
-      ) : (
-        <div className="mt-7">
-          <p className="text-xs font-medium uppercase tracking-wider text-primary">
-            {pack.game_type === "hidden_gems" ? "Clue" : "Daily prompt"} {index + 1} of{" "}
-            {playable.length}
-          </p>
-          <p className="mt-2 text-lg font-semibold leading-7">{item.prompt}</p>
-          <div className="mt-4 grid gap-2">
-            {item.payload.choices!.map((choice) => (
-              <button
-                key={choice}
-                type="button"
-                onClick={() => choose(choice)}
-                className={`rounded-2xl border p-3 text-left ${answer && choice === item.payload.answer ? "border-lime-400 bg-lime-400/10" : answer === choice ? "border-destructive bg-destructive/10" : "border-border hover:border-primary/40"}`}
-              >
-                {choice}
-              </button>
-            ))}
+      <div className="p-6 sm:p-8">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <Icon className="h-5 w-5 text-primary" />
+            <h3 className="mt-3 text-2xl font-semibold">{pack.title}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{pack.description}</p>
           </div>
-          {answer ? (
-            <div className="mt-4 rounded-2xl bg-muted p-4">
-              <p className="flex items-center gap-2 font-medium">
-                <CheckCircle2 className="h-4 w-4 text-lime-500" />
-                {answer === item.payload.answer ? "Correct" : `Answer: ${item.payload.answer}`}
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">{item.explanation}</p>
-              <Button size="sm" className="mt-4" onClick={next}>
-                {index === playable.length - 1 ? "See score" : "Next"}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          ) : null}
+          <Badge variant="outline">{pack.genre}</Badge>
         </div>
-      )}
+        {finished ? (
+          <div className="py-8 text-center">
+            <p className="text-2xl font-semibold">
+              {score} of {playable.length}
+            </p>
+            <Button className="mt-5" onClick={restart}>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Play again
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-7">
+            <div className="mb-5 h-2 overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-400 to-lime-400 transition-all duration-500"
+                style={{ width: `${((index + 1) / playable.length) * 100}%` }}
+              />
+            </div>
+            <p className="text-xs font-medium uppercase tracking-wider text-primary">
+              {pack.game_type === "hidden_gems" ? "Clue" : "Daily prompt"} {index + 1} of{" "}
+              {playable.length}
+            </p>
+            <p className="mt-2 text-lg font-semibold leading-7">{item.prompt}</p>
+            <div className="mt-4 grid gap-2">
+              {item.payload.choices!.map((choice) => (
+                <button
+                  key={choice}
+                  type="button"
+                  onClick={() => choose(choice)}
+                  className={`rounded-2xl border p-3 text-left ${answer && choice === item.payload.answer ? "border-lime-400 bg-lime-400/10" : answer === choice ? "border-destructive bg-destructive/10" : "border-border hover:border-primary/40"}`}
+                >
+                  {choice}
+                </button>
+              ))}
+            </div>
+            {answer ? (
+              <div className="mt-4 rounded-2xl bg-muted p-4">
+                <p className="flex items-center gap-2 font-medium">
+                  <CheckCircle2 className="h-4 w-4 text-lime-500" />
+                  {answer === item.payload.answer ? "Correct" : `Answer: ${item.payload.answer}`}
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">{item.explanation}</p>
+                <Button size="sm" className="mt-4" onClick={next}>
+                  {index === playable.length - 1 ? "See score" : "Next"}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        )}
+      </div>
     </article>
   );
 }
@@ -218,6 +253,7 @@ function MatchPlayer({ pack }: { pack: ReleasedPlayGamePack }) {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [score, setScore] = useState(0);
+  const [finished, setFinished] = useState(false);
   if (!matches.length) return null;
   const match = matches[index];
   function choose(value: string) {
@@ -226,39 +262,80 @@ function MatchPlayer({ pack }: { pack: ReleasedPlayGamePack }) {
     if (value === match.right) setScore((current) => current + 1);
   }
   function next() {
-    setIndex((current) => (current + 1) % matches.length);
+    if (index === matches.length - 1) {
+      setFinished(true);
+      return;
+    }
+    setIndex((current) => current + 1);
     setSelected(null);
   }
+  function restart() {
+    setIndex(0);
+    setSelected(null);
+    setScore(0);
+    setFinished(false);
+  }
   return (
-    <article className="rounded-[2rem] border border-violet-400/25 bg-card p-6 sm:p-8">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <Layers3 className="h-5 w-5 text-violet-400" />
-          <h3 className="mt-3 text-2xl font-semibold">{pack.title}</h3>
-          <p className="mt-2 text-sm text-muted-foreground">{pack.description}</p>
+    <article className="overflow-hidden rounded-[2rem] border border-violet-400/25 bg-card shadow-xl shadow-violet-500/5">
+      <div className="relative aspect-[16/7] overflow-hidden bg-muted">
+        <img
+          src={GAME_COVERS.vybe_match}
+          alt=""
+          loading="lazy"
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
+      </div>
+      <div className="p-6 sm:p-8">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <Layers3 className="h-5 w-5 text-violet-400" />
+            <h3 className="mt-3 text-2xl font-semibold">{pack.title}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{pack.description}</p>
+          </div>
+          <Badge variant="outline">Score {score}</Badge>
         </div>
-        <Badge variant="outline">Score {score}</Badge>
+        {finished ? (
+          <div className="py-8 text-center">
+            <CheckCircle2 className="mx-auto h-12 w-12 text-lime-400" />
+            <p className="mt-4 text-2xl font-semibold">
+              You matched {score} of {matches.length}
+            </p>
+            <Button className="mt-5" onClick={restart}>
+              <RotateCcw className="mr-2 h-4 w-4" /> Play again
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="mt-7 h-2 overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-violet-500 to-cyan-400 transition-all duration-500"
+                style={{ width: `${((index + 1) / matches.length) * 100}%` }}
+              />
+            </div>
+            <p className="mt-7 text-sm text-muted-foreground">Find the match for:</p>
+            <p className="mt-1 text-xl font-semibold">{match.left}</p>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              {answers.map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => choose(value)}
+                  className={`rounded-2xl border p-3 text-left ${selected && value === match.right ? "border-lime-400 bg-lime-400/10" : selected === value ? "border-destructive bg-destructive/10" : "border-border hover:border-violet-400/50"}`}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+            {selected ? (
+              <Button size="sm" className="mt-4" onClick={next}>
+                Next match
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : null}
+          </>
+        )}
       </div>
-      <p className="mt-7 text-sm text-muted-foreground">Find the match for:</p>
-      <p className="mt-1 text-xl font-semibold">{match.left}</p>
-      <div className="mt-4 grid gap-2 sm:grid-cols-2">
-        {answers.map((value) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => choose(value)}
-            className={`rounded-2xl border p-3 text-left ${selected && value === match.right ? "border-lime-400 bg-lime-400/10" : selected === value ? "border-destructive bg-destructive/10" : "border-border hover:border-violet-400/50"}`}
-          >
-            {value}
-          </button>
-        ))}
-      </div>
-      {selected ? (
-        <Button size="sm" className="mt-4" onClick={next}>
-          Next match
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
-      ) : null}
     </article>
   );
 }
