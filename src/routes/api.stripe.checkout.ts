@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 const checkoutInput = z.object({
-  planCode: z.enum(["creator_plus", "creator_pro", "creator_studio"]),
+  planCode: z.enum(["creator_plus"]),
   interval: z.enum(["monthly", "annual"]),
 });
 
@@ -136,3 +136,4 @@ export const Route = createFileRoute("/api/stripe/checkout")({
     },
   },
 });
+

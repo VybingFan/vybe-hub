@@ -80,7 +80,7 @@ export const CREATOR_PLAN_CATALOG: CreatorPlanCatalogEntry[] = [
       "Creator Plus badge and priority email support",
       "Ten hosted videos; native storage and AI activate when connected",
     ],
-    launchState: "planned",
+    launchState: "available",
   },
   {
     code: "creator_pro",
@@ -143,8 +143,8 @@ export const MEMBERSHIP_FEATURE_STATUS = {
   songAndPlaylistEditors: "available",
   publicCreatorLinks: "available",
   merchShowcase: "available",
-  creatorStories: "coming_soon",
-  creatorAnalytics: "coming_soon",
+  creatorStories: "available",
+  creatorAnalytics: "available",
   creatorAssistant: "coming_soon",
   hostedVideoPublishing: "available",
   nativeVideoHosting: "coming_soon",
@@ -158,3 +158,4 @@ export const FOUNDING_CREATOR_NOTE =
 
 export const PIONEER_NOTE =
   "VYBE Pioneer is planned recognition for the first 50 eligible public paying creators, not a separate plan. Enrollment and discounted pricing are not open yet.";
+

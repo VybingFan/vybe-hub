@@ -23,6 +23,7 @@ import { VIDEO_TYPES } from "@/features/video/schema";
 import { CreatorActions } from "@/components/engagement/CreatorActions";
 import { CreatorComments } from "@/components/engagement/CreatorComments";
 import { FollowCreatorButton } from "@/components/engagement/FollowCreatorButton";
+import { CreatorPlanBadge } from "@/components/membership/CreatorPlanBadge";
 
 export const Route = createFileRoute("/creator/$username")({ component: CreatorPage });
 
@@ -120,6 +121,7 @@ export function PublicArtistHome({
                   <h1 className="mt-1 break-words text-3xl font-bold sm:text-4xl md:text-6xl">
                     {name}
                   </h1>
+                  <CreatorPlanBadge userId={profile.user_id} />
                   <div className="mt-3 flex flex-wrap gap-2">
                     {(profile.genres?.length
                       ? profile.genres
@@ -292,6 +294,7 @@ export function PublicArtistHome({
     </div>
   );
 }
+
 
 
 

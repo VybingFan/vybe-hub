@@ -66,6 +66,8 @@ import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedEpkRouteImport } from './routes/_authenticated/epk'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCreatorSupportRouteImport } from './routes/_authenticated/creator-support'
+import { Route as AuthenticatedCreatorAnalyticsRouteImport } from './routes/_authenticated/creator-analytics'
 import { Route as AuthenticatedContentRouteImport } from './routes/_authenticated/content'
 import { Route as AuthenticatedConnectionsRouteImport } from './routes/_authenticated/connections'
 import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
@@ -383,6 +385,18 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCreatorSupportRoute =
+  AuthenticatedCreatorSupportRouteImport.update({
+    id: '/creator-support',
+    path: '/creator-support',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCreatorAnalyticsRoute =
+  AuthenticatedCreatorAnalyticsRouteImport.update({
+    id: '/creator-analytics',
+    path: '/creator-analytics',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedContentRoute = AuthenticatedContentRouteImport.update({
   id: '/content',
   path: '/content',
@@ -584,6 +598,8 @@ export interface FileRoutesByFullPath {
   '/communities': typeof AuthenticatedCommunitiesRoute
   '/connections': typeof AuthenticatedConnectionsRoute
   '/content': typeof AuthenticatedContentRoute
+  '/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
+  '/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/epk': typeof AuthenticatedEpkRoute
@@ -673,6 +689,8 @@ export interface FileRoutesByTo {
   '/communities': typeof AuthenticatedCommunitiesRoute
   '/connections': typeof AuthenticatedConnectionsRoute
   '/content': typeof AuthenticatedContentRoute
+  '/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
+  '/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/epk': typeof AuthenticatedEpkRoute
@@ -764,6 +782,8 @@ export interface FileRoutesById {
   '/_authenticated/communities': typeof AuthenticatedCommunitiesRoute
   '/_authenticated/connections': typeof AuthenticatedConnectionsRoute
   '/_authenticated/content': typeof AuthenticatedContentRoute
+  '/_authenticated/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
+  '/_authenticated/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
   '/_authenticated/epk': typeof AuthenticatedEpkRoute
@@ -855,6 +875,8 @@ export interface FileRouteTypes {
     | '/communities'
     | '/connections'
     | '/content'
+    | '/creator-analytics'
+    | '/creator-support'
     | '/dashboard'
     | '/discover'
     | '/epk'
@@ -944,6 +966,8 @@ export interface FileRouteTypes {
     | '/communities'
     | '/connections'
     | '/content'
+    | '/creator-analytics'
+    | '/creator-support'
     | '/dashboard'
     | '/discover'
     | '/epk'
@@ -1034,6 +1058,8 @@ export interface FileRouteTypes {
     | '/_authenticated/communities'
     | '/_authenticated/connections'
     | '/_authenticated/content'
+    | '/_authenticated/creator-analytics'
+    | '/_authenticated/creator-support'
     | '/_authenticated/dashboard'
     | '/_authenticated/discover'
     | '/_authenticated/epk'
@@ -1543,6 +1569,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/creator-support': {
+      id: '/_authenticated/creator-support'
+      path: '/creator-support'
+      fullPath: '/creator-support'
+      preLoaderRoute: typeof AuthenticatedCreatorSupportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/creator-analytics': {
+      id: '/_authenticated/creator-analytics'
+      path: '/creator-analytics'
+      fullPath: '/creator-analytics'
+      preLoaderRoute: typeof AuthenticatedCreatorAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/content': {
       id: '/_authenticated/content'
       path: '/content'
@@ -1770,6 +1810,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommunitiesRoute: typeof AuthenticatedCommunitiesRoute
   AuthenticatedConnectionsRoute: typeof AuthenticatedConnectionsRoute
   AuthenticatedContentRoute: typeof AuthenticatedContentRoute
+  AuthenticatedCreatorAnalyticsRoute: typeof AuthenticatedCreatorAnalyticsRoute
+  AuthenticatedCreatorSupportRoute: typeof AuthenticatedCreatorSupportRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
   AuthenticatedEpkRoute: typeof AuthenticatedEpkRoute
@@ -1816,6 +1858,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommunitiesRoute: AuthenticatedCommunitiesRoute,
   AuthenticatedConnectionsRoute: AuthenticatedConnectionsRoute,
   AuthenticatedContentRoute: AuthenticatedContentRoute,
+  AuthenticatedCreatorAnalyticsRoute: AuthenticatedCreatorAnalyticsRoute,
+  AuthenticatedCreatorSupportRoute: AuthenticatedCreatorSupportRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
   AuthenticatedEpkRoute: AuthenticatedEpkRoute,
