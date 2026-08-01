@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CheckCircle2, Gem, Layers3, RotateCcw, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Gamepad2,
+  Gem,
+  Layers3,
+  RotateCcw,
+  Sparkles,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,14 +17,18 @@ import {
 
 export function PublishedGamePacks() {
   const [packs, setPacks] = useState<ReleasedPlayGamePack[]>([]);
+  const [selectedPackId, setSelectedPackId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
     void publicPlayGamePackService
       .listReleased()
       .then((next) => {
-        if (active)
-          setPacks(next.filter((pack) => pack.game_type !== "beat_blitz" && pack.items.length));
+        if (active) {
+          const playable = next.filter((pack) => pack.items.length);
+          setPacks(playable);
+          setSelectedPackId(playable.find((pack) => pack.game_type !== "beat_blitz")?.id ?? null);
+        }
       })
       .catch(() => undefined);
     return () => {
@@ -25,16 +37,75 @@ export function PublishedGamePacks() {
   }, []);
 
   if (!packs.length) return null;
+  const selectedPack = packs.find((pack) => pack.id === selectedPackId) ?? null;
+
+  function choosePack(pack: ReleasedPlayGamePack) {
+    if (pack.game_type === "beat_blitz") {
+      document.getElementById("trivia")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    setSelectedPackId(pack.id);
+    window.requestAnimationFrame(() => {
+      document.getElementById("selected-game")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+
   return (
-    <section className="border-t border-border/60 bg-surface/40">
+    <section id="game-library" className="scroll-mt-24 border-t border-border/60 bg-surface/40">
       <div className="mx-auto max-w-6xl px-6 py-16">
-        <p className="text-sm font-medium text-primary">More ready games</p>
-        <h2 className="mt-1 text-3xl font-semibold">Choose another way to play</h2>
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          {packs.map((pack) => (
-            <PackPlayer key={pack.id} pack={pack} />
-          ))}
+        <p className="text-sm font-medium text-primary">Games</p>
+        <h2 className="mt-1 text-3xl font-semibold">Choose a game to play</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+          Pick any active game below. New reviewed game packs appear here automatically.
+        </p>
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {packs.map((pack) => {
+            const Icon =
+              pack.game_type === "beat_blitz"
+                ? Gamepad2
+                : pack.game_type === "vybe_match"
+                  ? Layers3
+                  : pack.game_type === "hidden_gems"
+                    ? Gem
+                    : Sparkles;
+            const itemCount =
+              pack.game_type === "vybe_match"
+                ? pack.items.reduce((total, item) => total + (item.payload.matches?.length ?? 0), 0)
+                : pack.items.length;
+            const selected = selectedPackId === pack.id;
+            return (
+              <button
+                key={pack.id}
+                type="button"
+                onClick={() => choosePack(pack)}
+                aria-pressed={selected}
+                className={`rounded-3xl border p-5 text-left transition hover:-translate-y-0.5 ${
+                  selected
+                    ? "border-primary bg-primary/10"
+                    : "border-border bg-card hover:border-primary/50"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <Icon className="h-5 w-5 text-primary" />
+                  <Badge variant="outline">{itemCount} to play</Badge>
+                </div>
+                <h3 className="mt-5 font-semibold">{pack.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{pack.description}</p>
+                <p className="mt-4 text-xs font-medium uppercase tracking-wider text-primary">
+                  Play now
+                </p>
+              </button>
+            );
+          })}
         </div>
+        {selectedPack ? (
+          <div id="selected-game" className="scroll-mt-24 mt-8 max-w-3xl">
+            <PackPlayer key={selectedPack.id} pack={selectedPack} />
+          </div>
+        ) : null}
       </div>
     </section>
   );

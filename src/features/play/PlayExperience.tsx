@@ -73,8 +73,8 @@ const vibeChoices = [
 const playDestinations = [
   {
     title: "Games",
-    detail: "Start with VYBE Music Trivia.",
-    href: "#trivia",
+    detail: "Choose from every active VYBE game.",
+    href: "#game-library",
     status: "Available now",
     icon: Gamepad2,
   },
