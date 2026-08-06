@@ -48,6 +48,7 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-pas
 import { Route as ArtistUsernameRouteImport } from './routes/artist.$username'
 import { Route as ApiVideoUploadUrlRouteImport } from './routes/api.video-upload-url'
 import { Route as ApiAdminTeamInviteRouteImport } from './routes/api.admin-team-invite'
+import { Route as ApiAccountDeletionRouteImport } from './routes/api.account-deletion'
 import { Route as AdminInviteTokenRouteImport } from './routes/admin-invite.$token'
 import { Route as AuthenticatedWatchRouteImport } from './routes/_authenticated/watch'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
@@ -289,6 +290,11 @@ const ApiVideoUploadUrlRoute = ApiVideoUploadUrlRouteImport.update({
 const ApiAdminTeamInviteRoute = ApiAdminTeamInviteRouteImport.update({
   id: '/api/admin-team-invite',
   path: '/api/admin-team-invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAccountDeletionRoute = ApiAccountDeletionRouteImport.update({
+  id: '/api/account-deletion',
+  path: '/api/account-deletion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminInviteTokenRoute = AdminInviteTokenRouteImport.update({
@@ -594,6 +600,7 @@ export interface FileRoutesByFullPath {
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
+  '/api/account-deletion': typeof ApiAccountDeletionRoute
   '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
   '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
@@ -682,6 +689,7 @@ export interface FileRoutesByTo {
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
+  '/api/account-deletion': typeof ApiAccountDeletionRoute
   '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
   '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
@@ -772,6 +780,7 @@ export interface FileRoutesById {
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_authenticated/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
+  '/api/account-deletion': typeof ApiAccountDeletionRoute
   '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
   '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
@@ -862,6 +871,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/watch'
     | '/admin-invite/$token'
+    | '/api/account-deletion'
     | '/api/admin-team-invite'
     | '/api/video-upload-url'
     | '/artist/$username'
@@ -950,6 +960,7 @@ export interface FileRouteTypes {
     | '/videos'
     | '/watch'
     | '/admin-invite/$token'
+    | '/api/account-deletion'
     | '/api/admin-team-invite'
     | '/api/video-upload-url'
     | '/artist/$username'
@@ -1039,6 +1050,7 @@ export interface FileRouteTypes {
     | '/_authenticated/videos'
     | '/_authenticated/watch'
     | '/admin-invite/$token'
+    | '/api/account-deletion'
     | '/api/admin-team-invite'
     | '/api/video-upload-url'
     | '/artist/$username'
@@ -1107,6 +1119,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TrustRoute: typeof TrustRoute
   AdminInviteTokenRoute: typeof AdminInviteTokenRoute
+  ApiAccountDeletionRoute: typeof ApiAccountDeletionRoute
   ApiAdminTeamInviteRoute: typeof ApiAdminTeamInviteRoute
   ApiVideoUploadUrlRoute: typeof ApiVideoUploadUrlRoute
   ArtistUsernameRoute: typeof ArtistUsernameRoute
@@ -1402,6 +1415,13 @@ declare module '@tanstack/react-router' {
       path: '/api/admin-team-invite'
       fullPath: '/api/admin-team-invite'
       preLoaderRoute: typeof ApiAdminTeamInviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/account-deletion': {
+      id: '/api/account-deletion'
+      path: '/api/account-deletion'
+      fullPath: '/api/account-deletion'
+      preLoaderRoute: typeof ApiAccountDeletionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-invite/$token': {
@@ -1878,6 +1898,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TrustRoute: TrustRoute,
   AdminInviteTokenRoute: AdminInviteTokenRoute,
+  ApiAccountDeletionRoute: ApiAccountDeletionRoute,
   ApiAdminTeamInviteRoute: ApiAdminTeamInviteRoute,
   ApiVideoUploadUrlRoute: ApiVideoUploadUrlRoute,
   ArtistUsernameRoute: ArtistUsernameRoute,
