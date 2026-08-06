@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type {
+  CreatePlaylistInput,
+  UpdatePlaylistInput,
+} from "@/features/playlists/schema";
+import { secureMediaService } from "@/services/media/secureMediaService";
 import { playlistService } from "@/services/playlists/playlistService";
-import type { CreatePlaylistInput, UpdatePlaylistInput } from "@/features/playlists/schema";
+
+const SHARED_PLAYLIST_QUERY_KEY = "secure-shared-playlist";
 
 export function useMyPlaylists(userId?: string) {
   return useQuery({
@@ -20,15 +26,24 @@ export function useMyPlaylist(userId?: string, playlistId?: string) {
 
 export function useCreatePlaylist(userId?: string) {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (input: CreatePlaylistInput) => {
-      if (!userId) throw new Error("Sign in to create a playlist.");
+      if (!userId) {
+        throw new Error("Sign in to create a playlist.");
+      }
+
       return playlistService.create(userId, input);
     },
+
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["playlists", userId] }),
-        queryClient.invalidateQueries({ queryKey: ["shared-playlist"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["playlists", userId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [SHARED_PLAYLIST_QUERY_KEY],
+        }),
       ]);
     },
   });
@@ -36,19 +51,37 @@ export function useCreatePlaylist(userId?: string) {
 
 export function useReplacePlaylistTracks(userId?: string) {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ playlistId, trackIds }: { playlistId: string; trackIds: string[] }) => {
-      if (!userId) throw new Error("Sign in to manage a playlist.");
-      if (!trackIds.length) throw new Error("Keep at least one published song in the playlist.");
+    mutationFn: ({
+      playlistId,
+      trackIds,
+    }: {
+      playlistId: string;
+      trackIds: string[];
+    }) => {
+      if (!userId) {
+        throw new Error("Sign in to manage a playlist.");
+      }
+
+      if (!trackIds.length) {
+        throw new Error("Keep at least one published song in the playlist.");
+      }
+
       return playlistService.replaceTracks(playlistId, trackIds);
     },
+
     onSuccess: async (_data, variables) => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["playlists", userId] }),
+        queryClient.invalidateQueries({
+          queryKey: ["playlists", userId],
+        }),
         queryClient.invalidateQueries({
           queryKey: ["playlist-editor", userId, variables.playlistId],
         }),
-        queryClient.invalidateQueries({ queryKey: ["shared-playlist"] }),
+        queryClient.invalidateQueries({
+          queryKey: [SHARED_PLAYLIST_QUERY_KEY],
+        }),
       ]);
     },
   });
@@ -56,18 +89,33 @@ export function useReplacePlaylistTracks(userId?: string) {
 
 export function useUpdatePlaylist(userId?: string) {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ playlistId, input }: { playlistId: string; input: UpdatePlaylistInput }) => {
-      if (!userId) throw new Error("Sign in to manage a playlist.");
+    mutationFn: ({
+      playlistId,
+      input,
+    }: {
+      playlistId: string;
+      input: UpdatePlaylistInput;
+    }) => {
+      if (!userId) {
+        throw new Error("Sign in to manage a playlist.");
+      }
+
       return playlistService.update(playlistId, input);
     },
+
     onSuccess: async (_data, variables) => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["playlists", userId] }),
+        queryClient.invalidateQueries({
+          queryKey: ["playlists", userId],
+        }),
         queryClient.invalidateQueries({
           queryKey: ["playlist-editor", userId, variables.playlistId],
         }),
-        queryClient.invalidateQueries({ queryKey: ["shared-playlist"] }),
+        queryClient.invalidateQueries({
+          queryKey: [SHARED_PLAYLIST_QUERY_KEY],
+        }),
       ]);
     },
   });
@@ -75,18 +123,33 @@ export function useUpdatePlaylist(userId?: string) {
 
 export function useReplacePlaylistCover(userId?: string) {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ playlistId, file }: { playlistId: string; file: File }) => {
-      if (!userId) throw new Error("Sign in to manage a playlist.");
+    mutationFn: ({
+      playlistId,
+      file,
+    }: {
+      playlistId: string;
+      file: File;
+    }) => {
+      if (!userId) {
+        throw new Error("Sign in to manage a playlist.");
+      }
+
       return playlistService.replaceCover(userId, playlistId, file);
     },
+
     onSuccess: async (_data, variables) => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["playlists", userId] }),
+        queryClient.invalidateQueries({
+          queryKey: ["playlists", userId],
+        }),
         queryClient.invalidateQueries({
           queryKey: ["playlist-editor", userId, variables.playlistId],
         }),
-        queryClient.invalidateQueries({ queryKey: ["shared-playlist"] }),
+        queryClient.invalidateQueries({
+          queryKey: [SHARED_PLAYLIST_QUERY_KEY],
+        }),
       ]);
     },
   });
@@ -94,15 +157,24 @@ export function useReplacePlaylistCover(userId?: string) {
 
 export function useDeletePlaylist(userId?: string) {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (playlistId: string) => {
-      if (!userId) throw new Error("Sign in to delete a playlist.");
+      if (!userId) {
+        throw new Error("Sign in to delete a playlist.");
+      }
+
       return playlistService.delete(playlistId);
     },
+
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["playlists", userId] }),
-        queryClient.invalidateQueries({ queryKey: ["shared-playlist"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["playlists", userId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [SHARED_PLAYLIST_QUERY_KEY],
+        }),
       ]);
     },
   });
@@ -110,7 +182,9 @@ export function useDeletePlaylist(userId?: string) {
 
 export function useSharedPlaylist(slug: string) {
   return useQuery({
-    queryKey: ["shared-playlist", slug],
-    queryFn: () => playlistService.getShared(slug),
+    queryKey: [SHARED_PLAYLIST_QUERY_KEY, slug],
+    queryFn: () => secureMediaService.authorizePlaylist(slug),
+    enabled: !!slug,
+    retry: false,
   });
 }
