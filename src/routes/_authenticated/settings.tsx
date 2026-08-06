@@ -29,6 +29,7 @@ import { playNotificationChime } from "@/lib/notificationSound";
 import { useMembership } from "@/hooks/useMembership";
 import { UsageMeter } from "@/components/membership/UsageMeter";
 import { supabase } from "@/integrations/supabase/client";
+import { SelfServiceDeletionCard } from "@/components/accountDeletion/SelfServiceDeletionCard";
 
 export const Route = createFileRoute("/_authenticated/settings")({ component: SettingsPage });
 
@@ -403,14 +404,7 @@ function SettingsContent() {
       </Section>
 
       <Section title="Account management">
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-sm text-muted-foreground">
-              Account deletion is not automated during alpha testing. Contact VYBE support to
-              request account removal and data review.
-            </p>
-          </CardContent>
-        </Card>
+        <SelfServiceDeletionCard />
       </Section>
     </div>
   );

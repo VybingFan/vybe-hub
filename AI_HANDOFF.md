@@ -1,5 +1,17 @@
 # VYBE-HUB AI Development Handoff
 
+## V24.34.1 Account Deletion Workflows
+
+**Branch:** `vybe-account-deletion-v24-34-1`  
+**Base:** V24.34 visual game presentation / `a93556c`
+
+V24.34.1 adds two account-deletion paths: a member can schedule and cancel deletion from Settings, and an administrator with the explicit `admin.accounts.delete` permission can inspect an account-owned data preview and perform permanent deletion. Super Administrator receives the new suspend/delete/audit permissions by default; other operational roles receive them only when assigned through the Administrator Team model.
+
+Permanent execution is guarded by `ALLOW_ACCOUNT_DELETION=true` and must remain false for initial localhost testing. The administrator route blocks self-deletion and blocks any account that still has the `admin` application role. Storage cleanup is restricted to exact user-UUID folders, and the Supabase Auth user is deleted last.
+
+Apply `20260805230000_account_deletion_v24_34_1.sql` before testing. Before production, review every post-V24.28 user-owned table and retention requirement and extend the explicit cleanup map.
+
+
 ## Current Verified Development Checkpoint
 
 **Branch:** `vybe-creator-pwa-foundation-v24-13`

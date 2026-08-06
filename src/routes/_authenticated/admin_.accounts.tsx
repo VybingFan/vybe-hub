@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { adminService, type AdminCreatorRecord } from "@/services/admin/adminService";
+import { AdminDeletionPanel } from "@/components/accountDeletion/AdminDeletionPanel";
 
 export const Route = createFileRoute("/_authenticated/admin_/accounts")({
   component: AdminAccountsRoute,
@@ -120,19 +121,24 @@ function AdminAccountsPage() {
                   Joined {new Date(record.joined_at).toLocaleDateString()}
                 </p>
               </div>
-              <div className="flex flex-wrap items-start gap-2">
-                {record.roles.length ? (
-                  record.roles.map((role) => (
-                    <Badge key={role} variant={role === "admin" ? "default" : "secondary"}>
-                      {role}
-                    </Badge>
-                  ))
-                ) : (
-                  <Badge variant="outline">role incomplete</Badge>
-                )}
-                {record.roles.includes("creator") ? (
-                  <Badge variant="outline">{record.plan_code.replaceAll("_", " ")}</Badge>
-                ) : null}
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-start gap-2">
+                  {record.roles.length ? (
+                    record.roles.map((role) => (
+                      <Badge key={role} variant={role === "admin" ? "default" : "secondary"}>
+                        {role}
+                      </Badge>
+                    ))
+                  ) : (
+                    <Badge variant="outline">role incomplete</Badge>
+                  )}
+                  {record.roles.includes("creator") ? (
+                    <Badge variant="outline">{record.plan_code.replaceAll("_", " ")}</Badge>
+                  ) : null}
+                </div>
+                <AdminPermissionGuard anyOf={["admin.accounts.delete"]}>
+                  <AdminDeletionPanel userId={record.user_id} email={record.email} />
+                </AdminPermissionGuard>
               </div>
             </CardContent>
           </Card>

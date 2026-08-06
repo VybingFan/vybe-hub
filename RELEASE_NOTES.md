@@ -1,3 +1,13 @@
+# V24.34.1 — Account deletion workflows
+
+- Added self-service account deletion requests with a seven-day recovery period and cancellation.
+- Added a permission-gated Back Office deletion preview and permanent deletion action.
+- Added `admin.accounts.suspend`, `admin.accounts.delete`, and `admin.accounts.audit`; only Super Administrator receives the new permissions by default.
+- Protects the current administrator and all administrator accounts from direct deletion.
+- Requires exact email confirmation and removes exact user-owned Storage paths before database and Auth cleanup.
+- Keeps permanent execution disabled unless `ALLOW_ACCOUNT_DELETION=true`.
+- Requires `20260805230000_account_deletion_v24_34_1.sql` before testing the UI.
+
 # V24.8 — Stripe membership checkout
 
 - Added sandbox-ready Stripe Checkout for the three public paid creator plans.
