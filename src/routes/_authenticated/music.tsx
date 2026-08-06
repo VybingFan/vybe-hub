@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   Archive,
+  CheckSquare2,
   ChevronRight,
   Clock3,
   Disc3,
@@ -12,6 +13,7 @@ import {
   Sparkles,
   Scale,
   Wrench,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
@@ -39,7 +41,10 @@ import {
   type TrackWorkspaceCategory,
 } from "@/features/music/workflow";
 import { useCreatorTracks } from "@/hooks/useMusic";
-import { useUpdateTrackWorkflow } from "@/hooks/useTrackWorkflow";
+import {
+  useBulkUpdateTrackWorkflow,
+  useUpdateTrackWorkflow,
+} from "@/hooks/useTrackWorkflow";
 import { useUser } from "@/hooks/useUser";
 
 type WorkflowTrack = Track & {
@@ -83,11 +88,21 @@ function MusicLibrary() {
   const { data = [], isLoading, error } = useCreatorTracks(user?.id);
   const tracks = data as WorkflowTrack[];
   const workflow = useUpdateTrackWorkflow(user?.id);
+  const bulkWorkflow = useBulkUpdateTrackWorkflow(user?.id);
 
   const [view, setView] = useState<LibraryView>("overview");
   const [query, setQuery] = useState("");
   const [stage, setStage] = useState<"all" | TrackProductionStage>("all");
   const [limit, setLimit] = useState(20);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkCategory, setBulkCategory] = useState<TrackWorkspaceCategory | "">("");
+  const [bulkStage, setBulkStage] = useState<TrackProductionStage | "">("");
+
+  useEffect(() => {
+    setSelectedIds([]);
+    setBulkCategory("");
+    setBulkStage("");
+  }, [view, query, stage]);
 
   const counts = useMemo(() => {
     const value = Object.fromEntries(
@@ -140,6 +155,11 @@ function MusicLibrary() {
     );
   }, [query, stage, tracks, view]);
 
+  const visibleTracks = filtered.slice(0, limit);
+  const visibleIds = visibleTracks.map((track) => track.id);
+  const allVisibleSelected =
+    visibleIds.length > 0 && visibleIds.every((id) => selectedIds.includes(id));
+
   const updateCategory = async (
     track: WorkflowTrack,
     category: TrackWorkspaceCategory,
@@ -169,10 +189,59 @@ function MusicLibrary() {
           ? { category: "released" as const }
           : {}),
       });
-      toast.success(`Stage changed to ${TRACK_PRODUCTION_STAGE_LABELS[nextStage]}.`);
+      toast.success(
+        `Stage changed to ${TRACK_PRODUCTION_STAGE_LABELS[nextStage]}.`,
+      );
     } catch (cause) {
       toast.error(cause instanceof Error ? cause.message : "Update failed.");
     }
+  };
+
+  const applyBulkUpdate = async () => {
+    if (!selectedIds.length) {
+      toast.error("Select at least one song.");
+      return;
+    }
+
+    if (!bulkCategory && !bulkStage) {
+      toast.error("Choose a category or production stage.");
+      return;
+    }
+
+    try {
+      await bulkWorkflow.mutateAsync({
+        trackIds: selectedIds,
+        ...(bulkCategory ? { category: bulkCategory } : {}),
+        ...(bulkStage ? { stage: bulkStage } : {}),
+      });
+
+      toast.success(
+        `${selectedIds.length} song${selectedIds.length === 1 ? "" : "s"} updated.`,
+      );
+      setSelectedIds([]);
+      setBulkCategory("");
+      setBulkStage("");
+    } catch (cause) {
+      toast.error(cause instanceof Error ? cause.message : "Bulk update failed.");
+    }
+  };
+
+  const toggleSelected = (trackId: string) => {
+    setSelectedIds((current) =>
+      current.includes(trackId)
+        ? current.filter((id) => id !== trackId)
+        : [...current, trackId],
+    );
+  };
+
+  const toggleAllVisible = () => {
+    setSelectedIds((current) => {
+      if (allVisibleSelected) {
+        return current.filter((id) => !visibleIds.includes(id));
+      }
+
+      return Array.from(new Set([...current, ...visibleIds]));
+    });
   };
 
   if (isLoading) {
@@ -263,6 +332,9 @@ function MusicLibrary() {
                       key={track.id}
                       track={track}
                       busy={workflow.isPending}
+                      selectable={false}
+                      selected={false}
+                      onSelectedChange={() => undefined}
                       onEdit={() =>
                         navigate({
                           to: "/music/$trackId",
@@ -346,6 +418,93 @@ function MusicLibrary() {
               </Select>
             </div>
 
+            {!!filtered.length && (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-muted/30 p-3">
+                <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
+                  <input
+                    type="checkbox"
+                    checked={allVisibleSelected}
+                    onChange={toggleAllVisible}
+                    className="h-4 w-4 accent-primary"
+                  />
+                  Select visible
+                </label>
+
+                <span className="text-sm text-muted-foreground">
+                  {selectedIds.length} selected
+                </span>
+              </div>
+            )}
+
+            {!!selectedIds.length && (
+              <Card className="border-primary/30">
+                <CardContent className="p-4">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+                    <div className="flex items-center gap-2 font-medium">
+                      <CheckSquare2 className="h-4 w-4 text-primary" />
+                      Bulk update {selectedIds.length} song
+                      {selectedIds.length === 1 ? "" : "s"}
+                    </div>
+
+                    <div className="grid flex-1 gap-2 sm:grid-cols-2">
+                      <Select
+                        value={bulkCategory}
+                        onValueChange={(value) =>
+                          setBulkCategory(value as TrackWorkspaceCategory)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Move to category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {TRACK_WORKSPACE_CATEGORIES.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {TRACK_WORKSPACE_CATEGORY_LABELS[item]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <Select
+                        value={bulkStage}
+                        onValueChange={(value) =>
+                          setBulkStage(value as TrackProductionStage)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Change production stage" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {TRACK_PRODUCTION_STAGES.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {TRACK_PRODUCTION_STAGE_LABELS[item]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => void applyBulkUpdate()}
+                        disabled={bulkWorkflow.isPending}
+                      >
+                        {bulkWorkflow.isPending ? "Updating…" : "Apply"}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setSelectedIds([])}
+                        aria-label="Clear selection"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {!filtered.length ? (
               <EmptyState
                 title="No matching songs"
@@ -353,11 +512,14 @@ function MusicLibrary() {
               />
             ) : (
               <div className="space-y-2">
-                {filtered.slice(0, limit).map((track) => (
+                {visibleTracks.map((track) => (
                   <TrackRow
                     key={track.id}
                     track={track}
-                    busy={workflow.isPending}
+                    busy={workflow.isPending || bulkWorkflow.isPending}
+                    selectable
+                    selected={selectedIds.includes(track.id)}
+                    onSelectedChange={() => toggleSelected(track.id)}
                     onEdit={() =>
                       navigate({
                         to: "/music/$trackId",
@@ -426,12 +588,18 @@ function CategoryCard({
 function TrackRow({
   track,
   busy,
+  selectable,
+  selected,
+  onSelectedChange,
   onEdit,
   onCategory,
   onStage,
 }: {
   track: WorkflowTrack;
   busy: boolean;
+  selectable: boolean;
+  selected: boolean;
+  onSelectedChange: () => void;
   onEdit: () => void;
   onCategory: (category: TrackWorkspaceCategory) => void;
   onStage: (stage: TrackProductionStage) => void;
@@ -440,9 +608,19 @@ function TrackRow({
   const stage = track.production_stage ?? "idea";
 
   return (
-    <Card>
+    <Card className={selected ? "border-primary/50 bg-primary/5" : undefined}>
       <CardContent className="p-3 sm:p-4">
         <div className="flex items-center gap-3">
+          {selectable && (
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={onSelectedChange}
+              aria-label={`Select ${track.title}`}
+              className="h-4 w-4 shrink-0 accent-primary"
+            />
+          )}
+
           <img
             src={track.cover_url || "/banners/default-creator-banner.png"}
             alt=""
