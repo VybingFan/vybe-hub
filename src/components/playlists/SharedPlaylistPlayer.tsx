@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, Repeat2, Shuffle, SkipBack, SkipForward, Volume2 } from "lucide-react";
+import { LockKeyhole, Pause, Play, Repeat2, Shuffle, SkipBack, SkipForward, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
@@ -52,6 +52,7 @@ export function SharedPlaylistPlayer({
     setPlaying(true);
   };
   const toggle = async () => {
+    if (!track.audio_url) return;
     if (!audioRef.current) return;
     if (playing) audioRef.current.pause();
     else await audioRef.current.play();
@@ -90,7 +91,9 @@ export function SharedPlaylistPlayer({
     <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-card shadow-elevated">
       <audio
         ref={audioRef}
-        src={track.audio_url}
+        src={track.audio_url || undefined}
+        controlsList="nodownload noremoteplayback"
+        disablePictureInPicture
         onPlay={() => {
           if (playlistSlug && !recordedTracks.current.has(track.id)) {
             recordedTracks.current.add(track.id);
@@ -118,6 +121,10 @@ export function SharedPlaylistPlayer({
             Now playing
           </p>
           <h2 className="mt-2 line-clamp-2 text-2xl font-semibold sm:text-3xl">{track.title}</h2>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-muted-foreground">
+            {track.playback_mode === "preview" ? <span className="rounded-full border px-2 py-0.5 text-xs">Preview · {track.preview_duration_sec}s</span> : null}
+            {!track.audio_url ? <span className="flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs"><LockKeyhole className="h-3 w-3" /> Playback restricted</span> : null}
+          </div>
           <p className="mt-2 text-muted-foreground">
             {track.primary_artist_name || "Independent artist"}
             {track.featured_artist_names?.length

@@ -75,6 +75,9 @@ function PlaylistEditor() {
   const [occasion, setOccasion] = useState("");
   const [status, setStatus] = useState<"published" | "draft">("published");
   const [trackIds, setTrackIds] = useState<string[]>([]);
+  const [accessMode, setAccessMode] = useState<"public" | "unlisted" | "password" | "approved_listeners" | "membership_only">("public");
+  const [accessExpiresAt, setAccessExpiresAt] = useState("");
+  const [requireSignIn, setRequireSignIn] = useState(false);
 
   useEffect(() => {
     if (!playlist) return;
@@ -83,6 +86,9 @@ function PlaylistEditor() {
     setOccasion(playlist.occasion || "");
     setStatus(playlist.is_published ? "published" : "draft");
     setTrackIds(playlist.trackIds ?? []);
+    setAccessMode(playlist.access_mode ?? "public");
+    setAccessExpiresAt(playlist.access_expires_at?.slice(0, 16) ?? "");
+    setRequireSignIn(playlist.require_sign_in ?? false);
   }, [playlist]);
 
   const trackMap = useMemo(() => new Map(tracks.map((track) => [track.id, track])), [tracks]);
@@ -123,6 +129,9 @@ function PlaylistEditor() {
           description: description.trim(),
           occasion,
           is_published: status === "published",
+          access_mode: accessMode,
+          access_expires_at: accessExpiresAt ? new Date(accessExpiresAt).toISOString() : null,
+          require_sign_in: requireSignIn,
         },
       });
       await replaceTracks.mutateAsync({ playlistId, trackIds });
@@ -241,6 +250,17 @@ function PlaylistEditor() {
         </aside>
 
         <div className="space-y-8">
+          <section className="rounded-3xl border border-border bg-card p-6 md:p-8">
+            <h2 className="text-2xl font-semibold">Protected sharing</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Choose whether this playlist is public, hidden from discovery, or restricted to authorized listeners.</p>
+            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              <div><Label>Access mode</Label><Select value={accessMode} onValueChange={(value) => setAccessMode(value as typeof accessMode)}><SelectTrigger className="mt-2"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="public">Public</SelectItem><SelectItem value="unlisted">Unlisted link</SelectItem><SelectItem value="password">Password protected</SelectItem><SelectItem value="approved_listeners">Approved listeners</SelectItem><SelectItem value="membership_only">Membership only</SelectItem></SelectContent></Select></div>
+              <div><Label>Link expiration</Label><Input className="mt-2" type="datetime-local" value={accessExpiresAt} onChange={(event) => setAccessExpiresAt(event.target.value)} /></div>
+              <label className="flex items-center gap-3 rounded-xl border p-4 text-sm"><input type="checkbox" checked={requireSignIn} onChange={(event) => setRequireSignIn(event.target.checked)} /> Require listeners to sign in</label>
+            </div>
+            {accessMode === "password" || accessMode === "approved_listeners" ? <p className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-muted-foreground">V24.35 creates the protected-sharing data model. Password and approved-listener grant management is enabled through the next access-grant screen in this release series.</p> : null}
+          </section>
+
           <section className="rounded-3xl border border-border bg-card p-6 md:p-8">
             <h2 className="text-2xl font-semibold">Playlist details</h2>
             <div className="mt-6 grid gap-5">

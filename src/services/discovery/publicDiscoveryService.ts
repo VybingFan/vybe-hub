@@ -65,6 +65,7 @@ export const publicDiscoveryService = {
         "id,creator_id,title,primary_artist_name,featured_artist_names,genre,description,cover_url",
       )
       .eq("status", "published")
+      .eq("visibility", "public")
       .limit(40);
 
     if (query) {

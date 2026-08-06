@@ -12,6 +12,10 @@ export interface Playlist {
   cover_url: string | null;
   created_at: string;
   updated_at: string;
+  access_mode?: "public" | "unlisted" | "password" | "approved_listeners" | "membership_only";
+  access_expires_at?: string | null;
+  required_plan_code?: string | null;
+  require_sign_in?: boolean;
   /** Ordered track IDs included on creator-owned playlist queries. */
   trackIds?: string[];
 }
@@ -48,4 +52,8 @@ export interface UpdatePlaylistInput {
   description: string;
   occasion: string;
   is_published: boolean;
+  access_mode?: "public" | "unlisted" | "password" | "approved_listeners" | "membership_only";
+  access_expires_at?: string | null;
+  required_plan_code?: string | null;
+  require_sign_in?: boolean;
 }

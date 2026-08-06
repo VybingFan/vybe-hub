@@ -49,6 +49,8 @@ import {
   MAX_COVER_BYTES,
   type ContentStatus,
   type TrackDiscoveryMetadata,
+  type TrackVisibility,
+  type TrackPlaybackMode,
 } from "@/features/music/schema";
 import { readAudioDuration } from "@/services/music/musicService";
 
@@ -78,6 +80,11 @@ function SongEditor() {
   const [description, setDescription] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
   const [status, setStatus] = useState<ContentStatus>("draft");
+  const [visibility, setVisibility] = useState<TrackVisibility>("public");
+  const [playbackMode, setPlaybackMode] = useState<TrackPlaybackMode>("full");
+  const [previewDuration, setPreviewDuration] = useState<15 | 30 | 45 | 60>(30);
+  const [previewStart, setPreviewStart] = useState(0);
+  const [allowDownload, setAllowDownload] = useState(false);
   const [discovery, setDiscovery] = useState<TrackDiscoveryMetadata>(
     EMPTY_TRACK_DISCOVERY_METADATA,
   );
@@ -96,6 +103,11 @@ function SongEditor() {
     setDescription(track.description || "");
     setReleaseDate(track.release_date || "");
     setStatus(track.status);
+    setVisibility(track.visibility ?? "public");
+    setPlaybackMode(track.playback_mode ?? "full");
+    setPreviewDuration(track.preview_duration_sec ?? 30);
+    setPreviewStart(track.preview_start_sec ?? 0);
+    setAllowDownload(track.allow_download ?? false);
     setDiscovery(track.discovery_metadata || EMPTY_TRACK_DISCOVERY_METADATA);
     setReplacementAudio(null);
     setReplacementDetailsReviewed(false);
@@ -125,6 +137,11 @@ function SongEditor() {
           description: description.trim(),
           release_date: releaseDate,
           status,
+          visibility,
+          playback_mode: playbackMode,
+          preview_duration_sec: previewDuration,
+          preview_start_sec: previewStart,
+          allow_download: allowDownload,
           discovery_metadata: discovery,
         },
       });
@@ -260,6 +277,40 @@ function SongEditor() {
         </aside>
 
         <div className="space-y-8">
+          <section className="rounded-3xl border border-border bg-card p-6 md:p-8">
+            <h2 className="text-2xl font-semibold">Visibility & listening access</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Control discovery, playback, previews, and downloads for this song.</p>
+            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              <div>
+                <Label>Visibility</Label>
+                <Select value={visibility} onValueChange={(value) => setVisibility(value as TrackVisibility)}>
+                  <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public</SelectItem><SelectItem value="unlisted">Unlisted</SelectItem>
+                    <SelectItem value="private">Private</SelectItem><SelectItem value="scheduled">Scheduled</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Playback</Label>
+                <Select value={playbackMode} onValueChange={(value) => setPlaybackMode(value as TrackPlaybackMode)}>
+                  <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full">Full song</SelectItem><SelectItem value="preview">Preview only</SelectItem>
+                    <SelectItem value="none">No playback</SelectItem><SelectItem value="membership_only">Membership only</SelectItem>
+                    <SelectItem value="approved_listeners">Approved listeners</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {playbackMode === "preview" ? <>
+                <div><Label>Preview length</Label><Select value={String(previewDuration)} onValueChange={(value) => setPreviewDuration(Number(value) as 15 | 30 | 45 | 60)}><SelectTrigger className="mt-2"><SelectValue /></SelectTrigger><SelectContent>{[15,30,45,60].map((seconds) => <SelectItem key={seconds} value={String(seconds)}>{seconds} seconds</SelectItem>)}</SelectContent></Select></div>
+                <div><Label>Preview starts at</Label><Input className="mt-2" type="number" min={0} max={Math.max(0, track.duration_sec - 1)} value={previewStart} onChange={(event) => setPreviewStart(Math.max(0, Number(event.target.value) || 0))} /></div>
+              </> : null}
+              <label className="flex items-center gap-3 rounded-xl border p-4 text-sm"><input type="checkbox" checked={allowDownload} onChange={(event) => setAllowDownload(event.target.checked)} /> Allow authorized download</label>
+            </div>
+          </section>
+
           <section
             className={
               replacementAudio

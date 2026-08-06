@@ -9,9 +9,10 @@ import type {
 
 const AUDIO_BUCKET = "music-audio";
 const COVER_BUCKET = "music-covers";
+const PREVIEW_BUCKET = "music-previews";
 const AVATAR_BUCKET = "avatars";
 
-async function signedUrl(bucket: string, path: string | null) {
+async function signedUrl(bucket: string, path: string | null, ttl = 60 * 5) {
   if (!path) return null;
   const { data } = await supabase.storage.from(bucket).createSignedUrl(path, 60 * 60 * 6);
   return data?.signedUrl ?? null;
@@ -20,7 +21,12 @@ async function signedUrl(bucket: string, path: string | null) {
 async function hydrateTrack(row: Track): Promise<Track> {
   return {
     ...row,
-    audio_url: (await signedUrl(AUDIO_BUCKET, row.audio_url)) ?? "",
+    audio_url:
+      row.playback_mode === "preview"
+        ? (await signedUrl(PREVIEW_BUCKET, row.preview_audio_path ?? null, 60 * 3)) ?? ""
+        : row.playback_mode === "none" || row.playback_mode === "approved_listeners"
+          ? ""
+          : (await signedUrl(AUDIO_BUCKET, row.audio_url, 60 * 3)) ?? "",
     cover_url: await signedUrl(COVER_BUCKET, row.cover_url),
   };
 }
@@ -56,6 +62,7 @@ export const playlistService = {
         occasion: input.occasion,
         slug,
         is_published: true,
+        access_mode: "public",
       })
       .select("*")
       .single();
@@ -177,6 +184,7 @@ export const playlistService = {
       .select("*")
       .eq("slug", slug)
       .eq("is_published", true)
+      .in("access_mode", ["public", "unlisted"])
       .maybeSingle();
     if (error) throw error;
     if (!playlist) return null;

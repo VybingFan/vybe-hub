@@ -2,6 +2,10 @@ import { z } from "zod";
 import { MUSIC_RIGHTS_VALUES } from "@/constants/legal";
 
 export const CONTENT_STATUSES = ["draft", "published"] as const;
+export const TRACK_VISIBILITIES = ["public", "unlisted", "private", "scheduled", "archived"] as const;
+export type TrackVisibility = (typeof TRACK_VISIBILITIES)[number];
+export const TRACK_PLAYBACK_MODES = ["full", "preview", "none", "membership_only", "approved_listeners"] as const;
+export type TrackPlaybackMode = (typeof TRACK_PLAYBACK_MODES)[number];
 export type ContentStatus = (typeof CONTENT_STATUSES)[number];
 
 export const trackDiscoveryMetadataSchema = z.object({
@@ -50,6 +54,15 @@ export const trackSchema = z.object({
   rights_policy_version: z.string().min(1).nullable(),
   rights_confirmed_at: z.string().datetime().nullable(),
   discovery_metadata: trackDiscoveryMetadataSchema.default(EMPTY_TRACK_DISCOVERY_METADATA),
+  visibility: z.enum(TRACK_VISIBILITIES).default("public"),
+  playback_mode: z.enum(TRACK_PLAYBACK_MODES).default("full"),
+  preview_duration_sec: z.union([z.literal(15), z.literal(30), z.literal(45), z.literal(60)]).default(30),
+  preview_start_sec: z.number().int().min(0).default(0),
+  preview_audio_path: z.string().nullable().optional(),
+  available_from: z.string().datetime().nullable().optional(),
+  available_until: z.string().datetime().nullable().optional(),
+  required_plan_code: z.string().nullable().optional(),
+  allow_download: z.boolean().default(false),
 });
 
 export type TrackInput = z.infer<typeof trackSchema>;

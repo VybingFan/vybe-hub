@@ -25,6 +25,8 @@ import {
   EMPTY_TRACK_DISCOVERY_METADATA,
   type ContentStatus,
   type TrackDiscoveryMetadata,
+  type TrackVisibility,
+  type TrackPlaybackMode,
 } from "@/features/music/schema";
 import { readAudioDuration } from "@/services/music/musicService";
 
@@ -43,6 +45,11 @@ export interface SingleUploadValues {
   rights_basis: MusicRightsBasis;
   rights_confirmed: boolean;
   discovery_metadata: TrackDiscoveryMetadata;
+  visibility: TrackVisibility;
+  playback_mode: TrackPlaybackMode;
+  preview_duration_sec: 15 | 30 | 45 | 60;
+  preview_start_sec: number;
+  allow_download: boolean;
 }
 
 interface Props {
@@ -66,6 +73,11 @@ const empty = (defaultRightsBasis: MusicRightsBasis): SingleUploadValues => ({
   rights_basis: defaultRightsBasis,
   rights_confirmed: true,
   discovery_metadata: EMPTY_TRACK_DISCOVERY_METADATA,
+  visibility: "public",
+  playback_mode: "full",
+  preview_duration_sec: 30,
+  preview_start_sec: 0,
+  allow_download: false,
 });
 
 export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Props) {
@@ -145,6 +157,55 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
             preview={coverPreview}
             hint="JPG, PNG or WebP — up to 2MB"
           />
+        </div>
+      </ProfileCard>
+
+      <ProfileCard
+        title="Visibility & listening access"
+        description="Control who can find this song and whether listeners receive the full recording, a separate preview file, or no playback."
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Visibility">
+            <Select value={values.visibility} onValueChange={(value) => update("visibility", value as TrackVisibility)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="public">Public</SelectItem>
+                <SelectItem value="unlisted">Unlisted link only</SelectItem>
+                <SelectItem value="private">Private</SelectItem>
+                <SelectItem value="scheduled">Scheduled</SelectItem>
+                <SelectItem value="archived">Archived</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Playback">
+            <Select value={values.playback_mode} onValueChange={(value) => update("playback_mode", value as TrackPlaybackMode)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="full">Full song</SelectItem>
+                <SelectItem value="preview">Preview only</SelectItem>
+                <SelectItem value="none">Visible, no playback</SelectItem>
+                <SelectItem value="membership_only">Membership only</SelectItem>
+                <SelectItem value="approved_listeners">Approved listeners</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+          {values.playback_mode === "preview" ? (
+            <>
+              <Field label="Preview length">
+                <Select value={String(values.preview_duration_sec)} onValueChange={(value) => update("preview_duration_sec", Number(value) as 15 | 30 | 45 | 60)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{[15,30,45,60].map((seconds) => <SelectItem key={seconds} value={String(seconds)}>{seconds} seconds</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+              <Field label="Preview starts at (seconds)">
+                <Input type="number" min={0} max={Math.max(0, values.duration_sec - 1)} value={values.preview_start_sec} onChange={(event) => update("preview_start_sec", Math.max(0, Number(event.target.value) || 0))} />
+              </Field>
+            </>
+          ) : null}
+          <label className="flex items-center gap-3 rounded-xl border border-border/70 p-3 text-sm">
+            <Switch checked={values.allow_download} onCheckedChange={(checked) => update("allow_download", checked)} />
+            Allow an authorized download button
+          </label>
         </div>
       </ProfileCard>
 

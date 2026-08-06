@@ -11,7 +11,7 @@ export interface PublicCreatorPage {
   videos: CreatorVideo[];
 }
 
-async function signedUrl(bucket: string, path: string | null) {
+async function signedUrl(bucket: string, path: string | null, ttl = 60 * 5) {
   if (!path) return null;
   const { data } = await supabase.storage.from(bucket).createSignedUrl(path, 60 * 60 * 6);
   return data?.signedUrl ?? null;
@@ -37,6 +37,7 @@ export const publicCreatorService = {
         .select("*")
         .eq("creator_id", profile.user_id)
         .eq("status", "published")
+        .eq("visibility", "public")
         .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false }),
       supabase
@@ -51,6 +52,7 @@ export const publicCreatorService = {
         .eq("creator_id", profile.user_id)
         .eq("status", "published")
         .eq("visibility", "public")
+        .eq("visibility", "public")
         .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false }),
     ]);
@@ -61,7 +63,12 @@ export const publicCreatorService = {
     const tracks = await Promise.all(
       (rows ?? []).map(async (track) => ({
         ...track,
-        audio_url: (await signedUrl("music-audio", track.audio_url)) ?? "",
+        audio_url:
+          track.playback_mode === "preview"
+            ? (await signedUrl("music-previews", track.preview_audio_path, 60 * 3)) ?? ""
+            : track.playback_mode === "none" || track.playback_mode === "approved_listeners"
+              ? ""
+              : (await signedUrl("music-audio", track.audio_url, 60 * 3)) ?? "",
         cover_url: await signedUrl("music-covers", track.cover_url),
       })),
     );

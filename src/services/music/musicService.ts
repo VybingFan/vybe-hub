@@ -13,9 +13,11 @@ import {
   trackDiscoveryMetadataSchema,
 } from "@/features/music/schema";
 import { membershipService } from "@/services/membership/membershipService";
+import { generateWavPreview } from "@/services/music/previewGenerator";
 
 const AUDIO_BUCKET = "music-audio";
 const COVER_BUCKET = "music-covers";
+const PREVIEW_BUCKET = "music-previews";
 const SIGNED_URL_TTL = 60 * 60 * 6; // 6 h
 
 function sanitize(name: string) {
@@ -37,7 +39,12 @@ async function hydrateTrack(row: Track): Promise<Track> {
     discovery_metadata: parsedDiscovery.success
       ? parsedDiscovery.data
       : { ...EMPTY_TRACK_DISCOVERY_METADATA },
-    audio_url: (await signedUrl(AUDIO_BUCKET, row.audio_url)) ?? "",
+    audio_url:
+      row.playback_mode === "preview"
+        ? (await signedUrl(PREVIEW_BUCKET, row.preview_audio_path ?? null)) ?? ""
+        : row.playback_mode === "none"
+          ? ""
+          : (await signedUrl(AUDIO_BUCKET, row.audio_url)) ?? "",
     cover_url: await signedUrl(COVER_BUCKET, row.cover_url),
   };
 }
@@ -72,6 +79,16 @@ export const musicService = {
     const path = `${userId}/${Date.now()}-${sanitize(file.name)}`;
     const { error } = await supabase.storage
       .from(AUDIO_BUCKET)
+      .upload(path, file, { cacheControl: "3600", upsert: false, contentType: file.type });
+    if (error) throw error;
+    return path;
+  },
+
+
+  async uploadPreview(userId: string, trackId: string, file: File): Promise<string> {
+    const path = `${userId}/${trackId}/${Date.now()}-${sanitize(file.name)}`;
+    const { error } = await supabase.storage
+      .from(PREVIEW_BUCKET)
       .upload(path, file, { cacheControl: "3600", upsert: false, contentType: file.type });
     if (error) throw error;
     return path;
@@ -123,6 +140,11 @@ export const musicService = {
       rights_policy_version: params.input.rights_policy_version,
       rights_confirmed_at: params.input.rights_confirmed_at,
       discovery_metadata: params.input.discovery_metadata,
+      visibility: params.input.visibility,
+      playback_mode: params.input.playback_mode,
+      preview_duration_sec: params.input.preview_duration_sec,
+      preview_start_sec: params.input.preview_start_sec,
+      allow_download: params.input.allow_download,
     };
 
     const { data, error } = await supabase
@@ -134,6 +156,28 @@ export const musicService = {
       await this.removeStorage(AUDIO_BUCKET, audioPath);
       if (coverPath) await this.removeStorage(COVER_BUCKET, coverPath);
       throw error;
+    }
+    if (params.input.playback_mode === "preview") {
+      try {
+        const previewFile = await generateWavPreview(
+          params.audio,
+          params.input.preview_start_sec,
+          params.input.preview_duration_sec,
+        );
+        const previewPath = await this.uploadPreview(params.userId, data.id, previewFile);
+        const { error: previewUpdateError } = await supabase
+          .from("tracks")
+          .update({ preview_audio_path: previewPath })
+          .eq("id", data.id)
+          .eq("creator_id", params.userId);
+        if (previewUpdateError) throw previewUpdateError;
+        data.preview_audio_path = previewPath;
+      } catch (previewError) {
+        await supabase.from("tracks").delete().eq("id", data.id);
+        await this.removeStorage(AUDIO_BUCKET, audioPath);
+        if (coverPath) await this.removeStorage(COVER_BUCKET, coverPath);
+        throw previewError;
+      }
     }
     if (params.input.is_featured) {
       const { error: leadError } = await supabase.rpc("set_profile_lead_track", {
@@ -227,7 +271,7 @@ export const musicService = {
   async deleteTrack(id: string): Promise<void> {
     const { data: existing } = await supabase
       .from("tracks")
-      .select("audio_url, cover_url")
+      .select("audio_url, cover_url, preview_audio_path")
       .eq("id", id)
       .maybeSingle();
     const { error } = await supabase.from("tracks").delete().eq("id", id);
@@ -235,6 +279,7 @@ export const musicService = {
     if (existing) {
       await this.removeStorage(AUDIO_BUCKET, existing.audio_url as string);
       await this.removeStorage(COVER_BUCKET, (existing.cover_url as string | null) ?? null);
+      await this.removeStorage(PREVIEW_BUCKET, (existing.preview_audio_path as string | null) ?? null);
     }
   },
 
