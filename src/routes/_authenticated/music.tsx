@@ -1,12 +1,26 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Loader2, Plus, Search } from "lucide-react";
+import {
+  Archive,
+  ChevronRight,
+  Clock3,
+  Disc3,
+  Handshake,
+  Loader2,
+  Plus,
+  Search,
+  Sparkles,
+  Scale,
+  Wrench,
+} from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
-import { Section } from "@/components/common/Section";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
+import { Section } from "@/components/common/Section";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -15,17 +29,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { MusicCard } from "@/components/music/MusicCard";
-import { MusicTable } from "@/components/music/MusicTable";
-import { useUser } from "@/hooks/useUser";
+import { formatDuration, type Track } from "@/features/music/schema";
 import {
-  useCreatorTracks,
-  useDeleteTrack,
-  useReplaceTrackCover,
-  useSetProfileLead,
-} from "@/hooks/useMusic";
-import { MAX_COVER_BYTES, type Track } from "@/features/music/schema";
+  TRACK_PRODUCTION_STAGE_LABELS,
+  TRACK_PRODUCTION_STAGES,
+  TRACK_WORKSPACE_CATEGORIES,
+  TRACK_WORKSPACE_CATEGORY_LABELS,
+  type TrackProductionStage,
+  type TrackWorkspaceCategory,
+} from "@/features/music/workflow";
+import { useCreatorTracks } from "@/hooks/useMusic";
+import { useUpdateTrackWorkflow } from "@/hooks/useTrackWorkflow";
+import { useUser } from "@/hooks/useUser";
+
+type WorkflowTrack = Track & {
+  workspace_category?: TrackWorkspaceCategory;
+  production_stage?: TrackProductionStage;
+};
+
+type LibraryView = "overview" | "all" | TrackWorkspaceCategory;
+
+const categoryIcons = {
+  released: Disc3,
+  upcoming: Clock3,
+  work_in_progress: Wrench,
+  collaboration: Handshake,
+  rights_pending: Scale,
+  commercial_preview: Sparkles,
+  archived: Archive,
+} satisfies Record<TrackWorkspaceCategory, typeof Disc3>;
+
+const categoryDescriptions: Record<TrackWorkspaceCategory, string> = {
+  released: "Finished music already available to listeners.",
+  upcoming: "Music being prepared for a future release.",
+  work_in_progress: "Ideas, drafts, recordings, mixes, and unfinished songs.",
+  collaboration: "Songs that need artists, writers, producers, or musicians.",
+  rights_pending: "Music waiting for a license, agreement, clearance, or purchase.",
+  commercial_preview: "Released music promoted through a limited public preview.",
+  archived: "Music kept for your records but removed from active work.",
+};
 
 export const Route = createFileRoute("/_authenticated/music")({
   component: () => (
@@ -37,225 +79,475 @@ export const Route = createFileRoute("/_authenticated/music")({
 
 function MusicLibrary() {
   const navigate = useNavigate();
-  const openUpload = () => window.location.assign("/music/upload");
   const { user } = useUser();
-  const { data: tracks = [], isLoading, error } = useCreatorTracks(user?.id);
-  const del = useDeleteTrack(user?.id);
-  const replaceCover = useReplaceTrackCover(user?.id);
-  const setProfileLead = useSetProfileLead(user?.id);
-  const [coverTrackId, setCoverTrackId] = useState<string | null>(null);
-  const [q, setQ] = useState("");
-  const [status, setStatus] = useState<"all" | ContentStatus>("all");
-  const [genre, setGenre] = useState("all");
-  const [sort, setSort] = useState<"newest" | "title" | "duration">("newest");
-  const [visibleLimit, setVisibleLimit] = useState(24);
+  const { data = [], isLoading, error } = useCreatorTracks(user?.id);
+  const tracks = data as WorkflowTrack[];
+  const workflow = useUpdateTrackWorkflow(user?.id);
 
-  const genres = useMemo(
+  const [view, setView] = useState<LibraryView>("overview");
+  const [query, setQuery] = useState("");
+  const [stage, setStage] = useState<"all" | TrackProductionStage>("all");
+  const [limit, setLimit] = useState(20);
+
+  const counts = useMemo(() => {
+    const value = Object.fromEntries(
+      TRACK_WORKSPACE_CATEGORIES.map((category) => [category, 0]),
+    ) as Record<TrackWorkspaceCategory, number>;
+
+    tracks.forEach((track) => {
+      value[track.workspace_category ?? "work_in_progress"] += 1;
+    });
+
+    return value;
+  }, [tracks]);
+
+  const recent = useMemo(
     () =>
-      Array.from(
-        new Set(tracks.map((track) => track.genre?.trim()).filter(Boolean) as string[]),
-      ).sort((a, b) => a.localeCompare(b)),
+      [...tracks]
+        .sort((a, b) => (b.updated_at > a.updated_at ? 1 : -1))
+        .slice(0, 5),
     [tracks],
   );
 
   const filtered = useMemo(() => {
-    let list = tracks;
-    if (status !== "all") list = list.filter((t) => t.status === status);
-    if (genre !== "all") list = list.filter((t) => t.genre === genre);
-    if (q.trim()) {
-      const needle = q.toLowerCase();
-      list = list.filter(
-        (t) =>
-          t.title.toLowerCase().includes(needle) ||
-          (t.primary_artist_name || "").toLowerCase().includes(needle) ||
-          (t.featured_artist_names || []).some((name) => name.toLowerCase().includes(needle)) ||
-          (t.genre || "").toLowerCase().includes(needle) ||
-          (t.description || "").toLowerCase().includes(needle),
+    let value = tracks;
+
+    if (view !== "overview" && view !== "all") {
+      value = value.filter(
+        (track) =>
+          (track.workspace_category ?? "work_in_progress") === view,
       );
     }
-    const sorted = [...list];
-    if (sort === "title") sorted.sort((a, b) => a.title.localeCompare(b.title));
-    else if (sort === "duration") sorted.sort((a, b) => b.duration_sec - a.duration_sec);
-    else sorted.sort((a, b) => (b.created_at > a.created_at ? 1 : -1));
-    return sorted;
-  }, [tracks, q, status, genre, sort]);
-  const visibleTracks = filtered.slice(0, visibleLimit);
 
-  const onDelete = async (t: Track) => {
+    if (stage !== "all") {
+      value = value.filter(
+        (track) => (track.production_stage ?? "idea") === stage,
+      );
+    }
+
+    if (query.trim()) {
+      const needle = query.trim().toLowerCase();
+      value = value.filter(
+        (track) =>
+          track.title.toLowerCase().includes(needle) ||
+          (track.primary_artist_name || "").toLowerCase().includes(needle) ||
+          (track.genre || "").toLowerCase().includes(needle),
+      );
+    }
+
+    return [...value].sort((a, b) =>
+      b.updated_at > a.updated_at ? 1 : -1,
+    );
+  }, [query, stage, tracks, view]);
+
+  const updateCategory = async (
+    track: WorkflowTrack,
+    category: TrackWorkspaceCategory,
+  ) => {
     try {
-      await del.mutateAsync(t.id);
-      toast.success("Track deleted");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Delete failed");
+      await workflow.mutateAsync({
+        trackId: track.id,
+        category,
+        ...(category === "archived" ? { stage: "archived" as const } : {}),
+      });
+      toast.success(`Moved to ${TRACK_WORKSPACE_CATEGORY_LABELS[category]}.`);
+    } catch (cause) {
+      toast.error(cause instanceof Error ? cause.message : "Update failed.");
     }
   };
 
-  const onToggleFeatured = async (t: Track) => {
+  const updateStage = async (
+    track: WorkflowTrack,
+    nextStage: TrackProductionStage,
+  ) => {
     try {
-      await setProfileLead.mutateAsync(t.is_featured ? null : t.id);
-      toast.success(t.is_featured ? "Profile lead cleared" : `${t.title} is now your profile lead`);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Update failed");
+      await workflow.mutateAsync({
+        trackId: track.id,
+        stage: nextStage,
+        ...(nextStage === "released" &&
+        track.workspace_category === "work_in_progress"
+          ? { category: "released" as const }
+          : {}),
+      });
+      toast.success(`Stage changed to ${TRACK_PRODUCTION_STAGE_LABELS[nextStage]}.`);
+    } catch (cause) {
+      toast.error(cause instanceof Error ? cause.message : "Update failed.");
     }
   };
 
-  const openEditor = (track: Track) =>
-    navigate({ to: "/music/$trackId", params: { trackId: track.id } });
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <Loader2 className="h-7 w-7 animate-spin text-primary" />
+      </div>
+    );
+  }
 
-  const onCoverChange = async (track: Track, file: File) => {
-    if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
-      return toast.error("Choose a JPG, PNG, or WebP cover image.");
-    }
-    if (file.size > MAX_COVER_BYTES) return toast.error("Cover exceeds 2MB");
-    setCoverTrackId(track.id);
-    try {
-      await replaceCover.mutateAsync({ id: track.id, file });
-      toast.success(track.cover_url ? "Cover art replaced" : "Cover art added");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not save cover art");
-    } finally {
-      setCoverTrackId(null);
-    }
-  };
+  if (error) {
+    return (
+      <ErrorState
+        title="Couldn't load your music workspace"
+        message={(error as Error).message}
+      />
+    );
+  }
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <Section
         title="Music library"
-        description="Manage every song you've uploaded to VYBE."
+        description="Organize music by purpose and production stage instead of scrolling through one long catalog."
         action={
           <Button
-            type="button"
-            onClick={openUpload}
+            onClick={() => window.location.assign("/music/upload")}
             className="bg-gradient-brand text-primary-foreground shadow-glow"
           >
-            <Plus className="mr-2 h-4 w-4" /> Upload
+            <Plus className="mr-2 h-4 w-4" />
+            Upload
           </Button>
         }
       >
-        <div className="flex flex-col gap-3 md:flex-row md:items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search title, artist, or genre"
-              className="pl-9"
-            />
-          </div>
-          <Select
-            value={status}
-            onValueChange={(v) => {
-              setStatus(v as typeof status);
-              setVisibleLimit(24);
-            }}
-          >
-            <SelectTrigger className="md:w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select
-            value={genre}
-            onValueChange={(value) => {
-              setGenre(value);
-              setVisibleLimit(24);
-            }}
-          >
-            <SelectTrigger className="md:w-44">
-              <SelectValue placeholder="All genres" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All genres</SelectItem>
-              {genres.map((item) => (
-                <SelectItem key={item} value={item}>
-                  {item}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={sort} onValueChange={(v) => setSort(v as typeof sort)}>
-            <SelectTrigger className="md:w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest first</SelectItem>
-              <SelectItem value="title">Title A–Z</SelectItem>
-              <SelectItem value="duration">Longest</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        {!!filtered.length && (
-          <p className="text-sm text-muted-foreground">
-            Showing {Math.min(visibleLimit, filtered.length)} of {filtered.length} matching songs ·{" "}
-            {tracks.length} total
-          </p>
-        )}
+        {view === "overview" ? (
+          <div className="space-y-8">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <CategoryCard
+                label="All music"
+                count={tracks.length}
+                description="Open the complete catalog only when you need it."
+                icon={Disc3}
+                onClick={() => setView("all")}
+              />
 
-        {isLoading ? (
-          <div className="flex min-h-[30vh] items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              {TRACK_WORKSPACE_CATEGORIES.map((category) => (
+                <CategoryCard
+                  key={category}
+                  label={TRACK_WORKSPACE_CATEGORY_LABELS[category]}
+                  count={counts[category]}
+                  description={categoryDescriptions[category]}
+                  icon={categoryIcons[category]}
+                  onClick={() => setView(category)}
+                />
+              ))}
+            </div>
+
+            <div>
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-semibold">Recently updated</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Your five most recently changed songs.
+                  </p>
+                </div>
+
+                {!!tracks.length && (
+                  <Button variant="ghost" onClick={() => setView("all")}>
+                    View all
+                    <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+
+              <div className="mt-4 space-y-2">
+                {!recent.length ? (
+                  <EmptyState
+                    title="No music yet"
+                    description="Upload your first song to begin organizing your workspace."
+                    action={{
+                      label: "Upload your first song",
+                      onClick: () => window.location.assign("/music/upload"),
+                    }}
+                  />
+                ) : (
+                  recent.map((track) => (
+                    <TrackRow
+                      key={track.id}
+                      track={track}
+                      busy={workflow.isPending}
+                      onEdit={() =>
+                        navigate({
+                          to: "/music/$trackId",
+                          params: { trackId: track.id },
+                        })
+                      }
+                      onCategory={(category) =>
+                        void updateCategory(track, category)
+                      }
+                      onStage={(nextStage) =>
+                        void updateStage(track, nextStage)
+                      }
+                    />
+                  ))
+                )}
+              </div>
+            </div>
           </div>
-        ) : error ? (
-          <ErrorState title="Couldn't load library" message={(error as Error).message} />
-        ) : filtered.length === 0 ? (
-          <EmptyState
-            title={tracks.length ? "No matches" : "No tracks yet"}
-            description={
-              tracks.length
-                ? "Try a different search or filter."
-                : "Upload your first song to get started."
-            }
-            action={
-              tracks.length
-                ? undefined
-                : {
-                    label: "Upload your first song",
-                    onClick: openUpload,
-                  }
-            }
-          />
         ) : (
-          <Tabs defaultValue="grid">
-            <TabsList>
-              <TabsTrigger value="grid">Grid</TabsTrigger>
-              <TabsTrigger value="table">Table</TabsTrigger>
-            </TabsList>
-            <TabsContent value="grid" className="mt-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {visibleTracks.map((t) => (
-                  <MusicCard
-                    key={t.id}
-                    track={t}
-                    onCoverChange={onCoverChange}
-                    coverPending={coverTrackId === t.id}
-                    onEdit={openEditor}
+          <div className="space-y-5">
+            <Button
+              variant="ghost"
+              className="-ml-3"
+              onClick={() => {
+                setView("overview");
+                setQuery("");
+                setStage("all");
+              }}
+            >
+              ← Workspace overview
+            </Button>
+
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="text-2xl font-semibold">
+                  {view === "all"
+                    ? "All music"
+                    : TRACK_WORKSPACE_CATEGORY_LABELS[view]}
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {view === "all"
+                    ? "Search the complete catalog."
+                    : categoryDescriptions[view]}
+                </p>
+              </div>
+              <Badge variant="secondary">{filtered.length} songs</Badge>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_13rem]">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={query}
+                  onChange={(event) => {
+                    setQuery(event.target.value);
+                    setLimit(20);
+                  }}
+                  placeholder="Search title, artist, or genre"
+                  className="pl-9"
+                />
+              </div>
+
+              <Select
+                value={stage}
+                onValueChange={(value) => {
+                  setStage(value as "all" | TrackProductionStage);
+                  setLimit(20);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All stages</SelectItem>
+                  {TRACK_PRODUCTION_STAGES.map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {TRACK_PRODUCTION_STAGE_LABELS[item]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {!filtered.length ? (
+              <EmptyState
+                title="No matching songs"
+                description="Try another search, stage, or category."
+              />
+            ) : (
+              <div className="space-y-2">
+                {filtered.slice(0, limit).map((track) => (
+                  <TrackRow
+                    key={track.id}
+                    track={track}
+                    busy={workflow.isPending}
+                    onEdit={() =>
+                      navigate({
+                        to: "/music/$trackId",
+                        params: { trackId: track.id },
+                      })
+                    }
+                    onCategory={(category) =>
+                      void updateCategory(track, category)
+                    }
+                    onStage={(nextStage) =>
+                      void updateStage(track, nextStage)
+                    }
                   />
                 ))}
               </div>
-            </TabsContent>
-            <TabsContent value="table" className="mt-4">
-              <MusicTable
-                tracks={visibleTracks}
-                onEdit={openEditor}
-                onDelete={onDelete}
-                onToggleFeatured={onToggleFeatured}
-              />
-            </TabsContent>
-          </Tabs>
-        )}
-        {visibleLimit < filtered.length && (
-          <div className="flex justify-center pt-2">
-            <Button variant="outline" onClick={() => setVisibleLimit((value) => value + 24)}>
-              Load 24 more songs
-            </Button>
+            )}
+
+            {limit < filtered.length && (
+              <div className="flex justify-center">
+                <Button
+                  variant="outline"
+                  onClick={() => setLimit((current) => current + 20)}
+                >
+                  Load 20 more songs
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </Section>
     </div>
+  );
+}
+
+function CategoryCard({
+  label,
+  count,
+  description,
+  icon: Icon,
+  onClick,
+}: {
+  label: string;
+  count: number;
+  description: string;
+  icon: typeof Disc3;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="rounded-2xl border border-border bg-card p-5 text-left transition hover:border-primary/50"
+    >
+      <div className="flex items-start justify-between">
+        <Icon className="h-5 w-5 text-primary" />
+        <span className="text-2xl font-semibold">{count}</span>
+      </div>
+      <p className="mt-4 font-semibold">{label}</p>
+      <p className="mt-2 text-xs leading-5 text-muted-foreground">
+        {description}
+      </p>
+    </button>
+  );
+}
+
+function TrackRow({
+  track,
+  busy,
+  onEdit,
+  onCategory,
+  onStage,
+}: {
+  track: WorkflowTrack;
+  busy: boolean;
+  onEdit: () => void;
+  onCategory: (category: TrackWorkspaceCategory) => void;
+  onStage: (stage: TrackProductionStage) => void;
+}) {
+  const category = track.workspace_category ?? "work_in_progress";
+  const stage = track.production_stage ?? "idea";
+
+  return (
+    <Card>
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex items-center gap-3">
+          <img
+            src={track.cover_url || "/banners/default-creator-banner.png"}
+            alt=""
+            className="h-14 w-14 shrink-0 rounded-xl object-cover"
+          />
+
+          <button
+            type="button"
+            onClick={onEdit}
+            className="min-w-0 flex-1 text-left"
+          >
+            <p className="truncate font-semibold">{track.title}</p>
+            <p className="mt-1 truncate text-xs text-muted-foreground">
+              {track.primary_artist_name || "Independent artist"} ·{" "}
+              {formatDuration(track.duration_sec)}
+            </p>
+          </button>
+
+          <div className="hidden min-w-48 sm:block">
+            <Select
+              value={category}
+              disabled={busy}
+              onValueChange={(value) =>
+                onCategory(value as TrackWorkspaceCategory)
+              }
+            >
+              <SelectTrigger className="h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TRACK_WORKSPACE_CATEGORIES.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {TRACK_WORKSPACE_CATEGORY_LABELS[item]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="hidden min-w-40 sm:block">
+            <Select
+              value={stage}
+              disabled={busy}
+              onValueChange={(value) =>
+                onStage(value as TrackProductionStage)
+              }
+            >
+              <SelectTrigger className="h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TRACK_PRODUCTION_STAGES.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {TRACK_PRODUCTION_STAGE_LABELS[item]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button variant="ghost" size="sm" onClick={onEdit}>
+            Manage
+          </Button>
+        </div>
+
+        <div className="mt-3 grid gap-2 sm:hidden">
+          <Select
+            value={category}
+            disabled={busy}
+            onValueChange={(value) =>
+              onCategory(value as TrackWorkspaceCategory)
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TRACK_WORKSPACE_CATEGORIES.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {TRACK_WORKSPACE_CATEGORY_LABELS[item]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={stage}
+            disabled={busy}
+            onValueChange={(value) =>
+              onStage(value as TrackProductionStage)
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TRACK_PRODUCTION_STAGES.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {TRACK_PRODUCTION_STAGE_LABELS[item]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
