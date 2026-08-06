@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+﻿import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -52,6 +52,14 @@ import {
   type TrackVisibility,
   type TrackPlaybackMode,
 } from "@/features/music/schema";
+import {
+  TRACK_PRODUCTION_STAGE_LABELS,
+  TRACK_PRODUCTION_STAGES,
+  TRACK_WORKSPACE_CATEGORIES,
+  TRACK_WORKSPACE_CATEGORY_LABELS,
+  type TrackProductionStage,
+  type TrackWorkspaceCategory,
+} from "@/features/music/workflow";
 import { readAudioDuration } from "@/services/music/musicService";
 
 export const Route = createFileRoute("/_authenticated/music_/$trackId")({
@@ -80,6 +88,10 @@ function SongEditor() {
   const [description, setDescription] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
   const [status, setStatus] = useState<ContentStatus>("draft");
+  const [workspaceCategory, setWorkspaceCategory] =
+    useState<TrackWorkspaceCategory>("work_in_progress");
+  const [productionStage, setProductionStage] =
+    useState<TrackProductionStage>("idea");
   const [visibility, setVisibility] = useState<TrackVisibility>("public");
   const [playbackMode, setPlaybackMode] = useState<TrackPlaybackMode>("full");
   const [previewDuration, setPreviewDuration] = useState<15 | 30 | 45 | 60>(30);
@@ -103,6 +115,8 @@ function SongEditor() {
     setDescription(track.description || "");
     setReleaseDate(track.release_date || "");
     setStatus(track.status);
+    setWorkspaceCategory(track.workspace_category ?? "work_in_progress");
+    setProductionStage(track.production_stage ?? "idea");
     setVisibility(track.visibility ?? "public");
     setPlaybackMode(track.playback_mode ?? "full");
     setPreviewDuration(track.preview_duration_sec ?? 30);
@@ -137,6 +151,8 @@ function SongEditor() {
           description: description.trim(),
           release_date: releaseDate,
           status,
+          workspace_category: workspaceCategory,
+          production_stage: productionStage,
           visibility,
           playback_mode: playbackMode,
           preview_duration_sec: previewDuration,
@@ -277,6 +293,57 @@ function SongEditor() {
         </aside>
 
         <div className="space-y-8">
+          <section className="rounded-3xl border border-border bg-card p-6 md:p-8">
+            <h2 className="text-2xl font-semibold">Workspace & production</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Set why this song is in your workspace and where it currently is in the creative process.
+              These settings do not decide who can discover or hear the song.
+            </p>
+
+            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              <div>
+                <Label>Music category</Label>
+                <Select
+                  value={workspaceCategory}
+                  onValueChange={(value) =>
+                    setWorkspaceCategory(value as TrackWorkspaceCategory)
+                  }
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TRACK_WORKSPACE_CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {TRACK_WORKSPACE_CATEGORY_LABELS[category]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Production stage</Label>
+                <Select
+                  value={productionStage}
+                  onValueChange={(value) =>
+                    setProductionStage(value as TrackProductionStage)
+                  }
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TRACK_PRODUCTION_STAGES.map((stage) => (
+                      <SelectItem key={stage} value={stage}>
+                        {TRACK_PRODUCTION_STAGE_LABELS[stage]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </section>
           <section className="rounded-3xl border border-border bg-card p-6 md:p-8">
             <h2 className="text-2xl font-semibold">Visibility & listening access</h2>
             <p className="mt-2 text-sm text-muted-foreground">Control discovery, playback, previews, and downloads for this song.</p>
@@ -501,7 +568,7 @@ function SongEditor() {
             <FileAudio className="h-7 w-7 text-primary" />
             <h2 className="mt-5 text-2xl font-semibold">Replace audio file</h2>
             <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">
-              Upload a corrected or updated MP3 while keeping this song’s identity, cover, credits,
+              Upload a corrected or updated MP3 while keeping this songâ€™s identity, cover, credits,
               playlist positions, and public playlist links.
             </p>
             <div className="mt-5 rounded-2xl border border-border/70 bg-background/60 p-4 text-sm text-muted-foreground">
@@ -569,7 +636,7 @@ function SongEditor() {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete “{track.title}”?</AlertDialogTitle>
+                  <AlertDialogTitle>Delete â€œ{track.title}â€?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This permanently removes the audio, cover art, and song from every playlist
                     containing it. Use Replace audio when correcting an existing song.
@@ -624,3 +691,4 @@ function SongEditor() {
     </div>
   );
 }
+
