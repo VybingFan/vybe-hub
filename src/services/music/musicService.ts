@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+﻿import { supabase } from "@/integrations/supabase/client";
 import type {
   Album,
   AlbumInput,
@@ -145,6 +145,8 @@ export const musicService = {
       preview_duration_sec: params.input.preview_duration_sec,
       preview_start_sec: params.input.preview_start_sec,
       allow_download: params.input.allow_download,
+      workspace_category: params.input.workspace_category,
+      production_stage: params.input.production_stage,
     };
 
     const { data, error } = await supabase
@@ -388,3 +390,4 @@ export function readAudioDuration(file: File): Promise<number> {
     };
   });
 }
+

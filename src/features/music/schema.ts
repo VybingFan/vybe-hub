@@ -1,5 +1,9 @@
-import { z } from "zod";
+﻿import { z } from "zod";
 import { MUSIC_RIGHTS_VALUES } from "@/constants/legal";
+import {
+  TRACK_PRODUCTION_STAGES,
+  TRACK_WORKSPACE_CATEGORIES,
+} from "@/features/music/workflow";
 
 export const CONTENT_STATUSES = ["draft", "published"] as const;
 export const TRACK_VISIBILITIES = ["public", "unlisted", "private", "scheduled", "archived"] as const;
@@ -63,6 +67,8 @@ export const trackSchema = z.object({
   available_until: z.string().datetime().nullable().optional(),
   required_plan_code: z.string().nullable().optional(),
   allow_download: z.boolean().default(false),
+  workspace_category: z.enum(TRACK_WORKSPACE_CATEGORIES).default("work_in_progress"),
+  production_stage: z.enum(TRACK_PRODUCTION_STAGES).default("idea"),
 });
 
 export type TrackInput = z.infer<typeof trackSchema>;
@@ -109,3 +115,4 @@ export function formatDuration(totalSec: number): string {
   const s = Math.floor(totalSec % 60);
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
+

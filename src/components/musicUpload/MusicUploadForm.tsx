@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from "react";
+﻿import { useState, type ChangeEvent } from "react";
 import { Upload, Music2, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,14 @@ import {
   type TrackVisibility,
   type TrackPlaybackMode,
 } from "@/features/music/schema";
+import {
+  TRACK_PRODUCTION_STAGE_LABELS,
+  TRACK_PRODUCTION_STAGES,
+  TRACK_WORKSPACE_CATEGORIES,
+  TRACK_WORKSPACE_CATEGORY_LABELS,
+  type TrackProductionStage,
+  type TrackWorkspaceCategory,
+} from "@/features/music/workflow";
 import { readAudioDuration } from "@/services/music/musicService";
 
 export interface SingleUploadValues {
@@ -50,6 +58,8 @@ export interface SingleUploadValues {
   preview_duration_sec: 15 | 30 | 45 | 60;
   preview_start_sec: number;
   allow_download: boolean;
+  workspace_category: TrackWorkspaceCategory;
+  production_stage: TrackProductionStage;
 }
 
 interface Props {
@@ -78,6 +88,8 @@ const empty = (defaultRightsBasis: MusicRightsBasis): SingleUploadValues => ({
   preview_duration_sec: 30,
   preview_start_sec: 0,
   allow_download: false,
+  workspace_category: "work_in_progress",
+  production_stage: "idea",
 });
 
 export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Props) {
@@ -144,8 +156,8 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
             icon={<Music2 className="h-5 w-5" />}
             hint={
               values.audio
-                ? `${formatDuration(values.duration_sec)} · ${(values.audio.size / (1024 * 1024)).toFixed(1)} MB`
-                : "MP3 · your plan limit is checked before upload"
+                ? `${formatDuration(values.duration_sec)} Â· ${(values.audio.size / (1024 * 1024)).toFixed(1)} MB`
+                : "MP3 Â· your plan limit is checked before upload"
             }
           />
           <FilePicker
@@ -155,9 +167,61 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
             onChange={handleCover}
             icon={<ImageIcon className="h-5 w-5" />}
             preview={coverPreview}
-            hint="JPG, PNG or WebP — up to 2MB"
+            hint="JPG, PNG or WebP â€” up to 2MB"
           />
         </div>
+      </ProfileCard>
+      <ProfileCard
+        title="Place this song in your workspace"
+        description="Choose why you are managing this song and where it is in the creative process. You can change either setting later from the Music Library."
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Music category">
+            <Select
+              value={values.workspace_category}
+              onValueChange={(value) =>
+                update("workspace_category", value as TrackWorkspaceCategory)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TRACK_WORKSPACE_CATEGORIES.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {TRACK_WORKSPACE_CATEGORY_LABELS[category]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Field label="Production stage">
+            <Select
+              value={values.production_stage}
+              onValueChange={(value) =>
+                update("production_stage", value as TrackProductionStage)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TRACK_PRODUCTION_STAGES.map((stage) => (
+                  <SelectItem key={stage} value={stage}>
+                    {TRACK_PRODUCTION_STAGE_LABELS[stage]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+        </div>
+
+        <p className="mt-3 text-xs leading-5 text-muted-foreground">
+          Category, production stage, and listening access are separate. For
+          example, a song may be "Looking for collaborators," currently
+          "Recording," and shared only with approved listeners.
+        </p>
       </ProfileCard>
 
       <ProfileCard
@@ -375,7 +439,7 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
                 rows={4}
                 value={values.description}
                 onChange={(e) => update("description", e.target.value)}
-                placeholder="Tell listeners about this song…"
+                placeholder="Tell listeners about this songâ€¦"
               />
             </Field>
             <div className="flex items-center justify-between rounded-md border border-border/50 p-3">
@@ -463,3 +527,4 @@ function FilePicker({
     </label>
   );
 }
+

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, Loader2, ShieldCheck } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
@@ -71,6 +71,8 @@ function UploadPage() {
         preview_duration_sec: values.preview_duration_sec,
         preview_start_sec: values.preview_start_sec,
         allow_download: values.allow_download,
+        workspace_category: values.workspace_category,
+        production_stage: values.production_stage,
       },
       audio: values.audio,
       cover: values.cover,
@@ -141,6 +143,8 @@ function UploadPage() {
           preview_duration_sec: 30,
           preview_start_sec: 0,
           allow_download: false,
+          workspace_category: "work_in_progress",
+          production_stage: "recording",
           discovery_metadata: {
             mood_tags: [],
             location: "",
@@ -175,13 +179,13 @@ function UploadPage() {
             <div>
               <p className="font-medium">
                 {membership.plan_code === "founding_beta"
-                  ? "Founding Creator · Creator Pro Access"
+                  ? "Founding Creator Â· Creator Pro Access"
                   : membership.recognition_code === "vybe_pioneer"
-                    ? `${membership.public_name} · VYBE Pioneer`
+                    ? `${membership.public_name} Â· VYBE Pioneer`
                     : membership.public_name}
               </p>
               <p className="text-sm text-muted-foreground">
-                MP3 only · up to {membership.limits.track_duration_sec / 60} minutes · up to{" "}
+                MP3 only Â· up to {membership.limits.track_duration_sec / 60} minutes Â· up to{" "}
                 {Math.round(membership.limits.audio_bytes / 1024 / 1024)}MB per song
               </p>
             </div>
@@ -197,7 +201,7 @@ function UploadPage() {
       {rightsStatus.isLoading ? (
         <Card>
           <CardContent className="flex items-center gap-3 p-5 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Checking your music upload certification…
+            <Loader2 className="h-4 w-4 animate-spin" /> Checking your music upload certificationâ€¦
           </CardContent>
         </Card>
       ) : activeRights ? (
@@ -249,3 +253,4 @@ function UploadPage() {
     </div>
   );
 }
+
