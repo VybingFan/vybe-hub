@@ -21,7 +21,7 @@ const TABLE_MAP = [
   ["follows", "follower_id"],
   ["creator_profiles", "user_id"],
   ["supporter_profiles", "user_id"],
-  ["business_profiles", "user_id"],
+  ["business_profiles", "owner_user_id"],
   ["profiles", "id"],
   ["user_roles", "user_id"],
   ["account_entitlements", "user_id"],
