@@ -12,21 +12,54 @@ const COVER_BUCKET = "music-covers";
 const PREVIEW_BUCKET = "music-previews";
 const AVATAR_BUCKET = "avatars";
 
-async function signedUrl(bucket: string, path: string | null, ttl = 60 * 5) {
-  if (!path) return null;
-  const { data } = await supabase.storage.from(bucket).createSignedUrl(path, 60 * 60 * 6);
-  return data?.signedUrl ?? null;
+async function signedUrl(
+  bucket: string,
+  path: string | null,
+  ttl = 60 * 5,
+): Promise<string | null> {
+  if (!path) {
+    return null;
+  }
+
+  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, ttl);
+
+  if (error) {
+    console.error("Could not create signed Storage URL", {
+      bucket,
+      path,
+      message: error.message,
+    });
+
+    return null;
+  }
+
+  if (!data?.signedUrl) {
+    console.error("Supabase returned no signed Storage URL", {
+      bucket,
+      path,
+    });
+
+    return null;
+  }
+
+  return data.signedUrl;
 }
 
 async function hydrateTrack(row: Track): Promise<Track> {
+  let playableAudioUrl = "";
+
+  if (row.playback_mode === "preview") {
+    playableAudioUrl =
+      (await signedUrl(PREVIEW_BUCKET, row.preview_audio_path ?? null, 60 * 3)) ?? "";
+  } else if (row.playback_mode === "none" || row.playback_mode === "approved_listeners") {
+    playableAudioUrl = "";
+  } else {
+    playableAudioUrl = (await signedUrl(AUDIO_BUCKET, row.audio_url, 60 * 3)) ?? "";
+  }
+
   return {
     ...row,
-    audio_url:
-      row.playback_mode === "preview"
-        ? (await signedUrl(PREVIEW_BUCKET, row.preview_audio_path ?? null, 60 * 3)) ?? ""
-        : row.playback_mode === "none" || row.playback_mode === "approved_listeners"
-          ? ""
-          : (await signedUrl(AUDIO_BUCKET, row.audio_url, 60 * 3)) ?? "",
+    audio_url: playableAudioUrl,
     cover_url: await signedUrl(COVER_BUCKET, row.cover_url),
   };
 }
@@ -53,6 +86,7 @@ export const playlistService = {
         .replace(/(^-|-$)/g, "")
         .slice(0, 48) || "playlist"
     }-${crypto.randomUUID().slice(0, 8)}`;
+
     const { data, error } = await supabase
       .from("playlists")
       .insert({
@@ -63,21 +97,28 @@ export const playlistService = {
         slug,
         is_published: true,
         access_mode: "public",
-      })
+      } as never)
       .select("*")
       .single();
-    if (error) throw error;
+
+    if (error) {
+      throw error;
+    }
 
     const items = input.trackIds.map((trackId, position) => ({
       playlist_id: data.id,
       track_id: trackId,
       position,
     }));
+
     const { error: trackError } = await supabase.from("playlist_tracks").insert(items);
+
     if (trackError) {
       await supabase.from("playlists").delete().eq("id", data.id);
+
       throw trackError;
     }
+
     return hydratePlaylist({
       ...data,
       cover_path: data.cover_path ?? null,
@@ -90,8 +131,14 @@ export const playlistService = {
       .from("playlists")
       .select("*, playlist_tracks(track_id, position)")
       .eq("creator_id", userId)
-      .order("created_at", { ascending: false });
-    if (error) throw error;
+      .order("created_at", {
+        ascending: false,
+      });
+
+    if (error) {
+      throw error;
+    }
+
     return Promise.all(
       (data ?? []).map(({ playlist_tracks: items, ...playlist }) =>
         hydratePlaylist({
@@ -110,9 +157,17 @@ export const playlistService = {
       .eq("id", playlistId)
       .eq("creator_id", userId)
       .maybeSingle();
-    if (error) throw error;
-    if (!data) return null;
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data) {
+      return null;
+    }
+
     const { playlist_tracks: items, ...playlist } = data;
+
     return hydratePlaylist({
       ...playlist,
       cover_path: playlist.cover_path ?? null,
@@ -121,37 +176,64 @@ export const playlistService = {
   },
 
   async update(playlistId: string, input: UpdatePlaylistInput): Promise<void> {
-    const { error } = await supabase.from("playlists").update(input).eq("id", playlistId);
-    if (error) throw error;
+    const { error } = await supabase
+      .from("playlists")
+      .update(input as never)
+      .eq("id", playlistId);
+
+    if (error) {
+      throw error;
+    }
   },
 
   async replaceCover(userId: string, playlistId: string, file: File): Promise<void> {
     if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
       throw new Error("Choose a JPG, PNG, or WebP cover image.");
     }
-    if (file.size > MAX_COVER_BYTES) throw new Error("Cover exceeds 2MB");
+
+    if (file.size > MAX_COVER_BYTES) {
+      throw new Error("Cover exceeds 2MB");
+    }
+
     const { data: existing, error: lookupError } = await supabase
       .from("playlists")
       .select("cover_path")
       .eq("id", playlistId)
       .eq("creator_id", userId)
       .single();
-    if (lookupError) throw lookupError;
+
+    if (lookupError) {
+      throw lookupError;
+    }
+
     const previousPath = existing.cover_path;
+
     const newPath = `${userId}/playlist-covers/${playlistId}-${Date.now()}-${sanitize(file.name)}`;
-    const { error: uploadError } = await supabase.storage
-      .from(COVER_BUCKET)
-      .upload(newPath, file, { cacheControl: "3600", upsert: false, contentType: file.type });
-    if (uploadError) throw uploadError;
+
+    const { error: uploadError } = await supabase.storage.from(COVER_BUCKET).upload(newPath, file, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: file.type,
+    });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
     const { error } = await supabase
       .from("playlists")
-      .update({ cover_path: newPath })
+      .update({
+        cover_path: newPath,
+      })
       .eq("id", playlistId)
       .eq("creator_id", userId);
+
     if (error) {
       await supabase.storage.from(COVER_BUCKET).remove([newPath]);
+
       throw error;
     }
+
     if (previousPath && previousPath !== newPath) {
       await supabase.storage.from(COVER_BUCKET).remove([previousPath]);
     }
@@ -162,7 +244,10 @@ export const playlistService = {
       _playlist_id: playlistId,
       _track_ids: trackIds,
     });
-    if (error) throw error;
+
+    if (error) {
+      throw error;
+    }
   },
 
   async delete(playlistId: string): Promise<void> {
@@ -171,8 +256,13 @@ export const playlistService = {
       .select("cover_path")
       .eq("id", playlistId)
       .maybeSingle();
+
     const { error } = await supabase.from("playlists").delete().eq("id", playlistId);
-    if (error) throw error;
+
+    if (error) {
+      throw error;
+    }
+
     if (existing?.cover_path) {
       await supabase.storage.from(COVER_BUCKET).remove([existing.cover_path]);
     }
@@ -186,8 +276,14 @@ export const playlistService = {
       .eq("is_published", true)
       .in("access_mode", ["public", "unlisted"])
       .maybeSingle();
-    if (error) throw error;
-    if (!playlist) return null;
+
+    if (error) {
+      throw error;
+    }
+
+    if (!playlist) {
+      return null;
+    }
 
     const [{ data: creator }, { data: items, error: itemsError }] = await Promise.all([
       supabase
@@ -197,26 +293,36 @@ export const playlistService = {
         )
         .eq("user_id", playlist.creator_id)
         .maybeSingle(),
+
       supabase
         .from("playlist_tracks")
         .select("position, tracks(*)")
         .eq("playlist_id", playlist.id)
         .order("position"),
     ]);
-    if (itemsError) throw itemsError;
-    const tracks = (items ?? []).flatMap((item) => (item.tracks ? [item.tracks as Track] : []));
+
+    if (itemsError) {
+      throw itemsError;
+    }
+
+    const tracks = (items ?? []).flatMap((item) =>
+      item.tracks ? [item.tracks as unknown as Track] : [],
+    );
+
+    const hydratedTracks = await Promise.all(tracks.map(hydrateTrack));
+
     return hydratePlaylist({
       ...playlist,
       cover_path: playlist.cover_path ?? null,
       artistName: creator?.artist_name || creator?.display_name || "VYBE Artist",
-      artistUsername: creator?.username || null,
+      artistUsername: creator?.username ?? null,
       artistAvatarUrl:
         (await signedUrl(AVATAR_BUCKET, creator?.avatar_path ?? null)) ||
         creator?.avatar_url ||
         null,
       artistBannerUrl:
         (await signedUrl(AVATAR_BUCKET, creator?.cover_path ?? null)) || creator?.cover_url || null,
-      tracks: await Promise.all(tracks.map(hydrateTrack)),
+      tracks: hydratedTracks,
     });
   },
 };
