@@ -56,6 +56,7 @@ import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedStoriesRouteImport } from './routes/_authenticated/stories'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedReadRouteImport } from './routes/_authenticated/read'
+import { Route as AuthenticatedPublicMusicRouteImport } from './routes/_authenticated/public-music'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPlaylistsRouteImport } from './routes/_authenticated/playlists'
 import { Route as AuthenticatedPlayRouteImport } from './routes/_authenticated/play'
@@ -337,6 +338,12 @@ const AuthenticatedReadRoute = AuthenticatedReadRouteImport.update({
   path: '/read',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPublicMusicRoute =
+  AuthenticatedPublicMusicRouteImport.update({
+    id: '/public-music',
+    path: '/public-music',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -631,6 +638,7 @@ export interface FileRoutesByFullPath {
   '/play': typeof AuthenticatedPlayRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/public-music': typeof AuthenticatedPublicMusicRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/stories': typeof AuthenticatedStoriesRoute
@@ -725,6 +733,7 @@ export interface FileRoutesByTo {
   '/play': typeof AuthenticatedPlayRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/public-music': typeof AuthenticatedPublicMusicRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/stories': typeof AuthenticatedStoriesRoute
@@ -821,6 +830,7 @@ export interface FileRoutesById {
   '/_authenticated/play': typeof AuthenticatedPlayRoute
   '/_authenticated/playlists': typeof AuthenticatedPlaylistsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/public-music': typeof AuthenticatedPublicMusicRoute
   '/_authenticated/read': typeof AuthenticatedReadRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/stories': typeof AuthenticatedStoriesRoute
@@ -917,6 +927,7 @@ export interface FileRouteTypes {
     | '/play'
     | '/playlists'
     | '/profile'
+    | '/public-music'
     | '/read'
     | '/settings'
     | '/stories'
@@ -1011,6 +1022,7 @@ export interface FileRouteTypes {
     | '/play'
     | '/playlists'
     | '/profile'
+    | '/public-music'
     | '/read'
     | '/settings'
     | '/stories'
@@ -1106,6 +1118,7 @@ export interface FileRouteTypes {
     | '/_authenticated/play'
     | '/_authenticated/playlists'
     | '/_authenticated/profile'
+    | '/_authenticated/public-music'
     | '/_authenticated/read'
     | '/_authenticated/settings'
     | '/_authenticated/stories'
@@ -1537,6 +1550,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReadRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/public-music': {
+      id: '/_authenticated/public-music'
+      path: '/public-music'
+      fullPath: '/public-music'
+      preLoaderRoute: typeof AuthenticatedPublicMusicRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -1884,6 +1904,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPlayRoute: typeof AuthenticatedPlayRoute
   AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedPublicMusicRoute: typeof AuthenticatedPublicMusicRoute
   AuthenticatedReadRoute: typeof AuthenticatedReadRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedStoriesRoute: typeof AuthenticatedStoriesRoute
@@ -1933,6 +1954,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPlayRoute: AuthenticatedPlayRoute,
   AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedPublicMusicRoute: AuthenticatedPublicMusicRoute,
   AuthenticatedReadRoute: AuthenticatedReadRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedStoriesRoute: AuthenticatedStoriesRoute,

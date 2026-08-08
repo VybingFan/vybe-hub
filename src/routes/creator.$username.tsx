@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import {
   ArrowLeft,
   ExternalLink,
   Film,
-  Heart,
   LayoutDashboard,
   Loader2,
   MapPin,
@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
 import { MarketingNav } from "@/components/layout/MarketingNav";
-import { SharedPlaylistPlayer } from "@/components/playlists/SharedPlaylistPlayer";
+import { PublicCreatorMusicExperience } from "@/components/music/PublicCreatorMusicExperience";
 import { SocialLinksDisplay } from "@/components/socialLinks/SocialLinksDisplay";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +26,9 @@ import { FollowCreatorButton } from "@/components/engagement/FollowCreatorButton
 import { CreatorPlanBadge } from "@/components/membership/CreatorPlanBadge";
 import { PublicCreatorStories } from "@/components/stories/PublicCreatorStories";
 
-export const Route = createFileRoute("/creator/$username")({ component: CreatorPage });
+export const Route = createFileRoute("/creator/$username")({
+  component: CreatorPage,
+});
 
 function CreatorPage() {
   const { username } = Route.useParams();
@@ -53,14 +55,16 @@ export function PublicArtistHome({
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-5 px-6 text-center">
         <Logo />
-        <h1 className="text-3xl font-semibold">We could not find that artist.</h1>
+        <h1 className="text-3xl font-semibold">
+          We could not find that artist.
+        </h1>
         <Button asChild>
           <Link to="/">Discover VYBE</Link>
         </Button>
       </div>
     );
 
-  const { profile, tracks, merch, videos } = data;
+  const { profile, tracks, playlists, merch, videos } = data;
   const isOwner = user?.id === profile.user_id;
   const name = profile.artist_name || profile.display_name;
   const share = () =>
@@ -90,12 +94,21 @@ export function PublicArtistHome({
             Back
           </Button>
           {isOwner && (
-            <Button asChild size="sm" className="bg-gradient-brand text-white">
-              <a href={defaultRoute}>
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                Open Creator Studio
-              </a>
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild size="sm" variant="outline">
+                <Link to="/public-music">Manage public music</Link>
+              </Button>
+              <Button
+                asChild
+                size="sm"
+                className="bg-gradient-brand text-white"
+              >
+                <a href={defaultRoute}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Open Creator Studio
+                </a>
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -153,52 +166,73 @@ export function PublicArtistHome({
             </div>
           </div>
         </section>
+        <nav
+          aria-label={`${name} website sections`}
+          className="sticky top-16 z-30 border-y border-border/50 bg-background/90 backdrop-blur-xl"
+        >
+          <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-2 sm:px-6">
+            <CreatorSectionLink href="#music">Music</CreatorSectionLink>
+            <CreatorSectionLink href="#about">About</CreatorSectionLink>
+            {!!videos.length && (
+              <CreatorSectionLink href="#videos">Videos</CreatorSectionLink>
+            )}
+            {!!merch.length && (
+              <CreatorSectionLink href="#shop">Shop</CreatorSectionLink>
+            )}
+            <CreatorSectionLink href="#community">Community</CreatorSectionLink>
+          </div>
+        </nav>
         <section
           id="music"
-          className="mx-auto grid scroll-mt-8 max-w-7xl gap-10 px-6 py-10 lg:grid-cols-[1.3fr_.7fr]"
+          className="mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 md:py-14"
         >
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Music</p>
-            <h2 className="mt-2 text-3xl font-semibold">
-              {selectedTrackId ? "Your selected song" : "Listen without leaving the page"}
-            </h2>
-            <div className="mt-6">
-              <SharedPlaylistPlayer tracks={tracks} initialTrackId={selectedTrackId} />
-            </div>
+          <PublicCreatorMusicExperience
+            tracks={tracks}
+            playlists={playlists}
+            username={profile.username}
+            initialTrackId={selectedTrackId}
+          />
+        </section>
+
+        <section
+          id="about"
+          className="mx-auto grid max-w-7xl scroll-mt-28 gap-5 px-4 pb-16 sm:px-6 lg:grid-cols-[1.4fr_.6fr]"
+        >
+          <div className="rounded-3xl border border-border bg-card p-6 sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[.2em] text-primary">
+              The creator
+            </p>
+            <h2 className="mt-2 text-3xl font-semibold">About {name}</h2>
+            <p className="mt-5 whitespace-pre-line leading-7 text-muted-foreground">
+              {profile.bio || "This artist is getting their VYBE ready."}
+            </p>
           </div>
-          <aside className="space-y-5">
-            <div className="rounded-3xl border border-border bg-card p-6">
-              <h2 className="text-xl font-semibold">About {name}</h2>
-              <p className="mt-4 whitespace-pre-line leading-7 text-muted-foreground">
-                {profile.bio || "This artist is getting their VYBE ready."}
-              </p>
+          <div className="rounded-3xl border border-border bg-card p-6 sm:p-8">
+            <h2 className="text-xl font-semibold">Connect</h2>
+            <div className="mt-4">
+              <SocialLinksDisplay profile={profile} />
             </div>
-            <div className="rounded-3xl border border-border bg-card p-6">
-              <h2 className="text-xl font-semibold">Connect</h2>
-              <div className="mt-4">
-                <SocialLinksDisplay profile={profile} />
-              </div>
-            </div>
-            {profile.merch_url && (
-              <div className="rounded-3xl border border-genre-country/30 bg-card p-6">
-                <ShoppingBag className="h-6 w-6 text-genre-country" />
-                <h2 className="mt-4 text-xl font-semibold">Artist merch</h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Shop music, art, collectibles, apparel, experiences, and other items chosen by{" "}
-                  {name}.
-                </p>
-                <Button asChild className="mt-5" variant="outline">
-                  <a href={profile.merch_url} target="_blank" rel="noreferrer noopener">
-                    Visit merch store <ExternalLink className="ml-2 h-4 w-4" />
-                  </a>
-                </Button>
-              </div>
-            )}
-          </aside>
+            {profile.merch_url ? (
+              <Button asChild className="mt-6" variant="outline">
+                <a
+                  href={profile.merch_url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  Visit artist store <ExternalLink className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
+            ) : null}
+          </div>
         </section>
         {!!videos.length && (
-          <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
-            <p className="text-sm font-semibold uppercase tracking-[.2em] text-rose-400">Watch</p>
+          <section
+            id="videos"
+            className="mx-auto max-w-7xl scroll-mt-28 px-4 pb-16 sm:px-6"
+          >
+            <p className="text-sm font-semibold uppercase tracking-[.2em] text-rose-400">
+              Watch
+            </p>
             <h2 className="mt-2 text-3xl font-semibold">Videos from {name}</h2>
             <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {videos.map((video) => (
@@ -223,10 +257,13 @@ export function PublicArtistHome({
                   </div>
                   <div className="p-5">
                     <p className="text-xs font-medium text-rose-400">
-                      {VIDEO_TYPES.find((type) => type.value === video.video_type)?.label ||
-                        "Video"}
+                      {VIDEO_TYPES.find(
+                        (type) => type.value === video.video_type,
+                      )?.label || "Video"}
                     </p>
-                    <h3 className="mt-1 line-clamp-2 text-lg font-semibold">{video.title}</h3>
+                    <h3 className="mt-1 line-clamp-2 text-lg font-semibold">
+                      {video.title}
+                    </h3>
                     <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
                       {video.description || `Watch ${video.title} on VYBE.`}
                     </p>
@@ -237,11 +274,16 @@ export function PublicArtistHome({
           </section>
         )}
         {!!merch.length && (
-          <section className="mx-auto max-w-7xl px-6 pb-16">
+          <section
+            id="shop"
+            className="mx-auto max-w-7xl scroll-mt-28 px-6 pb-16"
+          >
             <p className="text-sm font-semibold uppercase tracking-[.2em] text-genre-country">
               Artist collection
             </p>
-            <h2 className="mt-2 text-3xl font-semibold">Merch, art, and experiences</h2>
+            <h2 className="mt-2 text-3xl font-semibold">
+              Merch, art, and experiences
+            </h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {merch.map((product) => (
                 <article
@@ -260,14 +302,19 @@ export function PublicArtistHome({
                     </div>
                   )}
                   <div className="p-5">
-                    <p className="text-xs text-genre-country">{product.category}</p>
-                    <h3 className="mt-1 text-lg font-semibold">{product.title}</h3>
+                    <p className="text-xs text-genre-country">
+                      {product.category}
+                    </p>
+                    <h3 className="mt-1 text-lg font-semibold">
+                      {product.title}
+                    </h3>
                     <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
                       {product.description}
                     </p>
                     <Badge variant="outline" className="mt-3">
-                      {MERCH_AVAILABILITY.find((status) => status.value === product.availability)
-                        ?.label || "Coming soon"}
+                      {MERCH_AVAILABILITY.find(
+                        (status) => status.value === product.availability,
+                      )?.label || "Coming soon"}
                     </Badge>
                     <div className="mt-4 flex items-center justify-between">
                       <span className="font-medium">
@@ -275,13 +322,18 @@ export function PublicArtistHome({
                           ? "Ask artist"
                           : `$${(product.price_cents / 100).toFixed(2)}`}
                       </span>
-                      {product.purchase_url && product.availability === "available_externally" && (
-                        <Button asChild size="sm">
-                          <a href={product.purchase_url} target="_blank" rel="noreferrer noopener">
-                            View
-                          </a>
-                        </Button>
-                      )}
+                      {product.purchase_url &&
+                        product.availability === "available_externally" && (
+                          <Button asChild size="sm">
+                            <a
+                              href={product.purchase_url}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              View
+                            </a>
+                          </Button>
+                        )}
                     </div>
                   </div>
                 </article>
@@ -289,15 +341,29 @@ export function PublicArtistHome({
             </div>
           </section>
         )}
-        <PublicCreatorStories creatorUserId={profile.user_id} />
-        <CreatorActions entityId={profile.user_id} />
-        <CreatorComments entityId={profile.user_id} />
+        <div id="community" className="scroll-mt-28">
+          <PublicCreatorStories creatorUserId={profile.user_id} />
+          <CreatorActions entityId={profile.user_id} />
+          <CreatorComments entityId={profile.user_id} />
+        </div>
       </main>
     </div>
   );
 }
 
-
-
-
-
+function CreatorSectionLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      className="shrink-0 rounded-full px-4 py-2 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+    >
+      {children}
+    </a>
+  );
+}

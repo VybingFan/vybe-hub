@@ -8,9 +8,17 @@ import { ProfileView } from "@/components/profile/ProfileView";
 import { SupporterProfileForm } from "@/components/supporter/SupporterProfileForm";
 import { SupporterProfileView } from "@/components/supporter/SupporterProfileView";
 import { ErrorState } from "@/components/common/ErrorState";
+import { CreatorDiscoveryReadiness } from "@/components/discovery/CreatorDiscoveryReadiness";
 import { useUser } from "@/hooks/useUser";
-import { useCreatorProfile, useSaveCreatorProfile } from "@/hooks/useCreatorProfile";
-import { useSupporterProfile, useSaveSupporterProfile } from "@/hooks/useSupporterProfile";
+import {
+  useCreatorProfile,
+  useSaveCreatorProfile,
+} from "@/hooks/useCreatorProfile";
+import { useCreatorTracks } from "@/hooks/useMusic";
+import {
+  useSupporterProfile,
+  useSaveSupporterProfile,
+} from "@/hooks/useSupporterProfile";
 import type { CreatorProfileInput } from "@/features/profile/schema";
 import type { SupporterProfileInput } from "@/features/supporter/schema";
 
@@ -30,7 +38,9 @@ function ProfileContent() {
   const { user, primaryRole } = useUser();
   if (primaryRole === "supporter")
     return <SupporterProfileContent userId={user?.id} email={user?.email} />;
-  return <CreatorProfileContent userId={user?.id} email={user?.email} canEdit />;
+  return (
+    <CreatorProfileContent userId={user?.id} email={user?.email} canEdit />
+  );
 }
 
 function CreatorProfileContent({
@@ -43,11 +53,18 @@ function CreatorProfileContent({
   canEdit: boolean;
 }) {
   const { data: profile, isLoading, error } = useCreatorProfile(userId);
+  const { data: tracks = [] } = useCreatorTracks(userId);
   const save = useSaveCreatorProfile(userId);
   const [isEditing, setIsEditing] = useState(false);
 
   if (isLoading) return <Center />;
-  if (error) return <ErrorState title="Couldn't load profile" message={(error as Error).message} />;
+  if (error)
+    return (
+      <ErrorState
+        title="Couldn't load profile"
+        message={(error as Error).message}
+      />
+    );
 
   const handleSave = async (values: CreatorProfileInput) => {
     await save.mutateAsync(values);
@@ -66,6 +83,11 @@ function CreatorProfileContent({
         />
       ) : (
         <>
+          <CreatorDiscoveryReadiness
+            profile={profile ?? null}
+            tracks={tracks}
+            onEditProfile={() => setIsEditing(true)}
+          />
           <ProfileHeader
             profile={profile ?? {}}
             email={email}
@@ -79,13 +101,25 @@ function CreatorProfileContent({
   );
 }
 
-function SupporterProfileContent({ userId, email }: { userId?: string; email?: string | null }) {
+function SupporterProfileContent({
+  userId,
+  email,
+}: {
+  userId?: string;
+  email?: string | null;
+}) {
   const { data: profile, isLoading, error } = useSupporterProfile(userId);
   const save = useSaveSupporterProfile(userId);
   const [isEditing, setIsEditing] = useState(false);
 
   if (isLoading) return <Center />;
-  if (error) return <ErrorState title="Couldn't load profile" message={(error as Error).message} />;
+  if (error)
+    return (
+      <ErrorState
+        title="Couldn't load profile"
+        message={(error as Error).message}
+      />
+    );
 
   const handleSave = async (values: SupporterProfileInput) => {
     await save.mutateAsync(values);

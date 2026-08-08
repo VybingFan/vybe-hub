@@ -46,6 +46,8 @@ export interface Playlist {
   created_at: string;
   updated_at: string;
   workspace_category: PlaylistWorkspaceCategory;
+  show_on_public_profile?: boolean;
+  profile_display_order?: number;
   access_mode?: PlaylistAccessMode;
   access_expires_at?: string | null;
   required_plan_code?: string | null;
@@ -100,4 +102,6 @@ export interface UpdatePlaylistInput {
   access_expires_at?: string | null;
   required_plan_code?: string | null;
   require_sign_in?: boolean;
+  show_on_public_profile?: boolean;
+  profile_display_order?: number;
 }

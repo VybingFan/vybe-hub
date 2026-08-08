@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { isCreatorDiscoveryReady } from "@/features/discovery/readiness";
 
 export interface DiscoveryCreator {
   user_id: string;
@@ -33,13 +34,17 @@ export interface DiscoveryArtistCredit {
 
 async function signedCover(path: string | null) {
   if (!path) return null;
-  const { data } = await supabase.storage.from("music-covers").createSignedUrl(path, 60 * 60);
+  const { data } = await supabase.storage
+    .from("music-covers")
+    .createSignedUrl(path, 60 * 60);
   return data?.signedUrl ?? null;
 }
 
 async function signedAvatar(path: string | null, fallback: string | null) {
   if (!path) return fallback;
-  const { data } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+  const { data } = await supabase.storage
+    .from("avatars")
+    .createSignedUrl(path, 60 * 60);
   return data?.signedUrl ?? fallback;
 }
 
@@ -77,15 +82,42 @@ export const publicDiscoveryService = {
       );
     }
 
-    const [{ data: creatorRows, error: creatorError }, { data: trackRows, error: trackError }] =
-      await Promise.all([creatorsQuery, tracksQuery]);
+    const [
+      { data: creatorRows, error: creatorError },
+      { data: trackRows, error: trackError },
+    ] = await Promise.all([creatorsQuery, tracksQuery]);
     if (creatorError) throw creatorError;
     if (trackError) throw trackError;
 
-    const directCreators = (creatorRows ?? []).filter(
-      (creator): creator is typeof creator & { username: string } => Boolean(creator.username),
+    const directCreatorCandidates = (creatorRows ?? []).filter(
+      (creator): creator is typeof creator & { username: string } =>
+        Boolean(creator.username),
     );
-    const creatorIds = [...new Set((trackRows ?? []).map((track) => track.creator_id))];
+    const directCreatorIds = directCreatorCandidates.map(
+      (creator) => creator.user_id,
+    );
+    const { data: discoveryMusicRows, error: discoveryMusicError } =
+      directCreatorIds.length
+        ? await supabase
+            .from("tracks")
+            .select("creator_id")
+            .in("creator_id", directCreatorIds)
+            .eq("status", "published")
+            .eq("visibility", "public")
+        : { data: [], error: null };
+    if (discoveryMusicError) throw discoveryMusicError;
+    const discoveryMusicCreatorIds = new Set(
+      (discoveryMusicRows ?? []).map((track) => track.creator_id),
+    );
+    const directCreators = directCreatorCandidates.filter((creator) =>
+      isCreatorDiscoveryReady(
+        creator,
+        discoveryMusicCreatorIds.has(creator.user_id),
+      ),
+    );
+    const creatorIds = [
+      ...new Set((trackRows ?? []).map((track) => track.creator_id)),
+    ];
     const missingIds = creatorIds.filter(
       (id) => !directCreators.some((creator) => creator.user_id === id),
     );
@@ -100,7 +132,8 @@ export const publicDiscoveryService = {
         .not("username", "is", null);
       if (error) throw error;
       relatedCreators = (data ?? []).filter(
-        (creator): creator is typeof creator & { username: string } => Boolean(creator.username),
+        (creator): creator is typeof creator & { username: string } =>
+          Boolean(creator.username) && isCreatorDiscoveryReady(creator, true),
       );
     }
 
@@ -108,7 +141,9 @@ export const publicDiscoveryService = {
       (creator, index, rows) =>
         rows.findIndex((item) => item.user_id === creator.user_id) === index,
     );
-    const creatorMap = new Map(allCreators.map((creator) => [creator.user_id, creator]));
+    const creatorMap = new Map(
+      allCreators.map((creator) => [creator.user_id, creator]),
+    );
     const creators = await Promise.all(
       allCreators.map(async (creator) => ({
         ...creator,
@@ -130,9 +165,13 @@ export const publicDiscoveryService = {
       { name: string; tracks: Set<string>; uploaders: Set<string> }
     >();
     for (const track of visibleTracks) {
-      const names = [track.primary_artist_name, ...track.featured_artist_names].filter(Boolean);
+      const names = [
+        track.primary_artist_name,
+        ...track.featured_artist_names,
+      ].filter(Boolean);
       for (const name of names) {
-        if (normalizedQuery && !name.toLowerCase().includes(normalizedQuery)) continue;
+        if (normalizedQuery && !name.toLowerCase().includes(normalizedQuery))
+          continue;
         const key = name.toLowerCase();
         const current = artistCredits.get(key) ?? {
           name,
