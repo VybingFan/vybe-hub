@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+﻿import { supabase } from "@/integrations/supabase/client";
 import { MAX_COVER_BYTES, type Track } from "@/features/music/schema";
 import type {
   CreatePlaylistInput,
@@ -96,7 +96,12 @@ export const playlistService = {
         occasion: input.occasion,
         slug,
         is_published: true,
-        access_mode: "public",
+        access_mode: input.access_mode,
+        access_expires_at: input.access_expires_at ?? null,
+        require_sign_in:
+          input.access_mode === "approved_listeners" ||
+          input.access_mode === "membership_only" ||
+          Boolean(input.require_sign_in),
       } as never)
       .select("*")
       .single();

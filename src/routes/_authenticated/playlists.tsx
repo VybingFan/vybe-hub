@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+﻿import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Check,
@@ -44,7 +44,7 @@ import {
   useReplacePlaylistCover,
 } from "@/hooks/usePlaylists";
 import { formatDuration, MAX_COVER_BYTES } from "@/features/music/schema";
-import { PLAYLIST_PURPOSES, type Playlist } from "@/features/playlists/schema";
+import { PLAYLIST_PURPOSES, type Playlist, type PlaylistAccessMode } from "@/features/playlists/schema";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 
 export const Route = createFileRoute("/_authenticated/playlists")({
@@ -69,6 +69,10 @@ function PlaylistStudio() {
   const [songGenre, setSongGenre] = useState("all");
   const [playlistQuery, setPlaylistQuery] = useState("");
   const [playlistSort, setPlaylistSort] = useState<"newest" | "title">("newest");
+  const [createAccessMode, setCreateAccessMode] =
+    useState<PlaylistAccessMode>("unlisted");
+  const [createRequireSignIn, setCreateRequireSignIn] = useState(false);
+  const [createAccessExpiresAt, setCreateAccessExpiresAt] = useState("");
   const [visiblePlaylistCount, setVisiblePlaylistCount] = useState(8);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
   const [playlistCover, setPlaylistCover] = useState<File | null>(null);
@@ -94,13 +98,15 @@ function PlaylistStudio() {
     const query = songQuery.trim().toLowerCase();
     return tracks.filter(
       (track) =>
-        (songGenre === "all" || track.genre === songGenre) &&
+        (createAccessMode === "approved_listeners"
+          ? track.status === "published"
+          : track.status === "published" && track.visibility === "public") &&        (songGenre === "all" || track.genre === songGenre) &&
         (!query ||
           track.title.toLowerCase().includes(query) ||
           (track.genre || "").toLowerCase().includes(query) ||
           (track.description || "").toLowerCase().includes(query)),
     );
-  }, [songGenre, songQuery, tracks]);
+  }, [createAccessMode, songGenre, songQuery, tracks]);
   const filteredPlaylists = useMemo(() => {
     const query = playlistQuery.trim().toLowerCase();
     const matches = playlists.filter(
@@ -138,6 +144,14 @@ function PlaylistStudio() {
         description: String(form.get("description") || ""),
         occasion: String(form.get("occasion") || ""),
         trackIds: selected,
+        access_mode: createAccessMode,
+        access_expires_at: createAccessExpiresAt
+          ? new Date(createAccessExpiresAt).toISOString()
+          : null,
+        require_sign_in:
+          createAccessMode === "approved_listeners" ||
+          createAccessMode === "membership_only" ||
+          createRequireSignIn,
       });
       if (!playlist?.slug)
         throw new Error("Playlist published without a share link. Refresh and try again.");
@@ -156,6 +170,9 @@ function PlaylistStudio() {
       setSelected([]);
       setPlaylistCover(null);
       setSongQuery("");
+      setCreateAccessMode("unlisted");
+      setCreateRequireSignIn(false);
+      setCreateAccessExpiresAt("");
       formElement.reset();
       toast.success("Playlist published. Your share link is ready.");
     } catch (error) {
@@ -260,6 +277,83 @@ function PlaylistStudio() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="rounded-2xl border border-border bg-muted/20 p-4">
+              <Label>Who can open this playlist?</Label>
+
+              <Select
+                value={createAccessMode}
+                onValueChange={(value) => {
+                  const next = value as PlaylistAccessMode;
+                  setCreateAccessMode(next);
+                  setSelected([]);
+
+                  if (next === "approved_listeners") {
+                    setCreateRequireSignIn(true);
+                  }
+                }}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="public">
+                    Public â€” listed and open to everyone
+                  </SelectItem>
+                  <SelectItem value="unlisted">
+                    Unlisted â€” only people with the link
+                  </SelectItem>
+                  <SelectItem value="approved_listeners">
+                    Approved listeners â€” invitation required
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                Public and unlisted playlists can use only public, published songs.
+                Approved-listener playlists can also use published private or unlisted songs.
+              </p>
+
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="create-playlist-expiration">
+                    Link expiration (optional)
+                  </Label>
+
+                  <Input
+                    id="create-playlist-expiration"
+                    className="mt-2"
+                    type="datetime-local"
+                    value={createAccessExpiresAt}
+                    onChange={(event) =>
+                      setCreateAccessExpiresAt(event.target.value)
+                    }
+                  />
+                </div>
+
+                <label className="flex items-center gap-3 rounded-xl border border-border p-4 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={
+                      createAccessMode === "approved_listeners" ||
+                      createRequireSignIn
+                    }
+                    disabled={createAccessMode === "approved_listeners"}
+                    onChange={(event) =>
+                      setCreateRequireSignIn(event.target.checked)
+                    }
+                  />
+                  Require listeners to sign in
+                </label>
+              </div>
+
+              {createAccessMode === "approved_listeners" ? (
+                <p className="mt-3 rounded-xl border border-primary/25 bg-primary/5 p-3 text-xs leading-5 text-muted-foreground">
+                  Create the playlist first, then use Manage playlist to add the
+                  exact listener email addresses.
+                </p>
+              ) : null}
+            </div>
             <div>
               <Label htmlFor="description">A note to your listeners</Label>
               <Textarea
@@ -292,7 +386,7 @@ function PlaylistStudio() {
                     {playlistCover ? playlistCover.name : "Choose cover art"}
                   </span>
                   <span className="mt-1 block text-xs text-muted-foreground">
-                    JPG, PNG, or WebP · up to 2MB
+                    JPG, PNG, or WebP Â· up to 2MB
                   </span>
                 </span>
               </label>
@@ -360,12 +454,12 @@ function PlaylistStudio() {
                         className="flex items-center gap-3 rounded-xl p-3 hover:bg-white/5"
                       >
                         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
-                          {checked ? selected.indexOf(track.id) + 1 : "—"}
+                          {checked ? selected.indexOf(track.id) + 1 : "â€”"}
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate font-medium">{track.title}</span>
                           <span className="text-xs text-muted-foreground">
-                            {track.genre || "No genre"} · {isPublished ? "Published" : "Draft"}
+                            {track.genre || "No genre"} Â· {isPublished ? "Published" : "Draft"}
                           </span>
                         </span>
                         <span className="text-xs text-muted-foreground">
@@ -386,7 +480,7 @@ function PlaylistStudio() {
                           >
                             {checked ? (
                               <>
-                                <Check className="mr-2 h-4 w-4" /> Added · Remove
+                                <Check className="mr-2 h-4 w-4" /> Added Â· Remove
                               </>
                             ) : (
                               <>
@@ -410,13 +504,13 @@ function PlaylistStudio() {
                   })
                 ) : tracks.length ? (
                   <p className="p-5 text-sm text-muted-foreground">
-                    No uploaded songs match “{songQuery}”. Try another title or genre.
+                    No uploaded songs match â€œ{songQuery}â€. Try another title or genre.
                   </p>
                 ) : (
                   <div className="p-5 text-sm text-muted-foreground">
                     <p>
                       A playlist needs at least one published song. Upload music first, choose
-                      “Published,” then return here.
+                      â€œPublished,â€ then return here.
                     </p>
                     <Button asChild variant="outline" size="sm" className="mt-4">
                       <Link to="/music/upload">
@@ -468,7 +562,7 @@ function PlaylistStudio() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="title">Title A–Z</SelectItem>
+                <SelectItem value="title">Title Aâ€“Z</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -554,7 +648,7 @@ function PlaylistStudio() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete “{deleteTarget?.title}”?</AlertDialogTitle>
+            <AlertDialogTitle>Delete â€œ{deleteTarget?.title}â€?</AlertDialogTitle>
             <AlertDialogDescription>
               This permanently removes the playlist and its share link. Your uploaded songs will
               remain in your music library.

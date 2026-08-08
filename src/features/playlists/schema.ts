@@ -1,4 +1,11 @@
-import type { Track } from "@/features/music/schema";
+﻿import type { Track } from "@/features/music/schema";
+
+export type PlaylistAccessMode =
+  | "public"
+  | "unlisted"
+  | "password"
+  | "approved_listeners"
+  | "membership_only";
 
 export interface Playlist {
   id: string;
@@ -12,7 +19,7 @@ export interface Playlist {
   cover_url: string | null;
   created_at: string;
   updated_at: string;
-  access_mode?: "public" | "unlisted" | "password" | "approved_listeners" | "membership_only";
+  access_mode?: PlaylistAccessMode;
   access_expires_at?: string | null;
   required_plan_code?: string | null;
   require_sign_in?: boolean;
@@ -45,6 +52,9 @@ export interface CreatePlaylistInput {
   description: string;
   occasion: string;
   trackIds: string[];
+  access_mode: PlaylistAccessMode;
+  access_expires_at?: string | null;
+  require_sign_in?: boolean;
 }
 
 export interface UpdatePlaylistInput {
@@ -52,7 +62,7 @@ export interface UpdatePlaylistInput {
   description: string;
   occasion: string;
   is_published: boolean;
-  access_mode?: "public" | "unlisted" | "password" | "approved_listeners" | "membership_only";
+  access_mode?: PlaylistAccessMode;
   access_expires_at?: string | null;
   required_plan_code?: string | null;
   require_sign_in?: boolean;
