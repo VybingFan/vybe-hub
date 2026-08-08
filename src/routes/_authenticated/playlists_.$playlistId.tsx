@@ -40,7 +40,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { formatDuration } from "@/features/music/schema";
-import { PLAYLIST_PURPOSES } from "@/features/playlists/schema";
+import {
+  PLAYLIST_PURPOSES,
+  PLAYLIST_WORKSPACE_CATEGORIES,
+  PLAYLIST_WORKSPACE_CATEGORY_LABELS,
+  type PlaylistWorkspaceCategory,
+} from "@/features/playlists/schema";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 import { useCreatorTracks } from "@/hooks/useMusic";
 import {
@@ -84,6 +89,8 @@ function PlaylistEditor() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [occasion, setOccasion] = useState("");
+  const [workspaceCategory, setWorkspaceCategory] =
+    useState<PlaylistWorkspaceCategory>("released");
   const [status, setStatus] = useState<"published" | "draft">("published");
   const [trackIds, setTrackIds] = useState<string[]>([]);
   const [accessMode, setAccessMode] = useState<PlaylistAccessMode>("public");
@@ -96,6 +103,7 @@ function PlaylistEditor() {
     setTitle(playlist.title);
     setDescription(playlist.description || "");
     setOccasion(playlist.occasion || "");
+    setWorkspaceCategory(playlist.workspace_category ?? "released");
     setStatus(playlist.is_published ? "published" : "draft");
     setTrackIds(playlist.trackIds ?? []);
     setAccessMode(playlist.access_mode ?? "public");
@@ -117,10 +125,14 @@ function PlaylistEditor() {
     (track) => track.status === "published" && !trackIds.includes(track.id),
   );
 
-  const fallbackCover = selectedTracks.find((track) => track.cover_url)?.cover_url;
+  const fallbackCover = selectedTracks.find(
+    (track) => track.cover_url,
+  )?.cover_url;
 
   const artwork =
-    playlist?.cover_url || fallbackCover || "/banners/default-creator-banner.png";
+    playlist?.cover_url ||
+    fallbackCover ||
+    "/banners/default-creator-banner.png";
 
   const publicPath = playlist
     ? creator?.username
@@ -170,6 +182,7 @@ function PlaylistEditor() {
           title: title.trim(),
           description: description.trim(),
           occasion,
+          workspace_category: workspaceCategory,
           is_published: status === "published",
           access_mode: accessMode,
           access_expires_at: accessExpiresAt
@@ -186,7 +199,9 @@ function PlaylistEditor() {
 
       toast.success("Playlist saved.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save the playlist");
+      toast.error(
+        error instanceof Error ? error.message : "Could not save the playlist",
+      );
     }
   };
 
@@ -201,7 +216,9 @@ function PlaylistEditor() {
 
       toast.success("Playlist cover updated.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not update the cover");
+      toast.error(
+        error instanceof Error ? error.message : "Could not update the cover",
+      );
     }
   };
 
@@ -209,13 +226,19 @@ function PlaylistEditor() {
     try {
       await remove.mutateAsync(playlistId);
 
-      toast.success("Playlist deleted. Your songs remain in the Music Library.");
+      toast.success(
+        "Playlist deleted. Your songs remain in the Music Library.",
+      );
 
       navigate({
         to: "/playlists",
       });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not delete the playlist");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Could not delete the playlist",
+      );
     }
   };
 
@@ -257,7 +280,8 @@ function PlaylistEditor() {
           <h1 className="mt-2 text-4xl font-semibold">{playlist.title}</h1>
 
           <p className="mt-2 text-muted-foreground">
-            Manage its artwork, information, songs, order, and public availability.
+            Manage its artwork, information, songs, order, and public
+            availability.
           </p>
         </div>
 
@@ -292,7 +316,11 @@ function PlaylistEditor() {
       >
         <aside className="space-y-5">
           <div className="overflow-hidden rounded-3xl border border-border bg-card">
-            <img src={artwork} alt="" className="aspect-square w-full object-cover" />
+            <img
+              src={artwork}
+              alt=""
+              className="aspect-square w-full object-cover"
+            />
 
             <div className="p-5">
               <Label className="flex cursor-pointer items-center justify-center rounded-xl border border-border px-4 py-3 text-sm font-medium hover:border-primary/60">
@@ -301,9 +329,7 @@ function PlaylistEditor() {
                 ) : (
                   <ImagePlus className="mr-2 h-4 w-4" />
                 )}
-
                 Replace playlist cover
-
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
@@ -365,7 +391,9 @@ function PlaylistEditor() {
               </div>
 
               <div>
-                <Label htmlFor="playlist-access-expiration">Link expiration</Label>
+                <Label htmlFor="playlist-access-expiration">
+                  Link expiration
+                </Label>
 
                 <Input
                   id="playlist-access-expiration"
@@ -415,8 +443,8 @@ function PlaylistEditor() {
 
             {accessMode === "membership_only" ? (
               <p className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-muted-foreground">
-                Membership verification will be connected after approved-listener
-                management is validated.
+                Membership verification will be connected after
+                approved-listener management is validated.
               </p>
             ) : null}
           </section>
@@ -438,6 +466,26 @@ function PlaylistEditor() {
               </div>
 
               <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <Label>Playlist category</Label>
+                  <Select
+                    value={workspaceCategory}
+                    onValueChange={(value) =>
+                      setWorkspaceCategory(value as PlaylistWorkspaceCategory)
+                    }
+                  >
+                    <SelectTrigger className="mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PLAYLIST_WORKSPACE_CATEGORIES.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {PLAYLIST_WORKSPACE_CATEGORY_LABELS[category]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div>
                   <Label>Purpose</Label>
 
@@ -517,7 +565,9 @@ function PlaylistEditor() {
                   </span>
 
                   <img
-                    src={track.cover_url || "/banners/default-creator-banner.png"}
+                    src={
+                      track.cover_url || "/banners/default-creator-banner.png"
+                    }
                     alt=""
                     className="h-12 w-12 rounded-xl object-cover"
                   />
@@ -602,7 +652,11 @@ function PlaylistEditor() {
           <div className="flex flex-col-reverse justify-between gap-4 sm:flex-row">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button type="button" variant="ghost" className="text-destructive">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-destructive"
+                >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete playlist
                 </Button>
@@ -610,7 +664,9 @@ function PlaylistEditor() {
 
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete “{playlist.title}”?</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    Delete “{playlist.title}”?
+                  </AlertDialogTitle>
 
                   <AlertDialogDescription>
                     This removes the playlist, its cover, and its public link.
@@ -634,9 +690,7 @@ function PlaylistEditor() {
             <Button
               size="lg"
               disabled={
-                update.isPending ||
-                replaceTracks.isPending ||
-                !trackIds.length
+                update.isPending || replaceTracks.isPending || !trackIds.length
               }
               className="bg-gradient-brand text-primary-foreground"
             >
@@ -645,7 +699,6 @@ function PlaylistEditor() {
               ) : (
                 <Save className="mr-2 h-4 w-4" />
               )}
-
               Save playlist
             </Button>
           </div>
@@ -653,10 +706,7 @@ function PlaylistEditor() {
       </form>
 
       {accessMode === "approved_listeners" && user ? (
-        <PlaylistAccessGrantManager
-          playlistId={playlistId}
-          userId={user.id}
-        />
+        <PlaylistAccessGrantManager playlistId={playlistId} userId={user.id} />
       ) : null}
     </div>
   );

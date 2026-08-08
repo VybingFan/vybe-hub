@@ -7,6 +7,32 @@ export type PlaylistAccessMode =
   | "approved_listeners"
   | "membership_only";
 
+export const PLAYLIST_WORKSPACE_CATEGORIES = [
+  "released",
+  "upcoming",
+  "work_in_progress",
+  "collaboration",
+  "rights_pending",
+  "commercial_preview",
+  "archived",
+] as const;
+
+export type PlaylistWorkspaceCategory =
+  (typeof PLAYLIST_WORKSPACE_CATEGORIES)[number];
+
+export const PLAYLIST_WORKSPACE_CATEGORY_LABELS: Record<
+  PlaylistWorkspaceCategory,
+  string
+> = {
+  released: "Released",
+  upcoming: "Upcoming",
+  work_in_progress: "Work in progress / private review",
+  collaboration: "Collaboration",
+  rights_pending: "Rights pending / restricted",
+  commercial_preview: "Commercial preview / pitch",
+  archived: "Archived",
+};
+
 export interface Playlist {
   id: string;
   creator_id: string;
@@ -19,6 +45,7 @@ export interface Playlist {
   cover_url: string | null;
   created_at: string;
   updated_at: string;
+  workspace_category: PlaylistWorkspaceCategory;
   access_mode?: PlaylistAccessMode;
   access_expires_at?: string | null;
   required_plan_code?: string | null;
@@ -45,6 +72,11 @@ export const PLAYLIST_PURPOSES = [
   "Set list",
   "Behind the music",
   "Exclusive preview",
+  "Family or friends review",
+  "Producer review",
+  "Collaboration session",
+  "Radio submission",
+  "Label or business pitch",
 ] as const;
 
 export interface CreatePlaylistInput {
@@ -53,6 +85,7 @@ export interface CreatePlaylistInput {
   occasion: string;
   trackIds: string[];
   access_mode: PlaylistAccessMode;
+  workspace_category: PlaylistWorkspaceCategory;
   access_expires_at?: string | null;
   require_sign_in?: boolean;
 }
@@ -63,6 +96,7 @@ export interface UpdatePlaylistInput {
   occasion: string;
   is_published: boolean;
   access_mode?: PlaylistAccessMode;
+  workspace_category: PlaylistWorkspaceCategory;
   access_expires_at?: string | null;
   required_plan_code?: string | null;
   require_sign_in?: boolean;

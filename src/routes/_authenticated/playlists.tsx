@@ -3,8 +3,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Check,
   Copy,
+  Eye,
+  Globe2,
   ImagePlus,
+  Link2,
   ListMusic,
+  LockKeyhole,
   Loader2,
   Pencil,
   Plus,
@@ -36,7 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useUser } from "@/hooks/useUser";
-import { useCreatorTracks, useUpdateTrack } from "@/hooks/useMusic";
+import { useCreatorTracks } from "@/hooks/useMusic";
 import {
   useCreatePlaylist,
   useDeletePlaylist,
@@ -44,8 +48,20 @@ import {
   useReplacePlaylistCover,
 } from "@/hooks/usePlaylists";
 import { formatDuration, MAX_COVER_BYTES } from "@/features/music/schema";
-import { PLAYLIST_PURPOSES, type Playlist, type PlaylistAccessMode } from "@/features/playlists/schema";
+import {
+  PLAYLIST_PURPOSES,
+  PLAYLIST_WORKSPACE_CATEGORIES,
+  PLAYLIST_WORKSPACE_CATEGORY_LABELS,
+  type Playlist,
+  type PlaylistAccessMode,
+  type PlaylistWorkspaceCategory,
+} from "@/features/playlists/schema";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
+import { Badge } from "@/components/ui/badge";
+import {
+  TRACK_PRODUCTION_STAGE_LABELS,
+  TRACK_WORKSPACE_CATEGORY_LABELS,
+} from "@/features/music/workflow";
 
 export const Route = createFileRoute("/_authenticated/playlists")({
   component: () => (
@@ -58,7 +74,6 @@ export const Route = createFileRoute("/_authenticated/playlists")({
 function PlaylistStudio() {
   const { user } = useUser();
   const { data: tracks = [], isLoading } = useCreatorTracks(user?.id);
-  const updateTrack = useUpdateTrack(user?.id);
   const { data: creatorProfile } = useCreatorProfile(user?.id);
   const { data: playlists = [] } = useMyPlaylists(user?.id);
   const create = useCreatePlaylist(user?.id);
@@ -68,13 +83,21 @@ function PlaylistStudio() {
   const [songQuery, setSongQuery] = useState("");
   const [songGenre, setSongGenre] = useState("all");
   const [playlistQuery, setPlaylistQuery] = useState("");
-  const [playlistSort, setPlaylistSort] = useState<"newest" | "title">("newest");
+  const [playlistCategory, setPlaylistCategory] = useState<
+    "all" | PlaylistWorkspaceCategory
+  >("all");
+  const [playlistSort, setPlaylistSort] = useState<"newest" | "title">(
+    "newest",
+  );
   const [createAccessMode, setCreateAccessMode] =
     useState<PlaylistAccessMode>("unlisted");
+  const [createWorkspaceCategory, setCreateWorkspaceCategory] =
+    useState<PlaylistWorkspaceCategory>("released");
   const [createRequireSignIn, setCreateRequireSignIn] = useState(false);
   const [createAccessExpiresAt, setCreateAccessExpiresAt] = useState("");
   const [visiblePlaylistCount, setVisiblePlaylistCount] = useState(8);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
   const [playlistCover, setPlaylistCover] = useState<File | null>(null);
   const playlistCoverPreview = useMemo(
     () => (playlistCover ? URL.createObjectURL(playlistCover) : null),
@@ -90,7 +113,11 @@ function PlaylistStudio() {
   const songGenres = useMemo(
     () =>
       Array.from(
-        new Set(tracks.map((track) => track.genre?.trim()).filter(Boolean) as string[]),
+        new Set(
+          tracks
+            .map((track) => track.genre?.trim())
+            .filter(Boolean) as string[],
+        ),
       ).sort((a, b) => a.localeCompare(b)),
     [tracks],
   );
@@ -100,7 +127,8 @@ function PlaylistStudio() {
       (track) =>
         (createAccessMode === "approved_listeners"
           ? track.status === "published"
-          : track.status === "published" && track.visibility === "public") &&        (songGenre === "all" || track.genre === songGenre) &&
+          : track.status === "published" && track.visibility === "public") &&
+        (songGenre === "all" || track.genre === songGenre) &&
         (!query ||
           track.title.toLowerCase().includes(query) ||
           (track.genre || "").toLowerCase().includes(query) ||
@@ -109,35 +137,46 @@ function PlaylistStudio() {
   }, [createAccessMode, songGenre, songQuery, tracks]);
   const filteredPlaylists = useMemo(() => {
     const query = playlistQuery.trim().toLowerCase();
-    const matches = playlists.filter(
-      (playlist) =>
-        !query ||
-        playlist.title.toLowerCase().includes(query) ||
-        (playlist.occasion || "").toLowerCase().includes(query) ||
-        (playlist.description || "").toLowerCase().includes(query),
-    );
+    const matches = playlists.filter((playlist) => {
+      const category = playlist.workspace_category ?? "released";
+      return (
+        (playlistCategory === "all" || category === playlistCategory) &&
+        (!query ||
+          playlist.title.toLowerCase().includes(query) ||
+          PLAYLIST_WORKSPACE_CATEGORY_LABELS[category]
+            .toLowerCase()
+            .includes(query) ||
+          (playlist.occasion || "").toLowerCase().includes(query) ||
+          (playlist.description || "").toLowerCase().includes(query))
+      );
+    });
     return [...matches].sort((a, b) =>
       playlistSort === "title"
         ? a.title.localeCompare(b.title)
         : b.created_at.localeCompare(a.created_at),
     );
-  }, [playlistQuery, playlistSort, playlists]);
+  }, [playlistCategory, playlistQuery, playlistSort, playlists]);
+  const playlistCategories = useMemo(
+    () =>
+      PLAYLIST_WORKSPACE_CATEGORIES.map(
+        (category) =>
+          [
+            category,
+            playlists.filter(
+              (playlist) =>
+                (playlist.workspace_category ?? "released") === category,
+            ).length,
+          ] as const,
+      ).filter(([, count]) => count > 0),
+    [playlists],
+  );
   const visiblePlaylists = filteredPlaylists.slice(0, visiblePlaylistCount);
-  const publishAndAddTrack = async (trackId: string) => {
-    try {
-      await updateTrack.mutateAsync({ id: trackId, patch: { status: "published" } });
-      setSelected((current) => (current.includes(trackId) ? current : [...current, trackId]));
-      toast.success("Song published and added to the playlist.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not publish song");
-    }
-  };
-
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
-    if (!selected.length) return toast.error("Choose at least one published song.");
+    if (!selected.length)
+      return toast.error("Choose at least one published song.");
     try {
       const playlist = await create.mutateAsync({
         title: String(form.get("title") || ""),
@@ -145,6 +184,7 @@ function PlaylistStudio() {
         occasion: String(form.get("occasion") || ""),
         trackIds: selected,
         access_mode: createAccessMode,
+        workspace_category: createWorkspaceCategory,
         access_expires_at: createAccessExpiresAt
           ? new Date(createAccessExpiresAt).toISOString()
           : null,
@@ -154,10 +194,15 @@ function PlaylistStudio() {
           createRequireSignIn,
       });
       if (!playlist?.slug)
-        throw new Error("Playlist published without a share link. Refresh and try again.");
+        throw new Error(
+          "Playlist published without a share link. Refresh and try again.",
+        );
       if (playlistCover) {
         try {
-          await replaceCover.mutateAsync({ playlistId: playlist.id, file: playlistCover });
+          await replaceCover.mutateAsync({
+            playlistId: playlist.id,
+            file: playlistCover,
+          });
         } catch (coverError) {
           toast.error(
             coverError instanceof Error
@@ -171,12 +216,16 @@ function PlaylistStudio() {
       setPlaylistCover(null);
       setSongQuery("");
       setCreateAccessMode("unlisted");
+      setCreateWorkspaceCategory("released");
       setCreateRequireSignIn(false);
       setCreateAccessExpiresAt("");
+      setShowCreate(false);
       formElement.reset();
       toast.success("Playlist published. Your share link is ready.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not create playlist");
+      toast.error(
+        error instanceof Error ? error.message : "Could not create playlist",
+      );
     }
   };
   const playlistPath = (slug: string) =>
@@ -186,7 +235,8 @@ function PlaylistStudio() {
   const shareUrl = (slug: string) =>
     `${typeof window !== "undefined" ? window.location.origin : ""}${playlistPath(slug)}`;
   const copy = async (slug: string) => {
-    if (!slug) return toast.error("This playlist does not have a share link yet.");
+    if (!slug)
+      return toast.error("This playlist does not have a share link yet.");
     const url = shareUrl(slug);
     try {
       if (navigator.clipboard?.writeText) {
@@ -205,7 +255,9 @@ function PlaylistStudio() {
       toast.success("Share link copied");
     } catch {
       window.prompt("Copy this playlist link:", url);
-      toast.error("Automatic copy was blocked. Copy the displayed link instead.");
+      toast.error(
+        "Automatic copy was blocked. Copy the displayed link instead.",
+      );
     }
   };
   const confirmDelete = async () => {
@@ -214,23 +266,35 @@ function PlaylistStudio() {
       await deletePlaylist.mutateAsync(deleteTarget.id);
       if (createdSlug === deleteTarget.slug) setCreatedSlug(null);
       setDeleteTarget(null);
-      toast.success("Playlist deleted. Your uploaded songs are still in your music library.");
+      toast.success(
+        "Playlist deleted. Your uploaded songs are still in your music library.",
+      );
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not delete playlist");
+      toast.error(
+        error instanceof Error ? error.message : "Could not delete playlist",
+      );
     }
   };
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      <header>
-        <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">
-          Artist workspace
-        </p>
-        <h1 className="mt-2 text-4xl font-semibold">Playlist Studio</h1>
-        <p className="mt-3 max-w-2xl text-muted-foreground">
-          Choose a purpose, arrange the songs, and send fans one VYBE link where the entire playlist
-          plays.
-        </p>
+      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">
+            Creator Studio
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">
+            Playlist Workspace
+          </h1>
+          <p className="mt-3 max-w-2xl text-muted-foreground">
+            Build public releases, private reviews, pitches, and listening
+            experiences from the songs in your Music Workspace.
+          </p>
+        </div>
+        <Button size="lg" onClick={() => setShowCreate((value) => !value)}>
+          <Plus className="mr-2 h-4 w-4" />{" "}
+          {showCreate ? "Close builder" : "New playlist"}
+        </Button>
       </header>
       {createdSlug && (
         <div className="flex flex-col gap-4 rounded-2xl border border-primary/30 bg-primary/10 p-5 sm:flex-row sm:items-center sm:justify-between">
@@ -238,309 +302,375 @@ function PlaylistStudio() {
             <p className="flex items-center gap-2 font-semibold">
               <Check className="h-5 w-5 text-primary" /> Ready to send
             </p>
-            <p className="mt-1 break-all text-sm text-muted-foreground">{shareUrl(createdSlug)}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Your new playlist link is ready to copy or preview.
+            </p>
           </div>
           <Button onClick={() => copy(createdSlug)}>
             <Copy className="mr-2 h-4 w-4" /> Copy link
           </Button>
         </div>
       )}
-      <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr]">
-        <form onSubmit={submit} className="rounded-3xl border border-border bg-card p-6 md:p-8">
-          <h2 className="flex items-center gap-2 text-2xl font-semibold">
-            <Plus className="text-primary" /> Create a playlist
-          </h2>
-          <div className="mt-7 grid gap-5">
-            <div>
-              <Label htmlFor="title">Playlist title</Label>
-              <Input
-                className="mt-2"
-                id="title"
-                name="title"
-                required
-                maxLength={120}
-                placeholder="Songs for the ride home"
-              />
-            </div>
-            <div>
-              <Label htmlFor="occasion">What is it for?</Label>
-              <Select name="occasion">
-                <SelectTrigger className="mt-2" id="occasion">
-                  <SelectValue placeholder="Choose a playlist type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PLAYLIST_PURPOSES.map((purpose) => (
-                    <SelectItem key={purpose} value={purpose}>
-                      {purpose}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="rounded-2xl border border-border bg-muted/20 p-4">
-              <Label>Who can open this playlist?</Label>
-
-              <Select
-                value={createAccessMode}
-                onValueChange={(value) => {
-                  const next = value as PlaylistAccessMode;
-                  setCreateAccessMode(next);
-                  setSelected([]);
-
-                  if (next === "approved_listeners") {
-                    setCreateRequireSignIn(true);
-                  }
-                }}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="public">
-                    Public â€” listed and open to everyone
-                  </SelectItem>
-                  <SelectItem value="unlisted">
-                    Unlisted â€” only people with the link
-                  </SelectItem>
-                  <SelectItem value="approved_listeners">
-                    Approved listeners â€” invitation required
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                Public and unlisted playlists can use only public, published songs.
-                Approved-listener playlists can also use published private or unlisted songs.
-              </p>
-
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div>
-                  <Label htmlFor="create-playlist-expiration">
-                    Link expiration (optional)
-                  </Label>
-
-                  <Input
-                    id="create-playlist-expiration"
-                    className="mt-2"
-                    type="datetime-local"
-                    value={createAccessExpiresAt}
-                    onChange={(event) =>
-                      setCreateAccessExpiresAt(event.target.value)
-                    }
-                  />
-                </div>
-
-                <label className="flex items-center gap-3 rounded-xl border border-border p-4 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={
-                      createAccessMode === "approved_listeners" ||
-                      createRequireSignIn
-                    }
-                    disabled={createAccessMode === "approved_listeners"}
-                    onChange={(event) =>
-                      setCreateRequireSignIn(event.target.checked)
-                    }
-                  />
-                  Require listeners to sign in
-                </label>
-              </div>
-
-              {createAccessMode === "approved_listeners" ? (
-                <p className="mt-3 rounded-xl border border-primary/25 bg-primary/5 p-3 text-xs leading-5 text-muted-foreground">
-                  Create the playlist first, then use Manage playlist to add the
-                  exact listener email addresses.
-                </p>
-              ) : null}
-            </div>
-            <div>
-              <Label htmlFor="description">A note to your listeners</Label>
-              <Textarea
-                className="mt-2"
-                id="description"
-                name="description"
-                maxLength={600}
-                placeholder="Tell fans why you chose these songs."
-              />
-            </div>
-            <div>
-              <Label htmlFor="playlist-cover">Playlist cover art (optional)</Label>
-              <label
-                htmlFor="playlist-cover"
-                className="mt-2 flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-border p-4 transition hover:border-primary/50 hover:bg-primary/5"
-              >
-                {playlistCoverPreview ? (
-                  <img
-                    src={playlistCoverPreview}
-                    alt="Selected playlist cover preview"
-                    className="h-16 w-16 shrink-0 rounded-xl object-cover"
-                  />
-                ) : (
-                  <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-muted">
-                    <ImagePlus className="h-6 w-6 text-muted-foreground" />
-                  </span>
-                )}
-                <span className="min-w-0">
-                  <span className="block truncate font-medium">
-                    {playlistCover ? playlistCover.name : "Choose cover art"}
-                  </span>
-                  <span className="mt-1 block text-xs text-muted-foreground">
-                    JPG, PNG, or WebP Â· up to 2MB
-                  </span>
-                </span>
-              </label>
-              <Input
-                id="playlist-cover"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="sr-only"
-                onChange={(event) => {
-                  const file = event.target.files?.[0] ?? null;
-                  if (file && file.size > MAX_COVER_BYTES) {
-                    toast.error("Playlist cover must be 2MB or smaller.");
-                    event.target.value = "";
-                    setPlaylistCover(null);
-                    return;
-                  }
-                  setPlaylistCover(file);
-                }}
-              />
-            </div>
-            <div>
-              <Label>Choose songs in play order</Label>
-              <div className="relative mt-2">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="space-y-10">
+        {showCreate ? (
+          <form
+            onSubmit={submit}
+            className="rounded-3xl border border-primary/20 bg-card p-5 shadow-xl shadow-primary/5 md:p-8"
+          >
+            <h2 className="flex items-center gap-2 text-2xl font-semibold">
+              <Plus className="text-primary" /> Create a playlist
+            </h2>
+            <div className="mt-7 grid gap-5">
+              <div>
+                <Label htmlFor="title">Playlist title</Label>
                 <Input
-                  value={songQuery}
-                  onChange={(event) => setSongQuery(event.target.value)}
-                  placeholder="Search your uploaded songs by title or genre"
-                  className="pl-9"
+                  className="mt-2"
+                  id="title"
+                  name="title"
+                  required
+                  maxLength={120}
+                  placeholder="Songs for the ride home"
                 />
               </div>
-              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <Select value={songGenre} onValueChange={setSongGenre}>
-                  <SelectTrigger className="sm:w-56">
-                    <SelectValue placeholder="All genres" />
+              <div>
+                <Label>Playlist category</Label>
+                <Select
+                  value={createWorkspaceCategory}
+                  onValueChange={(value) =>
+                    setCreateWorkspaceCategory(
+                      value as PlaylistWorkspaceCategory,
+                    )
+                  }
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All genres</SelectItem>
-                    {songGenres.map((genre) => (
-                      <SelectItem key={genre} value={genre}>
-                        {genre}
+                    {PLAYLIST_WORKSPACE_CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {PLAYLIST_WORKSPACE_CATEGORY_LABELS[category]}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
-                  <span>{selected.length} selected</span>
-                  {!!selected.length && (
-                    <Button type="button" variant="ghost" size="sm" onClick={() => setSelected([])}>
-                      Clear selection
-                    </Button>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Uses the same workspace organization as your Music Library.
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="occasion">Playlist purpose</Label>
+                <Select name="occasion">
+                  <SelectTrigger className="mt-2" id="occasion">
+                    <SelectValue placeholder="Choose a playlist type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PLAYLIST_PURPOSES.map((purpose) => (
+                      <SelectItem key={purpose} value={purpose}>
+                        {purpose}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="rounded-2xl border border-border bg-muted/20 p-4">
+                <Label>Who can open this playlist?</Label>
+
+                <Select
+                  value={createAccessMode}
+                  onValueChange={(value) => {
+                    const next = value as PlaylistAccessMode;
+                    setCreateAccessMode(next);
+                    setSelected([]);
+
+                    if (next === "approved_listeners") {
+                      setCreateRequireSignIn(true);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectItem value="public">
+                      Public - listed and open to everyone
+                    </SelectItem>
+                    <SelectItem value="unlisted">
+                      Unlisted - only people with the link
+                    </SelectItem>
+                    <SelectItem value="approved_listeners">
+                      Approved listeners - invitation required
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  Public and unlisted playlists can use only public, published
+                  songs. Approved-listener playlists can also use published
+                  private or unlisted songs.
+                </p>
+
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label htmlFor="create-playlist-expiration">
+                      Link expiration (optional)
+                    </Label>
+
+                    <Input
+                      id="create-playlist-expiration"
+                      className="mt-2"
+                      type="datetime-local"
+                      value={createAccessExpiresAt}
+                      onChange={(event) =>
+                        setCreateAccessExpiresAt(event.target.value)
+                      }
+                    />
+                  </div>
+
+                  <label className="flex items-center gap-3 rounded-xl border border-border p-4 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={
+                        createAccessMode === "approved_listeners" ||
+                        createRequireSignIn
+                      }
+                      disabled={createAccessMode === "approved_listeners"}
+                      onChange={(event) =>
+                        setCreateRequireSignIn(event.target.checked)
+                      }
+                    />
+                    Require listeners to sign in
+                  </label>
+                </div>
+
+                {createAccessMode === "approved_listeners" ? (
+                  <p className="mt-3 rounded-xl border border-primary/25 bg-primary/5 p-3 text-xs leading-5 text-muted-foreground">
+                    Create the playlist first, then use Manage playlist to add
+                    the exact listener email addresses.
+                  </p>
+                ) : null}
+              </div>
+              <div>
+                <Label htmlFor="description">A note to your listeners</Label>
+                <Textarea
+                  className="mt-2"
+                  id="description"
+                  name="description"
+                  maxLength={600}
+                  placeholder="Tell fans why you chose these songs."
+                />
+              </div>
+              <div>
+                <Label htmlFor="playlist-cover">
+                  Playlist cover art (optional)
+                </Label>
+                <label
+                  htmlFor="playlist-cover"
+                  className="mt-2 flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-border p-4 transition hover:border-primary/50 hover:bg-primary/5"
+                >
+                  {playlistCoverPreview ? (
+                    <img
+                      src={playlistCoverPreview}
+                      alt="Selected playlist cover preview"
+                      className="h-16 w-16 shrink-0 rounded-xl object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-muted">
+                      <ImagePlus className="h-6 w-6 text-muted-foreground" />
+                    </span>
+                  )}
+                  <span className="min-w-0">
+                    <span className="block truncate font-medium">
+                      {playlistCover ? playlistCover.name : "Choose cover art"}
+                    </span>
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      JPG, PNG, or WebP - up to 2MB
+                    </span>
+                  </span>
+                </label>
+                <Input
+                  id="playlist-cover"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="sr-only"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] ?? null;
+                    if (file && file.size > MAX_COVER_BYTES) {
+                      toast.error("Playlist cover must be 2MB or smaller.");
+                      event.target.value = "";
+                      setPlaylistCover(null);
+                      return;
+                    }
+                    setPlaylistCover(file);
+                  }}
+                />
+              </div>
+              <div>
+                <Label>Choose songs in play order</Label>
+                <div className="relative mt-2">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={songQuery}
+                    onChange={(event) => setSongQuery(event.target.value)}
+                    placeholder="Search your uploaded songs by title or genre"
+                    className="pl-9"
+                  />
+                </div>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <Select value={songGenre} onValueChange={setSongGenre}>
+                    <SelectTrigger className="sm:w-56">
+                      <SelectValue placeholder="All genres" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All genres</SelectItem>
+                      {songGenres.map((genre) => (
+                        <SelectItem key={genre} value={genre}>
+                          {genre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
+                    <span>{selected.length} selected</span>
+                    {!!selected.length && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelected([])}
+                      >
+                        Clear selection
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <div className="mt-2 max-h-80 space-y-2 overflow-auto rounded-2xl border border-border p-2">
+                  {isLoading ? (
+                    <Loader2 className="m-6 animate-spin" />
+                  ) : visibleTracks.length ? (
+                    visibleTracks.map((track) => {
+                      const checked = selected.includes(track.id);
+                      const isPublished = track.status === "published";
+                      return (
+                        <div
+                          key={track.id}
+                          className="flex items-center gap-3 rounded-xl p-3 hover:bg-white/5"
+                        >
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
+                            {checked ? selected.indexOf(track.id) + 1 : "-"}
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate font-medium">
+                              {track.title}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {track.genre || "No genre"} -{" "}
+                              {isPublished ? "Published" : "Draft"}
+                            </span>
+                            <span className="mt-1 flex flex-wrap gap-1.5 text-[11px] text-muted-foreground">
+                              <span className="rounded-full bg-muted px-2 py-0.5">
+                                {
+                                  TRACK_WORKSPACE_CATEGORY_LABELS[
+                                    track.workspace_category ??
+                                      "work_in_progress"
+                                  ]
+                                }
+                              </span>
+                              <span className="rounded-full bg-muted px-2 py-0.5">
+                                {
+                                  TRACK_PRODUCTION_STAGE_LABELS[
+                                    track.production_stage ?? "idea"
+                                  ]
+                                }
+                              </span>
+                              <span className="rounded-full bg-muted px-2 py-0.5 capitalize">
+                                {track.visibility}
+                              </span>
+                            </span>
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {formatDuration(track.duration_sec)}
+                          </span>
+                          {isPublished ? (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant={checked ? "secondary" : "outline"}
+                              onClick={() =>
+                                setSelected((current) =>
+                                  checked
+                                    ? current.filter((id) => id !== track.id)
+                                    : [...current, track.id],
+                                )
+                              }
+                            >
+                              {checked ? (
+                                <>
+                                  <Check className="mr-2 h-4 w-4" /> Added -
+                                  Remove
+                                </>
+                              ) : (
+                                <>
+                                  <Plus className="mr-2 h-4 w-4" /> Add to
+                                  playlist
+                                </>
+                              )}
+                            </Button>
+                          ) : null}
+                        </div>
+                      );
+                    })
+                  ) : tracks.length ? (
+                    <p className="p-5 text-sm text-muted-foreground">
+                      No eligible songs match "{songQuery}". Try another title
+                      or genre.
+                    </p>
+                  ) : (
+                    <div className="p-5 text-sm text-muted-foreground">
+                      <p>
+                        A playlist needs at least one published song. Upload
+                        music first, choose Published, then return here.
+                      </p>
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                        className="mt-4"
+                      >
+                        <Link to="/music/upload">
+                          <Upload className="mr-2 h-4 w-4" /> Upload your first
+                          song
+                        </Link>
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
-              <div className="mt-2 max-h-80 space-y-2 overflow-auto rounded-2xl border border-border p-2">
-                {isLoading ? (
-                  <Loader2 className="m-6 animate-spin" />
-                ) : visibleTracks.length ? (
-                  visibleTracks.map((track) => {
-                    const checked = selected.includes(track.id);
-                    const isPublished = track.status === "published";
-                    return (
-                      <div
-                        key={track.id}
-                        className="flex items-center gap-3 rounded-xl p-3 hover:bg-white/5"
-                      >
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
-                          {checked ? selected.indexOf(track.id) + 1 : "â€”"}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate font-medium">{track.title}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {track.genre || "No genre"} Â· {isPublished ? "Published" : "Draft"}
-                          </span>
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {formatDuration(track.duration_sec)}
-                        </span>
-                        {isPublished ? (
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant={checked ? "secondary" : "outline"}
-                            onClick={() =>
-                              setSelected((current) =>
-                                checked
-                                  ? current.filter((id) => id !== track.id)
-                                  : [...current, track.id],
-                              )
-                            }
-                          >
-                            {checked ? (
-                              <>
-                                <Check className="mr-2 h-4 w-4" /> Added Â· Remove
-                              </>
-                            ) : (
-                              <>
-                                <Plus className="mr-2 h-4 w-4" /> Add to playlist
-                              </>
-                            )}
-                          </Button>
-                        ) : (
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            disabled={updateTrack.isPending}
-                            onClick={() => publishAndAddTrack(track.id)}
-                          >
-                            Publish & add
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })
-                ) : tracks.length ? (
-                  <p className="p-5 text-sm text-muted-foreground">
-                    No uploaded songs match â€œ{songQuery}â€. Try another title or genre.
-                  </p>
+              <Button
+                disabled={
+                  create.isPending || replaceCover.isPending || !selected.length
+                }
+                size="lg"
+                className="bg-gradient-brand text-white"
+              >
+                {create.isPending || replaceCover.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <div className="p-5 text-sm text-muted-foreground">
-                    <p>
-                      A playlist needs at least one published song. Upload music first, choose
-                      â€œPublished,â€ then return here.
-                    </p>
-                    <Button asChild variant="outline" size="sm" className="mt-4">
-                      <Link to="/music/upload">
-                        <Upload className="mr-2 h-4 w-4" /> Upload your first song
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-              </div>
+                  <ListMusic className="mr-2 h-4 w-4" />
+                )}{" "}
+                Publish and get link
+              </Button>
             </div>
-            <Button
-              disabled={create.isPending || replaceCover.isPending || !selected.length}
-              size="lg"
-              className="bg-gradient-brand text-white"
-            >
-              {create.isPending || replaceCover.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <ListMusic className="mr-2 h-4 w-4" />
-              )}{" "}
-              Publish and get link
-            </Button>
-          </div>
-        </form>
+          </form>
+        ) : null}
         <section>
           <div className="flex items-end justify-between gap-3">
             <div>
-              <h2 className="text-2xl font-semibold">Your shared playlists</h2>
+              <h2 className="text-2xl font-semibold">Your playlists</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                {playlists.length} published links
+                {playlists.length}{" "}
+                {playlists.length === 1 ? "playlist" : "playlists"} in this
+                workspace
               </p>
             </div>
           </div>
@@ -555,67 +685,159 @@ function PlaylistStudio() {
             />
             <Select
               value={playlistSort}
-              onValueChange={(value) => setPlaylistSort(value as typeof playlistSort)}
+              onValueChange={(value) =>
+                setPlaylistSort(value as typeof playlistSort)
+              }
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="title">Title Aâ€“Z</SelectItem>
+                <SelectItem value="title">Title A-Z</SelectItem>
               </SelectContent>
             </Select>
           </div>
-          <div className="mt-5 space-y-3">
+          {playlistCategories.length ? (
+            <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+              <Button
+                size="sm"
+                variant={playlistCategory === "all" ? "default" : "outline"}
+                onClick={() => {
+                  setPlaylistCategory("all");
+                  setVisiblePlaylistCount(8);
+                }}
+              >
+                All {playlists.length}
+              </Button>
+              {playlistCategories.map(([category, count]) => (
+                <Button
+                  key={category}
+                  size="sm"
+                  className="shrink-0"
+                  variant={
+                    playlistCategory === category ? "default" : "outline"
+                  }
+                  onClick={() => {
+                    setPlaylistCategory(category);
+                    setVisiblePlaylistCount(8);
+                  }}
+                >
+                  {PLAYLIST_WORKSPACE_CATEGORY_LABELS[category]} {count}
+                </Button>
+              ))}
+            </div>
+          ) : null}
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {visiblePlaylists.length ? (
               visiblePlaylists.map((playlist) => (
-                <article key={playlist.id} className="rounded-2xl border border-border bg-card p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex min-w-0 items-start gap-3">
-                      {playlist.cover_url ? (
-                        <img
-                          src={playlist.cover_url}
-                          alt=""
-                          className="h-14 w-14 shrink-0 rounded-xl object-cover"
-                        />
+                <article
+                  key={playlist.id}
+                  className="group flex min-w-0 overflow-hidden rounded-2xl border border-border bg-card transition hover:border-primary/35 hover:shadow-lg hover:shadow-primary/5"
+                >
+                  <div className="relative w-24 shrink-0 overflow-hidden bg-gradient-to-br from-primary/25 via-muted to-background sm:w-28">
+                    {playlist.cover_url ? (
+                      <img
+                        src={playlist.cover_url}
+                        alt={`${playlist.title} cover`}
+                        className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center">
+                        <ListMusic className="h-8 w-8 text-primary/70" />
+                      </span>
+                    )}
+                    <Badge className="absolute left-2 top-2 h-6 gap-1 bg-background/90 px-2 text-[10px] text-foreground backdrop-blur">
+                      {playlist.access_mode === "public" ? (
+                        <Globe2 className="h-3 w-3" />
+                      ) : playlist.access_mode === "unlisted" ? (
+                        <Link2 className="h-3 w-3" />
                       ) : (
-                        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-muted">
-                          <ListMusic className="h-5 w-5 text-muted-foreground" />
-                        </span>
+                        <LockKeyhole className="h-3 w-3" />
                       )}
-                      <div className="min-w-0">
-                        <p className="truncate font-semibold">{playlist.title}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {(playlist.trackIds ?? []).length}{" "}
-                          {(playlist.trackIds ?? []).length === 1 ? "song" : "songs"}
-                        </p>
-                      </div>
-                    </div>
+                      {playlist.access_mode === "approved_listeners"
+                        ? "Approved listeners"
+                        : playlist.access_mode === "membership_only"
+                          ? "Members only"
+                          : playlist.access_mode === "password"
+                            ? "Password"
+                            : playlist.access_mode === "public"
+                              ? "Public"
+                              : "Unlisted"}
+                    </Badge>
                   </div>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {playlist.occasion || "Shared listening experience"}
-                  </p>
-                  <p className="mt-3 break-all text-xs text-muted-foreground">
-                    {shareUrl(playlist.slug)}
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" onClick={() => copy(playlist.slug)}>
-                      <Copy className="mr-2 h-4 w-4" /> Copy link
-                    </Button>
-                    <Button asChild variant="outline" size="sm">
-                      <Link to="/playlists/$playlistId" params={{ playlistId: playlist.id }}>
-                        <Pencil className="mr-2 h-4 w-4" />
-                        Manage playlist
-                      </Link>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => setDeleteTarget(playlist)}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" /> Delete playlist
-                    </Button>
+                  <div className="min-w-0 flex-1 p-3 sm:p-4">
+                    <p className="truncate font-semibold">{playlist.title}</p>
+                    <p className="mt-1 truncate text-[11px] font-medium text-primary">
+                      {
+                        PLAYLIST_WORKSPACE_CATEGORY_LABELS[
+                          playlist.workspace_category ?? "released"
+                        ]
+                      }
+                    </p>
+                    <p className="mt-1 truncate text-xs text-muted-foreground">
+                      {(playlist.trackIds ?? []).length}{" "}
+                      {(playlist.trackIds ?? []).length === 1
+                        ? "song"
+                        : "songs"}{" "}
+                      - {playlist.occasion || "Other"} -{" "}
+                      {new Date(
+                        playlist.updated_at || playlist.created_at,
+                      ).toLocaleDateString()}
+                    </p>
+                    <div className="mt-3 flex items-center gap-1.5">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        aria-label="Copy playlist link"
+                        title="Copy link"
+                        onClick={() => copy(playlist.slug)}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        aria-label="Preview playlist"
+                        title="Preview"
+                        onClick={() =>
+                          window.open(
+                            playlistPath(playlist.slug),
+                            "_blank",
+                            "noopener,noreferrer",
+                          )
+                        }
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                        className="h-8 px-2.5"
+                      >
+                        <Link
+                          to="/playlists/$playlistId"
+                          params={{ playlistId: playlist.id }}
+                        >
+                          <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                          Manage
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="ml-auto h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        aria-label="Delete playlist"
+                        title="Delete"
+                        onClick={() => setDeleteTarget(playlist)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete playlist</span>
+                      </Button>
+                    </div>
                   </div>
                 </article>
               ))
@@ -631,7 +853,7 @@ function PlaylistStudio() {
             {visiblePlaylistCount < filteredPlaylists.length && (
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full md:col-span-2 xl:col-span-3"
                 onClick={() => setVisiblePlaylistCount((value) => value + 8)}
               >
                 Load 8 more playlists
@@ -648,14 +870,16 @@ function PlaylistStudio() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete â€œ{deleteTarget?.title}â€?</AlertDialogTitle>
+            <AlertDialogTitle>Delete "{deleteTarget?.title}"?</AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently removes the playlist and its share link. Your uploaded songs will
-              remain in your music library.
+              This permanently removes the playlist and its share link. Your
+              uploaded songs will remain in your music library.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deletePlaylist.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deletePlaylist.isPending}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={deletePlaylist.isPending}
@@ -664,7 +888,9 @@ function PlaylistStudio() {
                 void confirmDelete();
               }}
             >
-              {deletePlaylist.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {deletePlaylist.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Delete playlist
             </AlertDialogAction>
           </AlertDialogFooter>
