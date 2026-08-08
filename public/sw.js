@@ -1,4 +1,4 @@
-const CACHE_NAME = "vybe-creator-v24-18";
+const CACHE_NAME = "vybe-creator-v24-38";
 const OFFLINE_URL = "/offline.html";
 const OFFLINE_PLAY_URL = "/experience/play";
 const SAFE_STATIC_PREFIXES = ["/assets/", "/branding/", "/pwa/"];
@@ -11,9 +11,9 @@ self.addEventListener("install", (event) => {
       .then((cache) =>
         cache.addAll([
           OFFLINE_URL,
-          "/pwa/icon-192.png",
-          "/pwa/icon-512.png",
-          "/pwa/icon-maskable-512.png",
+          "/pwa/icon-192-v24-38.png",
+          "/pwa/icon-512-v24-38.png",
+          "/pwa/icon-maskable-512-v24-38.png",
         ]),
       ),
   );
@@ -75,6 +75,14 @@ self.addEventListener("fetch", (event) => {
 
   if (!SAFE_STATIC_PREFIXES.some((prefix) => url.pathname.startsWith(prefix))) return;
 
+  if (url.pathname.startsWith("/pwa/") || url.pathname === "/favicon.ico" || url.pathname === "/manifest.webmanifest") {
+    event.respondWith(fetch(request).then((response) => {
+      if (response.ok) caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()));
+      return response;
+    }).catch(() => caches.match(request)));
+    return;
+  }
+
   event.respondWith(
     caches.match(request).then(
       (cached) =>
@@ -89,3 +97,4 @@ self.addEventListener("fetch", (event) => {
     ),
   );
 });
+

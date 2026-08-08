@@ -53,11 +53,13 @@ import { Route as ApiAccountDeletionRouteImport } from './routes/api.account-del
 import { Route as AdminInviteTokenRouteImport } from './routes/admin-invite.$token'
 import { Route as AuthenticatedWatchRouteImport } from './routes/_authenticated/watch'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
+import { Route as AuthenticatedStoriesRouteImport } from './routes/_authenticated/stories'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedReadRouteImport } from './routes/_authenticated/read'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPlaylistsRouteImport } from './routes/_authenticated/playlists'
 import { Route as AuthenticatedPlayRouteImport } from './routes/_authenticated/play'
+import { Route as AuthenticatedOrganizationRouteImport } from './routes/_authenticated/organization'
 import { Route as AuthenticatedMyVybeRouteImport } from './routes/_authenticated/my-vybe'
 import { Route as AuthenticatedMusicRouteImport } from './routes/_authenticated/music'
 import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/merch'
@@ -67,6 +69,8 @@ import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedEpkRouteImport } from './routes/_authenticated/epk'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCreatorSupportRouteImport } from './routes/_authenticated/creator-support'
+import { Route as AuthenticatedCreatorAnalyticsRouteImport } from './routes/_authenticated/creator-analytics'
 import { Route as AuthenticatedContentRouteImport } from './routes/_authenticated/content'
 import { Route as AuthenticatedConnectionsRouteImport } from './routes/_authenticated/connections'
 import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
@@ -318,6 +322,11 @@ const AuthenticatedVideosRoute = AuthenticatedVideosRouteImport.update({
   path: '/videos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStoriesRoute = AuthenticatedStoriesRouteImport.update({
+  id: '/stories',
+  path: '/stories',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -343,6 +352,12 @@ const AuthenticatedPlayRoute = AuthenticatedPlayRouteImport.update({
   path: '/play',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOrganizationRoute =
+  AuthenticatedOrganizationRouteImport.update({
+    id: '/organization',
+    path: '/organization',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMyVybeRoute = AuthenticatedMyVybeRouteImport.update({
   id: '/my-vybe',
   path: '/my-vybe',
@@ -388,6 +403,18 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCreatorSupportRoute =
+  AuthenticatedCreatorSupportRouteImport.update({
+    id: '/creator-support',
+    path: '/creator-support',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCreatorAnalyticsRoute =
+  AuthenticatedCreatorAnalyticsRouteImport.update({
+    id: '/creator-analytics',
+    path: '/creator-analytics',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedContentRoute = AuthenticatedContentRouteImport.update({
   id: '/content',
   path: '/content',
@@ -589,6 +616,8 @@ export interface FileRoutesByFullPath {
   '/communities': typeof AuthenticatedCommunitiesRoute
   '/connections': typeof AuthenticatedConnectionsRoute
   '/content': typeof AuthenticatedContentRoute
+  '/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
+  '/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/epk': typeof AuthenticatedEpkRoute
@@ -598,11 +627,13 @@ export interface FileRoutesByFullPath {
   '/merch': typeof AuthenticatedMerchRoute
   '/music': typeof AuthenticatedMusicRoute
   '/my-vybe': typeof AuthenticatedMyVybeRoute
+  '/organization': typeof AuthenticatedOrganizationRoute
   '/play': typeof AuthenticatedPlayRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/stories': typeof AuthenticatedStoriesRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
@@ -679,6 +710,8 @@ export interface FileRoutesByTo {
   '/communities': typeof AuthenticatedCommunitiesRoute
   '/connections': typeof AuthenticatedConnectionsRoute
   '/content': typeof AuthenticatedContentRoute
+  '/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
+  '/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/epk': typeof AuthenticatedEpkRoute
@@ -688,11 +721,13 @@ export interface FileRoutesByTo {
   '/merch': typeof AuthenticatedMerchRoute
   '/music': typeof AuthenticatedMusicRoute
   '/my-vybe': typeof AuthenticatedMyVybeRoute
+  '/organization': typeof AuthenticatedOrganizationRoute
   '/play': typeof AuthenticatedPlayRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/stories': typeof AuthenticatedStoriesRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
@@ -771,6 +806,8 @@ export interface FileRoutesById {
   '/_authenticated/communities': typeof AuthenticatedCommunitiesRoute
   '/_authenticated/connections': typeof AuthenticatedConnectionsRoute
   '/_authenticated/content': typeof AuthenticatedContentRoute
+  '/_authenticated/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
+  '/_authenticated/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
   '/_authenticated/epk': typeof AuthenticatedEpkRoute
@@ -780,11 +817,13 @@ export interface FileRoutesById {
   '/_authenticated/merch': typeof AuthenticatedMerchRoute
   '/_authenticated/music': typeof AuthenticatedMusicRoute
   '/_authenticated/my-vybe': typeof AuthenticatedMyVybeRoute
+  '/_authenticated/organization': typeof AuthenticatedOrganizationRoute
   '/_authenticated/play': typeof AuthenticatedPlayRoute
   '/_authenticated/playlists': typeof AuthenticatedPlaylistsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/read': typeof AuthenticatedReadRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/stories': typeof AuthenticatedStoriesRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_authenticated/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
@@ -863,6 +902,8 @@ export interface FileRouteTypes {
     | '/communities'
     | '/connections'
     | '/content'
+    | '/creator-analytics'
+    | '/creator-support'
     | '/dashboard'
     | '/discover'
     | '/epk'
@@ -872,11 +913,13 @@ export interface FileRouteTypes {
     | '/merch'
     | '/music'
     | '/my-vybe'
+    | '/organization'
     | '/play'
     | '/playlists'
     | '/profile'
     | '/read'
     | '/settings'
+    | '/stories'
     | '/videos'
     | '/watch'
     | '/admin-invite/$token'
@@ -953,6 +996,8 @@ export interface FileRouteTypes {
     | '/communities'
     | '/connections'
     | '/content'
+    | '/creator-analytics'
+    | '/creator-support'
     | '/dashboard'
     | '/discover'
     | '/epk'
@@ -962,11 +1007,13 @@ export interface FileRouteTypes {
     | '/merch'
     | '/music'
     | '/my-vybe'
+    | '/organization'
     | '/play'
     | '/playlists'
     | '/profile'
     | '/read'
     | '/settings'
+    | '/stories'
     | '/videos'
     | '/watch'
     | '/admin-invite/$token'
@@ -1044,6 +1091,8 @@ export interface FileRouteTypes {
     | '/_authenticated/communities'
     | '/_authenticated/connections'
     | '/_authenticated/content'
+    | '/_authenticated/creator-analytics'
+    | '/_authenticated/creator-support'
     | '/_authenticated/dashboard'
     | '/_authenticated/discover'
     | '/_authenticated/epk'
@@ -1053,11 +1102,13 @@ export interface FileRouteTypes {
     | '/_authenticated/merch'
     | '/_authenticated/music'
     | '/_authenticated/my-vybe'
+    | '/_authenticated/organization'
     | '/_authenticated/play'
     | '/_authenticated/playlists'
     | '/_authenticated/profile'
     | '/_authenticated/read'
     | '/_authenticated/settings'
+    | '/_authenticated/stories'
     | '/_authenticated/videos'
     | '/_authenticated/watch'
     | '/admin-invite/$token'
@@ -1465,6 +1516,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVideosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/stories': {
+      id: '/_authenticated/stories'
+      path: '/stories'
+      fullPath: '/stories'
+      preLoaderRoute: typeof AuthenticatedStoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -1498,6 +1556,13 @@ declare module '@tanstack/react-router' {
       path: '/play'
       fullPath: '/play'
       preLoaderRoute: typeof AuthenticatedPlayRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/organization': {
+      id: '/_authenticated/organization'
+      path: '/organization'
+      fullPath: '/organization'
+      preLoaderRoute: typeof AuthenticatedOrganizationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/my-vybe': {
@@ -1561,6 +1626,20 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/creator-support': {
+      id: '/_authenticated/creator-support'
+      path: '/creator-support'
+      fullPath: '/creator-support'
+      preLoaderRoute: typeof AuthenticatedCreatorSupportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/creator-analytics': {
+      id: '/_authenticated/creator-analytics'
+      path: '/creator-analytics'
+      fullPath: '/creator-analytics'
+      preLoaderRoute: typeof AuthenticatedCreatorAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/content': {
@@ -1790,6 +1869,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommunitiesRoute: typeof AuthenticatedCommunitiesRoute
   AuthenticatedConnectionsRoute: typeof AuthenticatedConnectionsRoute
   AuthenticatedContentRoute: typeof AuthenticatedContentRoute
+  AuthenticatedCreatorAnalyticsRoute: typeof AuthenticatedCreatorAnalyticsRoute
+  AuthenticatedCreatorSupportRoute: typeof AuthenticatedCreatorSupportRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
   AuthenticatedEpkRoute: typeof AuthenticatedEpkRoute
@@ -1799,11 +1880,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMerchRoute: typeof AuthenticatedMerchRoute
   AuthenticatedMusicRoute: typeof AuthenticatedMusicRoute
   AuthenticatedMyVybeRoute: typeof AuthenticatedMyVybeRoute
+  AuthenticatedOrganizationRoute: typeof AuthenticatedOrganizationRoute
   AuthenticatedPlayRoute: typeof AuthenticatedPlayRoute
   AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReadRoute: typeof AuthenticatedReadRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedStoriesRoute: typeof AuthenticatedStoriesRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
   AuthenticatedAdminAccountsRoute: typeof AuthenticatedAdminAccountsRoute
@@ -1835,6 +1918,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommunitiesRoute: AuthenticatedCommunitiesRoute,
   AuthenticatedConnectionsRoute: AuthenticatedConnectionsRoute,
   AuthenticatedContentRoute: AuthenticatedContentRoute,
+  AuthenticatedCreatorAnalyticsRoute: AuthenticatedCreatorAnalyticsRoute,
+  AuthenticatedCreatorSupportRoute: AuthenticatedCreatorSupportRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
   AuthenticatedEpkRoute: AuthenticatedEpkRoute,
@@ -1844,11 +1929,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMerchRoute: AuthenticatedMerchRoute,
   AuthenticatedMusicRoute: AuthenticatedMusicRoute,
   AuthenticatedMyVybeRoute: AuthenticatedMyVybeRoute,
+  AuthenticatedOrganizationRoute: AuthenticatedOrganizationRoute,
   AuthenticatedPlayRoute: AuthenticatedPlayRoute,
   AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReadRoute: AuthenticatedReadRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedStoriesRoute: AuthenticatedStoriesRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
   AuthenticatedAdminAccountsRoute: AuthenticatedAdminAccountsRoute,

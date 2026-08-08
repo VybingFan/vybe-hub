@@ -20,6 +20,11 @@ import { usePublicCreator } from "@/hooks/usePublicCreator";
 import { useUser } from "@/hooks/useUser";
 import { MERCH_AVAILABILITY } from "@/features/merch/schema";
 import { VIDEO_TYPES } from "@/features/video/schema";
+import { CreatorActions } from "@/components/engagement/CreatorActions";
+import { CreatorComments } from "@/components/engagement/CreatorComments";
+import { FollowCreatorButton } from "@/components/engagement/FollowCreatorButton";
+import { CreatorPlanBadge } from "@/components/membership/CreatorPlanBadge";
+import { PublicCreatorStories } from "@/components/stories/PublicCreatorStories";
 
 export const Route = createFileRoute("/creator/$username")({ component: CreatorPage });
 
@@ -117,6 +122,7 @@ export function PublicArtistHome({
                   <h1 className="mt-1 break-words text-3xl font-bold sm:text-4xl md:text-6xl">
                     {name}
                   </h1>
+                  <CreatorPlanBadge userId={profile.user_id} />
                   <div className="mt-3 flex flex-wrap gap-2">
                     {(profile.genres?.length
                       ? profile.genres
@@ -138,12 +144,7 @@ export function PublicArtistHome({
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button asChild className="bg-gradient-brand text-white">
-                  <Link to="/auth/sign-up">
-                    <Heart className="mr-2 h-4 w-4" />
-                    Follow
-                  </Link>
-                </Button>
+                <FollowCreatorButton creatorUserId={profile.user_id} />
                 <Button variant="outline" onClick={share}>
                   <Share2 className="mr-2 h-4 w-4" />
                   Share
@@ -288,7 +289,15 @@ export function PublicArtistHome({
             </div>
           </section>
         )}
+        <PublicCreatorStories creatorUserId={profile.user_id} />
+        <CreatorActions entityId={profile.user_id} />
+        <CreatorComments entityId={profile.user_id} />
       </main>
     </div>
   );
 }
+
+
+
+
+

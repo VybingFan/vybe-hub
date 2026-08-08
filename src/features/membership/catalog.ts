@@ -48,6 +48,7 @@ export const CREATOR_PLAN_CATALOG: CreatorPlanCatalogEntry[] = [
     analytics: "30-day basic totals",
     highlights: [
       "Public creator page and VYBE username",
+      "Private EPK starter with bio, booking email, press photo, and two tracks",
       "Music library, editors, and shareable playlists",
       "No credit card and no expiration",
       "One hosted YouTube or Vimeo video showcase",
@@ -78,9 +79,10 @@ export const CREATOR_PLAN_CATALOG: CreatorPlanCatalogEntry[] = [
       "Playlist-listen and profile-activity notifications",
       "Release scheduling and creator stories",
       "Creator Plus badge and priority email support",
+      "Complete Industry Kit with bios, contacts, brand files, credits, WAV masters, and press milestones",
       "Ten hosted videos; native storage and AI activate when connected",
     ],
-    launchState: "planned",
+    launchState: "available",
   },
   {
     code: "creator_pro",
@@ -143,8 +145,8 @@ export const MEMBERSHIP_FEATURE_STATUS = {
   songAndPlaylistEditors: "available",
   publicCreatorLinks: "available",
   merchShowcase: "available",
-  creatorStories: "coming_soon",
-  creatorAnalytics: "coming_soon",
+  creatorStories: "available",
+  creatorAnalytics: "available",
   creatorAssistant: "coming_soon",
   hostedVideoPublishing: "available",
   nativeVideoHosting: "coming_soon",
@@ -158,3 +160,5 @@ export const FOUNDING_CREATOR_NOTE =
 
 export const PIONEER_NOTE =
   "VYBE Pioneer is planned recognition for the first 50 eligible public paying creators, not a separate plan. Enrollment and discounted pricing are not open yet.";
+
+

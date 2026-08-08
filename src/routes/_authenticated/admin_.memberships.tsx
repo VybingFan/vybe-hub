@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CREATOR_PLAN_CATALOG } from "@/features/membership/catalog";
+import { AdminTierDetails } from "@/components/membership/AdminTierDetails";
 import {
   adminService,
   type AdminMembershipRecord,
@@ -158,3 +159,4 @@ function Metric({ label, value }: { label: string; value: number }) {
     </Card>
   );
 }
+
