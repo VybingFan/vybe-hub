@@ -1,8 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type {
-  CreatePlaylistInput,
-  UpdatePlaylistInput,
-} from "@/features/playlists/schema";
+import type { CreatePlaylistInput, UpdatePlaylistInput } from "@/features/playlists/schema";
 import { secureMediaService } from "@/services/media/secureMediaService";
 import { playlistService } from "@/services/playlists/playlistService";
 
@@ -53,13 +50,7 @@ export function useReplacePlaylistTracks(userId?: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      playlistId,
-      trackIds,
-    }: {
-      playlistId: string;
-      trackIds: string[];
-    }) => {
+    mutationFn: ({ playlistId, trackIds }: { playlistId: string; trackIds: string[] }) => {
       if (!userId) {
         throw new Error("Sign in to manage a playlist.");
       }
@@ -91,13 +82,7 @@ export function useUpdatePlaylist(userId?: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      playlistId,
-      input,
-    }: {
-      playlistId: string;
-      input: UpdatePlaylistInput;
-    }) => {
+    mutationFn: ({ playlistId, input }: { playlistId: string; input: UpdatePlaylistInput }) => {
       if (!userId) {
         throw new Error("Sign in to manage a playlist.");
       }
@@ -125,13 +110,7 @@ export function useReplacePlaylistCover(userId?: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      playlistId,
-      file,
-    }: {
-      playlistId: string;
-      file: File;
-    }) => {
+    mutationFn: ({ playlistId, file }: { playlistId: string; file: File }) => {
       if (!userId) {
         throw new Error("Sign in to manage a playlist.");
       }
@@ -180,10 +159,10 @@ export function useDeletePlaylist(userId?: string) {
   });
 }
 
-export function useSharedPlaylist(slug: string) {
+export function useSharedPlaylist(slug: string, password?: string) {
   return useQuery({
-    queryKey: [SHARED_PLAYLIST_QUERY_KEY, slug],
-    queryFn: () => secureMediaService.authorizePlaylist(slug),
+    queryKey: [SHARED_PLAYLIST_QUERY_KEY, slug, password || ""],
+    queryFn: () => secureMediaService.authorizePlaylist(slug, password),
     enabled: !!slug,
     retry: false,
   });

@@ -22,7 +22,7 @@ export interface PlaylistAuthorizationResult {
 }
 
 interface SecurePlaylistApiResponse {
-  result?: PlaylistAuthorizationResult;
+  result?: unknown;
   error?: string;
 }
 
@@ -63,13 +63,14 @@ async function readJson(response: Response): Promise<SecurePlaylistApiResponse> 
 }
 
 export const secureMediaService = {
-  async authorizePlaylist(slug: string): Promise<PlaylistAuthorizationResult> {
+  async authorizePlaylist(slug: string, password?: string): Promise<PlaylistAuthorizationResult> {
     const response = await fetch("/api/secure-playlist", {
       method: "POST",
       headers: await authHeaders(),
       body: JSON.stringify({
         action: "authorize",
         slug,
+        password: password || undefined,
       }),
     });
 
@@ -79,6 +80,26 @@ export const secureMediaService = {
       throw new Error("The secure media API did not return an authorization result.");
     }
 
-    return payload.result;
+    return payload.result as PlaylistAuthorizationResult;
+  },
+
+  async setPlaylistPassword(slug: string, password: string): Promise<void> {
+    const response = await fetch("/api/secure-playlist", {
+      method: "POST",
+      headers: await authHeaders(),
+      body: JSON.stringify({ action: "set_password", slug, password }),
+    });
+
+    await readJson(response);
+  },
+
+  async clearPlaylistPassword(slug: string): Promise<void> {
+    const response = await fetch("/api/secure-playlist", {
+      method: "POST",
+      headers: await authHeaders(),
+      body: JSON.stringify({ action: "clear_password", slug }),
+    });
+
+    await readJson(response);
   },
 };

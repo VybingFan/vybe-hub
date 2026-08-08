@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { PlaylistAccessGrantManager } from "@/components/access/PlaylistAccessGrantManager";
+import { PlaylistPasswordManager } from "@/components/access/PlaylistPasswordManager";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,11 +59,29 @@ import {
 import { useUser } from "@/hooks/useUser";
 
 type PlaylistAccessMode =
-  | "public"
-  | "unlisted"
-  | "password"
-  | "approved_listeners"
-  | "membership_only";
+  "public" | "unlisted" | "password" | "approved_listeners" | "membership_only";
+
+const PLAYLIST_ACCESS_MODE_LABELS: Record<PlaylistAccessMode, string> = {
+  public: "Public",
+  unlisted: "Unlisted link",
+  password: "Password protected",
+  approved_listeners: "Approved listeners",
+  membership_only: "Membership only",
+};
+
+function toLocalDateTimeInput(value: string): string {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  const localTime = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60_000,
+  );
+
+  return localTime.toISOString().slice(0, 16);
+}
 
 export const Route = createFileRoute("/_authenticated/playlists_/$playlistId")({
   component: () => (
@@ -89,8 +108,7 @@ function PlaylistEditor() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [occasion, setOccasion] = useState("");
-  const [workspaceCategory, setWorkspaceCategory] =
-    useState<PlaylistWorkspaceCategory>("released");
+  const [workspaceCategory, setWorkspaceCategory] = useState<PlaylistWorkspaceCategory>("released");
   const [status, setStatus] = useState<"published" | "draft">("published");
   const [trackIds, setTrackIds] = useState<string[]>([]);
   const [accessMode, setAccessMode] = useState<PlaylistAccessMode>("public");
@@ -107,14 +125,15 @@ function PlaylistEditor() {
     setStatus(playlist.is_published ? "published" : "draft");
     setTrackIds(playlist.trackIds ?? []);
     setAccessMode(playlist.access_mode ?? "public");
-    setAccessExpiresAt(playlist.access_expires_at?.slice(0, 16) ?? "");
+    setAccessExpiresAt(
+      playlist.access_expires_at
+        ? toLocalDateTimeInput(playlist.access_expires_at)
+        : "",
+    );
     setRequireSignIn(playlist.require_sign_in ?? false);
   }, [playlist]);
 
-  const trackMap = useMemo(
-    () => new Map(tracks.map((track) => [track.id, track])),
-    [tracks],
-  );
+  const trackMap = useMemo(() => new Map(tracks.map((track) => [track.id, track])), [tracks]);
 
   const selectedTracks = trackIds.flatMap((id) => {
     const track = trackMap.get(id);
@@ -125,14 +144,9 @@ function PlaylistEditor() {
     (track) => track.status === "published" && !trackIds.includes(track.id),
   );
 
-  const fallbackCover = selectedTracks.find(
-    (track) => track.cover_url,
-  )?.cover_url;
+  const fallbackCover = selectedTracks.find((track) => track.cover_url)?.cover_url;
 
-  const artwork =
-    playlist?.cover_url ||
-    fallbackCover ||
-    "/banners/default-creator-banner.png";
+  const artwork = playlist?.cover_url || fallbackCover || "/banners/default-creator-banner.png";
 
   const publicPath = playlist
     ? creator?.username
@@ -185,9 +199,7 @@ function PlaylistEditor() {
           workspace_category: workspaceCategory,
           is_published: status === "published",
           access_mode: accessMode,
-          access_expires_at: accessExpiresAt
-            ? new Date(accessExpiresAt).toISOString()
-            : null,
+          access_expires_at: accessExpiresAt ? new Date(accessExpiresAt).toISOString() : null,
           require_sign_in: requireSignIn,
         },
       });
@@ -199,9 +211,7 @@ function PlaylistEditor() {
 
       toast.success("Playlist saved.");
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Could not save the playlist",
-      );
+      toast.error(error instanceof Error ? error.message : "Could not save the playlist");
     }
   };
 
@@ -216,9 +226,7 @@ function PlaylistEditor() {
 
       toast.success("Playlist cover updated.");
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Could not update the cover",
-      );
+      toast.error(error instanceof Error ? error.message : "Could not update the cover");
     }
   };
 
@@ -226,19 +234,13 @@ function PlaylistEditor() {
     try {
       await remove.mutateAsync(playlistId);
 
-      toast.success(
-        "Playlist deleted. Your songs remain in the Music Library.",
-      );
+      toast.success("Playlist deleted. Your songs remain in the Music Library.");
 
       navigate({
         to: "/playlists",
       });
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Could not delete the playlist",
-      );
+      toast.error(error instanceof Error ? error.message : "Could not delete the playlist");
     }
   };
 
@@ -280,8 +282,7 @@ function PlaylistEditor() {
           <h1 className="mt-2 text-4xl font-semibold">{playlist.title}</h1>
 
           <p className="mt-2 text-muted-foreground">
-            Manage its artwork, information, songs, order, and public
-            availability.
+            Manage its artwork, information, songs, order, and public availability.
           </p>
         </div>
 
@@ -290,9 +291,7 @@ function PlaylistEditor() {
             type="button"
             variant="outline"
             onClick={async () => {
-              await navigator.clipboard.writeText(
-                `${window.location.origin}${publicPath}`,
-              );
+              await navigator.clipboard.writeText(`${window.location.origin}${publicPath}`);
 
               toast.success("Playlist link copied.");
             }}
@@ -310,17 +309,10 @@ function PlaylistEditor() {
         </div>
       </header>
 
-      <form
-        onSubmit={save}
-        className="grid gap-8 lg:grid-cols-[20rem_minmax(0,1fr)]"
-      >
+      <form onSubmit={save} className="grid gap-8 lg:grid-cols-[20rem_minmax(0,1fr)]">
         <aside className="space-y-5">
           <div className="overflow-hidden rounded-3xl border border-border bg-card">
-            <img
-              src={artwork}
-              alt=""
-              className="aspect-square w-full object-cover"
-            />
+            <img src={artwork} alt="" className="aspect-square w-full object-cover" />
 
             <div className="p-5">
               <Label className="flex cursor-pointer items-center justify-center rounded-xl border border-border px-4 py-3 text-sm font-medium hover:border-primary/60">
@@ -343,8 +335,8 @@ function PlaylistEditor() {
               </Label>
 
               <p className="mt-3 text-xs leading-5 text-muted-foreground">
-                JPG, PNG, or WebP up to 2MB. Until you add one, VYBE uses the
-                first available song cover.
+                JPG, PNG, or WebP up to 2MB. Until you add one, VYBE uses the first available song
+                cover.
               </p>
             </div>
           </div>
@@ -352,9 +344,7 @@ function PlaylistEditor() {
           <div className="rounded-2xl border border-border bg-card p-5">
             <p className="text-sm font-medium">Shared link</p>
 
-            <p className="mt-2 break-all text-xs text-muted-foreground">
-              {publicPath}
-            </p>
+            <p className="mt-2 break-all text-xs text-muted-foreground">{publicPath}</p>
           </div>
         </aside>
 
@@ -363,37 +353,39 @@ function PlaylistEditor() {
             <h2 className="text-2xl font-semibold">Protected sharing</h2>
 
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Choose whether this playlist is public, hidden from discovery, or
-              restricted to authorized listeners.
+              Choose whether this playlist is public, hidden from discovery, or restricted to
+              authorized listeners.
             </p>
 
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
               <div>
                 <Label>Access mode</Label>
 
-                <Select value={accessMode} onValueChange={changeAccessMode}>
+                <Select
+                  key={`access-${accessMode}`}
+                  value={accessMode}
+                  onValueChange={changeAccessMode}
+                >
                   <SelectTrigger className="mt-2">
-                    <SelectValue />
+                    <SelectValue placeholder="Choose an access mode">
+                      {PLAYLIST_ACCESS_MODE_LABELS[accessMode]}
+                    </SelectValue>
                   </SelectTrigger>
 
                   <SelectContent>
                     <SelectItem value="public">Public</SelectItem>
                     <SelectItem value="unlisted">Unlisted link</SelectItem>
                     <SelectItem value="password">Password protected</SelectItem>
-                    <SelectItem value="approved_listeners">
-                      Approved listeners
-                    </SelectItem>
-                    <SelectItem value="membership_only">
-                      Membership only
+                    <SelectItem value="approved_listeners">Approved listeners</SelectItem>
+                    <SelectItem value="membership_only" disabled>
+                      Membership only — supporter subscriptions required
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label htmlFor="playlist-access-expiration">
-                  Link expiration
-                </Label>
+                <Label htmlFor="playlist-access-expiration">Link expiration</Label>
 
                 <Input
                   id="playlist-access-expiration"
@@ -408,17 +400,13 @@ function PlaylistEditor() {
                 <input
                   type="checkbox"
                   checked={requireSignIn}
-                  disabled={
-                    accessMode === "approved_listeners" ||
-                    accessMode === "membership_only"
-                  }
+                  disabled={accessMode === "approved_listeners" || accessMode === "membership_only"}
                   onChange={(event) => setRequireSignIn(event.target.checked)}
                 />
 
                 <span>
                   Require listeners to sign in
-                  {(accessMode === "approved_listeners" ||
-                    accessMode === "membership_only") && (
+                  {(accessMode === "approved_listeners" || accessMode === "membership_only") && (
                     <span className="mt-1 block text-xs text-muted-foreground">
                       Sign-in is required for this access mode.
                     </span>
@@ -429,22 +417,17 @@ function PlaylistEditor() {
 
             {accessMode === "approved_listeners" ? (
               <p className="mt-4 rounded-xl border border-primary/25 bg-primary/5 p-3 text-sm text-muted-foreground">
-                Add approved listeners below. Each listener must sign in using
-                the exact email address entered in the invitation.
+                Add approved listeners below. Each listener must sign in using the exact email
+                address entered in the invitation.
               </p>
             ) : null}
 
-            {accessMode === "password" ? (
-              <p className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-muted-foreground">
-                Password entry and password verification will be connected in
-                the next protected-sharing package.
-              </p>
-            ) : null}
+            {accessMode === "password" ? <PlaylistPasswordManager slug={playlist.slug} /> : null}
 
             {accessMode === "membership_only" ? (
               <p className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-muted-foreground">
-                Membership verification will be connected after
-                approved-listener management is validated.
+                Supporter-to-creator subscriptions are not connected yet. This option cannot be
+                selected until subscriber records and billing status can be verified securely.
               </p>
             ) : null}
           </section>
@@ -469,13 +452,16 @@ function PlaylistEditor() {
                 <div>
                   <Label>Playlist category</Label>
                   <Select
+                    key={`category-${workspaceCategory}`}
                     value={workspaceCategory}
                     onValueChange={(value) =>
                       setWorkspaceCategory(value as PlaylistWorkspaceCategory)
                     }
                   >
                     <SelectTrigger className="mt-2">
-                      <SelectValue />
+                      <SelectValue placeholder="Choose a playlist category">
+                        {PLAYLIST_WORKSPACE_CATEGORY_LABELS[workspaceCategory]}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {PLAYLIST_WORKSPACE_CATEGORIES.map((category) => (
@@ -509,9 +495,7 @@ function PlaylistEditor() {
 
                   <Select
                     value={status}
-                    onValueChange={(value) =>
-                      setStatus(value as "published" | "draft")
-                    }
+                    onValueChange={(value) => setStatus(value as "published" | "draft")}
                   >
                     <SelectTrigger className="mt-2">
                       <SelectValue />
@@ -549,9 +533,7 @@ function PlaylistEditor() {
                 </p>
               </div>
 
-              <span className="text-sm text-muted-foreground">
-                {trackIds.length} songs
-              </span>
+              <span className="text-sm text-muted-foreground">{trackIds.length} songs</span>
             </div>
 
             <div className="mt-6 space-y-2">
@@ -565,9 +547,7 @@ function PlaylistEditor() {
                   </span>
 
                   <img
-                    src={
-                      track.cover_url || "/banners/default-creator-banner.png"
-                    }
+                    src={track.cover_url || "/banners/default-creator-banner.png"}
                     alt=""
                     className="h-12 w-12 rounded-xl object-cover"
                   />
@@ -609,9 +589,7 @@ function PlaylistEditor() {
                     className="text-destructive"
                     disabled={trackIds.length === 1}
                     onClick={() =>
-                      setTrackIds((current) =>
-                        current.filter((id) => id !== track.id),
-                      )
+                      setTrackIds((current) => current.filter((id) => id !== track.id))
                     }
                     aria-label={`Remove ${track.title}`}
                   >
@@ -631,9 +609,7 @@ function PlaylistEditor() {
                       key={track.id}
                       type="button"
                       className="flex items-center gap-3 rounded-2xl border border-border/70 p-3 text-left transition hover:border-primary/40"
-                      onClick={() =>
-                        setTrackIds((current) => [...current, track.id])
-                      }
+                      onClick={() => setTrackIds((current) => [...current, track.id])}
                     >
                       <Music2 className="h-4 w-4 shrink-0 text-primary" />
 
@@ -652,11 +628,7 @@ function PlaylistEditor() {
           <div className="flex flex-col-reverse justify-between gap-4 sm:flex-row">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="text-destructive"
-                >
+                <Button type="button" variant="ghost" className="text-destructive">
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete playlist
                 </Button>
@@ -664,13 +636,11 @@ function PlaylistEditor() {
 
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Delete “{playlist.title}”?
-                  </AlertDialogTitle>
+                  <AlertDialogTitle>Delete “{playlist.title}”?</AlertDialogTitle>
 
                   <AlertDialogDescription>
-                    This removes the playlist, its cover, and its public link.
-                    Uploaded songs remain in your Music Library.
+                    This removes the playlist, its cover, and its public link. Uploaded songs remain
+                    in your Music Library.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
 
@@ -689,9 +659,7 @@ function PlaylistEditor() {
 
             <Button
               size="lg"
-              disabled={
-                update.isPending || replaceTracks.isPending || !trackIds.length
-              }
+              disabled={update.isPending || replaceTracks.isPending || !trackIds.length}
               className="bg-gradient-brand text-primary-foreground"
             >
               {update.isPending || replaceTracks.isPending ? (

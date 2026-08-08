@@ -7,10 +7,74 @@ const PREVIEW_BUCKET = "music-previews";
 const AVATAR_BUCKET = "avatars";
 const SIGNED_URL_TTL_SECONDS = 60 * 3;
 
-const requestSchema = z.object({
-  action: z.literal("authorize"),
-  slug: z.string().trim().min(1).max(160),
-});
+const requestSchema = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("authorize"),
+    slug: z.string().trim().min(1).max(160),
+    password: z.string().max(128).optional(),
+  }),
+  z.object({
+    action: z.literal("set_password"),
+    slug: z.string().trim().min(1).max(160),
+    password: z.string().min(8).max(128),
+  }),
+  z.object({
+    action: z.literal("clear_password"),
+    slug: z.string().trim().min(1).max(160),
+  }),
+]);
+
+const PASSWORD_ITERATIONS = 210_000;
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = "";
+  bytes.forEach((byte) => (binary += String.fromCharCode(byte)));
+  return btoa(binary);
+}
+
+function base64ToBytes(value: string): Uint8Array {
+  return Uint8Array.from(atob(value), (character) => character.charCodeAt(0));
+}
+
+async function passwordDigest(password: string, salt: Uint8Array): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", hash: "SHA-256", salt, iterations: PASSWORD_ITERATIONS },
+    key,
+    256,
+  );
+  return bytesToBase64(new Uint8Array(bits));
+}
+
+async function hashPassword(password: string): Promise<string> {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  return `pbkdf2-sha256$${PASSWORD_ITERATIONS}$${bytesToBase64(salt)}$${await passwordDigest(password, salt)}`;
+}
+
+async function verifyPassword(password: string, stored: string | null): Promise<boolean> {
+  if (!stored) return false;
+  const [algorithm, iterations, encodedSalt, expected] = stored.split("$");
+  if (
+    algorithm !== "pbkdf2-sha256" ||
+    Number(iterations) !== PASSWORD_ITERATIONS ||
+    !encodedSalt ||
+    !expected
+  )
+    return false;
+  const actual = await passwordDigest(password, base64ToBytes(encodedSalt));
+  if (actual.length !== expected.length) return false;
+  let difference = 0;
+  for (let index = 0; index < actual.length; index += 1) {
+    difference |= actual.charCodeAt(index) ^ expected.charCodeAt(index);
+  }
+  return difference === 0;
+}
 
 type AccessReason =
   | "AUTHORIZED"
@@ -82,11 +146,7 @@ function normalizedEmail(email: string | null | undefined): string | null {
   return value || null;
 }
 
-function denied(
-  reason: AccessReason,
-  accessMode: string | null,
-  expiresAt: string | null,
-) {
+function denied(reason: AccessReason, accessMode: string | null, expiresAt: string | null) {
   return {
     authorized: false,
     reason,
@@ -166,6 +226,38 @@ export const Route = createFileRoute("/api/secure-playlist")({
           });
         }
 
+        if (parsed.data.action === "set_password" || parsed.data.action === "clear_password") {
+          if (!listener || listener.id !== playlist.creator_id) {
+            return Response.json(
+              { error: "Only the playlist owner can manage its password." },
+              { status: 403 },
+            );
+          }
+
+          const accessPasswordHash =
+            parsed.data.action === "set_password" ? await hashPassword(parsed.data.password) : null;
+          const currentAccessMode = String(playlist.access_mode || "public");
+          const { error: passwordError } = await client
+            .from("playlists")
+            .update({
+              access_password_hash: accessPasswordHash,
+              access_mode:
+                parsed.data.action === "set_password"
+                  ? "password"
+                  : currentAccessMode === "password"
+                    ? "unlisted"
+                    : currentAccessMode,
+            })
+            .eq("id", playlist.id)
+            .eq("creator_id", listener.id);
+
+          if (passwordError) {
+            return Response.json({ error: passwordError.message }, { status: 500 });
+          }
+
+          return Response.json({ result: { success: true } });
+        }
+
         const accessMode = String(playlist.access_mode || "public");
         const expiresAt = (playlist.access_expires_at as string | null) ?? null;
 
@@ -196,7 +288,10 @@ export const Route = createFileRoute("/api/secure-playlist")({
           });
         }
 
-        if (accessMode === "password") {
+        if (
+          accessMode === "password" &&
+          !(await verifyPassword(parsed.data.password ?? "", playlist.access_password_hash))
+        ) {
           await logAccess(client, {
             playlistId: playlist.id,
             listenerUserId: listener?.id,
@@ -320,7 +415,11 @@ export const Route = createFileRoute("/api/secure-playlist")({
               result: denied("PLAY_LIMIT_REACHED", accessMode, expiresAt),
             });
           }
-        } else if (accessMode !== "public" && accessMode !== "unlisted") {
+        } else if (
+          accessMode !== "public" &&
+          accessMode !== "unlisted" &&
+          accessMode !== "password"
+        ) {
           return Response.json({
             result: denied("UNSUPPORTED_ACCESS_MODE", accessMode, expiresAt),
           });
@@ -345,9 +444,7 @@ export const Route = createFileRoute("/api/secure-playlist")({
           return Response.json({ error: itemsError.message }, { status: 500 });
         }
 
-        const rawTracks = (items ?? []).flatMap((item: any) =>
-          item.tracks ? [item.tracks] : [],
-        );
+        const rawTracks = (items ?? []).flatMap((item: any) => (item.tracks ? [item.tracks] : []));
 
         const tracks = await Promise.all(
           rawTracks
