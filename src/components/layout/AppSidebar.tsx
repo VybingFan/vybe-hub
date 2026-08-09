@@ -120,13 +120,13 @@ const memberMore: NavItem[] = [
 
 const creatorStudio: NavItem[] = [
   {
-    title: "Studio Home",
+    title: "Creator Dashboard",
     url: "/dashboard",
     icon: LayoutDashboard,
     allow: ["creator", "admin"],
   },
   {
-    title: "Create",
+    title: "Create & Manage",
     url: "/content",
     icon: LibraryBig,
     allow: ["creator", "admin"],
@@ -141,6 +141,17 @@ const creatorStudio: NavItem[] = [
     title: "Playlists",
     url: "/playlists",
     icon: ListMusic,
+    allow: ["creator", "admin"],
+  },  {
+    title: "Upload Music",
+    url: "/music/upload",
+    icon: Music2,
+    allow: ["creator", "admin"],
+  },
+  {
+    title: "Video Library",
+    url: "/videos",
+    icon: Clapperboard,
     allow: ["creator", "admin"],
   },
 ];
@@ -162,13 +173,13 @@ const creatorAudience: NavItem[] = [
 
 const creatorGrowth: NavItem[] = [
   {
-    title: "Profile & Discovery",
+    title: "Public Profile & Discovery",
     url: "/profile",
     icon: User,
     allow: ["creator", "admin"],
   },
   {
-    title: "Merch",
+    title: "Merchandise",
     url: "/merch",
     icon: ShoppingBag,
     allow: ["creator", "admin"],
@@ -389,16 +400,12 @@ export function AppSidebar() {
           </>
         ) : (
           <>
-            <NavGroup
-              label="Your VYBE"
-              items={visible(memberPrimary)}
-              isActive={isActive}
-            />
-            <NavGroup
-              label="Explore More"
-              items={visible(memberMore)}
-              isActive={isActive}
-            />
+            {!hasAnyRole(["creator"]) ? (
+              <>
+                <NavGroup label="Your VYBE" items={visible(memberPrimary)} isActive={isActive} />
+                <NavGroup label="Explore More" items={visible(memberMore)} isActive={isActive} />
+              </>
+            ) : null}
             {visible(creatorStudio).length ? (
               <NavGroup
                 label="Creator Studio"
@@ -417,6 +424,12 @@ export function AppSidebar() {
               <NavGroup
                 label="Profile & Growth"
                 items={visible(creatorGrowth)}
+                isActive={isActive}
+              />
+            ) : null}            {hasAnyRole(["creator"]) ? (
+              <NavGroup
+                label="Browse VYBE"
+                items={[{ title: "Explore the VYBE app", url: "/home", icon: Compass, allow: ["creator"] }]}
                 isActive={isActive}
               />
             ) : null}

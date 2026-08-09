@@ -168,18 +168,23 @@ export function PublicArtistHome({
         </section>
         <nav
           aria-label={`${name} website sections`}
-          className="sticky top-16 z-30 border-y border-border/50 bg-background/90 backdrop-blur-xl"
+          className="sticky top-16 z-30 border-y border-primary/15 bg-background/92 shadow-[0_12px_30px_rgba(0,0,0,.08)] backdrop-blur-xl"
         >
-          <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-2 sm:px-6">
-            <CreatorSectionLink href="#music">Music</CreatorSectionLink>
-            <CreatorSectionLink href="#about">About</CreatorSectionLink>
-            {!!videos.length && (
-              <CreatorSectionLink href="#videos">Videos</CreatorSectionLink>
-            )}
-            {!!merch.length && (
-              <CreatorSectionLink href="#shop">Shop</CreatorSectionLink>
-            )}
-            <CreatorSectionLink href="#community">Community</CreatorSectionLink>
+          <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[.16em] text-primary">
+              Explore everything {name} is sharing
+            </p>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              <CreatorSectionLink href="#music">Music</CreatorSectionLink>
+              <CreatorSectionLink href="#about">About</CreatorSectionLink>
+              {!!videos.length && (
+                <CreatorSectionLink href="#videos">Videos</CreatorSectionLink>
+              )}
+              {!!merch.length && (
+                <CreatorSectionLink href="#shop">Shop</CreatorSectionLink>
+              )}
+              <CreatorSectionLink href="#community">Community</CreatorSectionLink>
+            </div>
           </div>
         </nav>
         <section
@@ -372,7 +377,7 @@ function CreatorSectionLink({
   return (
     <a
       href={href}
-      className="shrink-0 rounded-full px-4 py-2 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+      className="shrink-0 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:bg-primary/10 hover:text-primary hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
       {children}
     </a>
