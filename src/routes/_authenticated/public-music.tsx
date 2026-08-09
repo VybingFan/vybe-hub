@@ -1,13 +1,22 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ExternalLink, ListMusic, Loader2, Music2, Star } from "lucide-react";
+import {
+  ExternalLink,
+  ListMusic,
+  Loader2,
+  Music2,
+  Search,
+  Star,
+} from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
 import {
   Select,
   SelectContent,
@@ -40,6 +49,8 @@ function PublicMusicSetup() {
   const { data: profile } = useCreatorProfile(creatorId);
   const queryClient = useQueryClient();
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [showIneligible, setShowIneligible] = useState(false);
 
   const refresh = async () => {
     await Promise.all([
@@ -80,6 +91,34 @@ function PublicMusicSetup() {
   const protectedPlaylists = playlists.filter(
     (playlist) => !playlist.is_published || playlist.access_mode !== "public",
   );
+  const topFive = useMemo(
+    () =>
+      tracks
+        .filter((track) => track.profile_feature_rank)
+        .sort(
+          (a, b) =>
+            (a.profile_feature_rank ?? 99) - (b.profile_feature_rank ?? 99),
+        ),
+    [tracks],
+  );
+  const displayTracks = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+
+    return [...tracks]
+      .filter((track) => {
+        const eligible =
+          track.status === "published" && track.visibility === "public";
+        if (!showIneligible && !eligible) return false;
+        if (!needle) return true;
+        return [track.title, track.primary_artist_name, track.genre]
+          .filter(Boolean)
+          .some((value) => value!.toLowerCase().includes(needle));
+      })
+      .sort((a, b) => {
+        const genre = (a.genre || "Other").localeCompare(b.genre || "Other");
+        return genre || a.title.localeCompare(b.title);
+      });
+  }, [query, showIneligible, tracks]);
 
   if (tracksLoading || playlistsLoading) {
     return (
@@ -90,36 +129,39 @@ function PublicMusicSetup() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">
-            Creator website
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold md:text-4xl">
-            Public music setup
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Choose the first songs visitors hear and which public playlists
-            appear on your page. Access settings remain separate and protected
-            links are never listed here.
-          </p>
-        </div>
-        {profile?.username ? (
-          <Button asChild variant="outline">
-            <a
-              href={`/artist/${profile.username}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              View public page <ExternalLink className="ml-2 h-4 w-4" />
-            </a>
-          </Button>
-        ) : null}
-      </header>
+    <div className="mx-auto max-w-5xl space-y-5">
+      <WorkspacePageHeader
+        eyebrow="Creator website"
+        title="Public music setup"
+        description="Choose the first songs visitors hear and which public playlists appear on your page. Protected and unlisted music remains separate."
+        status={
+          <Badge variant="secondary">
+            {
+              tracks.filter(
+                (track) =>
+                  track.status === "published" && track.visibility === "public",
+              ).length
+            }{" "}
+            eligible
+          </Badge>
+        }
+        action={
+          profile?.username ? (
+            <Button asChild variant="outline">
+              <a
+                href={`/artist/${profile.username}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                View public page <ExternalLink className="ml-2 h-4 w-4" />
+              </a>
+            </Button>
+          ) : null
+        }
+      />
 
       <Card>
-        <CardContent className="p-5 sm:p-6">
+        <CardContent className="p-4 sm:p-5">
           <div className="flex items-start gap-3">
             <Star className="mt-1 h-5 w-5 text-primary" />
             <div>
@@ -132,18 +174,47 @@ function PublicMusicSetup() {
             </div>
           </div>
 
-          <div className="mt-5 divide-y rounded-2xl border">
-            {tracks.map((track) => {
+          {topFive.length ? (
+            <div className="mt-4 flex flex-wrap gap-2 rounded-xl bg-muted/40 p-3">
+              {topFive.map((track) => (
+                <Badge key={track.id} variant="secondary">
+                  {track.profile_feature_rank}. {track.title}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto]">
+            <label className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search title, artist, or genre"
+                className="pl-9"
+              />
+            </label>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowIneligible((current) => !current)}
+            >
+              {showIneligible ? "Eligible only" : "Show ineligible"}
+            </Button>
+          </div>
+
+          <div className="mt-3 max-h-[32rem] divide-y overflow-y-auto rounded-xl border">
+            {displayTracks.map((track) => {
               const published =
                 track.status === "published" && track.visibility === "public";
               const busy = busyId === track.id;
               return (
                 <div
                   key={track.id}
-                  className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center"
+                  className="flex flex-col gap-2.5 p-3 sm:flex-row sm:items-center"
                 >
                   <div className="flex min-w-0 flex-1 items-center gap-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
                       {track.cover_url ? (
                         <img
                           src={track.cover_url}
@@ -162,6 +233,12 @@ function PublicMusicSetup() {
                           ? "Public and published"
                           : "Not eligible for public display"}
                       </p>
+                      <Badge
+                        variant="outline"
+                        className="mt-1 h-5 px-1.5 text-[10px]"
+                      >
+                        {track.genre || "Other"}
+                      </Badge>
                     </div>
                   </div>
 
@@ -204,7 +281,7 @@ function PublicMusicSetup() {
                       )
                     }
                   >
-                    <SelectTrigger className="w-full sm:w-40">
+                    <SelectTrigger className="h-9 w-full sm:w-40">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -219,12 +296,17 @@ function PublicMusicSetup() {
                 </div>
               );
             })}
+            {!displayTracks.length ? (
+              <p className="p-5 text-sm text-muted-foreground">
+                No songs match this view.
+              </p>
+            ) : null}
           </div>
         </CardContent>
       </Card>
 
       <Card>
-        <CardContent className="p-5 sm:p-6">
+        <CardContent className="p-4 sm:p-5">
           <div className="flex items-start gap-3">
             <ListMusic className="mt-1 h-5 w-5 text-primary" />
             <div>

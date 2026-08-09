@@ -65,14 +65,22 @@ const empty = (defaultRightsBasis: MusicRightsBasis): AlbumUploadValues => ({
   rights_confirmed: true,
 });
 
-export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Props) {
-  const [values, setValues] = useState<AlbumUploadValues>(() => empty(defaultRightsBasis));
+export function AlbumUploadForm({
+  onSubmit,
+  submitting,
+  defaultRightsBasis,
+}: Props) {
+  const [values, setValues] = useState<AlbumUploadValues>(() =>
+    empty(defaultRightsBasis),
+  );
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [showOptional, setShowOptional] = useState(false);
   const [showRightsCategory, setShowRightsCategory] = useState(false);
 
-  const update = <K extends keyof AlbumUploadValues>(key: K, val: AlbumUploadValues[K]) =>
-    setValues((v) => ({ ...v, [key]: val }));
+  const update = <K extends keyof AlbumUploadValues>(
+    key: K,
+    val: AlbumUploadValues[K],
+  ) => setValues((v) => ({ ...v, [key]: val }));
 
   const handleCover = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -86,7 +94,11 @@ export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
     const drafts: AlbumTrackDraft[] = [];
     for (const f of files) {
       const dur = await readAudioDuration(f);
-      drafts.push({ title: f.name.replace(/\.[^.]+$/, ""), audio: f, duration_sec: dur });
+      drafts.push({
+        title: f.name.replace(/\.[^.]+$/, ""),
+        audio: f,
+        duration_sec: dur,
+      });
     }
     setValues((v) => ({ ...v, tracks: [...v.tracks, ...drafts] }));
     e.target.value = "";
@@ -99,13 +111,18 @@ export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
     }));
 
   const removeTrack = (i: number) =>
-    setValues((v) => ({ ...v, tracks: v.tracks.filter((_, idx) => idx !== i) }));
+    setValues((v) => ({
+      ...v,
+      tracks: v.tracks.filter((_, idx) => idx !== i),
+    }));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!values.title.trim()) return toast.error("Album title is required");
-    if (!values.primary_artist_name.trim()) return toast.error("Primary artist is required");
-    if (values.tracks.length === 0) return toast.error("Add at least one track");
+    if (!values.primary_artist_name.trim())
+      return toast.error("Primary artist is required");
+    if (values.tracks.length === 0)
+      return toast.error("Add at least one track");
     try {
       await onSubmit(values);
       setValues(empty(defaultRightsBasis));
@@ -118,7 +135,7 @@ export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
   };
 
   return (
-    <form onSubmit={submit} className="space-y-6">
+    <form id="upload-album-form" onSubmit={submit} className="space-y-4 pb-20">
       <ProfileCard
         title="Album essentials"
         description="Start with the album title, primary artist, and audio files. Complete other information now or later."
@@ -126,7 +143,10 @@ export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-1.5">
             <Label>Title</Label>
-            <Input value={values.title} onChange={(e) => update("title", e.target.value)} />
+            <Input
+              value={values.title}
+              onChange={(e) => update("title", e.target.value)}
+            />
           </div>
           <div className="space-y-1.5">
             <Label>Primary performing artist</Label>
@@ -160,12 +180,21 @@ export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
             <ImageIcon className="h-5 w-5" /> Cover art
           </div>
           {coverPreview && (
-            <img src={coverPreview} alt="" className="h-24 w-24 rounded-md object-cover" />
+            <img
+              src={coverPreview}
+              alt=""
+              className="h-24 w-24 rounded-md object-cover"
+            />
           )}
           <p className="text-xs text-muted-foreground">
             {values.cover?.name || "JPG, PNG or WebP"}
           </p>
-          <Input type="file" accept={ACCEPTED_IMAGE} onChange={handleCover} className="hidden" />
+          <Input
+            type="file"
+            accept={ACCEPTED_IMAGE}
+            onChange={handleCover}
+            className="hidden"
+          />
           <Button type="button" variant="outline" size="sm" asChild>
             <span>{values.cover ? "Replace" : "Choose file"}</span>
           </Button>
@@ -208,7 +237,10 @@ export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
             </div>
             <div className="space-y-1.5">
               <Label>Genre</Label>
-              <Input value={values.genre} onChange={(e) => update("genre", e.target.value)} />
+              <Input
+                value={values.genre}
+                onChange={(e) => update("genre", e.target.value)}
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Release date</Label>
@@ -233,7 +265,9 @@ export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
             <Label>Rights category for this album</Label>
             <Select
               value={values.rights_basis}
-              onValueChange={(value) => update("rights_basis", value as MusicRightsBasis)}
+              onValueChange={(value) =>
+                update("rights_basis", value as MusicRightsBasis)
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -277,7 +311,9 @@ export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
                 key={i}
                 className="flex items-center gap-3 rounded-md border border-border/50 p-3"
               >
-                <span className="w-6 text-sm tabular-nums text-muted-foreground">{i + 1}.</span>
+                <span className="w-6 text-sm tabular-nums text-muted-foreground">
+                  {i + 1}.
+                </span>
                 <Input
                   value={t.title}
                   onChange={(e) => updateTrack(i, { title: e.target.value })}
@@ -286,7 +322,12 @@ export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
                 <span className="text-xs tabular-nums text-muted-foreground">
                   {formatDuration(t.duration_sec)}
                 </span>
-                <Button type="button" variant="ghost" size="icon" onClick={() => removeTrack(i)}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeTrack(i)}
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </li>
@@ -295,8 +336,11 @@ export function AlbumUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
         )}
       </ProfileCard>
 
-      <div className="flex justify-end">
-        <SubmitButton loading={submitting} className="w-auto px-8">
+      <div className="fixed bottom-20 right-4 z-40 md:bottom-6 md:right-8">
+        <SubmitButton
+          loading={submitting}
+          className="w-auto bg-gradient-brand px-6 text-primary-foreground shadow-elevated"
+        >
           <Upload className="mr-2 h-4 w-4" /> Upload album
         </SubmitButton>
       </div>

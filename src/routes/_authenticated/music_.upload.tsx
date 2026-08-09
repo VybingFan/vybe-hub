@@ -1,11 +1,17 @@
-﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, Loader2, ShieldCheck } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { MusicUploadForm, type SingleUploadValues } from "@/components/musicUpload/MusicUploadForm";
-import { AlbumUploadForm, type AlbumUploadValues } from "@/components/musicUpload/AlbumUploadForm";
+import {
+  MusicUploadForm,
+  type SingleUploadValues,
+} from "@/components/musicUpload/MusicUploadForm";
+import {
+  AlbumUploadForm,
+  type AlbumUploadValues,
+} from "@/components/musicUpload/AlbumUploadForm";
 import { useUser } from "@/hooks/useUser";
 import { useCreateAlbum, useUploadTrack } from "@/hooks/useMusic";
 import { musicService } from "@/services/music/musicService";
@@ -15,6 +21,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MUSIC_RIGHTS_POLICY_VERSION } from "@/constants/legal";
 import { creatorRightsService } from "@/services/rights/creatorRightsService";
 import { CreatorRightsCertificationGate } from "@/components/musicUpload/CreatorRightsCertificationGate";
+import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
 
 export const Route = createFileRoute("/_authenticated/music_/upload")({
   component: () => (
@@ -36,11 +43,15 @@ function UploadPage() {
     queryFn: () => creatorRightsService.getMusicStatus(),
     enabled: !!user?.id,
   });
-  const activeRights = rightsStatus.data?.active === true ? rightsStatus.data : null;
+  const activeRights =
+    rightsStatus.data?.active === true ? rightsStatus.data : null;
 
   const submitSingle = async (values: SingleUploadValues) => {
     if (!values.audio) throw new Error("Audio file required");
-    if (membership && values.duration_sec > membership.limits.track_duration_sec) {
+    if (
+      membership &&
+      values.duration_sec > membership.limits.track_duration_sec
+    ) {
       throw new Error(
         `Songs on your plan must be ${membership.limits.track_duration_sec / 60} minutes or shorter`,
       );
@@ -64,7 +75,8 @@ function UploadPage() {
         rights_basis: values.rights_basis,
         rights_confirmed: true,
         rights_policy_version: MUSIC_RIGHTS_POLICY_VERSION,
-        rights_confirmed_at: activeRights?.certified_at ?? new Date().toISOString(),
+        rights_confirmed_at:
+          activeRights?.certified_at ?? new Date().toISOString(),
         discovery_metadata: values.discovery_metadata,
         visibility: values.visibility,
         playback_mode: values.playback_mode,
@@ -77,25 +89,33 @@ function UploadPage() {
       audio: values.audio,
       cover: values.cover,
     });
-    await queryClient.invalidateQueries({ queryKey: ["creator-music-rights-status", user?.id] });
+    await queryClient.invalidateQueries({
+      queryKey: ["creator-music-rights-status", user?.id],
+    });
     navigate({ to: "/music" });
   };
 
   const submitAlbum = async (values: AlbumUploadValues) => {
     if (!user?.id) throw new Error("Not authenticated");
-    if (activeRights && values.tracks.length > activeRights.uploads_until_renewal) {
+    if (
+      activeRights &&
+      values.tracks.length > activeRights.uploads_until_renewal
+    ) {
       throw new Error(
         `Your current certification covers ${activeRights.uploads_until_renewal} more songs. Renew it before uploading this ${values.tracks.length}-song album.`,
       );
     }
     if (membership) {
-      const remaining = membership.limits.uploaded_tracks - membership.usage.uploaded_tracks;
+      const remaining =
+        membership.limits.uploaded_tracks - membership.usage.uploaded_tracks;
       if (values.tracks.length > remaining)
         throw new Error(
           `Your plan has room for ${remaining} more song${remaining === 1 ? "" : "s"}`,
         );
       if (
-        values.tracks.some((track) => track.duration_sec > membership.limits.track_duration_sec)
+        values.tracks.some(
+          (track) => track.duration_sec > membership.limits.track_duration_sec,
+        )
       ) {
         throw new Error(
           `Every song must be ${membership.limits.track_duration_sec / 60} minutes or shorter`,
@@ -137,7 +157,8 @@ function UploadPage() {
           rights_basis: values.rights_basis,
           rights_confirmed: true,
           rights_policy_version: MUSIC_RIGHTS_POLICY_VERSION,
-          rights_confirmed_at: activeRights?.certified_at ?? new Date().toISOString(),
+          rights_confirmed_at:
+            activeRights?.certified_at ?? new Date().toISOString(),
           visibility: "public",
           playback_mode: "full",
           preview_duration_sec: 30,
@@ -155,38 +176,43 @@ function UploadPage() {
         },
       });
     }
-    await queryClient.invalidateQueries({ queryKey: ["creator-music-rights-status", user?.id] });
+    await queryClient.invalidateQueries({
+      queryKey: ["creator-music-rights-status", user?.id],
+    });
     navigate({ to: "/music" });
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <Button variant="ghost" size="sm" asChild>
+    <div className="mx-auto max-w-5xl space-y-5">
+      <WorkspacePageHeader
+        eyebrow="Music workspace"
+        title="Upload music"
+        description="Add a single or album. Required files and details come first; optional discovery, release, and promotion information can be added now or later."
+        action={
+          <Button variant="outline" size="sm" asChild>
             <Link to="/music">
-              <ChevronLeft className="mr-1 h-4 w-4" /> Back to library
+              <ChevronLeft className="mr-1 h-4 w-4" /> Music library
             </Link>
           </Button>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight md:text-3xl">Upload music</h1>
-          <p className="text-sm text-muted-foreground">Release a single track or a full album.</p>
-        </div>
-      </div>
+        }
+      />
 
       {membership && (
         <Card>
-          <CardContent className="space-y-3 p-5">
+          <CardContent className="space-y-3 p-4">
             <div>
               <p className="font-medium">
                 {membership.plan_code === "founding_beta"
-                  ? "Founding Creator Â· Creator Pro Access"
+                  ? "Founding Creator · Creator Pro Access"
                   : membership.recognition_code === "vybe_pioneer"
-                    ? `${membership.public_name} Â· VYBE Pioneer`
+                    ? `${membership.public_name} · VYBE Pioneer`
                     : membership.public_name}
               </p>
               <p className="text-sm text-muted-foreground">
-                MP3 only Â· up to {membership.limits.track_duration_sec / 60} minutes Â· up to{" "}
-                {Math.round(membership.limits.audio_bytes / 1024 / 1024)}MB per song
+                MP3 only · up to {membership.limits.track_duration_sec / 60}{" "}
+                minutes · up to{" "}
+                {Math.round(membership.limits.audio_bytes / 1024 / 1024)}MB per
+                song
               </p>
             </div>
             <UsageMeter
@@ -201,17 +227,21 @@ function UploadPage() {
       {rightsStatus.isLoading ? (
         <Card>
           <CardContent className="flex items-center gap-3 p-5 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Checking your music upload certificationâ€¦
+            <Loader2 className="h-4 w-4 animate-spin" /> Checking your music
+            upload certification…
           </CardContent>
         </Card>
       ) : activeRights ? (
         <div className="flex items-start gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
           <div>
-            <p className="font-medium">Your music upload certification is active.</p>
+            <p className="font-medium">
+              Your music upload certification is active.
+            </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              You confirm that you own or have permission or licenses for every song you upload.
-              VYBE will ask you to renew after {activeRights.uploads_until_renewal} more{" "}
+              You confirm that you own or have permission or licenses for every
+              song you upload. VYBE will ask you to renew after{" "}
+              {activeRights.uploads_until_renewal} more{" "}
               {activeRights.uploads_until_renewal === 1 ? "song" : "songs"}.
             </p>
           </div>
@@ -230,18 +260,18 @@ function UploadPage() {
 
       {!rightsStatus.isLoading && activeRights && (
         <Tabs defaultValue="single">
-          <TabsList>
+          <TabsList className="grid w-full grid-cols-2 sm:w-72">
             <TabsTrigger value="single">Single</TabsTrigger>
             <TabsTrigger value="album">Album</TabsTrigger>
           </TabsList>
-          <TabsContent value="single" className="mt-6">
+          <TabsContent value="single" className="mt-4">
             <MusicUploadForm
               onSubmit={submitSingle}
               submitting={upload.isPending}
               defaultRightsBasis={activeRights.default_rights_basis}
             />
           </TabsContent>
-          <TabsContent value="album" className="mt-6">
+          <TabsContent value="album" className="mt-4">
             <AlbumUploadForm
               onSubmit={submitAlbum}
               submitting={createAlbum.isPending}
@@ -253,4 +283,3 @@ function UploadPage() {
     </div>
   );
 }
-

@@ -1,4 +1,4 @@
-﻿import { useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import { Upload, Music2, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -92,8 +92,14 @@ const empty = (defaultRightsBasis: MusicRightsBasis): SingleUploadValues => ({
   production_stage: "idea",
 });
 
-export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Props) {
-  const [values, setValues] = useState<SingleUploadValues>(() => empty(defaultRightsBasis));
+export function MusicUploadForm({
+  onSubmit,
+  submitting,
+  defaultRightsBasis,
+}: Props) {
+  const [values, setValues] = useState<SingleUploadValues>(() =>
+    empty(defaultRightsBasis),
+  );
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [optional, setOptional] = useState({
     credits: false,
@@ -103,8 +109,10 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
     rights: false,
   });
 
-  const update = <K extends keyof SingleUploadValues>(key: K, val: SingleUploadValues[K]) =>
-    setValues((v) => ({ ...v, [key]: val }));
+  const update = <K extends keyof SingleUploadValues>(
+    key: K,
+    val: SingleUploadValues[K],
+  ) => setValues((v) => ({ ...v, [key]: val }));
 
   const handleAudio = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -129,7 +137,8 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
     e.preventDefault();
     if (!values.audio) return toast.error("Please select an audio file");
     if (!values.title.trim()) return toast.error("Title is required");
-    if (!values.primary_artist_name.trim()) return toast.error("Primary artist is required");
+    if (!values.primary_artist_name.trim())
+      return toast.error("Primary artist is required");
     try {
       await onSubmit(values);
       setValues(empty(defaultRightsBasis));
@@ -142,7 +151,7 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
   };
 
   return (
-    <form onSubmit={submit} className="space-y-6">
+    <form id="upload-track-form" onSubmit={submit} className="space-y-4 pb-20">
       <ProfileCard
         title="Start with the essentials"
         description="Only the audio file, song title, and primary artist are required. Add everything else now or return later."
@@ -156,8 +165,8 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
             icon={<Music2 className="h-5 w-5" />}
             hint={
               values.audio
-                ? `${formatDuration(values.duration_sec)} Â· ${(values.audio.size / (1024 * 1024)).toFixed(1)} MB`
-                : "MP3 Â· your plan limit is checked before upload"
+                ? `${formatDuration(values.duration_sec)} · ${(values.audio.size / (1024 * 1024)).toFixed(1)} MB`
+                : "MP3 · your plan limit is checked before upload"
             }
           />
           <FilePicker
@@ -167,7 +176,7 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
             onChange={handleCover}
             icon={<ImageIcon className="h-5 w-5" />}
             preview={coverPreview}
-            hint="JPG, PNG or WebP â€” up to 2MB"
+            hint="JPG, PNG or WebP — up to 2MB"
           />
         </div>
       </ProfileCard>
@@ -230,8 +239,15 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
       >
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="Visibility">
-            <Select value={values.visibility} onValueChange={(value) => update("visibility", value as TrackVisibility)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={values.visibility}
+              onValueChange={(value) =>
+                update("visibility", value as TrackVisibility)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="public">Public</SelectItem>
                 <SelectItem value="unlisted">Unlisted link only</SelectItem>
@@ -242,32 +258,71 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
             </Select>
           </Field>
           <Field label="Playback">
-            <Select value={values.playback_mode} onValueChange={(value) => update("playback_mode", value as TrackPlaybackMode)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={values.playback_mode}
+              onValueChange={(value) =>
+                update("playback_mode", value as TrackPlaybackMode)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="full">Full song</SelectItem>
                 <SelectItem value="preview">Preview only</SelectItem>
                 <SelectItem value="none">Visible, no playback</SelectItem>
                 <SelectItem value="membership_only">Membership only</SelectItem>
-                <SelectItem value="approved_listeners">Approved listeners</SelectItem>
+                <SelectItem value="approved_listeners">
+                  Approved listeners
+                </SelectItem>
               </SelectContent>
             </Select>
           </Field>
           {values.playback_mode === "preview" ? (
             <>
               <Field label="Preview length">
-                <Select value={String(values.preview_duration_sec)} onValueChange={(value) => update("preview_duration_sec", Number(value) as 15 | 30 | 45 | 60)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{[15,30,45,60].map((seconds) => <SelectItem key={seconds} value={String(seconds)}>{seconds} seconds</SelectItem>)}</SelectContent>
+                <Select
+                  value={String(values.preview_duration_sec)}
+                  onValueChange={(value) =>
+                    update(
+                      "preview_duration_sec",
+                      Number(value) as 15 | 30 | 45 | 60,
+                    )
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[15, 30, 45, 60].map((seconds) => (
+                      <SelectItem key={seconds} value={String(seconds)}>
+                        {seconds} seconds
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </Field>
               <Field label="Preview starts at (seconds)">
-                <Input type="number" min={0} max={Math.max(0, values.duration_sec - 1)} value={values.preview_start_sec} onChange={(event) => update("preview_start_sec", Math.max(0, Number(event.target.value) || 0))} />
+                <Input
+                  type="number"
+                  min={0}
+                  max={Math.max(0, values.duration_sec - 1)}
+                  value={values.preview_start_sec}
+                  onChange={(event) =>
+                    update(
+                      "preview_start_sec",
+                      Math.max(0, Number(event.target.value) || 0),
+                    )
+                  }
+                />
               </Field>
             </>
           ) : null}
           <label className="flex items-center gap-3 rounded-xl border border-border/70 p-3 text-sm">
-            <Switch checked={values.allow_download} onCheckedChange={(checked) => update("allow_download", checked)} />
+            <Switch
+              checked={values.allow_download}
+              onCheckedChange={(checked) => update("allow_download", checked)}
+            />
             Allow an authorized download button
           </label>
         </div>
@@ -330,7 +385,10 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
                 className="h-4 w-4 accent-primary"
                 checked={optional[key as keyof typeof optional]}
                 onChange={(event) =>
-                  setOptional((current) => ({ ...current, [key]: event.target.checked }))
+                  setOptional((current) => ({
+                    ...current,
+                    [key]: event.target.checked,
+                  }))
                 }
               />
               {label}
@@ -439,7 +497,7 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
                 rows={4}
                 value={values.description}
                 onChange={(e) => update("description", e.target.value)}
-                placeholder="Tell listeners about this songâ€¦"
+                placeholder="Tell listeners about this song…"
               />
             </Field>
             <div className="flex items-center justify-between rounded-md border border-border/50 p-3">
@@ -460,7 +518,9 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
           <Field label="Rights category for this song">
             <Select
               value={values.rights_basis}
-              onValueChange={(value) => update("rights_basis", value as MusicRightsBasis)}
+              onValueChange={(value) =>
+                update("rights_basis", value as MusicRightsBasis)
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -477,8 +537,11 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
         )}
       </ProfileCard>
 
-      <div className="flex justify-end">
-        <SubmitButton loading={submitting} className="w-auto px-8">
+      <div className="fixed bottom-20 right-4 z-40 md:bottom-6 md:right-8">
+        <SubmitButton
+          loading={submitting}
+          className="w-auto bg-gradient-brand px-6 text-primary-foreground shadow-elevated"
+        >
           <Upload className="mr-2 h-4 w-4" /> Upload track
         </SubmitButton>
       </div>
@@ -486,7 +549,13 @@ export function MusicUploadForm({ onSubmit, submitting, defaultRightsBasis }: Pr
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
@@ -518,13 +587,23 @@ function FilePicker({
         {icon}
         {label}
       </div>
-      {preview && <img src={preview} alt="" className="h-24 w-24 rounded-md object-cover" />}
+      {preview && (
+        <img
+          src={preview}
+          alt=""
+          className="h-24 w-24 rounded-md object-cover"
+        />
+      )}
       <p className="text-xs text-muted-foreground">{file ? file.name : hint}</p>
-      <Input type="file" accept={accept} onChange={onChange} className="hidden" />
+      <Input
+        type="file"
+        accept={accept}
+        onChange={onChange}
+        className="hidden"
+      />
       <Button type="button" variant="outline" size="sm" asChild>
         <span>{file ? "Replace file" : "Choose file"}</span>
       </Button>
     </label>
   );
 }
-
