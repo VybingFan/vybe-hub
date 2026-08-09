@@ -9,6 +9,7 @@ import { SupporterProfileForm } from "@/components/supporter/SupporterProfileFor
 import { SupporterProfileView } from "@/components/supporter/SupporterProfileView";
 import { ErrorState } from "@/components/common/ErrorState";
 import { CreatorDiscoveryReadiness } from "@/components/discovery/CreatorDiscoveryReadiness";
+import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
 import { useUser } from "@/hooks/useUser";
 import {
   useCreatorProfile,
@@ -25,7 +26,6 @@ import type { SupporterProfileInput } from "@/features/supporter/schema";
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
 });
-
 function ProfilePage() {
   return (
     <RoleGuard allow={["creator", "supporter", "admin"]}>
@@ -56,7 +56,6 @@ function CreatorProfileContent({
   const { data: tracks = [] } = useCreatorTracks(userId);
   const save = useSaveCreatorProfile(userId);
   const [isEditing, setIsEditing] = useState(false);
-
   if (isLoading) return <Center />;
   if (error)
     return (
@@ -65,14 +64,19 @@ function CreatorProfileContent({
         message={(error as Error).message}
       />
     );
-
   const handleSave = async (values: CreatorProfileInput) => {
     await save.mutateAsync(values);
     setIsEditing(false);
   };
+  const publicUrl = profile?.username ? `/artist/${profile.username}` : null;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="mx-auto max-w-5xl space-y-5">
+      <WorkspacePageHeader
+        eyebrow="Creator workspace"
+        title="Profile & Discovery"
+        description="Manage the private setup behind your public creator page and Discovery eligibility."
+      />
       {isEditing && canEdit ? (
         <ProfileForm
           initial={profile ?? null}
@@ -93,6 +97,7 @@ function CreatorProfileContent({
             email={email}
             isEditing={false}
             onEditToggle={() => canEdit && setIsEditing(true)}
+            publicUrl={publicUrl}
           />
           <ProfileView profile={profile ?? null} />
         </>
@@ -111,7 +116,6 @@ function SupporterProfileContent({
   const { data: profile, isLoading, error } = useSupporterProfile(userId);
   const save = useSaveSupporterProfile(userId);
   const [isEditing, setIsEditing] = useState(false);
-
   if (isLoading) return <Center />;
   if (error)
     return (
@@ -120,26 +124,28 @@ function SupporterProfileContent({
         message={(error as Error).message}
       />
     );
-
   const handleSave = async (values: SupporterProfileInput) => {
     await save.mutateAsync(values);
     setIsEditing(false);
   };
-
   const headerProfile = {
     artist_name: profile?.display_name,
     display_name: profile?.username ? `@${profile.username}` : undefined,
     avatar_url: profile?.avatar_url,
     location: profile?.location,
   };
-
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="mx-auto max-w-5xl space-y-5">
+      <WorkspacePageHeader
+        eyebrow="Supporter account"
+        title="Profile"
+        description="Manage how your supporter identity appears across VYBE."
+      />
       <ProfileHeader
         profile={headerProfile as never}
         email={email}
         isEditing={isEditing}
-        onEditToggle={() => setIsEditing((v) => !v)}
+        onEditToggle={() => setIsEditing((value) => !value)}
       />
       {isEditing ? (
         <SupporterProfileForm

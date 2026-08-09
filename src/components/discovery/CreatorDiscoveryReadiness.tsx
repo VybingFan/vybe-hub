@@ -1,4 +1,5 @@
-import { CheckCircle2, Circle, Compass } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2, ChevronDown, Circle, Compass } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import type { CreatorProfile } from "@/features/profile/schema";
@@ -20,16 +21,17 @@ export function CreatorDiscoveryReadiness({
   const requirements = creatorDiscoveryRequirements(profile, hasPublicMusic);
   const missing = requirements.filter((requirement) => !requirement.complete);
   const ready = missing.length === 0;
+  const [expanded, setExpanded] = useState(!ready);
 
   return (
-    <div
+    <section
       className={
         ready
-          ? "rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5"
-          : "rounded-2xl border border-primary/25 bg-primary/5 p-5"
+          ? "overflow-hidden rounded-2xl border border-emerald-500/30 bg-emerald-500/10"
+          : "overflow-hidden rounded-2xl border border-primary/25 bg-primary/5"
       }
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3 p-4">
         <Compass
           className={
             ready
@@ -45,10 +47,26 @@ export function CreatorDiscoveryReadiness({
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {ready
-              ? "Your creator profile has the required information and public music for Discovery."
-              : "Incomplete creator pages are kept out of public Discovery until the required items below are ready."}
+              ? "Your required profile information and public music are ready."
+              : `${missing.length} required ${missing.length === 1 ? "item remains" : "items remain"} before your creator page can appear in Discovery.`}
           </p>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        </div>
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={() => setExpanded((value) => !value)}
+          aria-expanded={expanded}
+        >
+          {expanded ? "Hide" : "Details"}
+          <ChevronDown
+            className={`ml-1 h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`}
+          />
+        </Button>
+      </div>
+      {expanded ? (
+        <div className="border-t border-border/60 px-4 pb-4 pt-3">
+          <div className="grid gap-2 sm:grid-cols-2">
             {requirements.map((requirement) => (
               <div
                 key={requirement.key}
@@ -82,7 +100,7 @@ export function CreatorDiscoveryReadiness({
             </Button>
           </div>
         </div>
-      </div>
-    </div>
+      ) : null}
+    </section>
   );
 }
