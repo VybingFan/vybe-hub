@@ -330,7 +330,7 @@ export function PublicArtistHome({
                               target="_blank"
                               rel="noreferrer noopener"
                             >
-                              View
+                              {purchaseActionLabel(product.purchase_url)}
                             </a>
                           </Button>
                         )}
@@ -351,6 +351,17 @@ export function PublicArtistHome({
   );
 }
 
+function purchaseActionLabel(url: string) {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    if (host.includes("stripe.com")) return "Buy with Stripe";
+    if (host.includes("square")) return "Buy with Square";
+    if (host.includes("paypal.com") || host.includes("paypal.me")) return "Buy with PayPal";
+    if (host.includes("etsy.com")) return "View on Etsy";
+    if (host.includes("shopify.com") || host.includes("myshopify.com")) return "Visit store";
+  } catch { /* URL input validation handles malformed values. */ }
+  return "View product";
+}
 function CreatorSectionLink({
   href,
   children,

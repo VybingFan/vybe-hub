@@ -1,11 +1,12 @@
 import { FormEvent, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ImagePlus, Loader2, ShoppingBag, Trash2 } from "lucide-react";
+import { ImagePlus, Loader2, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MerchProductEditor } from "@/components/merch/MerchProductEditor";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -15,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useUser } from "@/hooks/useUser";
-import { useCreateMerch, useDeleteMerch, useMerch } from "@/hooks/useMerch";
+import { useCreateMerch, useMerch } from "@/hooks/useMerch";
 import { MERCH_AVAILABILITY, MERCH_CATEGORIES } from "@/features/merch/schema";
 
 export const Route = createFileRoute("/_authenticated/merch")({
@@ -30,7 +31,6 @@ function MerchStudio() {
   const { user } = useUser();
   const { data: products = [] } = useMerch(user?.id);
   const create = useCreateMerch(user?.id);
-  const remove = useDeleteMerch(user?.id);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -159,10 +159,11 @@ function MerchStudio() {
                         ? "Ask artist"
                         : `$${(product.price_cents / 100).toFixed(2)}`}
                     </span>
-                    <Button size="icon" variant="ghost" onClick={() => remove.mutate(product.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <span className="text-xs text-muted-foreground">
+                      {product.is_active ? "Visible" : "Archived"}
+                    </span>
                   </div>
+                  {user?.id && <MerchProductEditor creatorId={user.id} product={product} />}
                 </div>
               </article>
             ))}
