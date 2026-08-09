@@ -114,7 +114,7 @@ export function PublicArtistHome({
       </div>
       <main>
         <section className="relative">
-          <div className="h-44 overflow-hidden sm:h-56 md:h-80">
+          <div className="h-36 overflow-hidden sm:h-44 md:h-56">
             <img
               src={profile.cover_url || "/banners/default-creator-banner.png"}
               alt=""
@@ -122,17 +122,17 @@ export function PublicArtistHome({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
           </div>
-          <div className="relative mx-auto -mt-16 max-w-7xl px-5 pb-8 sm:-mt-20 sm:px-6 md:-mt-24 md:pb-10">
-            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-end">
+          <div className="relative mx-auto max-w-7xl px-5 py-5 sm:px-6 md:py-6">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <img
                   src={profile.avatar_url || "/avatars/default-avatar.png"}
                   alt={name}
-                  className="h-24 w-24 rounded-2xl border-4 border-background object-cover shadow-elevated sm:h-32 sm:w-32 sm:rounded-3xl"
+                  className="h-20 w-20 rounded-2xl border border-border object-cover shadow-elevated sm:h-24 sm:w-24"
                 />
                 <div>
                   <p className="text-sm text-primary">@{profile.username}</p>
-                  <h1 className="mt-1 break-words text-3xl font-bold sm:text-4xl md:text-6xl">
+                  <h1 className="mt-1 break-words text-3xl font-bold sm:text-4xl">
                     {name}
                   </h1>
                   <CreatorPlanBadge userId={profile.user_id} />

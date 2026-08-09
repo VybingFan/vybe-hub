@@ -69,9 +69,27 @@ const categoryDescriptions: Record<TrackWorkspaceCategory, string> = {
   upcoming: "Music being prepared for a future release.",
   work_in_progress: "Ideas, drafts, recordings, mixes, and unfinished songs.",
   collaboration: "Songs that need artists, writers, producers, or musicians.",
-  rights_pending: "Music waiting for a license, agreement, clearance, or purchase.",
-  commercial_preview: "Released music promoted through a limited public preview.",
+  rights_pending:
+    "Music waiting for a license, agreement, clearance, or purchase.",
+  commercial_preview:
+    "Released music promoted through a limited public preview.",
   archived: "Music kept for your records but removed from active work.",
+};
+
+const visibilityLabels: Record<string, string> = {
+  public: "Public",
+  unlisted: "Unlisted",
+  private: "Private",
+  scheduled: "Scheduled",
+  archived: "Archived",
+};
+
+const playbackLabels: Record<string, string> = {
+  full: "Full song",
+  preview: "Preview",
+  none: "No playback",
+  membership_only: "Members",
+  approved_listeners: "Approved listeners",
 };
 
 export const Route = createFileRoute("/_authenticated/music")({
@@ -95,7 +113,9 @@ function MusicLibrary() {
   const [stage, setStage] = useState<"all" | TrackProductionStage>("all");
   const [limit, setLimit] = useState(20);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [bulkCategory, setBulkCategory] = useState<TrackWorkspaceCategory | "">("");
+  const [bulkCategory, setBulkCategory] = useState<TrackWorkspaceCategory | "">(
+    "",
+  );
   const [bulkStage, setBulkStage] = useState<TrackProductionStage | "">("");
 
   useEffect(() => {
@@ -129,8 +149,7 @@ function MusicLibrary() {
 
     if (view !== "overview" && view !== "all") {
       value = value.filter(
-        (track) =>
-          (track.workspace_category ?? "work_in_progress") === view,
+        (track) => (track.workspace_category ?? "work_in_progress") === view,
       );
     }
 
@@ -150,9 +169,7 @@ function MusicLibrary() {
       );
     }
 
-    return [...value].sort((a, b) =>
-      b.updated_at > a.updated_at ? 1 : -1,
-    );
+    return [...value].sort((a, b) => (b.updated_at > a.updated_at ? 1 : -1));
   }, [query, stage, tracks, view]);
 
   const visibleTracks = filtered.slice(0, limit);
@@ -222,7 +239,9 @@ function MusicLibrary() {
       setBulkCategory("");
       setBulkStage("");
     } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "Bulk update failed.");
+      toast.error(
+        cause instanceof Error ? cause.message : "Bulk update failed.",
+      );
     }
   };
 
@@ -277,7 +296,7 @@ function MusicLibrary() {
         }
       >
         {view === "overview" ? (
-          <div className="space-y-8">
+          <div className="space-y-5">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <CategoryCard
                 label="All music"
@@ -380,7 +399,12 @@ function MusicLibrary() {
                     : categoryDescriptions[view]}
                 </p>
               </div>
-              <Badge variant="secondary">{filtered.length} songs</Badge>
+              <div className="text-right">
+                <Badge variant="secondary">{filtered.length} songs</Badge>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Category and stage changes save immediately.
+                </p>
+              </div>
             </div>
 
             <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_13rem]">
@@ -529,9 +553,7 @@ function MusicLibrary() {
                     onCategory={(category) =>
                       void updateCategory(track, category)
                     }
-                    onStage={(nextStage) =>
-                      void updateStage(track, nextStage)
-                    }
+                    onStage={(nextStage) => void updateStage(track, nextStage)}
                   />
                 ))}
               </div>
@@ -571,16 +593,14 @@ function CategoryCard({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-2xl border border-border bg-card p-5 text-left transition hover:border-primary/50"
+      className="rounded-xl border border-border bg-card p-3 text-left transition hover:border-primary/50"
     >
-      <div className="flex items-start justify-between">
-        <Icon className="h-5 w-5 text-primary" />
-        <span className="text-2xl font-semibold">{count}</span>
+      <div className="flex items-center gap-2">
+        <Icon className="h-4 w-4 shrink-0 text-primary" />
+        <p className="min-w-0 flex-1 truncate text-sm font-semibold">{label}</p>
+        <span className="text-lg font-semibold">{count}</span>
       </div>
-      <p className="mt-4 font-semibold">{label}</p>
-      <p className="mt-2 text-xs leading-5 text-muted-foreground">
-        {description}
-      </p>
+      <p className="sr-only">{description}</p>
     </button>
   );
 }
@@ -606,10 +626,13 @@ function TrackRow({
 }) {
   const category = track.workspace_category ?? "work_in_progress";
   const stage = track.production_stage ?? "idea";
+  const visibility = track.visibility ?? "public";
+  const publishingStatus = track.status ?? "draft";
+  const playbackMode = track.playback_mode ?? "full";
 
   return (
     <Card className={selected ? "border-primary/50 bg-primary/5" : undefined}>
-      <CardContent className="p-3 sm:p-4">
+      <CardContent className="p-2.5 sm:p-3">
         <div className="flex items-center gap-3">
           {selectable && (
             <input
@@ -624,7 +647,7 @@ function TrackRow({
           <img
             src={track.cover_url || "/banners/default-creator-banner.png"}
             alt=""
-            className="h-14 w-14 shrink-0 rounded-xl object-cover"
+            className="h-11 w-11 shrink-0 rounded-lg object-cover"
           />
 
           <button
@@ -637,6 +660,26 @@ function TrackRow({
               {track.primary_artist_name || "Independent artist"} ·{" "}
               {formatDuration(track.duration_sec)}
             </p>
+            <span className="mt-1.5 flex flex-wrap gap-1">
+              <Badge
+                variant={visibility === "public" ? "default" : "outline"}
+                className="h-5 px-1.5 text-[10px] font-medium"
+              >
+                {visibilityLabels[visibility] ?? visibility}
+              </Badge>
+              <Badge
+                variant="secondary"
+                className="h-5 px-1.5 text-[10px] font-medium"
+              >
+                {publishingStatus === "published" ? "Published" : "Draft"}
+              </Badge>
+              <Badge
+                variant="outline"
+                className="h-5 px-1.5 text-[10px] font-medium"
+              >
+                {playbackLabels[playbackMode] ?? playbackMode}
+              </Badge>
+            </span>
           </button>
 
           <div className="hidden min-w-48 sm:block">
@@ -664,9 +707,7 @@ function TrackRow({
             <Select
               value={stage}
               disabled={busy}
-              onValueChange={(value) =>
-                onStage(value as TrackProductionStage)
-              }
+              onValueChange={(value) => onStage(value as TrackProductionStage)}
             >
               <SelectTrigger className="h-9">
                 <SelectValue />
@@ -686,7 +727,7 @@ function TrackRow({
           </Button>
         </div>
 
-        <div className="mt-3 grid gap-2 sm:hidden">
+        <div className="mt-2 grid grid-cols-2 gap-2 sm:hidden">
           <Select
             value={category}
             disabled={busy}
@@ -709,9 +750,7 @@ function TrackRow({
           <Select
             value={stage}
             disabled={busy}
-            onValueChange={(value) =>
-              onStage(value as TrackProductionStage)
-            }
+            onValueChange={(value) => onStage(value as TrackProductionStage)}
           >
             <SelectTrigger>
               <SelectValue />

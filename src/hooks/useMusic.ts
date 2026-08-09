@@ -37,7 +37,16 @@ export function useUpdateTrack(userId: string | undefined) {
   return useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: Partial<TrackInput> }) =>
       musicService.updateTrack(id, patch),
-    onSuccess: () => qc.invalidateQueries({ queryKey: creatorTracksKey(userId) }),
+    onSuccess: (updated) => {
+      qc.setQueryData(
+        creatorTracksKey(userId),
+        (current: Array<typeof updated> | undefined) =>
+          current?.map((track) => (track.id === updated.id ? updated : track)),
+      );
+      qc.invalidateQueries({ queryKey: creatorTracksKey(userId) });
+      qc.invalidateQueries({ queryKey: ["public-creator"] });
+      qc.invalidateQueries({ queryKey: ["public-music"] });
+    },
   });
 }
 
