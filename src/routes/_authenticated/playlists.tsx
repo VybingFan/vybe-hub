@@ -1,4 +1,4 @@
-﻿import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Check,
@@ -58,6 +58,7 @@ import {
 } from "@/features/playlists/schema";
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 import { Badge } from "@/components/ui/badge";
+import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
 import {
   TRACK_PRODUCTION_STAGE_LABELS,
   TRACK_WORKSPACE_CATEGORY_LABELS,
@@ -277,25 +278,19 @@ function PlaylistStudio() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">
-            Creator Studio
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">
-            Playlist Workspace
-          </h1>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
-            Build public releases, private reviews, pitches, and listening
-            experiences from the songs in your Music Workspace.
-          </p>
-        </div>
-        <Button size="lg" onClick={() => setShowCreate((value) => !value)}>
-          <Plus className="mr-2 h-4 w-4" />{" "}
-          {showCreate ? "Close builder" : "New playlist"}
-        </Button>
-      </header>
+    <div className="mx-auto max-w-6xl space-y-5">
+      <WorkspacePageHeader
+        eyebrow="Creator Studio"
+        title="Playlist Workspace"
+        description="Build public releases, private reviews, pitches, and listening experiences from songs already in your Music Library. Playlist access does not change a song's own visibility."
+        status={<Badge variant="secondary">{playlists.length} total</Badge>}
+        action={
+          <Button onClick={() => setShowCreate((value) => !value)}>
+            <Plus className="mr-2 h-4 w-4" />{" "}
+            {showCreate ? "Close builder" : "New playlist"}
+          </Button>
+        }
+      />
       {createdSlug && (
         <div className="flex flex-col gap-4 rounded-2xl border border-primary/30 bg-primary/10 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -311,16 +306,16 @@ function PlaylistStudio() {
           </Button>
         </div>
       )}
-      <div className="space-y-10">
+      <div className="space-y-6">
         {showCreate ? (
           <form
             onSubmit={submit}
-            className="rounded-3xl border border-primary/20 bg-card p-5 shadow-xl shadow-primary/5 md:p-8"
+            className="rounded-2xl border border-primary/20 bg-card p-4 pb-20 shadow-lg shadow-primary/5 md:p-5"
           >
-            <h2 className="flex items-center gap-2 text-2xl font-semibold">
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
               <Plus className="text-primary" /> Create a playlist
             </h2>
-            <div className="mt-7 grid gap-5">
+            <div className="mt-4 grid gap-4">
               <div>
                 <Label htmlFor="title">Playlist title</Label>
                 <Input
@@ -651,7 +646,7 @@ function PlaylistStudio() {
                   create.isPending || replaceCover.isPending || !selected.length
                 }
                 size="lg"
-                className="bg-gradient-brand text-white"
+                className="fixed bottom-20 right-4 z-40 bg-gradient-brand text-white shadow-elevated md:bottom-6 md:right-8"
               >
                 {create.isPending || replaceCover.isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -728,7 +723,7 @@ function PlaylistStudio() {
               ))}
             </div>
           ) : null}
-          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {visiblePlaylists.length ? (
               visiblePlaylists.map((playlist) => (
                 <article
@@ -768,13 +763,21 @@ function PlaylistStudio() {
                   </div>
                   <div className="min-w-0 flex-1 p-3 sm:p-4">
                     <p className="truncate font-semibold">{playlist.title}</p>
-                    <p className="mt-1 truncate text-[11px] font-medium text-primary">
-                      {
-                        PLAYLIST_WORKSPACE_CATEGORY_LABELS[
-                          playlist.workspace_category ?? "released"
-                        ]
-                      }
-                    </p>
+                    <div className="mt-1 flex min-w-0 items-center gap-1.5">
+                      <p className="truncate text-[11px] font-medium text-primary">
+                        {
+                          PLAYLIST_WORKSPACE_CATEGORY_LABELS[
+                            playlist.workspace_category ?? "released"
+                          ]
+                        }
+                      </p>
+                      <Badge
+                        variant="secondary"
+                        className="h-5 px-1.5 text-[10px]"
+                      >
+                        {playlist.is_published ? "Published" : "Draft"}
+                      </Badge>
+                    </div>
                     <p className="mt-1 truncate text-xs text-muted-foreground">
                       {(playlist.trackIds ?? []).length}{" "}
                       {(playlist.trackIds ?? []).length === 1
