@@ -24,7 +24,9 @@ const requestSchema = z.discriminatedUnion("action", [
   }),
 ]);
 
-const PASSWORD_ITERATIONS = 210_000;
+// Cloudflare Workers currently rejects PBKDF2 iteration counts above 100,000.
+// Keep this value aligned with the production runtime so hashes work everywhere.
+const PASSWORD_ITERATIONS = 100_000;
 
 function bytesToBase64(bytes: Uint8Array): string {
   let binary = "";
@@ -234,8 +236,22 @@ export const Route = createFileRoute("/api/secure-playlist")({
             );
           }
 
-          const accessPasswordHash =
-            parsed.data.action === "set_password" ? await hashPassword(parsed.data.password) : null;
+          let accessPasswordHash: string | null = null;
+
+          if (parsed.data.action === "set_password") {
+            try {
+              accessPasswordHash = await hashPassword(parsed.data.password);
+            } catch (error) {
+              console.error("Playlist password hashing failed", error);
+              return Response.json(
+                {
+                  error:
+                    "The playlist password could not be secured. Please try again.",
+                },
+                { status: 500 },
+              );
+            }
+          }
           const currentAccessMode = String(playlist.access_mode || "public");
           const { error: passwordError } = await client
             .from("playlists")
