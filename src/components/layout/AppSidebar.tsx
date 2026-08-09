@@ -1,33 +1,32 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
+  Activity,
   BarChart3,
-  Home,
-  Compass,
-  User,
-  Settings,
-  ShieldCheck,
-  Music2,
-  ListMusic,
-  ShoppingBag,
   BellRing,
-  BriefcaseBusiness,
-  ContactRound,
   BookOpenText,
+  BriefcaseBusiness,
   CalendarDays,
   Clapperboard,
+  ClipboardList,
+  Compass,
+  ContactRound,
+  CreditCard,
+  ExternalLink,
+  FolderKanban,
   Gamepad2,
+  Gift,
   Heart,
+  Home,
   LayoutDashboard,
   LibraryBig,
+  ListMusic,
+  Music2,
+  Settings,
+  ShieldCheck,
+  ShoppingBag,
+  User,
   UsersRound,
-  Upload,
-  ClipboardList,
-  ExternalLink,
-  CreditCard,
-  Gift,
-  Activity,
-  FolderKanban,
   Workflow,
 } from "lucide-react";
 import {
@@ -45,7 +44,10 @@ import { Logo } from "@/components/common/Logo";
 import { useUser } from "@/hooks/useUser";
 import type { AppRole } from "@/features/auth/roles";
 import { adminNotificationService } from "@/services/admin/adminNotificationService";
-import { adminTeamService, type AdminAccess } from "@/services/admin/adminTeamService";
+import {
+  adminTeamService,
+  type AdminAccess,
+} from "@/services/admin/adminTeamService";
 
 interface NavItem {
   title: string;
@@ -56,8 +58,13 @@ interface NavItem {
   permissionAnyOf?: string[];
 }
 
-const exploreItems: NavItem[] = [
-  { title: "Home", url: "/home", icon: Home, allow: ["supporter", "creator", "business", "admin"] },
+const memberPrimary: NavItem[] = [
+  {
+    title: "Home",
+    url: "/home",
+    icon: Home,
+    allow: ["supporter", "creator", "business", "admin"],
+  },
   {
     title: "Discover",
     url: "/discover",
@@ -70,6 +77,15 @@ const exploreItems: NavItem[] = [
     icon: Music2,
     allow: ["supporter", "creator", "business", "admin"],
   },
+  {
+    title: "My VYBE",
+    url: "/my-vybe",
+    icon: Heart,
+    allow: ["supporter", "creator", "business", "admin"],
+  },
+];
+
+const memberMore: NavItem[] = [
   {
     title: "Watch",
     url: "/watch",
@@ -100,59 +116,104 @@ const exploreItems: NavItem[] = [
     icon: CalendarDays,
     allow: ["supporter", "creator", "business", "admin"],
   },
-  {
-    title: "My VYBE",
-    url: "/my-vybe",
-    icon: Heart,
-    allow: ["supporter", "creator", "business", "admin"],
-  },
 ];
 
-const creatorItems: NavItem[] = [
+const creatorStudio: NavItem[] = [
   {
-    title: "Studio Dashboard",
+    title: "Studio Home",
     url: "/dashboard",
     icon: LayoutDashboard,
     allow: ["creator", "admin"],
   },
-  { title: "Content", url: "/content", icon: LibraryBig, allow: ["creator", "admin"] },
-  { title: "Music Library", url: "/music", icon: Music2, allow: ["creator", "admin"] },
-  { title: "Upload Music", url: "/music/upload", icon: Upload, allow: ["creator", "admin"] },
-  { title: "Video Library", url: "/videos", icon: Clapperboard, allow: ["creator", "admin"] },
-  { title: "Playlists", url: "/playlists", icon: ListMusic, allow: ["creator", "admin"] },
-  { title: "Activity", url: "/activity", icon: BellRing, allow: ["creator", "admin"] },
-  { title: "Connections", url: "/connections", icon: ContactRound, allow: ["creator", "admin"] },
-  { title: "Merch", url: "/merch", icon: ShoppingBag, allow: ["creator", "admin"] },
-  { title: "Public Profile", url: "/profile", icon: User, allow: ["creator", "admin"] },
+  {
+    title: "Create",
+    url: "/content",
+    icon: LibraryBig,
+    allow: ["creator", "admin"],
+  },
+  {
+    title: "Music Library",
+    url: "/music",
+    icon: Music2,
+    allow: ["creator", "admin"],
+  },
+  {
+    title: "Playlists",
+    url: "/playlists",
+    icon: ListMusic,
+    allow: ["creator", "admin"],
+  },
+];
+
+const creatorAudience: NavItem[] = [
+  {
+    title: "Activity",
+    url: "/activity",
+    icon: BellRing,
+    allow: ["creator", "admin"],
+  },
+  {
+    title: "Connections",
+    url: "/connections",
+    icon: ContactRound,
+    allow: ["creator", "admin"],
+  },
+];
+
+const creatorGrowth: NavItem[] = [
+  {
+    title: "Profile & Discovery",
+    url: "/profile",
+    icon: User,
+    allow: ["creator", "admin"],
+  },
+  {
+    title: "Merch",
+    url: "/merch",
+    icon: ShoppingBag,
+    allow: ["creator", "admin"],
+  },
   {
     title: "Industry Kit & EPK",
     url: "/epk",
     icon: BriefcaseBusiness,
     allow: ["creator", "admin"],
   },
-  { title: "Creator Settings", url: "/settings", icon: Settings, allow: ["creator", "admin"] },
+  {
+    title: "Creator Settings",
+    url: "/settings",
+    icon: Settings,
+    allow: ["creator", "admin"],
+  },
 ];
 
 export function AppSidebar() {
-  const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
   const { hasAnyRole } = useUser();
   const isAdmin = hasAnyRole(["admin"]);
   const [pendingWork, setPendingWork] = useState(0);
   const [adminAccess, setAdminAccess] = useState<AdminAccess | null>(null);
-  const isActive = (url: string) => pathname === url || pathname.startsWith(url + "/");
-  const visibleExplore = exploreItems.filter((item) => hasAnyRole(item.allow));
-  const visibleCreator = creatorItems.filter((item) => hasAnyRole(item.allow));
+  const isActive = (url: string) =>
+    pathname === url || pathname.startsWith(url + "/");
+  const visible = (items: NavItem[]) =>
+    items.filter((item) => hasAnyRole(item.allow));
 
   useEffect(() => {
     if (!isAdmin) {
       setAdminAccess(null);
       return;
     }
-    void adminTeamService.getMyAccess().then(setAdminAccess).catch(() => setAdminAccess(null));
+    void adminTeamService
+      .getMyAccess()
+      .then(setAdminAccess)
+      .catch(() => setAdminAccess(null));
   }, [isAdmin, pathname]);
 
   useEffect(() => {
-    if (!isAdmin || !adminAccess?.permissions.includes("admin.work_queue.read")) return;
+    if (!isAdmin || !adminAccess?.permissions.includes("admin.work_queue.read"))
+      return;
     void adminNotificationService
       .summary()
       .then((summary) => setPendingWork(summary.unread))
@@ -166,14 +227,14 @@ export function AppSidebar() {
           <Logo />
         </Link>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="pb-5">
         {isAdmin ? (
           <>
             <NavGroup
-              label="Back Office"
+              label="Operations"
               items={[
                 {
-                  title: "Operations Overview",
+                  title: "Overview",
                   url: "/admin",
                   icon: LayoutDashboard,
                   allow: ["admin"],
@@ -187,12 +248,33 @@ export function AppSidebar() {
                   permissionAnyOf: ["admin.work_queue.read"],
                 },
                 {
-                  title: "Members & Accounts",
+                  title: "Accounts",
                   url: "/admin/accounts",
                   icon: ContactRound,
                   allow: ["admin"],
                   permissionAnyOf: ["admin.accounts.read"],
                 },
+                {
+                  title: "Creators",
+                  url: "/admin/creators",
+                  icon: UsersRound,
+                  allow: ["admin"],
+                  permissionAnyOf: ["admin.creator.read"],
+                },
+                {
+                  title: "Rights & Content",
+                  url: "/admin/rights",
+                  icon: ShieldCheck,
+                  allow: ["admin"],
+                  permissionAnyOf: ["admin.rights.read", "admin.content.read"],
+                },
+              ]}
+              isActive={isActive}
+              adminPermissions={adminAccess?.permissions ?? []}
+            />
+            <NavGroup
+              label="Business"
+              items={[
                 {
                   title: "Business Operations",
                   url: "/admin/businesses",
@@ -215,20 +297,12 @@ export function AppSidebar() {
                   permissionAnyOf: ["admin.business.read"],
                 },
                 {
-                  title: "Creator Operations",
-                  url: "/admin/creators",
-                  icon: UsersRound,
+                  title: "Offers",
+                  url: "/admin/offers",
+                  icon: Gift,
                   allow: ["admin"],
-                  permissionAnyOf: ["admin.creator.read"],
+                  permissionAnyOf: ["admin.business.read"],
                 },
-                {
-                  title: "Rights & Moderation",
-                  url: "/admin/rights",
-                  icon: ShieldCheck,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.rights.read", "admin.content.read"],
-                },
-                { title: "Play Operations", url: "/admin/play", icon: Gamepad2, allow: ["admin"], permissionAnyOf: ["admin.content.read"] },
               ]}
               isActive={isActive}
               adminPermissions={adminAccess?.permissions ?? []}
@@ -237,25 +311,28 @@ export function AppSidebar() {
               label="Management"
               items={[
                 {
-                  title: "Memberships & Packages",
+                  title: "Memberships",
                   url: "/admin/memberships",
                   icon: CreditCard,
                   allow: ["admin"],
-                  permissionAnyOf: ["admin.finance.read", "admin.creator.membership"],
+                  permissionAnyOf: [
+                    "admin.finance.read",
+                    "admin.creator.membership",
+                  ],
                 },
                 {
-                  title: "Offers & Promotions",
-                  url: "/admin/offers",
-                  icon: Gift,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.business.read"],
-                },
-                {
-                  title: "Analytics & Reports",
+                  title: "Reports",
                   url: "/admin/reports",
                   icon: BarChart3,
                   allow: ["admin"],
                   permissionAnyOf: ["admin.analytics.read"],
+                },
+                {
+                  title: "Play Operations",
+                  url: "/admin/play",
+                  icon: Gamepad2,
+                  allow: ["admin"],
+                  permissionAnyOf: ["admin.content.read"],
                 },
                 {
                   title: "System Health",
@@ -264,8 +341,20 @@ export function AppSidebar() {
                   allow: ["admin"],
                   permissionAnyOf: ["admin.system.read"],
                 },
-                { title: "Administrator Team", url: "/admin/team", icon: UsersRound, allow: ["admin"], permissionAnyOf: ["admin.team.manage"] },
-                { title: "System Settings", url: "/settings", icon: Settings, allow: ["admin"], permissionAnyOf: ["admin.team.manage"] },
+                {
+                  title: "Admin Team",
+                  url: "/admin/team",
+                  icon: UsersRound,
+                  allow: ["admin"],
+                  permissionAnyOf: ["admin.team.manage"],
+                },
+                {
+                  title: "System Settings",
+                  url: "/settings",
+                  icon: Settings,
+                  allow: ["admin"],
+                  permissionAnyOf: ["admin.team.manage"],
+                },
               ]}
               isActive={isActive}
               adminPermissions={adminAccess?.permissions ?? []}
@@ -273,8 +362,19 @@ export function AppSidebar() {
             <NavGroup
               label="View VYBE"
               items={[
-                { title: "Explore VYBE", url: "/home", icon: ExternalLink, allow: ["admin"] },
-                { title: "Creator Studio", url: "/dashboard", icon: Music2, allow: ["admin"], permissionAnyOf: ["admin.creator.manage"] },
+                {
+                  title: "Member Experience",
+                  url: "/home",
+                  icon: ExternalLink,
+                  allow: ["admin"],
+                },
+                {
+                  title: "Creator Studio",
+                  url: "/dashboard",
+                  icon: Music2,
+                  allow: ["admin"],
+                  permissionAnyOf: ["admin.creator.manage"],
+                },
                 {
                   title: "Business Studio",
                   url: "/business",
@@ -288,34 +388,73 @@ export function AppSidebar() {
             />
           </>
         ) : (
-          <NavGroup label="Explore VYBE" items={visibleExplore} isActive={isActive} />
-        )}
-        {!isAdmin && visibleCreator.length > 0 && (
-          <NavGroup label="Creator Studio" items={visibleCreator} isActive={isActive} />
-        )}
-        {!isAdmin && hasAnyRole(["business"]) && (
-          <NavGroup
-            label="Business Studio"
-            items={[
-              {
-                title: "Business Dashboard",
-                url: "/business",
-                icon: BriefcaseBusiness,
-                allow: ["business", "admin"],
-              },
-            ]}
-            isActive={isActive}
-          />
-        )}
-        {hasAnyRole(["supporter"]) && !hasAnyRole(["creator", "admin"]) && (
-          <NavGroup
-            label="Account"
-            items={[
-              { title: "Profile", url: "/profile", icon: User, allow: ["supporter"] },
-              { title: "Settings", url: "/settings", icon: Settings, allow: ["supporter"] },
-            ]}
-            isActive={isActive}
-          />
+          <>
+            <NavGroup
+              label="Your VYBE"
+              items={visible(memberPrimary)}
+              isActive={isActive}
+            />
+            <NavGroup
+              label="Explore More"
+              items={visible(memberMore)}
+              isActive={isActive}
+            />
+            {visible(creatorStudio).length ? (
+              <NavGroup
+                label="Creator Studio"
+                items={visible(creatorStudio)}
+                isActive={isActive}
+              />
+            ) : null}
+            {visible(creatorAudience).length ? (
+              <NavGroup
+                label="Audience"
+                items={visible(creatorAudience)}
+                isActive={isActive}
+              />
+            ) : null}
+            {visible(creatorGrowth).length ? (
+              <NavGroup
+                label="Profile & Growth"
+                items={visible(creatorGrowth)}
+                isActive={isActive}
+              />
+            ) : null}
+            {hasAnyRole(["business"]) ? (
+              <NavGroup
+                label="Business Studio"
+                items={[
+                  {
+                    title: "Business Overview",
+                    url: "/business",
+                    icon: BriefcaseBusiness,
+                    allow: ["business", "admin"],
+                  },
+                ]}
+                isActive={isActive}
+              />
+            ) : null}
+            {hasAnyRole(["supporter"]) && !hasAnyRole(["creator", "admin"]) ? (
+              <NavGroup
+                label="Account"
+                items={[
+                  {
+                    title: "Profile",
+                    url: "/profile",
+                    icon: User,
+                    allow: ["supporter"],
+                  },
+                  {
+                    title: "Settings",
+                    url: "/settings",
+                    icon: Settings,
+                    allow: ["supporter"],
+                  },
+                ]}
+                isActive={isActive}
+              />
+            ) : null}
+          </>
         )}
       </SidebarContent>
     </Sidebar>
@@ -336,17 +475,23 @@ function NavGroup({
   const visibleItems = items.filter(
     (item) =>
       !item.permissionAnyOf ||
-      item.permissionAnyOf.some((permission) => adminPermissions?.includes(permission)),
+      item.permissionAnyOf.some((permission) =>
+        adminPermissions?.includes(permission),
+      ),
   );
   if (!visibleItems.length) return null;
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>{label}</SidebarGroupLabel>
+    <SidebarGroup className="py-1">
+      <SidebarGroupLabel className="h-7">{label}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {visibleItems.map((item) => (
             <SidebarMenuItem key={item.url}>
-              <SidebarMenuButton asChild isActive={isActive(item.url)}>
+              <SidebarMenuButton
+                asChild
+                isActive={isActive(item.url)}
+                tooltip={item.title}
+              >
                 <Link to={item.url} className="flex items-center gap-2">
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
