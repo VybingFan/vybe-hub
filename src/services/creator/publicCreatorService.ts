@@ -115,6 +115,15 @@ export const publicCreatorService = {
           null,
       })),
     );
+    const hydratedVideos = await Promise.all(
+      ((videos ?? []) as unknown as CreatorVideo[]).map(async (video) => ({
+        ...video,
+        thumbnail_url:
+          (await signedUrl("music-covers", video.thumbnail_path)) ||
+          video.thumbnail_url ||
+          null,
+      })),
+    );
     const playlists = await Promise.all(
       (
         (playlistRows ?? []) as unknown as (PublicCreatorPlaylist & {
@@ -166,7 +175,7 @@ export const publicCreatorService = {
       tracks,
       playlists,
       merch: hydratedMerch,
-      videos: (videos ?? []) as CreatorVideo[],
+      videos: hydratedVideos,
     };
   },
 };

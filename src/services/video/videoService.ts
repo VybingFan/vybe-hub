@@ -1,153 +1,17 @@
 import { supabase } from "@/integrations/supabase/client";
-import type {
-  CreateVideoInput,
-  CreatorVideo,
-  VideoProvider,
-  VideoType,
-} from "@/features/video/schema";
-
-function parseHostedVideo(source: string): {
-  provider: VideoProvider;
-  providerVideoId: string;
-} {
-  const url = new URL(source.trim());
-  const host = url.hostname.replace(/^www\./, "").toLowerCase();
-
-  if (host === "youtu.be") {
-    const id = url.pathname.split("/").filter(Boolean)[0];
-    if (id) return { provider: "youtube", providerVideoId: id };
-  }
-  if (host === "youtube.com" || host === "m.youtube.com") {
-    const id =
-      url.searchParams.get("v") || url.pathname.match(/^\/(?:shorts|embed)\/([^/?]+)/)?.[1];
-    if (id) return { provider: "youtube", providerVideoId: id };
-  }
-  if (host === "vimeo.com" || host === "player.vimeo.com") {
-    const id = url.pathname
-      .split("/")
-      .filter(Boolean)
-      .find((part) => /^\d+$/.test(part));
-    if (id) return { provider: "vimeo", providerVideoId: id };
-  }
-
-  throw new Error("Use a valid YouTube or Vimeo video link.");
-}
-
-export function videoEmbedUrl(video: CreatorVideo) {
-  if (video.provider === "youtube") {
-    return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(video.provider_video_id)}`;
-  }
-  if (video.provider === "vimeo") {
-    return `https://player.vimeo.com/video/${encodeURIComponent(video.provider_video_id)}`;
-  }
-  return `https://customer-${import.meta.env.VITE_CLOUDFLARE_STREAM_CUSTOMER_CODE || "not-configured"}.cloudflarestream.com/${encodeURIComponent(video.provider_video_id)}/iframe`;
-}
-
-export const videoService = {
-  async listMine(creatorId: string): Promise<CreatorVideo[]> {
-    const { data, error } = await supabase
-      .from("creator_videos")
-      .select("*")
-      .eq("creator_id", creatorId)
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    return (data ?? []) as CreatorVideo[];
-  },
-
-  async listPublished(creatorId?: string): Promise<CreatorVideo[]> {
-    let query = supabase
-      .from("creator_videos")
-      .select("*")
-      .eq("status", "published")
-      .eq("visibility", "public")
-      .order("is_featured", { ascending: false })
-      .order("created_at", { ascending: false });
-    if (creatorId) query = query.eq("creator_id", creatorId);
-    const { data, error } = await query;
-    if (error) throw error;
-    return (data ?? []) as CreatorVideo[];
-  },
-
-  async getPublic(id: string): Promise<CreatorVideo | null> {
-    const { data, error } = await supabase
-      .from("creator_videos")
-      .select("*")
-      .eq("id", id)
-      .eq("status", "published")
-      .in("visibility", ["public", "unlisted"])
-      .maybeSingle();
-    if (error) throw error;
-    return data as CreatorVideo | null;
-  },
-
-  async create(creatorId: string, input: CreateVideoInput): Promise<CreatorVideo> {
-    if (!input.rightsConfirmed)
-      throw new Error("Confirm that you have rights to share this video.");
-    const { provider, providerVideoId } = parseHostedVideo(input.sourceUrl);
-    const { data, error } = await supabase
-      .from("creator_videos")
-      .insert({
-        creator_id: creatorId,
-        title: input.title.trim(),
-        description: input.description.trim(),
-        video_type: input.videoType,
-        provider,
-        provider_video_id: providerVideoId,
-        source_url: input.sourceUrl.trim(),
-        thumbnail_url: input.thumbnailUrl?.trim() || null,
-        status: input.publishNow ? "published" : "draft",
-        visibility: "public",
-        rights_confirmed: true,
-      })
-      .select("*")
-      .single();
-    if (error) throw error;
-    return data as CreatorVideo;
-  },
-
-  async createNative(
-    creatorId: string,
-    input: {
-      title: string;
-      description: string;
-      videoType: VideoType;
-      streamUid: string;
-      rightsConfirmed: boolean;
-    },
-  ): Promise<CreatorVideo> {
-    if (!input.rightsConfirmed)
-      throw new Error("Confirm that you have rights to share this video.");
-    const { data, error } = await supabase
-      .from("creator_videos")
-      .insert({
-        creator_id: creatorId,
-        title: input.title.trim(),
-        description: input.description.trim(),
-        video_type: input.videoType,
-        provider: "cloudflare_stream",
-        provider_video_id: input.streamUid,
-        source_url: null,
-        thumbnail_url: null,
-        status: "draft",
-        visibility: "public",
-        rights_confirmed: true,
-      })
-      .select("*")
-      .single();
-    if (error) throw error;
-    return data as CreatorVideo;
-  },
-
-  async setPublished(id: string, published: boolean) {
-    const { error } = await supabase
-      .from("creator_videos")
-      .update({ status: published ? "published" : "draft" })
-      .eq("id", id);
-    if (error) throw error;
-  },
-
-  async remove(id: string) {
-    const { error } = await supabase.from("creator_videos").delete().eq("id", id);
-    if (error) throw error;
-  },
+import type { CreateVideoInput,CreatorVideo,VideoProvider,VideoType,VideoVisibility } from "@/features/video/schema";
+const BUCKET="music-covers"; const MAX_THUMBNAIL_BYTES=2*1024*1024;
+function parseHostedVideo(source:string):{provider:VideoProvider;providerVideoId:string}{const url=new URL(source.trim());const host=url.hostname.replace(/^www\./,"").toLowerCase();if(host==="youtu.be"){const id=url.pathname.split("/").filter(Boolean)[0];if(id)return{provider:"youtube",providerVideoId:id};}if(host==="youtube.com"||host==="m.youtube.com"){const id=url.searchParams.get("v")||url.pathname.match(/^\/(?:shorts|embed)\/([^/?]+)/)?.[1];if(id)return{provider:"youtube",providerVideoId:id};}if(host==="vimeo.com"||host==="player.vimeo.com"){const id=url.pathname.split("/").filter(Boolean).find((part)=>/^\d+$/.test(part));if(id)return{provider:"vimeo",providerVideoId:id};}throw new Error("Use a valid YouTube or Vimeo video link.");}
+function automaticThumbnail(provider:VideoProvider,id:string){return provider==="youtube"?`https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`:null;}
+async function hydrate(video:CreatorVideo){if(!video.thumbnail_path)return video;const{data}=await supabase.storage.from(BUCKET).createSignedUrl(video.thumbnail_path,60*60*6);return{...video,thumbnail_url:data?.signedUrl||video.thumbnail_url};}
+async function uploadThumbnail(creatorId:string,file:File){if(file.size>MAX_THUMBNAIL_BYTES)throw new Error("Thumbnail must be 2MB or smaller");if(!["image/jpeg","image/png","image/webp"].includes(file.type))throw new Error("Choose a JPG, PNG, or WebP thumbnail");const safe=file.name.replace(/[^a-zA-Z0-9._-]+/g,"_");const path=`${creatorId}/video-thumbnails/${Date.now()}-${safe}`;const{error}=await supabase.storage.from(BUCKET).upload(path,file,{contentType:file.type,cacheControl:"3600"});if(error)throw error;return path;}
+export function videoEmbedUrl(video:CreatorVideo){if(video.provider==="youtube")return`https://www.youtube-nocookie.com/embed/${encodeURIComponent(video.provider_video_id)}`;if(video.provider==="vimeo")return`https://player.vimeo.com/video/${encodeURIComponent(video.provider_video_id)}`;return`https://customer-${import.meta.env.VITE_CLOUDFLARE_STREAM_CUSTOMER_CODE||"not-configured"}.cloudflarestream.com/${encodeURIComponent(video.provider_video_id)}/iframe`;}
+export const videoService={
+ async listMine(creatorId:string){const{data,error}=await supabase.from("creator_videos").select("*").eq("creator_id",creatorId).order("created_at",{ascending:false});if(error)throw error;return Promise.all(((data??[]) as unknown as CreatorVideo[]).map(hydrate));},
+ async listPublished(creatorId?:string){let q=supabase.from("creator_videos").select("*").eq("status","published").eq("visibility","public").order("is_featured",{ascending:false}).order("created_at",{ascending:false});if(creatorId)q=q.eq("creator_id",creatorId);const{data,error}=await q;if(error)throw error;return Promise.all(((data??[]) as unknown as CreatorVideo[]).map(hydrate));},
+ async getPublic(id:string){const{data,error}=await supabase.from("creator_videos").select("*").eq("id",id).eq("status","published").in("visibility",["public","unlisted"]).maybeSingle();if(error)throw error;return data?hydrate(data as unknown as CreatorVideo):null;},
+ async create(creatorId:string,input:CreateVideoInput){if(!input.rightsConfirmed)throw new Error("Confirm that you have rights to share this video.");const parsed=parseHostedVideo(input.sourceUrl);const{data,error}=await supabase.from("creator_videos").insert({creator_id:creatorId,title:input.title.trim(),description:input.description.trim(),video_type:input.videoType,provider:parsed.provider,provider_video_id:parsed.providerVideoId,source_url:input.sourceUrl.trim(),thumbnail_url:input.thumbnailUrl?.trim()||automaticThumbnail(parsed.provider,parsed.providerVideoId),status:input.publishNow?"published":"draft",visibility:"public",rights_confirmed:true}).select("*").single();if(error)throw error;return data as unknown as CreatorVideo;},
+ async createNative(creatorId:string,input:{title:string;description:string;videoType:VideoType;streamUid:string;rightsConfirmed:boolean}){if(!input.rightsConfirmed)throw new Error("Confirm that you have rights to share this video.");const{data,error}=await supabase.from("creator_videos").insert({creator_id:creatorId,title:input.title.trim(),description:input.description.trim(),video_type:input.videoType,provider:"cloudflare_stream",provider_video_id:input.streamUid,source_url:null,thumbnail_url:null,status:"draft",visibility:"public",rights_confirmed:true}).select("*").single();if(error)throw error;return data as unknown as CreatorVideo;},
+ async update(id:string,creatorId:string,input:{title:string;description:string;videoType:VideoType;sourceUrl:string|null;thumbnailUrl:string|null;visibility:VideoVisibility;status:"draft"|"published"},thumbnail?:File|null){const{data:current,error:readError}=await supabase.from("creator_videos").select("*").eq("id",id).eq("creator_id",creatorId).single();if(readError)throw readError;let provider=current.provider as VideoProvider;let providerId=current.provider_video_id;let source=current.source_url;if(input.sourceUrl&&provider!=="cloudflare_stream"){const parsed=parseHostedVideo(input.sourceUrl);provider=parsed.provider;providerId=parsed.providerVideoId;source=input.sourceUrl.trim();}const nextPath=thumbnail?await uploadThumbnail(creatorId,thumbnail):(current as any).thumbnail_path||null;const fallback=input.thumbnailUrl?.trim()||automaticThumbnail(provider,providerId);const payload:any={title:input.title.trim(),description:input.description.trim(),video_type:input.videoType,provider,provider_video_id:providerId,source_url:source,thumbnail_url:fallback,thumbnail_path:nextPath,visibility:input.visibility,status:input.status};const{data,error}=await supabase.from("creator_videos").update(payload).eq("id",id).eq("creator_id",creatorId).select("*").single();if(error){if(thumbnail&&nextPath)await supabase.storage.from(BUCKET).remove([nextPath]);throw error;}if(thumbnail&&(current as any).thumbnail_path&&(current as any).thumbnail_path!==nextPath)await supabase.storage.from(BUCKET).remove([(current as any).thumbnail_path]);return hydrate(data as unknown as CreatorVideo);},
+ async setPublished(id:string,published:boolean){const{error}=await supabase.from("creator_videos").update({status:published?"published":"draft"}).eq("id",id);if(error)throw error;},async remove(id:string){const{error}=await supabase.from("creator_videos").delete().eq("id",id);if(error)throw error;}
 };

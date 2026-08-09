@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { VideoEditor } from "@/components/video/VideoEditor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -279,6 +280,7 @@ function VideoStudio() {
                       </Link>
                     </Button>
                   )}
+                  {user?.id && <VideoEditor creatorId={user.id} video={video} />}
                 </div>
               </article>
             ))}
