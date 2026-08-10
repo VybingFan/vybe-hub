@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@/hooks/useUser";
 import { EpkTierNotice } from "@/components/membership/EpkTierNotice";
+import { supabase } from "@/integrations/supabase/client";
 import {
   creatorEpkService,
   type CreatorEpkWorkspace,
@@ -56,6 +57,7 @@ function CreatorEpkWorkspacePage() {
   const [data, setData] = useState(emptyWorkspace);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("overview");
+  const [epkLevel, setEpkLevel] = useState<"starter" | "lite" | "full">("starter");
 
   const load = useCallback(async () => {
     if (!creatorId) return;
@@ -70,6 +72,21 @@ function CreatorEpkWorkspacePage() {
   }, [creatorId]);
 
   useEffect(() => void load(), [load]);
+
+  useEffect(() => {
+    void supabase.rpc("get_my_epk_tier").then(({ data }) => {
+      if (!data || typeof data !== "object") return;
+      if ("full_epk" in data && data.full_epk) setEpkLevel("full");
+      else if ("lite_epk" in data && data.lite_epk) setEpkLevel("lite");
+      else setEpkLevel("starter");
+    });
+  }, []);
+
+  const visibleTabs: Tab[] = epkLevel === "full"
+    ? ["overview", "professional", "media", "music", "press"]
+    : epkLevel === "lite"
+      ? ["overview", "professional", "media", "music"]
+      : ["overview", "professional"];
 
   const readiness = useMemo(() => calculateReadiness(data), [data]);
 
@@ -96,16 +113,16 @@ function CreatorEpkWorkspacePage() {
       <div className="flex flex-wrap gap-2">
         {([
           ["overview", "Overview"], ["professional", "Bio & contacts"], ["media", "Media & brand"], ["music", "Music & credits"], ["press", "Press & milestones"],
-        ] as [Tab, string][]).map(([value, label]) => (
+        ] as [Tab, string][]).filter(([value]) => visibleTabs.includes(value)).map(([value, label]) => (
           <Button key={value} type="button" variant={tab === value ? "default" : "outline"} onClick={() => setTab(value)}>{label}</Button>
         ))}
       </div>
 
       {tab === "overview" && <Overview data={data} readiness={readiness} onOpen={setTab} />}
       {tab === "professional" && creatorId && <ProfessionalForm creatorId={creatorId} data={data} onSaved={load} />}
-      {tab === "media" && creatorId && <MediaWorkspace creatorId={creatorId} data={data} onChanged={load} />}
-      {tab === "music" && creatorId && <MusicWorkspace creatorId={creatorId} data={data} onChanged={load} />}
-      {tab === "press" && creatorId && <PressWorkspace creatorId={creatorId} data={data} onChanged={load} />}
+      {epkLevel !== "starter" && tab === "media" && creatorId && <MediaWorkspace creatorId={creatorId} data={data} onChanged={load} />}
+      {epkLevel !== "starter" && tab === "music" && creatorId && <MusicWorkspace creatorId={creatorId} data={data} onChanged={load} />}
+      {epkLevel === "full" && tab === "press" && creatorId && <PressWorkspace creatorId={creatorId} data={data} onChanged={load} />}
     </div>
   );
 }
