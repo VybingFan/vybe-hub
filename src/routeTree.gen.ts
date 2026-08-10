@@ -72,6 +72,7 @@ import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCreatorSupportRouteImport } from './routes/_authenticated/creator-support'
 import { Route as AuthenticatedCreatorAnalyticsRouteImport } from './routes/_authenticated/creator-analytics'
+import { Route as AuthenticatedContentContinuityRouteImport } from './routes/_authenticated/content-continuity'
 import { Route as AuthenticatedContentRouteImport } from './routes/_authenticated/content'
 import { Route as AuthenticatedConnectionsRouteImport } from './routes/_authenticated/connections'
 import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
@@ -422,6 +423,12 @@ const AuthenticatedCreatorAnalyticsRoute =
     path: '/creator-analytics',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedContentContinuityRoute =
+  AuthenticatedContentContinuityRouteImport.update({
+    id: '/content-continuity',
+    path: '/content-continuity',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedContentRoute = AuthenticatedContentRouteImport.update({
   id: '/content',
   path: '/content',
@@ -623,6 +630,7 @@ export interface FileRoutesByFullPath {
   '/communities': typeof AuthenticatedCommunitiesRoute
   '/connections': typeof AuthenticatedConnectionsRoute
   '/content': typeof AuthenticatedContentRoute
+  '/content-continuity': typeof AuthenticatedContentContinuityRoute
   '/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
   '/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -718,6 +726,7 @@ export interface FileRoutesByTo {
   '/communities': typeof AuthenticatedCommunitiesRoute
   '/connections': typeof AuthenticatedConnectionsRoute
   '/content': typeof AuthenticatedContentRoute
+  '/content-continuity': typeof AuthenticatedContentContinuityRoute
   '/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
   '/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -815,6 +824,7 @@ export interface FileRoutesById {
   '/_authenticated/communities': typeof AuthenticatedCommunitiesRoute
   '/_authenticated/connections': typeof AuthenticatedConnectionsRoute
   '/_authenticated/content': typeof AuthenticatedContentRoute
+  '/_authenticated/content-continuity': typeof AuthenticatedContentContinuityRoute
   '/_authenticated/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
   '/_authenticated/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -912,6 +922,7 @@ export interface FileRouteTypes {
     | '/communities'
     | '/connections'
     | '/content'
+    | '/content-continuity'
     | '/creator-analytics'
     | '/creator-support'
     | '/dashboard'
@@ -1007,6 +1018,7 @@ export interface FileRouteTypes {
     | '/communities'
     | '/connections'
     | '/content'
+    | '/content-continuity'
     | '/creator-analytics'
     | '/creator-support'
     | '/dashboard'
@@ -1103,6 +1115,7 @@ export interface FileRouteTypes {
     | '/_authenticated/communities'
     | '/_authenticated/connections'
     | '/_authenticated/content'
+    | '/_authenticated/content-continuity'
     | '/_authenticated/creator-analytics'
     | '/_authenticated/creator-support'
     | '/_authenticated/dashboard'
@@ -1662,6 +1675,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCreatorAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/content-continuity': {
+      id: '/_authenticated/content-continuity'
+      path: '/content-continuity'
+      fullPath: '/content-continuity'
+      preLoaderRoute: typeof AuthenticatedContentContinuityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/content': {
       id: '/_authenticated/content'
       path: '/content'
@@ -1889,6 +1909,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCommunitiesRoute: typeof AuthenticatedCommunitiesRoute
   AuthenticatedConnectionsRoute: typeof AuthenticatedConnectionsRoute
   AuthenticatedContentRoute: typeof AuthenticatedContentRoute
+  AuthenticatedContentContinuityRoute: typeof AuthenticatedContentContinuityRoute
   AuthenticatedCreatorAnalyticsRoute: typeof AuthenticatedCreatorAnalyticsRoute
   AuthenticatedCreatorSupportRoute: typeof AuthenticatedCreatorSupportRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -1939,6 +1960,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCommunitiesRoute: AuthenticatedCommunitiesRoute,
   AuthenticatedConnectionsRoute: AuthenticatedConnectionsRoute,
   AuthenticatedContentRoute: AuthenticatedContentRoute,
+  AuthenticatedContentContinuityRoute: AuthenticatedContentContinuityRoute,
   AuthenticatedCreatorAnalyticsRoute: AuthenticatedCreatorAnalyticsRoute,
   AuthenticatedCreatorSupportRoute: AuthenticatedCreatorSupportRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,

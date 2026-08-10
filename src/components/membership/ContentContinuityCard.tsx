@@ -19,8 +19,8 @@ export function ContentContinuityCard() {
               : "Choose the strongest work to keep public before your adjustment period ends. Everything else remains safely stored in your workspace."}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Button asChild size="sm"><Link to="/music">Organize music</Link></Button>
-            <Button asChild size="sm" variant="outline"><Link to="/playlists">Organize playlists</Link></Button>
+            <Button asChild size="sm"><Link to="/content-continuity">Choose public content</Link></Button>
+
             <Button asChild size="sm" variant="outline"><Link to="/creator-memberships">Compare plans</Link></Button>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">Public visitors never see membership locks, limits, or adjustment notices.</p>
