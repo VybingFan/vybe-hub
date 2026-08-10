@@ -9,7 +9,7 @@ import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader"
 import { WorkspaceSection } from "@/components/workspace/WorkspaceSection";
 import { useUser } from "@/hooks/useUser";
 import { useCreatorTracks } from "@/hooks/useMusic";
-import { usePlaylists } from "@/hooks/usePlaylists";
+import { useMyPlaylists } from "@/hooks/usePlaylists";
 import { useMembershipAdjustment } from "@/hooks/useMembershipAdjustment";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -20,7 +20,7 @@ function Content(){
  const {user}=useUser();
  const {data:adjustment,isLoading}=useMembershipAdjustment();
  const {data:tracks=[]}=useCreatorTracks(user?.id);
- const {data:playlists=[]}=usePlaylists(user?.id);
+ const {data:playlists=[]}=useMyPlaylists(user?.id);
  const [choices,setChoices]=useState<Choice[]>([]); const [saving,setSaving]=useState("");
  useEffect(()=>{if(!user||!adjustment)return; void supabase.from("creator_content_continuity_choices" as any).select("entity_type,entity_id,keep_public").eq("user_id",user.id).eq("adjustment_id",adjustment.id).then(({data})=>setChoices((data??[]) as unknown as Choice[]));},[user,adjustment]);
  const map=useMemo(()=>new Map(choices.map(x=>[`${x.entity_type}:${x.entity_id}`,x.keep_public])),[choices]);
