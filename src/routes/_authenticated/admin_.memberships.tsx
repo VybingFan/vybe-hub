@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CREATOR_PLAN_CATALOG } from "@/features/membership/catalog";
 import { AdminTierDetails } from "@/components/membership/AdminTierDetails";
+import { AdminContinuityPanel } from "@/components/membership/AdminContinuityPanel";
 import {
   adminService,
   type AdminMembershipRecord,
@@ -76,6 +77,7 @@ function MembershipOperations() {
         <h2 className="text-xl font-semibold">Creator membership entitlements</h2>
         <AdminTierDetails />
       </section>
+      <AdminContinuityPanel />
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Business packages</h2>
         <div className="grid gap-4 md:grid-cols-3">
