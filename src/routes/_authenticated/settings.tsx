@@ -29,6 +29,7 @@ import { useMembership } from "@/hooks/useMembership";
 import { UsageMeter } from "@/components/membership/UsageMeter";
 import { supabase } from "@/integrations/supabase/client";
 import { SelfServiceDeletionCard } from "@/components/accountDeletion/SelfServiceDeletionCard";
+import { MembershipAdjustmentNotice } from "@/components/membership/MembershipAdjustmentNotice";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
@@ -258,6 +259,7 @@ function SettingsContent() {
             action={<Crown className="h-5 w-5 text-primary" />}
           >
             <div className="space-y-5 p-4 sm:p-5">
+              <MembershipAdjustmentNotice />
               <div className="flex flex-wrap gap-2">
                 {membership?.billing.customer_ref ? (
                   <Button

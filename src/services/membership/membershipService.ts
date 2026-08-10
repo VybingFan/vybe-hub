@@ -64,7 +64,25 @@ export interface CreatorMembership {
   };
 }
 
+export interface MembershipAdjustment {
+  id: string;
+  previous_plan_code: CreatorPlanCode;
+  target_plan_code: CreatorPlanCode;
+  reason: "membership_downgrade" | "membership_ended";
+  status: "active" | "restored" | "expired";
+  started_at: string;
+  ends_at: string;
+  restored_at: string | null;
+  days_remaining: number;
+  automatic_deletion: false;
+}
+
 export const membershipService = {
+  async getAdjustment(): Promise<MembershipAdjustment | null> {
+    const { data, error } = await (supabase.rpc as any)("get_my_membership_adjustment");
+    if (error) throw error;
+    return data && data !== null ? (data as MembershipAdjustment) : null;
+  },
   async getMine(): Promise<CreatorMembership> {
     const { data, error } = await supabase.rpc("get_my_creator_membership");
     if (error) throw error;
