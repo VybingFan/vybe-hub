@@ -73,28 +73,8 @@ function MembershipOperations() {
         <Metric label="Paid-plan records" value={paid} />
       </div>
       <section className="space-y-3">
-        <h2 className="text-xl font-semibold">Creator memberships</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          {CREATOR_PLAN_CATALOG.map((plan) => (
-            <Card key={plan.code}>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between gap-2">
-                  <CardTitle>{plan.name}</CardTitle>
-                  <Badge variant={plan.launchState === "available" ? "default" : "outline"}>
-                    {plan.launchState === "available" ? "Available" : "Parts under construction"}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <p className="text-lg font-semibold">
-                  ${plan.monthlyPrice}/month · ${plan.annualPrice}/year
-                </p>
-                <p className="text-muted-foreground">{plan.audience}</p>
-                <p>{plan.analytics}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <h2 className="text-xl font-semibold">Creator membership entitlements</h2>
+        <AdminTierDetails />
       </section>
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Business packages</h2>

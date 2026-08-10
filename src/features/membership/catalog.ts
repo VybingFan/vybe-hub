@@ -1,164 +1,25 @@
-export type PublicCreatorPlanCode =
-  "creator_free" | "creator_plus" | "creator_pro" | "creator_studio";
-
+export type PublicCreatorPlanCode = "creator_free" | "creator_plus" | "creator_pro" | "creator_studio";
 export type CreatorPlanCode = PublicCreatorPlanCode | "founding_beta";
 export type FeatureAvailability = "available" | "coming_soon" | "requires_upgrade";
+export type PublicPresence = "creator_profile" | "creator_showcase" | "creator_website" | "studio_website";
 
 export interface CreatorPlanCatalogEntry {
-  code: PublicCreatorPlanCode;
-  name: string;
-  audience: string;
-  monthlyPrice: number;
-  annualPrice: number;
-  pioneerMonthlyPrice?: number;
-  pioneerAnnualPrice?: number;
-  badge?: string;
-  limits: {
-    librarySongs: number;
-    publishedSongs: number;
-    playlists: number;
-    merchItems: number;
-    writtenPosts: number;
-    videoMinutes: number;
-    aiActions: number;
-    teamMembers: number;
-  };
-  analytics: string;
-  highlights: string[];
-  launchState: "available" | "planned";
+  code: PublicCreatorPlanCode; name: string; audience: string; monthlyPrice: number; annualPrice: number;
+  pioneerMonthlyPrice?: number; pioneerAnnualPrice?: number; badge?: string; publicPresence: PublicPresence;
+  limits: { librarySongs:number; publishedSongs:number; playlists:number; merchItems:number; writtenPosts:number; videoMinutes:number; aiActions:number; teamMembers:number; analyticsDays:number|null; activeUnlistedPlaylists:number; activePasswordPlaylists:number; passwordExpiryDays:number; publicLinks:number; featuredPublicItems:number };
+  analytics: string; highlights: string[]; launchState: "available" | "planned";
 }
 
+const limits = (librarySongs:number,publishedSongs:number,playlists:number,merchItems:number,writtenPosts:number,videoMinutes:number,aiActions:number,teamMembers:number,analyticsDays:number|null,activeUnlistedPlaylists:number,activePasswordPlaylists:number,passwordExpiryDays:number,publicLinks:number,featuredPublicItems:number) => ({librarySongs,publishedSongs,playlists,merchItems,writtenPosts,videoMinutes,aiActions,teamMembers,analyticsDays,activeUnlistedPlaylists,activePasswordPlaylists,passwordExpiryDays,publicLinks,featuredPublicItems});
+
 export const CREATOR_PLAN_CATALOG: CreatorPlanCatalogEntry[] = [
-  {
-    code: "creator_free",
-    name: "Creator Free",
-    audience: "Start a real creator home and share your work.",
-    monthlyPrice: 0,
-    annualPrice: 0,
-    limits: {
-      librarySongs: 15,
-      publishedSongs: 10,
-      playlists: 8,
-      merchItems: 2,
-      writtenPosts: 10,
-      videoMinutes: 0,
-      aiActions: 5,
-      teamMembers: 1,
-    },
-    analytics: "30-day basic totals",
-    highlights: [
-      "Public creator page and VYBE username",
-      "Private EPK starter with bio, booking email, press photo, and two tracks",
-      "Music library, editors, and shareable playlists",
-      "No credit card and no expiration",
-      "One hosted YouTube or Vimeo video showcase",
-    ],
-    launchState: "available",
-  },
-  {
-    code: "creator_plus",
-    name: "Creator Plus",
-    audience: "Grow an audience with more releases and creator tools.",
-    monthlyPrice: 12,
-    annualPrice: 120,
-    pioneerMonthlyPrice: 9,
-    pioneerAnnualPrice: 84,
-    badge: "Recommended",
-    limits: {
-      librarySongs: 75,
-      publishedSongs: 50,
-      playlists: 30,
-      merchItems: 10,
-      writtenPosts: 50,
-      videoMinutes: 30,
-      aiActions: 30,
-      teamMembers: 1,
-    },
-    analytics: "90-day creator analytics",
-    highlights: [
-      "Playlist-listen and profile-activity notifications",
-      "Release scheduling and creator stories",
-      "Creator Plus badge and priority email support",
-      "Complete Industry Kit with bios, contacts, brand files, credits, WAV masters, and press milestones",
-      "Ten hosted videos; native storage and AI activate when connected",
-    ],
-    launchState: "available",
-  },
-  {
-    code: "creator_pro",
-    name: "Creator Pro",
-    audience: "Run multimedia releases, campaigns, and direct fan growth.",
-    monthlyPrice: 24,
-    annualPrice: 240,
-    pioneerMonthlyPrice: 19,
-    pioneerAnnualPrice: 180,
-    limits: {
-      librarySongs: 250,
-      publishedSongs: 200,
-      playlists: 100,
-      merchItems: 50,
-      writtenPosts: 250,
-      videoMinutes: 180,
-      aiActions: 100,
-      teamMembers: 1,
-    },
-    analytics: "One year plus exports",
-    highlights: [
-      "Up to 50 hosted music videos, films, interviews, and episodes",
-      "Custom creator domain and advanced profile design",
-      "Campaign, presave, premiere, and audience tools",
-      "Selling tools planned after commerce is connected",
-    ],
-    launchState: "planned",
-  },
-  {
-    code: "creator_studio",
-    name: "Creator Studio",
-    audience: "Coordinate a professional creator team or production catalog.",
-    monthlyPrice: 49,
-    annualPrice: 490,
-    pioneerMonthlyPrice: 39,
-    pioneerAnnualPrice: 390,
-    limits: {
-      librarySongs: 500,
-      publishedSongs: 400,
-      playlists: 250,
-      merchItems: 150,
-      writtenPosts: 1000,
-      videoMinutes: 600,
-      aiActions: 300,
-      teamMembers: 5,
-    },
-    analytics: "All-time and team reporting",
-    highlights: [
-      "Up to 200 hosted videos and five controlled team seats",
-      "Multiple productions and approval workflows",
-      "Branded media kits and partnership tools",
-      "Live premieres, events, and studio onboarding planned",
-    ],
-    launchState: "planned",
-  },
+ {code:"creator_free",name:"Creator Free",audience:"Build a polished VYBE creator profile and begin sharing selected work.",monthlyPrice:0,annualPrice:0,publicPresence:"creator_profile",limits:limits(15,10,8,2,10,0,5,1,30,2,0,0,1,3),analytics:"30-day basic totals",highlights:["Compact VYBE Creator Profile—not a full creator website","Three featured public items and one primary external link","Music library, public playlists, and two active unlisted playlists","EPK readiness checklist and private preview","General VYBE browsing requires Supporter Mode"],launchState:"available"},
+ {code:"creator_plus",name:"Creator Plus",audience:"Present a stronger creator showcase and grow a developing audience.",monthlyPrice:12,annualPrice:120,pioneerMonthlyPrice:9,pioneerAnnualPrice:84,badge:"Recommended",publicPresence:"creator_showcase",limits:limits(75,50,30,10,50,30,30,1,90,10,3,7,5,5),analytics:"90-day basic creator analytics",highlights:["Enhanced Creator Showcase—not a full creator website","Artist's Top 5, selected catalog, and five public links","EPK Lite with biography, links, Top 5, and three media selections","Three active password playlists with seven-day expiration","General VYBE browsing requires Supporter Mode"],launchState:"available"},
+ {code:"creator_pro",name:"Creator Pro",audience:"Operate a complete public creator website and professional release workflow.",monthlyPrice:24,annualPrice:240,pioneerMonthlyPrice:19,pioneerAnnualPrice:180,publicPresence:"creator_website",limits:limits(250,200,100,50,250,180,100,1,365,50,25,90,25,25),analytics:"One year, advanced reporting, and exports",highlights:["Full multi-section Creator Website","Full EPK with export, private sharing, and viewer analytics","Approved listeners, sign-in controls, revocation, and access reporting","Creator-mode VYBE browsing and professional networking","Eligibility to apply for curated opportunities and Creator Live programs"],launchState:"planned"},
+ {code:"creator_studio",name:"Creator Studio",audience:"Coordinate a professional creator team, production catalog, and advanced public home.",monthlyPrice:49,annualPrice:490,pioneerMonthlyPrice:39,pioneerAnnualPrice:390,publicPresence:"studio_website",limits:limits(500,400,250,150,1000,600,300,5,null,150,100,365,100,100),analytics:"All-time analytics, exports, and team reporting",highlights:["Advanced team-managed Creator Website","Multiple EPK versions for professional purposes","Five controlled team seats and approval workflows","Advanced protected-sharing reporting","Eligibility for metered Creator Lives and Creator Rewards review"],launchState:"planned"}
 ];
 
-export const MEMBERSHIP_FEATURE_STATUS = {
-  musicLibrary: "available",
-  songAndPlaylistEditors: "available",
-  publicCreatorLinks: "available",
-  merchShowcase: "available",
-  creatorStories: "available",
-  creatorAnalytics: "available",
-  creatorAssistant: "coming_soon",
-  hostedVideoPublishing: "available",
-  nativeVideoHosting: "coming_soon",
-  commerce: "coming_soon",
-  customDomains: "coming_soon",
-  teamWorkspaces: "coming_soon",
-} satisfies Record<string, FeatureAvailability>;
-
-export const FOUNDING_CREATOR_NOTE =
-  "Founding Creator remains invitation-only and is not a public membership.";
-
-export const PIONEER_NOTE =
-  "VYBE Pioneer is planned recognition for the first 50 eligible public paying creators, not a separate plan. Enrollment and discounted pricing are not open yet.";
-
+export const MEMBERSHIP_FEATURE_STATUS = {musicLibrary:"available",songAndPlaylistEditors:"available",creatorProfiles:"available",creatorShowcases:"available",fullCreatorWebsites:"requires_upgrade",merchShowcase:"available",creatorStories:"available",creatorAnalytics:"available",protectedSharing:"available",epkLite:"available",fullEpk:"requires_upgrade",creatorModeBrowsing:"requires_upgrade",creatorAssistant:"coming_soon",nativeVideoHosting:"coming_soon",commerce:"coming_soon",customDomains:"coming_soon",creatorLives:"coming_soon",virtualInterviews:"coming_soon",creatorRewards:"coming_soon",teamWorkspaces:"coming_soon"} satisfies Record<string,FeatureAvailability>;
+export const FOUNDING_CREATOR_NOTE = "Founding Creator is invitation-only, receives Creator Pro access while eligible, and is not a public membership. It does not guarantee reach, interviews, advertising revenue, ownership, equity, dividends, or profit sharing.";
+export const PIONEER_NOTE = "VYBE Pioneer remains a proposed recognition program, not a separate plan. Enrollment and discounted pricing are not open or guaranteed.";
 
