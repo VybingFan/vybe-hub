@@ -59,6 +59,8 @@ import {
 import { useCreatorProfile } from "@/hooks/useCreatorProfile";
 import { Badge } from "@/components/ui/badge";
 import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
+import { useMembership } from "@/hooks/useMembership";
+import { getCreatorEntitlements, hasCreatorFeature } from "@/features/membership/entitlements";
 import {
   TRACK_PRODUCTION_STAGE_LABELS,
   TRACK_WORKSPACE_CATEGORY_LABELS,
@@ -77,6 +79,10 @@ function PlaylistStudio() {
   const { data: tracks = [], isLoading } = useCreatorTracks(user?.id);
   const { data: creatorProfile } = useCreatorProfile(user?.id);
   const { data: playlists = [] } = useMyPlaylists(user?.id);
+  const { data: membership } = useMembership();
+  const creatorEntitlements = getCreatorEntitlements(membership?.plan_code);
+  const canUsePasswords = hasCreatorFeature(membership?.plan_code, "playlist.password");
+  const canUseApprovedListeners = hasCreatorFeature(membership?.plan_code, "playlist.approved_listeners");
   const create = useCreatePlaylist(user?.id);
   const replaceCover = useReplacePlaylistCover(user?.id);
   const deletePlaylist = useDeletePlaylist(user?.id);
@@ -178,6 +184,10 @@ function PlaylistStudio() {
     const form = new FormData(formElement);
     if (!selected.length)
       return toast.error("Choose at least one published song.");
+    if (playlists.length >= creatorEntitlements.limits.playlists)
+      return toast.error(`Your membership includes ${creatorEntitlements.limits.playlists} playlists. Upgrade or remove an existing playlist to continue.`);
+    if (createAccessMode === "approved_listeners" && !canUseApprovedListeners)
+      return toast.error("Approved listeners requires Creator Pro.");
     try {
       const playlist = await create.mutateAsync({
         title: String(form.get("title") || ""),
@@ -291,6 +301,21 @@ function PlaylistStudio() {
           </Button>
         }
       />
+      <div className="rounded-2xl border border-border bg-muted/20 px-4 py-3 text-sm">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="font-medium">Membership playlist allowance</p>
+          <p className="text-muted-foreground">
+            {playlists.length} of {creatorEntitlements.limits.playlists} playlists used
+          </p>
+        </div>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+          {creatorEntitlements.limits.activePasswordPlaylists
+            ? `${creatorEntitlements.limits.activePasswordPlaylists} active password links Â· maximum ${creatorEntitlements.limits.passwordExpiryDays}-day expiration`
+            : "Password links require Creator Plus. Public and unlisted sharing remain available."}
+          {canUseApprovedListeners ? " Â· Approved listeners and sign-in controls included" : " Â· Approved listeners require Creator Pro"}
+        </p>
+      </div>
+
       {createdSlug && (
         <div className="flex flex-col gap-4 rounded-2xl border border-primary/30 bg-primary/10 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -393,8 +418,11 @@ function PlaylistStudio() {
                     <SelectItem value="unlisted">
                       Unlisted - only people with the link
                     </SelectItem>
-                    <SelectItem value="approved_listeners">
-                      Approved listeners - invitation required
+                    <SelectItem value="password" disabled={!canUsePasswords}>
+                      Password protected{canUsePasswords ? "" : " - Creator Plus"}
+                    </SelectItem>
+                    <SelectItem value="approved_listeners" disabled={!canUseApprovedListeners}>
+                      Approved listeners{canUseApprovedListeners ? " - invitation required" : " - Creator Pro"}
                     </SelectItem>
                   </SelectContent>
                 </Select>

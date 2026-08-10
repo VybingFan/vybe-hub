@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { LockedFeatureCard } from "@/components/membership/LockedFeatureCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CompactListRow } from "@/components/workspace/CompactListRow";
@@ -25,6 +26,8 @@ import { useMyPlaylists } from "@/hooks/usePlaylists";
 import { useMerch } from "@/hooks/useMerch";
 import { useMyActivity } from "@/hooks/useActivity";
 import { useMyConnections } from "@/hooks/useConnections";
+import { useMembership } from "@/hooks/useMembership";
+import { getCreatorEntitlements } from "@/features/membership/entitlements";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -45,6 +48,8 @@ function DashboardContent() {
   const { data: merch = [] } = useMerch(user?.id);
   const { data: activity = [] } = useMyActivity(user?.id);
   const { data: connections = [] } = useMyConnections(user?.id);
+  const { data: membership } = useMembership();
+  const creatorEntitlements = getCreatorEntitlements(membership?.plan_code);
   const published = tracks.filter(
     (track) => track.status === "published",
   ).length;
@@ -241,6 +246,36 @@ function DashboardContent() {
           </Card>
         </div>
       </section>
+
+      {creatorEntitlements.effectivePlan === "creator_free" ? (
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold">Membership & growth</h2>
+          <LockedFeatureCard
+            title="Protected playlist sharing"
+            description="Add password-protected playlists with controlled expiration for private previews."
+            requiredPlan="creator_plus"
+            usage="Creator Free includes public links and up to two active unlisted playlists."
+            compact
+          />
+          <LockedFeatureCard
+            title="Full Creator Website and EPK"
+            description="Build a multi-section public creator home and unlock the complete professional EPK."
+            requiredPlan="creator_pro"
+            compact
+          />
+        </section>
+      ) : creatorEntitlements.effectivePlan === "creator_plus" ? (
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold">Membership & growth</h2>
+          <LockedFeatureCard
+            title="Full Creator Website and professional EPK"
+            description="Move beyond the Creator Showcase with full public sections, EPK export, and professional sharing controls."
+            requiredPlan="creator_pro"
+            usage="Your Creator Showcase, Top 5, EPK Lite, and protected-sharing allowance remain active."
+            compact
+          />
+        </section>
+      ) : null}
 
       {setupComplete ? (
         <details className="group rounded-2xl border border-emerald-500/25 bg-emerald-500/5">

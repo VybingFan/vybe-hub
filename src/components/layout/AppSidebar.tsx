@@ -164,6 +164,12 @@ const creatorAudience: NavItem[] = [
     allow: ["creator", "admin"],
   },
   {
+    title: "Analytics",
+    url: "/creator-analytics",
+    icon: BarChart3,
+    allow: ["creator", "admin"],
+  },
+  {
     title: "Connections",
     url: "/connections",
     icon: ContactRound,
