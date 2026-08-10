@@ -30,6 +30,7 @@ import { UsageMeter } from "@/components/membership/UsageMeter";
 import { supabase } from "@/integrations/supabase/client";
 import { SelfServiceDeletionCard } from "@/components/accountDeletion/SelfServiceDeletionCard";
 import { MembershipAdjustmentNotice } from "@/components/membership/MembershipAdjustmentNotice";
+import { ContentContinuityCard } from "@/components/membership/ContentContinuityCard";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
@@ -260,6 +261,7 @@ function SettingsContent() {
           >
             <div className="space-y-5 p-4 sm:p-5">
               <MembershipAdjustmentNotice />
+              <ContentContinuityCard />
               <div className="flex flex-wrap gap-2">
                 {membership?.billing.customer_ref ? (
                   <Button
