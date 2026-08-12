@@ -128,13 +128,16 @@ export const publicCreatorService = {
       (
         (playlistRows ?? []) as unknown as (PublicCreatorPlaylist & {
           access_mode?: string;
+          access_expires_at?: string | null;
           show_on_public_profile?: boolean;
         })[]
       )
         .filter(
           (playlist) =>
             playlist.access_mode === "public" &&
-            playlist.show_on_public_profile === true,
+            playlist.show_on_public_profile === true &&
+            (!playlist.access_expires_at ||
+              new Date(playlist.access_expires_at).getTime() > Date.now()),
         )
         .sort(
           (a, b) =>

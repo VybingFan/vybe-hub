@@ -69,6 +69,7 @@ export function PublicCreatorMusicExperience({
   );
   const [filter, setFilter] = useState<Filter>({ kind: "all" });
   const [showAll, setShowAll] = useState(false);
+  const [showAllPlaylists, setShowAllPlaylists] = useState(false);
   const selected =
     publicTracks.find((track) => track.id === selectedId) ?? publicTracks[0];
 
@@ -303,7 +304,7 @@ export function PublicCreatorMusicExperience({
           </p>
           <h2 className="mt-1 text-2xl font-semibold">Public playlists</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {playlists.slice(0, 6).map((playlist) => (
+            {(showAllPlaylists ? playlists : playlists.slice(0, 6)).map((playlist) => (
               <Link
                 key={playlist.id}
                 to="/artist/$username/playlist/$slug"
@@ -333,6 +334,18 @@ export function PublicCreatorMusicExperience({
               </Link>
             ))}
           </div>
+          {playlists.length > 6 ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-4"
+              onClick={() => setShowAllPlaylists((value) => !value)}
+            >
+              {showAllPlaylists
+                ? "Show fewer playlists"
+                : `View all ${playlists.length} playlists`}
+            </Button>
+          ) : null}
         </section>
       ) : null}
     </div>

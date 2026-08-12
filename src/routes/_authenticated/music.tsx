@@ -78,7 +78,7 @@ const categoryDescriptions: Record<TrackWorkspaceCategory, string> = {
 
 const visibilityLabels: Record<string, string> = {
   public: "Public",
-  unlisted: "Unlisted",
+  unlisted: "Shareable",
   private: "Private",
   scheduled: "Scheduled",
   archived: "Archived",

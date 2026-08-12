@@ -83,7 +83,7 @@ const empty = (defaultRightsBasis: MusicRightsBasis): SingleUploadValues => ({
   rights_basis: defaultRightsBasis,
   rights_confirmed: true,
   discovery_metadata: EMPTY_TRACK_DISCOVERY_METADATA,
-  visibility: "public",
+  visibility: "private",
   playback_mode: "full",
   preview_duration_sec: 30,
   preview_start_sec: 0,
@@ -185,7 +185,7 @@ export function MusicUploadForm({
         description="Choose why you are managing this song and where it is in the creative process. You can change either setting later from the Music Library."
       >
         <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Music category">
+          <Field label="Where should this song be organized?">
             <Select
               value={values.workspace_category}
               onValueChange={(value) =>
@@ -205,7 +205,7 @@ export function MusicUploadForm({
             </Select>
           </Field>
 
-          <Field label="Production stage">
+          <Field label="How far along is this song?">
             <Select
               value={values.production_stage}
               onValueChange={(value) =>
@@ -234,7 +234,7 @@ export function MusicUploadForm({
       </ProfileCard>
 
       <ProfileCard
-        title="Visibility & listening access"
+        title="Who can find and hear this song?"
         description="Control who can find this song and whether listeners receive the full recording, a separate preview file, or no playback."
       >
         <div className="grid gap-4 md:grid-cols-2">
@@ -249,9 +249,9 @@ export function MusicUploadForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="public">Public</SelectItem>
-                <SelectItem value="unlisted">Unlisted link only</SelectItem>
-                <SelectItem value="private">Private</SelectItem>
+                <SelectItem value="public">Public - shown on your public pages</SelectItem>
+                <SelectItem value="unlisted">Shareable - hidden, available by link</SelectItem>
+                <SelectItem value="private">Private - only you can manage it</SelectItem>
                 <SelectItem value="scheduled">Scheduled</SelectItem>
                 <SelectItem value="archived">Archived</SelectItem>
               </SelectContent>
@@ -344,7 +344,7 @@ export function MusicUploadForm({
               placeholder="e.g. Poppa"
             />
           </Field>
-          <Field label="Status">
+          <Field label="Library status">
             <Select
               value={values.status}
               onValueChange={(v) => update("status", v as ContentStatus)}

@@ -85,12 +85,50 @@ function PublicMusicSetup() {
     }
   };
 
-  const publicPlaylists = playlists.filter(
-    (playlist) => playlist.is_published && playlist.access_mode === "public",
+  const publicPlaylists = playlists
+    .filter(
+      (playlist) => playlist.is_published && playlist.access_mode === "public",
+    )
+    .sort(
+      (a, b) =>
+        (a.profile_display_order ?? 999) -
+          (b.profile_display_order ?? 999) || a.title.localeCompare(b.title),
+    );
+  const shownPublicPlaylists = publicPlaylists.filter(
+    (playlist) => playlist.show_on_public_profile === true,
   );
   const protectedPlaylists = playlists.filter(
     (playlist) => !playlist.is_published || playlist.access_mode !== "public",
   );
+
+  const setPlaylistShown = async (playlistId: string, shown: boolean) => {
+    await publicMusicSetupService.setPlaylistShown(
+      playlistId,
+      creatorId!,
+      shown,
+    );
+    if (shown) {
+      await publicMusicSetupService.setPlaylistDisplayOrder(
+        creatorId!,
+        [...shownPublicPlaylists.map((playlist) => playlist.id), playlistId],
+      );
+    }
+  };
+
+  const movePlaylist = async (playlistId: string, nextPosition: number) => {
+    const selected = shownPublicPlaylists.find(
+      (playlist) => playlist.id === playlistId,
+    );
+    if (!selected) return;
+    const reordered = shownPublicPlaylists.filter(
+      (playlist) => playlist.id !== playlistId,
+    );
+    reordered.splice(nextPosition - 1, 0, selected);
+    await publicMusicSetupService.setPlaylistDisplayOrder(
+      creatorId!,
+      reordered.map((playlist) => playlist.id),
+    );
+  };
   const topFive = useMemo(
     () =>
       tracks
@@ -314,48 +352,83 @@ function PublicMusicSetup() {
                 Public playlists on your website
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                A playlist must be published, Public, and selected below before
-                it appears on your creator page.
+                Public controls who can open a playlist. This separate setting
+                controls whether it is promoted on your creator page and in
+                which order. Public playlists left unselected still work by link.
+              </p>
+              <p className="mt-2 text-xs font-medium text-primary">
+                {shownPublicPlaylists.length} selected for your creator page
               </p>
             </div>
           </div>
 
           <div className="mt-5 divide-y rounded-2xl border">
             {publicPlaylists.length ? (
-              publicPlaylists.map((playlist) => (
-                <label
-                  key={playlist.id}
-                  className="flex min-h-16 items-center gap-3 p-4"
-                >
-                  <Checkbox
-                    checked={playlist.show_on_public_profile === true}
-                    disabled={busyId === playlist.id}
-                    onCheckedChange={(checked) =>
-                      void run(
-                        playlist.id,
-                        () =>
-                          publicMusicSetupService.setPlaylistShown(
+              publicPlaylists.map((playlist) => {
+                const shown = playlist.show_on_public_profile === true;
+                const position = shownPublicPlaylists.findIndex(
+                  (item) => item.id === playlist.id,
+                );
+                return (
+                  <div
+                    key={playlist.id}
+                    className="flex min-h-20 flex-col gap-3 p-4 sm:flex-row sm:items-center"
+                  >
+                    <label className="flex min-w-0 flex-1 items-center gap-3">
+                      <Checkbox
+                        checked={shown}
+                        disabled={busyId === playlist.id}
+                        onCheckedChange={(checked) =>
+                          void run(
                             playlist.id,
-                            creatorId!,
-                            checked === true,
-                          ),
-                        checked
-                          ? "Playlist added to public page."
-                          : "Playlist removed from public page.",
-                      )
-                    }
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-medium">
-                      {playlist.title}
-                    </span>
-                    <span className="block truncate text-xs text-muted-foreground">
-                      {playlist.occasion || "Public playlist"}
-                    </span>
-                  </span>
-                  <Badge variant="outline">Public</Badge>
-                </label>
-              ))
+                            () => setPlaylistShown(playlist.id, checked === true),
+                            checked
+                              ? "Playlist added to creator page."
+                              : "Playlist remains public by link but is hidden from your creator page.",
+                          )
+                        }
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-medium">
+                          {playlist.title}
+                        </span>
+                        <span className="block truncate text-xs text-muted-foreground">
+                          {shown
+                            ? "Shown on creator page"
+                            : "Public by link only"}
+                          {" Â· "}
+                          {playlist.occasion || "Public playlist"}
+                        </span>
+                      </span>
+                    </label>
+                    {shown ? (
+                      <Select
+                        value={String(position + 1)}
+                        disabled={busyId === playlist.id}
+                        onValueChange={(value) =>
+                          void run(
+                            playlist.id,
+                            () => movePlaylist(playlist.id, Number(value)),
+                            `Playlist moved to position ${value}.`,
+                          )
+                        }
+                      >
+                        <SelectTrigger className="w-full sm:w-36">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {shownPublicPlaylists.map((_, index) => (
+                            <SelectItem key={index + 1} value={String(index + 1)}>
+                              Position {index + 1}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : null}
+                    <Badge variant="outline">Public</Badge>
+                  </div>
+                );
+              })
             ) : (
               <p className="p-5 text-sm text-muted-foreground">
                 No eligible public playlists yet. Create or update one in

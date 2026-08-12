@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Check,
   Copy,
@@ -30,6 +31,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -64,7 +66,8 @@ import { getCreatorEntitlements, hasCreatorFeature } from "@/features/membership
 import {
   TRACK_PRODUCTION_STAGE_LABELS,
   TRACK_WORKSPACE_CATEGORY_LABELS,
-} from "@/features/music/workflow";
+} from "@/features/music/workflow";import { publicMusicSetupService } from "@/services/music/publicMusicSetupService";
+
 
 export const Route = createFileRoute("/_authenticated/playlists")({
   component: () => (
@@ -79,6 +82,7 @@ function PlaylistStudio() {
   const { data: tracks = [], isLoading } = useCreatorTracks(user?.id);
   const { data: creatorProfile } = useCreatorProfile(user?.id);
   const { data: playlists = [] } = useMyPlaylists(user?.id);
+  const queryClient = useQueryClient();
   const { data: membership } = useMembership();
   const creatorEntitlements = getCreatorEntitlements(membership?.plan_code);
   const canUsePasswords = hasCreatorFeature(membership?.plan_code, "playlist.password");
@@ -86,6 +90,7 @@ function PlaylistStudio() {
   const create = useCreatePlaylist(user?.id);
   const replaceCover = useReplacePlaylistCover(user?.id);
   const deletePlaylist = useDeletePlaylist(user?.id);
+  const [publicDisplayBusyId, setPublicDisplayBusyId] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [songQuery, setSongQuery] = useState("");
   const [songGenre, setSongGenre] = useState("all");
@@ -132,9 +137,6 @@ function PlaylistStudio() {
     const query = songQuery.trim().toLowerCase();
     return tracks.filter(
       (track) =>
-        (createAccessMode === "approved_listeners"
-          ? track.status === "published"
-          : track.status === "published" && track.visibility === "public") &&
         (songGenre === "all" || track.genre === songGenre) &&
         (!query ||
           track.title.toLowerCase().includes(query) ||
@@ -178,12 +180,115 @@ function PlaylistStudio() {
     [playlists],
   );
   const visiblePlaylists = filteredPlaylists.slice(0, visiblePlaylistCount);
+  const publicPagePlaylists = playlists
+    .filter(
+      (playlist) =>
+        playlist.is_published &&
+        playlist.access_mode === "public" &&
+        (!playlist.access_expires_at ||
+          new Date(playlist.access_expires_at).getTime() > Date.now()) &&
+        playlist.show_on_public_profile === true,
+    )
+    .sort(
+      (a, b) =>
+        (a.profile_display_order ?? 999) -
+          (b.profile_display_order ?? 999) || a.title.localeCompare(b.title),
+    );
+
+  const updatePlaylistPublicDisplay = async (
+    playlistId: string,
+    shown: boolean,
+  ) => {
+    if (!user?.id) return;
+    setPublicDisplayBusyId(playlistId);
+    try {
+      await publicMusicSetupService.setPlaylistShown(
+        playlistId,
+        user.id,
+        shown,
+      );
+      if (shown) {
+        await publicMusicSetupService.setPlaylistDisplayOrder(
+          user.id,
+          [...publicPagePlaylists.map((playlist) => playlist.id), playlistId],
+        );
+      }
+      await queryClient.invalidateQueries({
+        queryKey: ["playlists", user.id],
+      });
+      if (creatorProfile?.username) {
+        await queryClient.invalidateQueries({
+          queryKey: ["public-creator", creatorProfile.username],
+        });
+      }
+      toast.success(
+        shown
+          ? "Playlist added to your public creator page."
+          : "Playlist remains public by link but is hidden from your creator page.",
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Public display update failed.",
+      );
+    } finally {
+      setPublicDisplayBusyId(null);
+    }
+  };
+
+  const movePlaylistOnPublicPage = async (
+    playlistId: string,
+    nextPosition: number,
+  ) => {
+    if (!user?.id) return;
+    const selectedPlaylist = publicPagePlaylists.find(
+      (playlist) => playlist.id === playlistId,
+    );
+    if (!selectedPlaylist) return;
+    const reordered = publicPagePlaylists.filter(
+      (playlist) => playlist.id !== playlistId,
+    );
+    reordered.splice(nextPosition - 1, 0, selectedPlaylist);
+    setPublicDisplayBusyId(playlistId);
+    try {
+      await publicMusicSetupService.setPlaylistDisplayOrder(
+        user.id,
+        reordered.map((playlist) => playlist.id),
+      );
+      await queryClient.invalidateQueries({
+        queryKey: ["playlists", user.id],
+      });
+      if (creatorProfile?.username) {
+        await queryClient.invalidateQueries({
+          queryKey: ["public-creator", creatorProfile.username],
+        });
+      }
+      toast.success(`Playlist moved to public position ${nextPosition}.`);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Playlist order update failed.",
+      );
+    } finally {
+      setPublicDisplayBusyId(null);
+    }
+  };
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     if (!selected.length)
-      return toast.error("Choose at least one published song.");
+      return toast.error("Choose at least one published song from your Music Library.");
+    const selectedTracks = tracks.filter((track) => selected.includes(track.id));
+    const nonPublicTracks = selectedTracks.filter(
+      (track) => track.visibility !== "public",
+    );
+    if (
+      createAccessMode === "public" &&
+      nonPublicTracks.length > 0 &&
+      !window.confirm(
+        `This public playlist includes ${nonPublicTracks.length} private or shareable song${nonPublicTracks.length === 1 ? "" : "s"}. People with playlist access may be able to hear those songs without making them public in your catalog. Continue?`,
+      )
+    )
+      return;
     if (playlists.length >= creatorEntitlements.limits.playlists)
       return toast.error(`Your membership includes ${creatorEntitlements.limits.playlists} playlists. Upgrade or remove an existing playlist to continue.`);
     if (createAccessMode === "approved_listeners" && !canUseApprovedListeners)
@@ -416,7 +521,7 @@ function PlaylistStudio() {
                       Public - listed and open to everyone
                     </SelectItem>
                     <SelectItem value="unlisted">
-                      Unlisted - only people with the link
+                      Shareable - hidden, only people with the link
                     </SelectItem>
                     <SelectItem value="password" disabled={!canUsePasswords}>
                       Password protected{canUsePasswords ? "" : " - Creator Plus"}
@@ -428,9 +533,9 @@ function PlaylistStudio() {
                 </Select>
 
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  Public and unlisted playlists can use only public, published
-                  songs. Approved-listener playlists can also use published
-                  private or unlisted songs.
+                  Every published song in your library appears below. Private and
+                  shareable songs stay hidden from your public song catalog. VYBE
+                  asks you to confirm before placing one in a public playlist.
                 </p>
 
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -607,7 +712,7 @@ function PlaylistStudio() {
                                 }
                               </span>
                               <span className="rounded-full bg-muted px-2 py-0.5 capitalize">
-                                {track.visibility}
+                                {track.visibility === "unlisted" ? "Shareable" : track.visibility}
                               </span>
                             </span>
                           </span>
@@ -645,8 +750,8 @@ function PlaylistStudio() {
                     })
                   ) : tracks.length ? (
                     <p className="p-5 text-sm text-muted-foreground">
-                      No eligible songs match "{songQuery}". Try another title
-                      or genre.
+                      No songs match "{songQuery}" and the selected genre. Clear
+                      the search or choose All genres.
                     </p>
                   ) : (
                     <div className="p-5 text-sm text-muted-foreground">
@@ -687,15 +792,31 @@ function PlaylistStudio() {
           </form>
         ) : null}
         <section>
-          <div className="flex items-end justify-between gap-3">
+          <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end">
             <div>
               <h2 className="text-2xl font-semibold">Your playlists</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {playlists.length}{" "}
                 {playlists.length === 1 ? "playlist" : "playlists"} in this
-                workspace
+                workspace Â· {publicPagePlaylists.length} shown on your public page
               </p>
             </div>
+            {creatorProfile?.username ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  window.open(
+                    `/artist/${encodeURIComponent(creatorProfile.username!)}`,
+                    "_blank",
+                    "noopener,noreferrer",
+                  )
+                }
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Preview my public creator page
+              </Button>
+            ) : null}
           </div>
           <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_10rem] lg:grid-cols-1 xl:grid-cols-[1fr_10rem]">
             <Input
@@ -816,6 +937,61 @@ function PlaylistStudio() {
                         playlist.updated_at || playlist.created_at,
                       ).toLocaleDateString()}
                     </p>
+                    {playlist.is_published &&
+                    playlist.access_mode === "public" &&
+                    (!playlist.access_expires_at ||
+                      new Date(playlist.access_expires_at).getTime() >
+                        Date.now()) ? (
+                      <div className="mt-3 rounded-xl border bg-muted/30 p-2.5">
+                        <label className="flex items-center gap-2 text-xs font-medium">
+                          <Checkbox
+                            checked={playlist.show_on_public_profile === true}
+                            disabled={publicDisplayBusyId === playlist.id}
+                            onCheckedChange={(checked) =>
+                              void updatePlaylistPublicDisplay(
+                                playlist.id,
+                                checked === true,
+                              )
+                            }
+                          />
+                          Show on public creator page
+                        </label>
+                        {playlist.show_on_public_profile === true ? (
+                          <Select
+                            value={String(
+                              publicPagePlaylists.findIndex(
+                                (item) => item.id === playlist.id,
+                              ) + 1,
+                            )}
+                            disabled={publicDisplayBusyId === playlist.id}
+                            onValueChange={(value) =>
+                              void movePlaylistOnPublicPage(
+                                playlist.id,
+                                Number(value),
+                              )
+                            }
+                          >
+                            <SelectTrigger className="mt-2 h-8 w-full text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {publicPagePlaylists.map((_, index) => (
+                                <SelectItem
+                                  key={index + 1}
+                                  value={String(index + 1)}
+                                >
+                                  Public position {index + 1}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <p className="mt-1.5 text-[11px] text-muted-foreground">
+                            Public by link only Â· not promoted on your creator page
+                          </p>
+                        )}
+                      </div>
+                    ) : null}
                     <div className="mt-3 flex items-center gap-1.5">
                       <Button
                         variant="outline"

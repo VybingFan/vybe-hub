@@ -54,4 +54,16 @@ export const publicMusicSetupService = {
 
     if (result.error) throw new Error(result.error.message);
   },
+
+  async setPlaylistDisplayOrder(creatorId: string, playlistIds: string[]) {
+    for (const [index, playlistId] of playlistIds.entries()) {
+      const result = await database
+        .from("playlists")
+        .update({ profile_display_order: index + 1 })
+        .eq("id", playlistId)
+        .eq("creator_id", creatorId);
+
+      if (result.error) throw new Error(result.error.message);
+    }
+  },
 };
