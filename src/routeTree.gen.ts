@@ -98,6 +98,7 @@ import { Route as AuthenticatedAdminPartnerCenterRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenticated/admin_.offers'
 import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_authenticated/admin_.memberships'
 import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin_.creators'
+import { Route as AuthenticatedAdminCommerceRightsRouteImport } from './routes/_authenticated/admin_.commerce-rights'
 import { Route as AuthenticatedAdminBusinessesRouteImport } from './routes/_authenticated/admin_.businesses'
 import { Route as AuthenticatedAdminBusinessPilotRouteImport } from './routes/_authenticated/admin_.business-pilot'
 import { Route as AuthenticatedAdminAccountsRouteImport } from './routes/_authenticated/admin_.accounts'
@@ -569,6 +570,12 @@ const AuthenticatedAdminCreatorsRoute =
     path: '/admin/creators',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminCommerceRightsRoute =
+  AuthenticatedAdminCommerceRightsRouteImport.update({
+    id: '/admin_/commerce-rights',
+    path: '/admin/commerce-rights',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminBusinessesRoute =
   AuthenticatedAdminBusinessesRouteImport.update({
     id: '/admin_/businesses',
@@ -686,6 +693,7 @@ export interface FileRoutesByFullPath {
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
   '/admin/business-pilot': typeof AuthenticatedAdminBusinessPilotRoute
   '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
+  '/admin/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
@@ -783,6 +791,7 @@ export interface FileRoutesByTo {
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
   '/admin/business-pilot': typeof AuthenticatedAdminBusinessPilotRoute
   '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
+  '/admin/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
@@ -882,6 +891,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/accounts': typeof AuthenticatedAdminAccountsRoute
   '/_authenticated/admin_/business-pilot': typeof AuthenticatedAdminBusinessPilotRoute
   '/_authenticated/admin_/businesses': typeof AuthenticatedAdminBusinessesRoute
+  '/_authenticated/admin_/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
   '/_authenticated/admin_/creators': typeof AuthenticatedAdminCreatorsRoute
   '/_authenticated/admin_/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/_authenticated/admin_/offers': typeof AuthenticatedAdminOffersRoute
@@ -981,6 +991,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/business-pilot'
     | '/admin/businesses'
+    | '/admin/commerce-rights'
     | '/admin/creators'
     | '/admin/memberships'
     | '/admin/offers'
@@ -1078,6 +1089,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/business-pilot'
     | '/admin/businesses'
+    | '/admin/commerce-rights'
     | '/admin/creators'
     | '/admin/memberships'
     | '/admin/offers'
@@ -1176,6 +1188,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/accounts'
     | '/_authenticated/admin_/business-pilot'
     | '/_authenticated/admin_/businesses'
+    | '/_authenticated/admin_/commerce-rights'
     | '/_authenticated/admin_/creators'
     | '/_authenticated/admin_/memberships'
     | '/_authenticated/admin_/offers'
@@ -1869,6 +1882,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCreatorsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/commerce-rights': {
+      id: '/_authenticated/admin_/commerce-rights'
+      path: '/admin/commerce-rights'
+      fullPath: '/admin/commerce-rights'
+      preLoaderRoute: typeof AuthenticatedAdminCommerceRightsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/businesses': {
       id: '/_authenticated/admin_/businesses'
       path: '/admin/businesses'
@@ -1954,6 +1974,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminAccountsRoute: typeof AuthenticatedAdminAccountsRoute
   AuthenticatedAdminBusinessPilotRoute: typeof AuthenticatedAdminBusinessPilotRoute
   AuthenticatedAdminBusinessesRoute: typeof AuthenticatedAdminBusinessesRoute
+  AuthenticatedAdminCommerceRightsRoute: typeof AuthenticatedAdminCommerceRightsRoute
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
   AuthenticatedAdminMembershipsRoute: typeof AuthenticatedAdminMembershipsRoute
   AuthenticatedAdminOffersRoute: typeof AuthenticatedAdminOffersRoute
@@ -2006,6 +2027,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminAccountsRoute: AuthenticatedAdminAccountsRoute,
   AuthenticatedAdminBusinessPilotRoute: AuthenticatedAdminBusinessPilotRoute,
   AuthenticatedAdminBusinessesRoute: AuthenticatedAdminBusinessesRoute,
+  AuthenticatedAdminCommerceRightsRoute: AuthenticatedAdminCommerceRightsRoute,
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
   AuthenticatedAdminMembershipsRoute: AuthenticatedAdminMembershipsRoute,
   AuthenticatedAdminOffersRoute: AuthenticatedAdminOffersRoute,

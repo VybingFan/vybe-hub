@@ -194,6 +194,11 @@ const creatorGrowth: NavItem[] = [
     url: "/commerce",
     icon: CreditCard,
     allow: ["creator", "admin"],
+  },  {
+    title: "Rights Review",
+    url: "/admin/commerce-rights",
+    icon: CreditCard,
+    allow: ["admin"],
   },
   {
     title: "Industry Kit & EPK",
