@@ -76,6 +76,7 @@ import { Route as AuthenticatedContentContinuityRouteImport } from './routes/_au
 import { Route as AuthenticatedContentRouteImport } from './routes/_authenticated/content'
 import { Route as AuthenticatedConnectionsRouteImport } from './routes/_authenticated/connections'
 import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
+import { Route as AuthenticatedCommerceRouteImport } from './routes/_authenticated/commerce'
 import { Route as AuthenticatedBusinessRouteImport } from './routes/_authenticated/business'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
@@ -446,6 +447,11 @@ const AuthenticatedCommunitiesRoute =
     path: '/communities',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCommerceRoute = AuthenticatedCommerceRouteImport.update({
+  id: '/commerce',
+  path: '/commerce',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBusinessRoute = AuthenticatedBusinessRouteImport.update({
   id: '/business',
   path: '/business',
@@ -627,6 +633,7 @@ export interface FileRoutesByFullPath {
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/business': typeof AuthenticatedBusinessRoute
+  '/commerce': typeof AuthenticatedCommerceRoute
   '/communities': typeof AuthenticatedCommunitiesRoute
   '/connections': typeof AuthenticatedConnectionsRoute
   '/content': typeof AuthenticatedContentRoute
@@ -723,6 +730,7 @@ export interface FileRoutesByTo {
   '/activity': typeof AuthenticatedActivityRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/business': typeof AuthenticatedBusinessRoute
+  '/commerce': typeof AuthenticatedCommerceRoute
   '/communities': typeof AuthenticatedCommunitiesRoute
   '/connections': typeof AuthenticatedConnectionsRoute
   '/content': typeof AuthenticatedContentRoute
@@ -821,6 +829,7 @@ export interface FileRoutesById {
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/business': typeof AuthenticatedBusinessRoute
+  '/_authenticated/commerce': typeof AuthenticatedCommerceRoute
   '/_authenticated/communities': typeof AuthenticatedCommunitiesRoute
   '/_authenticated/connections': typeof AuthenticatedConnectionsRoute
   '/_authenticated/content': typeof AuthenticatedContentRoute
@@ -919,6 +928,7 @@ export interface FileRouteTypes {
     | '/activity'
     | '/admin'
     | '/business'
+    | '/commerce'
     | '/communities'
     | '/connections'
     | '/content'
@@ -1015,6 +1025,7 @@ export interface FileRouteTypes {
     | '/activity'
     | '/admin'
     | '/business'
+    | '/commerce'
     | '/communities'
     | '/connections'
     | '/content'
@@ -1112,6 +1123,7 @@ export interface FileRouteTypes {
     | '/_authenticated/activity'
     | '/_authenticated/admin'
     | '/_authenticated/business'
+    | '/_authenticated/commerce'
     | '/_authenticated/communities'
     | '/_authenticated/connections'
     | '/_authenticated/content'
@@ -1703,6 +1715,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCommunitiesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/commerce': {
+      id: '/_authenticated/commerce'
+      path: '/commerce'
+      fullPath: '/commerce'
+      preLoaderRoute: typeof AuthenticatedCommerceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/business': {
       id: '/_authenticated/business'
       path: '/business'
@@ -1906,6 +1925,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedActivityRoute: typeof AuthenticatedActivityRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedBusinessRoute: typeof AuthenticatedBusinessRoute
+  AuthenticatedCommerceRoute: typeof AuthenticatedCommerceRoute
   AuthenticatedCommunitiesRoute: typeof AuthenticatedCommunitiesRoute
   AuthenticatedConnectionsRoute: typeof AuthenticatedConnectionsRoute
   AuthenticatedContentRoute: typeof AuthenticatedContentRoute
@@ -1957,6 +1977,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedActivityRoute: AuthenticatedActivityRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedBusinessRoute: AuthenticatedBusinessRoute,
+  AuthenticatedCommerceRoute: AuthenticatedCommerceRoute,
   AuthenticatedCommunitiesRoute: AuthenticatedCommunitiesRoute,
   AuthenticatedConnectionsRoute: AuthenticatedConnectionsRoute,
   AuthenticatedContentRoute: AuthenticatedContentRoute,

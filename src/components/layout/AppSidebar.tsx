@@ -189,6 +189,11 @@ const creatorGrowth: NavItem[] = [
     url: "/merch",
     icon: ShoppingBag,
     allow: ["creator", "admin"],
+  },  {
+    title: "Music Sales",
+    url: "/commerce",
+    icon: CreditCard,
+    allow: ["creator", "admin"],
   },
   {
     title: "Industry Kit & EPK",

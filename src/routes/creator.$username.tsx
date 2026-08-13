@@ -13,6 +13,7 @@ import {
 import { Logo } from "@/components/common/Logo";
 import { MarketingNav } from "@/components/layout/MarketingNav";
 import { PublicCreatorMusicExperience } from "@/components/music/PublicCreatorMusicExperience";
+import { PublicCreatorShop } from "@/components/commerce/PublicCreatorShop";
 import { SocialLinksDisplay } from "@/components/socialLinks/SocialLinksDisplay";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -199,6 +200,7 @@ export function PublicArtistHome({
           />
         </section>
 
+        <PublicCreatorShop creatorId={profile.user_id} creatorName={name} />
         <section
           id="about"
           className="mx-auto grid max-w-7xl scroll-mt-28 gap-5 px-4 pb-16 sm:px-6 lg:grid-cols-[1.4fr_.6fr]"
