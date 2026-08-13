@@ -205,13 +205,7 @@ const creatorGrowth: NavItem[] = [
     icon: CreditCard,
     allow: ["creator", "admin"],
   },
-  {
-    title: "Copyright Operations",
-    url: "/admin/copyright",
-    icon: CreditCard,
-    allow: ["admin"],
-  },
-  {
+{
     title: "Industry Kit & EPK",
     url: "/epk",
     icon: BriefcaseBusiness,
@@ -302,6 +296,20 @@ export function AppSidebar() {
                 {
                   title: "Rights & Content",
                   url: "/admin/rights",
+                  icon: ShieldCheck,
+                  allow: ["admin"],
+                  permissionAnyOf: ["admin.rights.read", "admin.content.read"],
+                },
+                {
+                  title: "Music Rights Review",
+                  url: "/admin/commerce-rights",
+                  icon: ShieldCheck,
+                  allow: ["admin"],
+                  permissionAnyOf: ["admin.rights.read", "admin.content.read"],
+                },
+                {
+                  title: "Copyright & DMCA",
+                  url: "/admin/copyright",
                   icon: ShieldCheck,
                   allow: ["admin"],
                   permissionAnyOf: ["admin.rights.read", "admin.content.read"],
