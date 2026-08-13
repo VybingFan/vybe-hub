@@ -15,6 +15,8 @@ import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader"
 import { useCreatorTracks } from "@/hooks/useMusic";
 import { useMyPlaylists } from "@/hooks/usePlaylists";
 import { useUser } from "@/hooks/useUser";
+import { useMembership } from "@/hooks/useMembership";
+import { hasCreatorFeature } from "@/features/membership/entitlements";
 import { commerceService, type CommerceProductType } from "@/services/commerce/commerceService";
 import { ProductRightsDeclaration } from "@/components/commerce/ProductRightsDeclaration";
 import { StripeSellerReadinessCard } from "@/components/commerce/StripeSellerReadinessCard";
@@ -24,6 +26,9 @@ export const Route = createFileRoute("/_authenticated/commerce")({ component: ()
 function CommerceStudio() {
   const { user } = useUser();
   const creatorId = user?.id;
+  const { data: membership } = useMembership();
+  const canPrepareCommerce = hasCreatorFeature(membership?.plan_code, "commerce.prepare");
+  const canPublishCommerce = hasCreatorFeature(membership?.plan_code, "commerce.publish");
   const client = useQueryClient();
   const { data: tracks = [] } = useCreatorTracks(creatorId);
   const { data: playlists = [] } = useMyPlaylists(creatorId);
@@ -35,6 +40,7 @@ function CommerceStudio() {
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!creatorId) return;
+    if (!canPrepareCommerce) return toast.error("Preparing sales listings requires Creator Plus or higher.");
     const form = event.currentTarget;
     const data = new FormData(form);
     const type = String(data.get("product_type")) as CommerceProductType;
@@ -63,9 +69,9 @@ function CommerceStudio() {
         <div><Label>Sales title</Label><Input className="mt-2" name="title" placeholder="Leave blank to use the song or playlist title" /></div>
         <div><Label>Description</Label><Textarea className="mt-2" name="description" /></div>
         <div className="grid grid-cols-2 gap-3"><div><Label>Price</Label><Input className="mt-2" name="price" type="number" min="0.99" step="0.01" required /></div><div><Label>Buyer receives</Label><Select name="fulfillment" defaultValue="stream"><SelectTrigger className="mt-2"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="stream">Streaming</SelectItem><SelectItem value="download">Download</SelectItem><SelectItem value="stream_and_download">Streaming + download</SelectItem></SelectContent></Select></div></div>
-        <Button className="w-full" disabled={create.isPending}><ShoppingBag className="mr-2 h-4 w-4" />Prepare sales listing</Button>
+        <Button className="w-full" disabled={create.isPending || !canPrepareCommerce}><ShoppingBag className="mr-2 h-4 w-4" />{canPrepareCommerce ? "Prepare sales listing" : "Creator Plus required"}</Button>
       </form>
-      <section className="space-y-3"><h2 className="text-xl font-semibold">Prepared products</h2>{products.length ? products.map((product) => <Card key={product.id}><CardContent className="flex flex-wrap items-center justify-between gap-3 p-4"><div><p className="font-medium">{product.title}</p><p className="text-sm text-muted-foreground">{product.product_type} · ${(product.price_cents / 100).toFixed(2)} · {product.fulfillment}</p></div><div className="flex flex-wrap items-center gap-2"><Badge variant={product.status === "active" ? "default" : "outline"}>{product.status}</Badge><Badge variant="outline">Rights: {(product as any).rights_status || "incomplete"}</Badge><ProductRightsDeclaration productId={product.id} rightsStatus={(product as any).rights_status} />{product.status === "draft" ? <Button size="sm" onClick={() => changeStatus.mutate({ id: product.id, status: "active" })}>Publish listing</Button> : product.status === "active" ? <Button size="sm" variant="outline" onClick={() => changeStatus.mutate({ id: product.id, status: "retired" })}>Remove from sale</Button> : null}</div></CardContent></Card>) : <Card><CardContent className="p-6 text-sm text-muted-foreground">No sales listings prepared yet.</CardContent></Card>}</section>
+      <section className="space-y-3"><h2 className="text-xl font-semibold">Prepared products</h2>{products.length ? products.map((product) => <Card key={product.id}><CardContent className="flex flex-wrap items-center justify-between gap-3 p-4"><div><p className="font-medium">{product.title}</p><p className="text-sm text-muted-foreground">{product.product_type} · ${(product.price_cents / 100).toFixed(2)} · {product.fulfillment}</p></div><div className="flex flex-wrap items-center gap-2"><Badge variant={product.status === "active" ? "default" : "outline"}>{product.status}</Badge><Badge variant="outline">Rights: {(product as any).rights_status || "incomplete"}</Badge><ProductRightsDeclaration productId={product.id} rightsStatus={(product as any).rights_status} />{product.status === "draft" ? <Button size="sm" disabled={!canPublishCommerce} title={!canPublishCommerce ? "Creator Pro or Studio required" : undefined} onClick={() => changeStatus.mutate({ id: product.id, status: "active" })}>{canPublishCommerce ? "Publish listing" : "Upgrade to publish"}</Button> : product.status === "active" ? <Button size="sm" variant="outline" onClick={() => changeStatus.mutate({ id: product.id, status: "retired" })}>Remove from sale</Button> : null}</div></CardContent></Card>) : <Card><CardContent className="p-6 text-sm text-muted-foreground">No sales listings prepared yet.</CardContent></Card>}</section>
     </div>
   </div>;
 }
