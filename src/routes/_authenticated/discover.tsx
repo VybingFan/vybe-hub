@@ -1,133 +1,71 @@
+import { FormEvent, useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import type { CSSProperties } from "react";
-import { ArrowRight, Compass, Play, Sparkles, Users } from "lucide-react";
+import { ArrowRight, Loader2, MapPin, Music2, Search, SlidersHorizontal, UserRound, UsersRound } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
+import {
+  publicDiscoveryService,
+  type DiscoveryArtistCredit,
+  type DiscoveryCreator,
+  type DiscoveryTrack,
+} from "@/services/discovery/publicDiscoveryService";
 
 export const Route = createFileRoute("/_authenticated/discover")({ component: DiscoverPage });
 
-const genres = [
-  ["Rock", "/images/discover/rock.webp", "var(--genre-rock)"],
-  ["Country", "/images/discover/country.webp", "var(--genre-country)"],
-  ["Pop", "/images/discover/pop.webp", "var(--genre-pop)"],
-  ["Electronic", "/images/discover/electronic.webp", "var(--genre-electronic)"],
-  ["Gospel & Soul", "/images/discover/gospel-soul.webp", "var(--genre-soul)"],
-  ["Jazz & Lo-fi", "/images/discover/jazz-lofi.webp", "var(--genre-jazz)"],
-] as const;
+const genres = ["Hip-Hop", "R&B", "Rock", "Country", "Pop", "Electronic", "Gospel", "Jazz"];
 
 function DiscoverPage() {
-  return (
-    <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
-      <div className="mx-auto max-w-7xl space-y-12">
-        <header className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-          <div>
-            <Badge className="mb-4 rounded-full bg-primary/10 text-primary">
-              <Sparkles className="mr-2 h-3.5 w-3.5" /> Made for your curiosity
-            </Badge>
-            <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">
-              Find your next VYBE.
-            </h1>
-            <p className="mt-3 max-w-xl text-muted-foreground">
-              Explore artists, genres, stories, communities, and events that feel like you.
-            </p>
-          </div>
-          <Button asChild variant="outline" className="rounded-full">
-            <Link to="/supporter-interests">
-              Tune your interests <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </header>
+  const [query, setQuery] = useState("");
+  const [input, setInput] = useState("");
+  const [creators, setCreators] = useState<DiscoveryCreator[]>([]);
+  const [artists, setArtists] = useState<DiscoveryArtistCredit[]>([]);
+  const [tracks, setTracks] = useState<DiscoveryTrack[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-        <section className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/10">
-          <img
-            src="/images/editorial/choose-your-vybe.webp"
-            alt="Members choosing among individual artists, genres, communities and merch experiences"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/45 to-transparent" />
-          <div className="relative flex min-h-[360px] max-w-xl flex-col justify-end p-7 md:p-10">
-            <p className="flex items-center gap-2 text-sm font-medium text-genre-country">
-              <Compass className="h-4 w-4" /> Choose your VYBE
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold text-white md:text-4xl">
-              Every sound opens another door.
-            </h2>
-            <p className="mt-3 text-white/70">
-              Move between artists, genres, stories, communities, events, playlists and merch.
-            </p>
-            <Button asChild className="mt-6 w-fit rounded-full bg-white text-black hover:bg-white/90">
-              <Link to="/listen"><Play className="mr-2 h-4 w-4 fill-current" /> Start exploring</Link>
-            </Button>
-          </div>
+  useEffect(() => {
+    setLoading(true); setError(null);
+    publicDiscoveryService.search(query)
+      .then((result) => { setCreators(result.creators); setArtists(result.artists); setTracks(result.tracks); })
+      .catch((reason) => setError(reason instanceof Error ? reason.message : "Discovery could not load."))
+      .finally(() => setLoading(false));
+  }, [query]);
+
+  const submit = (event: FormEvent) => { event.preventDefault(); setQuery(input.trim()); };
+  const choose = (value: string) => { setInput(value); setQuery(value); };
+
+  return <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
+    <div className="mx-auto max-w-6xl space-y-7">
+      <WorkspacePageHeader eyebrow="Supporter discovery" title="Find your next VYBE." description="Discover real VYBE creators and published music. Open a creator page to listen, follow, heart, save, and participate." status={<Button asChild variant="outline" className="rounded-full"><Link to="/supporter-interests"><SlidersHorizontal className="mr-2 h-4 w-4" />Tune interests</Link></Button>} />
+
+      <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card"><CardContent className="p-5 sm:p-7">
+        <form onSubmit={submit} className="relative"><Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" /><Input value={input} onChange={(event) => setInput(event.target.value)} placeholder="Search creator, performing artist, song, city, or genre" className="h-14 rounded-full bg-background pl-12 pr-28 text-base" /><Button className="absolute right-1.5 top-1.5 h-11 rounded-full px-6">Search</Button></form>
+        <div className="mt-4 flex flex-wrap gap-2">{genres.map((genre) => <Button key={genre} size="sm" variant={query === genre ? "default" : "outline"} className="rounded-full" onClick={() => choose(genre)}>{genre}</Button>)}{query ? <Button size="sm" variant="ghost" className="rounded-full" onClick={() => choose("")}>Show everything</Button> : null}</div>
+      </CardContent></Card>
+
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><ActionCard title="Tune interests" text="Choose the genres and experiences that should shape your discovery." to="/supporter-interests" icon={<SlidersHorizontal className="h-5 w-5" />} /><ActionCard title="Read creator stories" text="Go behind the music through stories, interviews, and creative journeys." to="/read" icon={<ArrowRight className="h-5 w-5" />} /><ActionCard title="Find your people" text="Join conversations about creators, releases, scenes, and shared interests." to="/communities" icon={<UsersRound className="h-5 w-5" />} /><ActionCard title="Return to My VYBE" text="Open your hearted songs, lists, followed creators, and saved experiences." to="/my-vybe" icon={<Music2 className="h-5 w-5" />} /></section>
+
+      {loading ? <div className="flex min-h-56 items-center justify-center"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div> : null}
+      {error ? <p className="rounded-2xl border border-destructive/30 bg-destructive/10 p-5 text-sm text-destructive">{error}</p> : null}
+      {!loading && !error ? <div className="space-y-10">
+        <section><div className="flex items-end justify-between"><div><p className="text-sm font-medium text-primary">Creators</p><h2 className="mt-1 text-2xl font-semibold">{query ? `Creators connected to “${query}”` : "Explore VYBE creator accounts"}</h2></div><span className="text-sm text-muted-foreground">{creators.length} found</span></div>
+          {creators.length ? <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{creators.map((creator) => <Link key={creator.user_id} to="/artist/$username" params={{ username: creator.username }} className="group rounded-2xl border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/40"><div className="flex items-center gap-4"><Avatar className="h-14 w-14"><AvatarImage src={creator.avatar_url ?? undefined} /><AvatarFallback><UserRound className="h-5 w-5" /></AvatarFallback></Avatar><div className="min-w-0 flex-1"><h3 className="truncate font-semibold">{creator.artist_name || creator.display_name}</h3><p className="truncate text-sm text-muted-foreground">{creator.genres?.join(", ") || creator.genre || "Independent creator"}</p>{creator.location ? <p className="mt-1 flex items-center gap-1 truncate text-xs text-muted-foreground"><MapPin className="h-3 w-3" />{creator.location}</p> : null}</div><ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5" /></div></Link>)}</div> : <Empty text="No creator accounts match this search yet." />}
         </section>
 
-        <section>
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="text-sm font-medium text-primary">Browse by sound</p>
-              <h2 className="mt-1 text-2xl font-semibold">Pick a genre, follow the feeling</h2>
-            </div>
-          </div>
-          <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-            {genres.map(([name, image, color]) => (
-              <button
-                key={name}
-                onClick={() => { window.location.href = "/listen"; }}
-                className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 text-left content-glow"
-                style={{ "--card-glow": color } as CSSProperties}
-              >
-                <img
-                  src={image}
-                  alt=""
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                />
-                <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent" />
-                <span className="absolute inset-x-0 bottom-0 p-4 font-semibold text-white">
-                  {name}
-                </span>
-              </button>
-            ))}
-          </div>
+        {artists.length ? <section><div className="flex items-end justify-between"><div><p className="text-sm font-medium text-primary">Artist credits</p><h2 className="mt-1 text-2xl font-semibold">Credited performing artists</h2></div><span className="text-sm text-muted-foreground">{artists.length} found</span></div><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{artists.map((artist) => <button key={artist.name.toLowerCase()} type="button" onClick={() => choose(artist.name)} className="rounded-2xl border bg-card p-5 text-left transition hover:border-primary/40"><div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary"><Music2 className="h-5 w-5" /></span><span><span className="block font-semibold">{artist.name}</span><span className="text-xs text-muted-foreground">{artist.songCount} {artist.songCount === 1 ? "song" : "songs"} · {artist.uploaderCount} {artist.uploaderCount === 1 ? "creator account" : "creator accounts"}</span></span></div></button>)}</div></section> : null}
+
+        <section><div className="flex items-end justify-between"><div><p className="text-sm font-medium text-primary">Published music</p><h2 className="mt-1 text-2xl font-semibold">Music to explore</h2></div><span className="text-sm text-muted-foreground">{tracks.length} found</span></div>
+          {tracks.length ? <div className="mt-5 grid gap-3 md:grid-cols-2">{tracks.map((track) => <Link key={track.id} to="/artist/$username" params={{ username: track.creator!.username }} search={{ track: track.id }} hash="music" className="flex items-center gap-4 rounded-2xl border bg-card p-4 transition hover:border-primary/40"><span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">{track.cover_url ? <img src={track.cover_url} alt="" className="h-full w-full object-cover" /> : <Music2 className="h-5 w-5 text-muted-foreground" />}</span><span className="min-w-0 flex-1"><span className="block truncate font-semibold">{track.title}</span><span className="block truncate text-sm text-muted-foreground">{track.primary_artist_name || track.creator?.artist_name}</span><span className="block truncate text-xs text-muted-foreground">{track.genre || `Uploaded by ${track.creator?.artist_name || track.creator?.display_name}`}</span></span><ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" /></Link>)}</div> : <Empty text="No published songs match this search yet." />}
         </section>
 
-        <section className="grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
-          <article className="relative min-h-[320px] overflow-hidden rounded-3xl border border-white/10">
-            <img
-              src="/images/editorial/artist-stories.webp"
-              alt="Artist telling the story behind a song"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/35 to-transparent" />
-            <div className="relative flex min-h-[320px] max-w-md flex-col justify-end p-7">
-              <p className="text-sm text-genre-pop">Behind the music</p>
-              <h3 className="mt-2 text-2xl font-semibold text-white">
-                Stories that make every listen mean more.
-              </h3>
-              <Link to="/read" className="mt-5 flex items-center gap-2 text-sm font-medium text-white">
-                Read artist stories <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </article>
-          <article className="flex min-h-[320px] flex-col justify-between rounded-3xl border border-border/70 bg-card p-7">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-genre-electronic/15 text-genre-electronic">
-              <Users className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm text-genre-electronic">Community rooms</p>
-              <h3 className="mt-2 text-2xl font-semibold">
-                The conversation continues after the song ends.
-              </h3>
-              <p className="mt-3 text-muted-foreground">
-                Find members who share your taste and join artist-led spaces.
-              </p>
-              <Link to="/communities" className="mt-5 flex items-center gap-2 text-sm font-medium text-foreground">
-                Find your people <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </article>
-        </section>
-      </div>
-    </RoleGuard>
-  );
+      </div> : null}
+    </div>
+  </RoleGuard>;
 }
+
+function Empty({ text }: { text: string }) { return <p className="mt-5 rounded-2xl border border-dashed p-7 text-center text-sm text-muted-foreground">{text}</p>; }
+function ActionCard({ title, text, to, icon }: { title: string; text: string; to: "/supporter-interests" | "/read" | "/communities" | "/my-vybe"; icon: ReactNode }) { return <Link to={to} className="group rounded-2xl border bg-card p-5 transition hover:border-primary/40"><span className="text-primary">{icon}</span><h3 className="mt-4 font-semibold">{title}</h3><p className="mt-2 text-sm text-muted-foreground">{text}</p><span className="mt-4 inline-flex items-center text-sm font-medium text-primary">Open <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-0.5" /></span></Link>; }

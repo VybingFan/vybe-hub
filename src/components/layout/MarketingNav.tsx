@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, UserRound, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/common/Logo";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
@@ -31,7 +31,8 @@ export function MarketingNav() {
       ? "Open Admin"
       : primaryRole === "creator"
         ? "Open Creator Studio"
-        : "Open VYBE";
+        : "Member Home";
+  const memberName = String(user?.user_metadata?.display_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "VYBE member");
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/40 bg-background/70 backdrop-blur-xl">
@@ -52,19 +53,28 @@ export function MarketingNav() {
         <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle />
           {!isLoading && user ? (
-            <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
-              <a href={defaultRoute}>{appLabel}</a>
-            </Button>
+            <div className="flex items-center gap-2">
+              <span className="hidden max-w-44 items-center gap-2 truncate rounded-full border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground xl:flex" title={user.email ?? memberName}>
+                <UserRound className="h-4 w-4 shrink-0 text-primary" />
+                <span className="truncate">Signed in as {memberName}</span>
+              </span>
+              <Button asChild variant="outline">
+                <Link to="/my-vybe">My VYBE</Link>
+              </Button>
+              <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
+                <a href={defaultRoute}>{appLabel}</a>
+              </Button>
+            </div>
           ) : !isLoading ? (
             <>
               <Button asChild variant="ghost">
                 <Link to="/creator">Creators</Link>
               </Button>
               <Button asChild variant="ghost">
-                <Link to="/auth/sign-in">Sign in</Link>
+                <Link to="/auth/sign-in">Supporter Sign In</Link>
               </Button>
               <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
-                <Link to="/auth/sign-up">Join VYBE</Link>
+                <Link to="/auth/sign-up">Create Free Account</Link>
               </Button>
             </>
           ) : null}
@@ -96,9 +106,13 @@ export function MarketingNav() {
             </div>
 
             {!isLoading && user ? (
-              <Button asChild className="w-full bg-gradient-brand text-primary-foreground">
-                <a href={defaultRoute}>{appLabel}</a>
-              </Button>
+              <div className="space-y-2 border-t border-border/50 pt-4">
+                <p className="flex items-center gap-2 rounded-xl bg-muted/40 px-3 py-2 text-sm">
+                  <UserRound className="h-4 w-4 text-primary" /> Signed in as {memberName}
+                </p>
+                <Button asChild variant="outline" className="w-full"><Link to="/my-vybe">My VYBE</Link></Button>
+                <Button asChild className="w-full bg-gradient-brand text-primary-foreground"><a href={defaultRoute}>{appLabel}</a></Button>
+              </div>
             ) : !isLoading ? (
               <div className="space-y-2 border-t border-border/50 pt-4">
                 <Button asChild variant="outline" className="w-full">
@@ -106,10 +120,10 @@ export function MarketingNav() {
                 </Button>
                 <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
                   <Button asChild variant="outline">
-                    <Link to="/auth/sign-in">Sign in</Link>
+                    <Link to="/auth/sign-in">Supporter Sign In</Link>
                   </Button>
                   <Button asChild className="bg-gradient-brand text-primary-foreground">
-                    <Link to="/auth/sign-up">Join VYBE</Link>
+                    <Link to="/auth/sign-up">Create Free Account</Link>
                   </Button>
                 </div>
               </div>

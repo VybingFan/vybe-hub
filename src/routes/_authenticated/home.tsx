@@ -1,58 +1,34 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { CalendarDays, Compass, Gamepad2, Heart, Sparkles, UsersRound } from "lucide-react";
-import { ExperiencePreviewPage } from "@/components/experience/ExperiencePreviewPage";
+import { useEffect, useState, type ReactNode } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, CalendarDays, Compass, Heart, Loader2, Music2, ShoppingBag, Sparkles, UsersRound } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
+import { useUser } from "@/hooks/useUser";
+import { publicDiscoveryService, type DiscoveryCreator, type DiscoveryTrack } from "@/services/discovery/publicDiscoveryService";
 
 export const Route = createFileRoute("/_authenticated/home")({ component: HomePage });
 
 function HomePage() {
-  return (
-    <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
-      <ExperiencePreviewPage
-        eyebrow="Your member home"
-        title="Something worth returning to—every day."
-        description="Follow what is new across the creators, communities, challenges, and experiences that make up your VYBE."
-        accent="#a855f7"
-        cards={[
-          {
-            title: "Discover creators",
-            description:
-              "Move across artists, genres, stories, playlists, and emerging creative voices.",
-            icon: Compass,
-            status: "Available now",
-            to: "/discover",
-          },
-          {
-            title: "Daily challenge",
-            description: "A fresh trivia, listening, or discovery challenge designed for members.",
-            icon: Gamepad2,
-          },
-          {
-            title: "From your creators",
-            description:
-              "Future updates from creators you follow, gathered into one personal feed.",
-            icon: Sparkles,
-          },
-          {
-            title: "Community activity",
-            description: "Return to conversations, polls, contests, and creator-led spaces.",
-            icon: UsersRound,
-          },
-          {
-            title: "Upcoming events",
-            description:
-              "See releases, listening parties, screenings, performances, and local events.",
-            icon: CalendarDays,
-          },
-          {
-            title: "Saved to My VYBE",
-            description:
-              "Pick up where you left off across saved creators, playlists, videos, and stories.",
-            icon: Heart,
-          },
-        ]}
-        note="Discovery is available now. Personalized following, challenges, communities, events, and saved experiences are presented here as the next member-centered phase."
-      />
-    </RoleGuard>
-  );
+  const { user } = useUser();
+  const [creators, setCreators] = useState<DiscoveryCreator[]>([]);
+  const [tracks, setTracks] = useState<DiscoveryTrack[]>([]);
+  const [loading, setLoading] = useState(true);
+  const name = String(user?.user_metadata?.display_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "VYBE member");
+  useEffect(() => { publicDiscoveryService.search("").then((result) => { setCreators(result.creators.slice(0, 6)); setTracks(result.tracks.slice(0, 8)); }).catch(() => { setCreators([]); setTracks([]); }).finally(() => setLoading(false)); }, []);
+  return <RoleGuard allow={["supporter", "creator", "business", "admin"]}><div className="mx-auto max-w-6xl space-y-7">
+    <WorkspacePageHeader eyebrow="Your member home" title={`Welcome back, ${name}.`} description="Discover what is happening across VYBE and return to the creators, music, conversations, and experiences that matter to you." status={<Badge variant="secondary">Supporter</Badge>} />
+    <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"><Quick to="/discover" title="Discover" text="Find creators and music" icon={<Compass />} /><Quick to="/my-vybe" title="My VYBE" text="Open saved music" icon={<Heart />} /><Quick to="/communities" title="Communities" text="Join conversations" icon={<UsersRound />} /><Quick to="/events" title="Events" text="See what is happening" icon={<CalendarDays />} /></section>
+    <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/15 via-card to-card"><CardContent className="grid gap-6 p-6 md:grid-cols-[1fr_auto] md:items-center"><div><p className="text-sm font-semibold text-primary">YOUR VYBE STARTS HERE</p><h2 className="mt-2 text-3xl font-semibold">Find something worth returning to.</h2><p className="mt-3 max-w-2xl text-muted-foreground">Explore creators, play music, save what moves you, and join the conversation around it.</p></div><Button asChild size="lg" className="rounded-full"><Link to="/discover">Start discovering <ArrowRight className="ml-2 h-4 w-4" /></Link></Button></CardContent></Card>
+    {loading ? <div className="flex min-h-40 items-center justify-center"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div> : <>
+      <section><div className="flex items-end justify-between"><div><p className="text-sm font-medium text-primary">Creators to discover</p><h2 className="mt-1 text-2xl font-semibold">Meet creators across VYBE</h2></div><Button asChild variant="ghost"><Link to="/discover">View all <ArrowRight className="ml-2 h-4 w-4" /></Link></Button></div><div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{creators.map((creator) => <Link key={creator.user_id} to="/artist/$username" params={{ username: creator.username }} className="flex items-center gap-3 rounded-2xl border bg-card p-4 transition hover:border-primary/40"><Avatar className="h-12 w-12"><AvatarImage src={creator.avatar_url ?? undefined} /><AvatarFallback>{(creator.artist_name || creator.display_name || "V").slice(0,1)}</AvatarFallback></Avatar><span className="min-w-0"><span className="block truncate font-semibold">{creator.artist_name || creator.display_name}</span><span className="block truncate text-xs text-muted-foreground">{creator.genres?.join(", ") || creator.genre || "Independent creator"}</span></span></Link>)}</div></section>
+      <section><div className="flex items-end justify-between"><div><p className="text-sm font-medium text-primary">Music across VYBE</p><h2 className="mt-1 text-2xl font-semibold">Press play on something new</h2></div><Button asChild variant="ghost"><Link to="/discover">More music <ArrowRight className="ml-2 h-4 w-4" /></Link></Button></div><div className="mt-4 grid gap-3 md:grid-cols-2">{tracks.map((track) => <Link key={track.id} to="/artist/$username" params={{ username: track.creator!.username }} search={{ track: track.id }} hash="music" className="flex items-center gap-3 rounded-2xl border bg-card p-3 transition hover:border-primary/40"><span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">{track.cover_url ? <img src={track.cover_url} alt="" className="h-full w-full object-cover" /> : <Music2 className="h-5 w-5" />}</span><span className="min-w-0"><span className="block truncate font-semibold">{track.title}</span><span className="block truncate text-xs text-muted-foreground">{track.primary_artist_name || track.creator?.artist_name}</span></span></Link>)}</div></section>
+    </>}
+    <section className="grid gap-4 md:grid-cols-3"><Coming title="From creators you follow" text="A personal creator-update feed will appear here as you follow creators." icon={<Sparkles />} /><Coming title="Upcoming near you" text="Saved and location-relevant releases, appearances, and events will appear here." icon={<CalendarDays />} /><a href="/#merch" className="rounded-2xl border bg-card p-5 transition hover:border-primary/40"><ShoppingBag className="h-5 w-5 text-primary" /><h3 className="mt-4 font-semibold">Explore merchandise</h3><p className="mt-2 text-sm text-muted-foreground">Discover creator brands and products shared across VYBE.</p><span className="mt-4 inline-flex items-center text-sm font-medium text-primary">Browse merch <ArrowRight className="ml-2 h-4 w-4" /></span></a></section>
+  </div></RoleGuard>;
 }
+function Quick({ to, title, text, icon }: { to: "/discover" | "/my-vybe" | "/communities" | "/events"; title: string; text: string; icon: ReactNode }) { return <Link to={to} className="rounded-2xl border bg-card p-4 transition hover:border-primary/40"><span className="text-primary [&>svg]:h-5 [&>svg]:w-5">{icon}</span><span className="mt-3 block font-semibold">{title}</span><span className="text-xs text-muted-foreground">{text}</span></Link>; }
+function Coming({ title, text, icon }: { title: string; text: string; icon: ReactNode }) { return <Card><CardContent className="p-5"><span className="text-primary [&>svg]:h-5 [&>svg]:w-5">{icon}</span><div className="mt-4 flex items-center justify-between gap-2"><h3 className="font-semibold">{title}</h3><Badge variant="outline">Building</Badge></div><p className="mt-2 text-sm text-muted-foreground">{text}</p></CardContent></Card>; }

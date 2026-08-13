@@ -73,7 +73,7 @@ const memberPrimary: NavItem[] = [
   },
   {
     title: "Listen",
-    url: "/listen",
+    url: "/experience/listen",
     icon: Music2,
     allow: ["supporter", "creator", "business", "admin"],
   },

@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useUser } from "@/hooks/useUser";
 import {
   publicDiscoveryService,
   type DiscoveryArtistCredit,
@@ -26,6 +27,7 @@ const genreChoices = ["Hip-Hop", "R&B", "Rock", "Country", "Pop", "Electronic", 
 function PublicExplorePage() {
   const { q } = Route.useSearch();
   const navigate = useNavigate();
+  const { user } = useUser();
   const [input, setInput] = useState(q);
   const [creators, setCreators] = useState<DiscoveryCreator[]>([]);
   const [artists, setArtists] = useState<DiscoveryArtistCredit[]>([]);
@@ -63,8 +65,9 @@ function PublicExplorePage() {
             Find your sound, city, or creator.
           </h1>
           <p className="mt-4 text-muted-foreground">
-            Browse published VYBE music without creating an account. Join when you want to follow,
-            save, or participate.
+            {user
+              ? "You are signed in. Discover creators and music, then follow, heart, save, or participate across VYBE."
+              : "Browse published VYBE music freely. Create a free Supporter account when you want to follow, save, or participate."}
           </p>
           <form onSubmit={submit} className="relative mx-auto mt-8 max-w-2xl">
             <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -252,15 +255,25 @@ function PublicExplorePage() {
             </section>
 
             <section className="rounded-[2rem] border bg-card p-8 text-center">
-              <h2 className="text-2xl font-semibold">Want to save what you find?</h2>
-              <p className="mt-2 text-muted-foreground">
-                Create a free Supporter account or start your own Creator Free page.
-              </p>
-              <Button asChild className="mt-5 rounded-full">
-                <Link to="/auth/sign-up">
-                  Create a free account <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              {user ? (
+                <>
+                  <h2 className="text-2xl font-semibold">Keep what moves you close.</h2>
+                  <p className="mt-2 text-muted-foreground">You are signed in. Return to hearted songs, saved lists, followed creators, and communities in My VYBE.</p>
+                  <div className="mt-5 flex flex-wrap justify-center gap-3">
+                    <Button asChild className="rounded-full"><Link to="/my-vybe">Open My VYBE <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+                    <Button asChild variant="outline" className="rounded-full"><Link to="/home">Member Home</Link></Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-2xl font-semibold">Want to save what you find?</h2>
+                  <p className="mt-2 text-muted-foreground">Sign in as a supporter or create a free account to follow, heart, save, and participate.</p>
+                  <div className="mt-5 flex flex-wrap justify-center gap-3">
+                    <Button asChild variant="outline" className="rounded-full"><Link to="/auth/sign-in">Supporter Sign In</Link></Button>
+                    <Button asChild className="rounded-full"><Link to="/auth/sign-up">Create Free Account <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+                  </div>
+                </>
+              )}
             </section>
           </div>
         )}
