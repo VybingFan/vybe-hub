@@ -196,6 +196,8 @@ export function PublicArtistHome({
             tracks={tracks}
             playlists={playlists}
             username={profile.username}
+            creatorUserId={profile.user_id}
+            creatorName={name}
             initialTrackId={selectedTrackId}
           />
         </section>

@@ -12,6 +12,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatDuration, type Track } from "@/features/music/schema";
+import {
+  buildCreatorContinuationQueue,
+  CREATOR_CONTINUATION_SORTS,
+  fillArtistTopFive,
+  type CreatorContinuationSort,
+} from "@/features/music/playbackContinuation";
+import { CreatorContinuationPlayer } from "@/components/music/CreatorContinuationPlayer";
 import type { PublicCreatorPlaylist } from "@/services/creator/publicCreatorService";
 
 type Filter =
@@ -23,38 +30,22 @@ export function PublicCreatorMusicExperience({
   tracks,
   playlists,
   username,
+  creatorUserId,
+  creatorName,
   initialTrackId,
 }: {
   tracks: Track[];
   playlists: PublicCreatorPlaylist[];
   username: string;
+  creatorUserId: string;
+  creatorName: string;
   initialTrackId?: string;
 }) {
   const publicTracks = useMemo(
     () => tracks.filter((track) => track.show_on_public_profile !== false),
     [tracks],
   );
-  const ranked = useMemo(
-    () =>
-      publicTracks
-        .filter((track) => track.profile_feature_rank != null)
-        .sort(
-          (a, b) =>
-            (a.profile_feature_rank ?? 99) - (b.profile_feature_rank ?? 99),
-        )
-        .slice(0, 5),
-    [publicTracks],
-  );
-  const topTracks = ranked.length
-    ? ranked
-    : publicTracks
-        .slice()
-        .sort(
-          (a, b) =>
-            Number(b.is_featured) - Number(a.is_featured) ||
-            b.created_at.localeCompare(a.created_at),
-        )
-        .slice(0, 5);
+  const topTracks = useMemo(() => fillArtistTopFive(publicTracks), [publicTracks]);
   const latest = publicTracks
     .slice()
     .sort((a, b) =>
@@ -70,9 +61,11 @@ export function PublicCreatorMusicExperience({
   const [filter, setFilter] = useState<Filter>({ kind: "all" });
   const [showAll, setShowAll] = useState(false);
   const [showAllPlaylists, setShowAllPlaylists] = useState(false);
+  const [continuationSort, setContinuationSort] =
+    useState<CreatorContinuationSort>("newest_added");
   const selected =
     publicTracks.find((track) => track.id === selectedId) ?? publicTracks[0];
-
+  const continuationQueue = buildCreatorContinuationQueue(publicTracks, topTracks, continuationSort);
   const genres = unique(
     publicTracks
       .map((track) => track.genre)
@@ -110,7 +103,7 @@ export function PublicCreatorMusicExperience({
               Selected by the artist
             </p>
             <h2 id="artist-top-five" className="mt-1 text-2xl font-semibold">
-              {ranked.length ? "Artist’s Top 5" : "Start here"}
+              {topTracks.length ? "Artist’s Top 5" : "Start here"}
             </h2>
           </div>
           <span className="text-xs text-muted-foreground">
@@ -157,34 +150,34 @@ export function PublicCreatorMusicExperience({
           ))}
         </div>
 
-        {selected ? (
-          <div className="mt-3 flex flex-col gap-3 rounded-2xl border bg-background/80 p-3 sm:flex-row sm:items-center">
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">
-                Now selected: {selected.title}
-              </p>
-              <p className="truncate text-xs text-muted-foreground">
-                {selected.playback_mode === "preview"
-                  ? "Public preview"
-                  : selected.audio_url
-                    ? "Full public playback"
-                    : "Playback restricted"}
-              </p>
-            </div>
-            {selected.audio_url ? (
-              <audio
-                key={selected.id}
-                src={selected.audio_url}
-                controls
-                preload="metadata"
-                controlsList="nodownload noremoteplayback"
-                className="h-10 w-full sm:w-80"
-              />
-            ) : (
-              <Badge variant="outline">Playback unavailable</Badge>
-            )}
+        <CreatorContinuationPlayer
+          queue={continuationQueue}
+          selectedId={selected?.id}
+          topTrackIds={new Set(topTracks.map((track) => track.id))}
+          creatorUserId={creatorUserId}
+          creatorName={creatorName}
+          onSelect={setSelectedId}
+        />
+        <div className="mt-3 flex flex-col gap-2 rounded-2xl border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium">Continue with this creator</p>
+            <p className="text-xs text-muted-foreground">
+              Top 5 first, then eligible public songs. Restricted music is excluded.
+            </p>
           </div>
-        ) : null}
+          <select
+            value={continuationSort}
+            onChange={(event) =>
+              setContinuationSort(event.target.value as CreatorContinuationSort)
+            }
+            className="h-9 rounded-xl border bg-background px-3 text-sm"
+            aria-label="Choose creator catalog order"
+          >
+            {CREATOR_CONTINUATION_SORTS.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </div>
       </section>
 
       {latest ? (
