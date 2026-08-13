@@ -33,7 +33,7 @@ function DiscoverPage() {
             </p>
           </div>
           <Button asChild variant="outline" className="rounded-full">
-            <Link to="/profile">
+            <Link to="/supporter-interests">
               Tune your interests <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
@@ -56,8 +56,8 @@ function DiscoverPage() {
             <p className="mt-3 text-white/70">
               Move between artists, genres, stories, communities, events, playlists and merch.
             </p>
-            <Button className="mt-6 w-fit rounded-full bg-white text-black hover:bg-white/90">
-              <Play className="mr-2 h-4 w-4 fill-current" /> Start exploring
+            <Button asChild className="mt-6 w-fit rounded-full bg-white text-black hover:bg-white/90">
+              <Link to="/listen"><Play className="mr-2 h-4 w-4 fill-current" /> Start exploring</Link>
             </Button>
           </div>
         </section>
@@ -73,6 +73,7 @@ function DiscoverPage() {
             {genres.map(([name, image, color]) => (
               <button
                 key={name}
+                onClick={() => { window.location.href = "/listen"; }}
                 className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 text-left content-glow"
                 style={{ "--card-glow": color } as CSSProperties}
               >
@@ -103,9 +104,9 @@ function DiscoverPage() {
               <h3 className="mt-2 text-2xl font-semibold text-white">
                 Stories that make every listen mean more.
               </h3>
-              <button className="mt-5 flex items-center gap-2 text-sm font-medium text-white">
+              <Link to="/read" className="mt-5 flex items-center gap-2 text-sm font-medium text-white">
                 Read artist stories <ArrowRight className="h-4 w-4" />
-              </button>
+              </Link>
             </div>
           </article>
           <article className="flex min-h-[320px] flex-col justify-between rounded-3xl border border-border/70 bg-card p-7">
@@ -120,9 +121,9 @@ function DiscoverPage() {
               <p className="mt-3 text-muted-foreground">
                 Find members who share your taste and join artist-led spaces.
               </p>
-              <button className="mt-5 flex items-center gap-2 text-sm font-medium text-foreground">
+              <Link to="/communities" className="mt-5 flex items-center gap-2 text-sm font-medium text-foreground">
                 Find your people <ArrowRight className="h-4 w-4" />
-              </button>
+              </Link>
             </div>
           </article>
         </section>

@@ -53,6 +53,8 @@ import { Route as ApiAccountDeletionRouteImport } from './routes/api.account-del
 import { Route as AdminInviteTokenRouteImport } from './routes/admin-invite.$token'
 import { Route as AuthenticatedWatchRouteImport } from './routes/_authenticated/watch'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
+import { Route as AuthenticatedSupporterProfileRouteImport } from './routes/_authenticated/supporter-profile'
+import { Route as AuthenticatedSupporterInterestsRouteImport } from './routes/_authenticated/supporter-interests'
 import { Route as AuthenticatedStoriesRouteImport } from './routes/_authenticated/stories'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedReadRouteImport } from './routes/_authenticated/read'
@@ -331,6 +333,18 @@ const AuthenticatedVideosRoute = AuthenticatedVideosRouteImport.update({
   path: '/videos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSupporterProfileRoute =
+  AuthenticatedSupporterProfileRouteImport.update({
+    id: '/supporter-profile',
+    path: '/supporter-profile',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSupporterInterestsRoute =
+  AuthenticatedSupporterInterestsRouteImport.update({
+    id: '/supporter-interests',
+    path: '/supporter-interests',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedStoriesRoute = AuthenticatedStoriesRouteImport.update({
   id: '/stories',
   path: '/stories',
@@ -699,6 +713,8 @@ export interface FileRoutesByFullPath {
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/stories': typeof AuthenticatedStoriesRoute
+  '/supporter-interests': typeof AuthenticatedSupporterInterestsRoute
+  '/supporter-profile': typeof AuthenticatedSupporterProfileRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
@@ -802,6 +818,8 @@ export interface FileRoutesByTo {
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/stories': typeof AuthenticatedStoriesRoute
+  '/supporter-interests': typeof AuthenticatedSupporterInterestsRoute
+  '/supporter-profile': typeof AuthenticatedSupporterProfileRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
@@ -907,6 +925,8 @@ export interface FileRoutesById {
   '/_authenticated/read': typeof AuthenticatedReadRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/stories': typeof AuthenticatedStoriesRoute
+  '/_authenticated/supporter-interests': typeof AuthenticatedSupporterInterestsRoute
+  '/_authenticated/supporter-profile': typeof AuthenticatedSupporterProfileRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_authenticated/watch': typeof AuthenticatedWatchRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
@@ -1012,6 +1032,8 @@ export interface FileRouteTypes {
     | '/read'
     | '/settings'
     | '/stories'
+    | '/supporter-interests'
+    | '/supporter-profile'
     | '/videos'
     | '/watch'
     | '/admin-invite/$token'
@@ -1115,6 +1137,8 @@ export interface FileRouteTypes {
     | '/read'
     | '/settings'
     | '/stories'
+    | '/supporter-interests'
+    | '/supporter-profile'
     | '/videos'
     | '/watch'
     | '/admin-invite/$token'
@@ -1219,6 +1243,8 @@ export interface FileRouteTypes {
     | '/_authenticated/read'
     | '/_authenticated/settings'
     | '/_authenticated/stories'
+    | '/_authenticated/supporter-interests'
+    | '/_authenticated/supporter-profile'
     | '/_authenticated/videos'
     | '/_authenticated/watch'
     | '/admin-invite/$token'
@@ -1630,6 +1656,20 @@ declare module '@tanstack/react-router' {
       path: '/videos'
       fullPath: '/videos'
       preLoaderRoute: typeof AuthenticatedVideosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/supporter-profile': {
+      id: '/_authenticated/supporter-profile'
+      path: '/supporter-profile'
+      fullPath: '/supporter-profile'
+      preLoaderRoute: typeof AuthenticatedSupporterProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/supporter-interests': {
+      id: '/_authenticated/supporter-interests'
+      path: '/supporter-interests'
+      fullPath: '/supporter-interests'
+      preLoaderRoute: typeof AuthenticatedSupporterInterestsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/stories': {
@@ -2070,6 +2110,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReadRoute: typeof AuthenticatedReadRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedStoriesRoute: typeof AuthenticatedStoriesRoute
+  AuthenticatedSupporterInterestsRoute: typeof AuthenticatedSupporterInterestsRoute
+  AuthenticatedSupporterProfileRoute: typeof AuthenticatedSupporterProfileRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
   AuthenticatedAdminAccountsRoute: typeof AuthenticatedAdminAccountsRoute
@@ -2127,6 +2169,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReadRoute: AuthenticatedReadRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedStoriesRoute: AuthenticatedStoriesRoute,
+  AuthenticatedSupporterInterestsRoute: AuthenticatedSupporterInterestsRoute,
+  AuthenticatedSupporterProfileRoute: AuthenticatedSupporterProfileRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
   AuthenticatedAdminAccountsRoute: AuthenticatedAdminAccountsRoute,

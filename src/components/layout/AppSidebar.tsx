@@ -505,7 +505,7 @@ export function AppSidebar() {
                 items={[
                   {
                     title: "Profile",
-                    url: "/profile",
+                    url: "/supporter-profile",
                     icon: User,
                     allow: ["supporter"],
                   },
