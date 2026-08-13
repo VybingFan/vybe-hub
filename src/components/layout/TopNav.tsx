@@ -99,7 +99,7 @@ export function TopNav() {
           name="q"
           placeholder={
             isAdmin
-              ? "Search accounts, businesses, campaigns, offers…"
+              ? "Search accounts, creators, rights, memberships, operations…"
               : "Search artists, songs, cities, genres…"
           }
           className="h-9 rounded-full border-border/60 bg-muted/40 pl-9"

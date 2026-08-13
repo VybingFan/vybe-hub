@@ -374,6 +374,16 @@ export function AppSidebar() {
                   ],
                 },
                 {
+                  title: "Membership & Privacy Audit",
+                  url: "/admin/membership-audit",
+                  icon: ShieldCheck,
+                  allow: ["admin"],
+                  permissionAnyOf: [
+                    "admin.finance.read",
+                    "admin.creator.membership",
+                  ],
+                },
+                {
                   title: "Reports",
                   url: "/admin/reports",
                   icon: BarChart3,

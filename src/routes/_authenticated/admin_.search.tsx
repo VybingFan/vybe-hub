@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { BriefcaseBusiness, Megaphone, Search, Tags, UsersRound } from "lucide-react";
 import { toast } from "sonner";
+import { ADMIN_SEARCH_DESTINATIONS } from "@/features/admin/adminSearchCatalog";
 import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,6 +28,15 @@ function AdminSearchRoute() {
   const [businesses, setBusinesses] = useState<BusinessRecord[]>([]);
   const [campaigns, setCampaigns] = useState<CampaignRecord[]>([]);
   const [offers, setOffers] = useState<BusinessOfferRecord[]>([]);
+  const destinationMatches = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    if (!needle) return [];
+    return ADMIN_SEARCH_DESTINATIONS.filter((item) =>
+      [item.title, item.detail, item.keywords].some((value) =>
+        value.toLowerCase().includes(needle),
+      ),
+    );
+  }, [q]);
   useEffect(() => {
     if (!q.trim()) return;
     void Promise.all([
@@ -69,8 +79,8 @@ function AdminSearchRoute() {
       );
   }, [q]);
   const total = useMemo(
-    () => accounts.length + businesses.length + campaigns.length + offers.length,
-    [accounts, businesses, campaigns, offers],
+    () => destinationMatches.length + accounts.length + businesses.length + campaigns.length + offers.length,
+    [destinationMatches, accounts, businesses, campaigns, offers],
   );
 
   return (
@@ -86,9 +96,29 @@ function AdminSearchRoute() {
           <p className="mt-2 text-sm text-muted-foreground">
             {q
               ? `${total} matching operational records`
-              : "Use the header to search accounts, businesses, campaigns, and offers."}
+              : "Search accounts, creators, businesses, rights, memberships, reports, and administrative tools."}
           </p>
         </header>
+        {destinationMatches.length ? (
+          <section className="space-y-3">
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <Search className="h-4 w-4 text-primary" />
+              Administrative work areas
+            </h2>
+            <div className="grid gap-3 md:grid-cols-2">
+              {destinationMatches.map((item) => (
+                <Link key={item.href} to={item.href as any}>
+                  <Card className="h-full transition hover:border-primary/40">
+                    <CardContent className="p-4">
+                      <p className="font-medium">{item.title}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{item.detail}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
         <ResultSection
           title="Members & Accounts"
           icon={UsersRound}

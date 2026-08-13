@@ -100,6 +100,7 @@ import { Route as AuthenticatedAdminPlayRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminPartnerCenterRouteImport } from './routes/_authenticated/admin_.partner-center'
 import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenticated/admin_.offers'
 import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_authenticated/admin_.memberships'
+import { Route as AuthenticatedAdminMembershipAuditRouteImport } from './routes/_authenticated/admin_.membership-audit'
 import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin_.creators'
 import { Route as AuthenticatedAdminCopyrightRouteImport } from './routes/_authenticated/admin_.copyright'
 import { Route as AuthenticatedAdminCommerceRightsRouteImport } from './routes/_authenticated/admin_.commerce-rights'
@@ -585,6 +586,12 @@ const AuthenticatedAdminMembershipsRoute =
     path: '/admin/memberships',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminMembershipAuditRoute =
+  AuthenticatedAdminMembershipAuditRouteImport.update({
+    id: '/admin_/membership-audit',
+    path: '/admin/membership-audit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCreatorsRoute =
   AuthenticatedAdminCreatorsRouteImport.update({
     id: '/admin_/creators',
@@ -724,6 +731,7 @@ export interface FileRoutesByFullPath {
   '/admin/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
+  '/admin/membership-audit': typeof AuthenticatedAdminMembershipAuditRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/partner-center': typeof AuthenticatedAdminPartnerCenterRoute
@@ -826,6 +834,7 @@ export interface FileRoutesByTo {
   '/admin/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
+  '/admin/membership-audit': typeof AuthenticatedAdminMembershipAuditRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
   '/admin/partner-center': typeof AuthenticatedAdminPartnerCenterRoute
@@ -930,6 +939,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
   '/_authenticated/admin_/copyright': typeof AuthenticatedAdminCopyrightRoute
   '/_authenticated/admin_/creators': typeof AuthenticatedAdminCreatorsRoute
+  '/_authenticated/admin_/membership-audit': typeof AuthenticatedAdminMembershipAuditRoute
   '/_authenticated/admin_/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/_authenticated/admin_/offers': typeof AuthenticatedAdminOffersRoute
   '/_authenticated/admin_/partner-center': typeof AuthenticatedAdminPartnerCenterRoute
@@ -1034,6 +1044,7 @@ export interface FileRouteTypes {
     | '/admin/commerce-rights'
     | '/admin/copyright'
     | '/admin/creators'
+    | '/admin/membership-audit'
     | '/admin/memberships'
     | '/admin/offers'
     | '/admin/partner-center'
@@ -1136,6 +1147,7 @@ export interface FileRouteTypes {
     | '/admin/commerce-rights'
     | '/admin/copyright'
     | '/admin/creators'
+    | '/admin/membership-audit'
     | '/admin/memberships'
     | '/admin/offers'
     | '/admin/partner-center'
@@ -1239,6 +1251,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/commerce-rights'
     | '/_authenticated/admin_/copyright'
     | '/_authenticated/admin_/creators'
+    | '/_authenticated/admin_/membership-audit'
     | '/_authenticated/admin_/memberships'
     | '/_authenticated/admin_/offers'
     | '/_authenticated/admin_/partner-center'
@@ -1948,6 +1961,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMembershipsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/membership-audit': {
+      id: '/_authenticated/admin_/membership-audit'
+      path: '/admin/membership-audit'
+      fullPath: '/admin/membership-audit'
+      preLoaderRoute: typeof AuthenticatedAdminMembershipAuditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/creators': {
       id: '/_authenticated/admin_/creators'
       path: '/admin/creators'
@@ -2058,6 +2078,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCommerceRightsRoute: typeof AuthenticatedAdminCommerceRightsRoute
   AuthenticatedAdminCopyrightRoute: typeof AuthenticatedAdminCopyrightRoute
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
+  AuthenticatedAdminMembershipAuditRoute: typeof AuthenticatedAdminMembershipAuditRoute
   AuthenticatedAdminMembershipsRoute: typeof AuthenticatedAdminMembershipsRoute
   AuthenticatedAdminOffersRoute: typeof AuthenticatedAdminOffersRoute
   AuthenticatedAdminPartnerCenterRoute: typeof AuthenticatedAdminPartnerCenterRoute
@@ -2114,6 +2135,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCommerceRightsRoute: AuthenticatedAdminCommerceRightsRoute,
   AuthenticatedAdminCopyrightRoute: AuthenticatedAdminCopyrightRoute,
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
+  AuthenticatedAdminMembershipAuditRoute:
+    AuthenticatedAdminMembershipAuditRoute,
   AuthenticatedAdminMembershipsRoute: AuthenticatedAdminMembershipsRoute,
   AuthenticatedAdminOffersRoute: AuthenticatedAdminOffersRoute,
   AuthenticatedAdminPartnerCenterRoute: AuthenticatedAdminPartnerCenterRoute,
