@@ -17,6 +17,7 @@ import { useMyPlaylists } from "@/hooks/usePlaylists";
 import { useUser } from "@/hooks/useUser";
 import { commerceService, type CommerceProductType } from "@/services/commerce/commerceService";
 import { ProductRightsDeclaration } from "@/components/commerce/ProductRightsDeclaration";
+import { StripeSellerReadinessCard } from "@/components/commerce/StripeSellerReadinessCard";
 
 export const Route = createFileRoute("/_authenticated/commerce")({ component: () => <RoleGuard allow={["creator", "admin"]}><CommerceStudio /></RoleGuard> });
 
@@ -52,6 +53,7 @@ function CommerceStudio() {
   };
   return <div className="mx-auto max-w-6xl space-y-5">
     <WorkspacePageHeader eyebrow="Creator commerce" title="Music sales" description="Prepare songs and permanent collections for sale. Checkout stays disabled until VYBE activates a verified payment and payout provider." status={<Badge variant="outline">Foundation</Badge>} />
+    <StripeSellerReadinessCard />
     {!settings?.checkout_enabled ? <Card className="border-amber-500/30"><CardContent className="flex gap-3 p-5"><LockKeyhole className="h-5 w-5 text-amber-500" /><div><p className="font-medium">Live checkout is not active</p><p className="text-sm text-muted-foreground">You can prepare listings safely. Customers will see “Sales opening soon” until activation.</p></div></CardContent></Card> : null}
     <div className="grid gap-5 lg:grid-cols-[.8fr_1.2fr]">
       <form onSubmit={submit} className="space-y-4 rounded-2xl border bg-card p-5">

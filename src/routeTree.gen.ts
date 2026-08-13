@@ -84,6 +84,7 @@ import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticat
 import { Route as DemoStorySlugRouteImport } from './routes/demo.story.$slug'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api.stripe.webhook'
 import { Route as ApiStripePortalRouteImport } from './routes/api.stripe.portal'
+import { Route as ApiStripeConnectRouteImport } from './routes/api.stripe.connect'
 import { Route as ApiStripeCheckoutRouteImport } from './routes/api.stripe.checkout'
 import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_authenticated/playlists_.$playlistId'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
@@ -91,6 +92,7 @@ import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminWorkQueueRouteImport } from './routes/_authenticated/admin_.work-queue'
 import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin_.team'
 import { Route as AuthenticatedAdminSystemHealthRouteImport } from './routes/_authenticated/admin_.system-health'
+import { Route as AuthenticatedAdminSellerReadinessRouteImport } from './routes/_authenticated/admin_.seller-readiness'
 import { Route as AuthenticatedAdminSearchRouteImport } from './routes/_authenticated/admin_.search'
 import { Route as AuthenticatedAdminRightsRouteImport } from './routes/_authenticated/admin_.rights'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin_.reports'
@@ -491,6 +493,11 @@ const ApiStripePortalRoute = ApiStripePortalRouteImport.update({
   path: '/api/stripe/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiStripeConnectRoute = ApiStripeConnectRouteImport.update({
+  id: '/api/stripe/connect',
+  path: '/api/stripe/connect',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStripeCheckoutRoute = ApiStripeCheckoutRouteImport.update({
   id: '/api/stripe/checkout',
   path: '/api/stripe/checkout',
@@ -529,6 +536,12 @@ const AuthenticatedAdminSystemHealthRoute =
   AuthenticatedAdminSystemHealthRouteImport.update({
     id: '/admin_/system-health',
     path: '/admin/system-health',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminSellerReadinessRoute =
+  AuthenticatedAdminSellerReadinessRouteImport.update({
+    id: '/admin_/seller-readiness',
+    path: '/admin/seller-readiness',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminSearchRoute =
@@ -718,6 +731,7 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
   '/admin/search': typeof AuthenticatedAdminSearchRoute
+  '/admin/seller-readiness': typeof AuthenticatedAdminSellerReadinessRoute
   '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
@@ -725,6 +739,7 @@ export interface FileRoutesByFullPath {
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
+  '/api/stripe/connect': typeof ApiStripeConnectRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
@@ -818,6 +833,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/rights': typeof AuthenticatedAdminRightsRoute
   '/admin/search': typeof AuthenticatedAdminSearchRoute
+  '/admin/seller-readiness': typeof AuthenticatedAdminSellerReadinessRoute
   '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
@@ -825,6 +841,7 @@ export interface FileRoutesByTo {
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
+  '/api/stripe/connect': typeof ApiStripeConnectRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
@@ -920,6 +937,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin_/rights': typeof AuthenticatedAdminRightsRoute
   '/_authenticated/admin_/search': typeof AuthenticatedAdminSearchRoute
+  '/_authenticated/admin_/seller-readiness': typeof AuthenticatedAdminSellerReadinessRoute
   '/_authenticated/admin_/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/_authenticated/admin_/team': typeof AuthenticatedAdminTeamRoute
   '/_authenticated/admin_/work-queue': typeof AuthenticatedAdminWorkQueueRoute
@@ -927,6 +945,7 @@ export interface FileRoutesById {
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
   '/_authenticated/playlists_/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
+  '/api/stripe/connect': typeof ApiStripeConnectRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
@@ -1022,6 +1041,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/rights'
     | '/admin/search'
+    | '/admin/seller-readiness'
     | '/admin/system-health'
     | '/admin/team'
     | '/admin/work-queue'
@@ -1029,6 +1049,7 @@ export interface FileRouteTypes {
     | '/music/upload'
     | '/playlists/$playlistId'
     | '/api/stripe/checkout'
+    | '/api/stripe/connect'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
@@ -1122,6 +1143,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/rights'
     | '/admin/search'
+    | '/admin/seller-readiness'
     | '/admin/system-health'
     | '/admin/team'
     | '/admin/work-queue'
@@ -1129,6 +1151,7 @@ export interface FileRouteTypes {
     | '/music/upload'
     | '/playlists/$playlistId'
     | '/api/stripe/checkout'
+    | '/api/stripe/connect'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
@@ -1223,6 +1246,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/reports'
     | '/_authenticated/admin_/rights'
     | '/_authenticated/admin_/search'
+    | '/_authenticated/admin_/seller-readiness'
     | '/_authenticated/admin_/system-health'
     | '/_authenticated/admin_/team'
     | '/_authenticated/admin_/work-queue'
@@ -1230,6 +1254,7 @@ export interface FileRouteTypes {
     | '/_authenticated/music_/upload'
     | '/_authenticated/playlists_/$playlistId'
     | '/api/stripe/checkout'
+    | '/api/stripe/connect'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
@@ -1277,6 +1302,7 @@ export interface RootRouteChildren {
   PlaylistSlugRoute: typeof PlaylistSlugRoute
   VideoVideoIdRoute: typeof VideoVideoIdRoute
   ApiStripeCheckoutRoute: typeof ApiStripeCheckoutRoute
+  ApiStripeConnectRoute: typeof ApiStripeConnectRoute
   ApiStripePortalRoute: typeof ApiStripePortalRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
   DemoStorySlugRoute: typeof DemoStorySlugRoute
@@ -1810,6 +1836,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStripePortalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/stripe/connect': {
+      id: '/api/stripe/connect'
+      path: '/api/stripe/connect'
+      fullPath: '/api/stripe/connect'
+      preLoaderRoute: typeof ApiStripeConnectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/stripe/checkout': {
       id: '/api/stripe/checkout'
       path: '/api/stripe/checkout'
@@ -1857,6 +1890,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/system-health'
       fullPath: '/admin/system-health'
       preLoaderRoute: typeof AuthenticatedAdminSystemHealthRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin_/seller-readiness': {
+      id: '/_authenticated/admin_/seller-readiness'
+      path: '/admin/seller-readiness'
+      fullPath: '/admin/seller-readiness'
+      preLoaderRoute: typeof AuthenticatedAdminSellerReadinessRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin_/search': {
@@ -2025,6 +2065,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminRightsRoute: typeof AuthenticatedAdminRightsRoute
   AuthenticatedAdminSearchRoute: typeof AuthenticatedAdminSearchRoute
+  AuthenticatedAdminSellerReadinessRoute: typeof AuthenticatedAdminSellerReadinessRoute
   AuthenticatedAdminSystemHealthRoute: typeof AuthenticatedAdminSystemHealthRoute
   AuthenticatedAdminTeamRoute: typeof AuthenticatedAdminTeamRoute
   AuthenticatedAdminWorkQueueRoute: typeof AuthenticatedAdminWorkQueueRoute
@@ -2080,6 +2121,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminRightsRoute: AuthenticatedAdminRightsRoute,
   AuthenticatedAdminSearchRoute: AuthenticatedAdminSearchRoute,
+  AuthenticatedAdminSellerReadinessRoute:
+    AuthenticatedAdminSellerReadinessRoute,
   AuthenticatedAdminSystemHealthRoute: AuthenticatedAdminSystemHealthRoute,
   AuthenticatedAdminTeamRoute: AuthenticatedAdminTeamRoute,
   AuthenticatedAdminWorkQueueRoute: AuthenticatedAdminWorkQueueRoute,
@@ -2154,6 +2197,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlaylistSlugRoute: PlaylistSlugRoute,
   VideoVideoIdRoute: VideoVideoIdRoute,
   ApiStripeCheckoutRoute: ApiStripeCheckoutRoute,
+  ApiStripeConnectRoute: ApiStripeConnectRoute,
   ApiStripePortalRoute: ApiStripePortalRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
   DemoStorySlugRoute: DemoStorySlugRoute,

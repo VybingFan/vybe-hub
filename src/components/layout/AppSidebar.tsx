@@ -314,6 +314,13 @@ export function AppSidebar() {
                   allow: ["admin"],
                   permissionAnyOf: ["admin.rights.read", "admin.content.read"],
                 },
+                {
+                  title: "Seller Payout Readiness",
+                  url: "/admin/seller-readiness",
+                  icon: CreditCard,
+                  allow: ["admin"],
+                  permissionAnyOf: ["admin.finance.read", "admin.content.read"],
+                },
               ]}
               isActive={isActive}
               adminPermissions={adminAccess?.permissions ?? []}
