@@ -158,13 +158,7 @@ const creatorStudio: NavItem[] = [
 
 const creatorAudience: NavItem[] = [
   {
-    title: "Activity",
-    url: "/activity",
-    icon: BellRing,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Analytics",
+    title: "Insights",
     url: "/creator-analytics",
     icon: BarChart3,
     allow: ["creator", "admin"],
