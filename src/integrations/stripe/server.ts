@@ -3,9 +3,16 @@ import type { Database } from "@/integrations/supabase/types";
 
 export type PaidCreatorPlanCode = "creator_plus" | "creator_pro" | "creator_studio";
 export type BillingInterval = "monthly" | "annual";
+export type FocusAddOnCode = "second_focus" | "pro_multi_focus" | "studio_multi_focus";
 
 export type StripePriceSelection = {
   planCode: PaidCreatorPlanCode;
+  interval: BillingInterval;
+  priceId: string;
+};
+
+export type StripeFocusPriceSelection = {
+  addOnCode: FocusAddOnCode;
   interval: BillingInterval;
   priceId: string;
 };
@@ -55,6 +62,20 @@ function configuredPrices(): StripePriceSelection[] {
   );
 }
 
+function configuredFocusPrices(): StripeFocusPriceSelection[] {
+  const entries: Array<[FocusAddOnCode, BillingInterval, string | undefined]> = [
+    ["second_focus", "monthly", process.env.STRIPE_PRICE_FOCUS_SECOND_MONTHLY],
+    ["second_focus", "annual", process.env.STRIPE_PRICE_FOCUS_SECOND_ANNUAL],
+    ["pro_multi_focus", "monthly", process.env.STRIPE_PRICE_FOCUS_PRO_MULTI_MONTHLY],
+    ["pro_multi_focus", "annual", process.env.STRIPE_PRICE_FOCUS_PRO_MULTI_ANNUAL],
+    ["studio_multi_focus", "monthly", process.env.STRIPE_PRICE_FOCUS_STUDIO_MULTI_MONTHLY],
+    ["studio_multi_focus", "annual", process.env.STRIPE_PRICE_FOCUS_STUDIO_MULTI_ANNUAL],
+  ];
+  return entries.flatMap(([addOnCode, interval, priceId]) =>
+    priceId ? [{ addOnCode, interval, priceId }] : [],
+  );
+}
+
 export function priceFor(planCode: string, interval: string): StripePriceSelection {
   const match = configuredPrices().find(
     (price) => price.planCode === planCode && price.interval === interval,
@@ -67,6 +88,18 @@ export function priceFor(planCode: string, interval: string): StripePriceSelecti
 
 export function selectionForPrice(priceId: string): StripePriceSelection | null {
   return configuredPrices().find((price) => price.priceId === priceId) ?? null;
+}
+
+export function focusPriceFor(addOnCode: string, interval: string): StripeFocusPriceSelection {
+  const match = configuredFocusPrices().find(
+    (price) => price.addOnCode === addOnCode && price.interval === interval,
+  );
+  if (!match) throw new Error(`Stripe focus price is not configured for ${addOnCode} ${interval}.`);
+  return match;
+}
+
+export function focusSelectionForPrice(priceId: string): StripeFocusPriceSelection | null {
+  return configuredFocusPrices().find((price) => price.priceId === priceId) ?? null;
 }
 
 export function appUrlFor(request: Request) {

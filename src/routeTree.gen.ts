@@ -86,6 +86,7 @@ import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticat
 import { Route as DemoStorySlugRouteImport } from './routes/demo.story.$slug'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api.stripe.webhook'
 import { Route as ApiStripePortalRouteImport } from './routes/api.stripe.portal'
+import { Route as ApiStripeFocusCheckoutRouteImport } from './routes/api.stripe.focus-checkout'
 import { Route as ApiStripeConnectRouteImport } from './routes/api.stripe.connect'
 import { Route as ApiStripeCheckoutRouteImport } from './routes/api.stripe.checkout'
 import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_authenticated/playlists_.$playlistId'
@@ -508,6 +509,11 @@ const ApiStripePortalRoute = ApiStripePortalRouteImport.update({
   path: '/api/stripe/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiStripeFocusCheckoutRoute = ApiStripeFocusCheckoutRouteImport.update({
+  id: '/api/stripe/focus-checkout',
+  path: '/api/stripe/focus-checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStripeConnectRoute = ApiStripeConnectRouteImport.update({
   id: '/api/stripe/connect',
   path: '/api/stripe/connect',
@@ -764,6 +770,7 @@ export interface FileRoutesByFullPath {
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/connect': typeof ApiStripeConnectRoute
+  '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
@@ -869,6 +876,7 @@ export interface FileRoutesByTo {
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/connect': typeof ApiStripeConnectRoute
+  '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
@@ -976,6 +984,7 @@ export interface FileRoutesById {
   '/_authenticated/playlists_/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/connect': typeof ApiStripeConnectRoute
+  '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
@@ -1083,6 +1092,7 @@ export interface FileRouteTypes {
     | '/playlists/$playlistId'
     | '/api/stripe/checkout'
     | '/api/stripe/connect'
+    | '/api/stripe/focus-checkout'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
@@ -1188,6 +1198,7 @@ export interface FileRouteTypes {
     | '/playlists/$playlistId'
     | '/api/stripe/checkout'
     | '/api/stripe/connect'
+    | '/api/stripe/focus-checkout'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
@@ -1294,6 +1305,7 @@ export interface FileRouteTypes {
     | '/_authenticated/playlists_/$playlistId'
     | '/api/stripe/checkout'
     | '/api/stripe/connect'
+    | '/api/stripe/focus-checkout'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
     | '/demo/story/$slug'
@@ -1342,6 +1354,7 @@ export interface RootRouteChildren {
   VideoVideoIdRoute: typeof VideoVideoIdRoute
   ApiStripeCheckoutRoute: typeof ApiStripeCheckoutRoute
   ApiStripeConnectRoute: typeof ApiStripeConnectRoute
+  ApiStripeFocusCheckoutRoute: typeof ApiStripeFocusCheckoutRoute
   ApiStripePortalRoute: typeof ApiStripePortalRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
   DemoStorySlugRoute: typeof DemoStorySlugRoute
@@ -1889,6 +1902,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStripePortalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/stripe/focus-checkout': {
+      id: '/api/stripe/focus-checkout'
+      path: '/api/stripe/focus-checkout'
+      fullPath: '/api/stripe/focus-checkout'
+      preLoaderRoute: typeof ApiStripeFocusCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/stripe/connect': {
       id: '/api/stripe/connect'
       path: '/api/stripe/connect'
@@ -2265,6 +2285,7 @@ const rootRouteChildren: RootRouteChildren = {
   VideoVideoIdRoute: VideoVideoIdRoute,
   ApiStripeCheckoutRoute: ApiStripeCheckoutRoute,
   ApiStripeConnectRoute: ApiStripeConnectRoute,
+  ApiStripeFocusCheckoutRoute: ApiStripeFocusCheckoutRoute,
   ApiStripePortalRoute: ApiStripePortalRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
   DemoStorySlugRoute: DemoStorySlugRoute,
