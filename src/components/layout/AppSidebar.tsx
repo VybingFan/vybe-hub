@@ -154,6 +154,12 @@ const creatorStudio: NavItem[] = [
     icon: Clapperboard,
     allow: ["creator", "admin"],
   },
+  {
+    title: "Film Studio",
+    url: "/film-studio",
+    icon: Clapperboard,
+    allow: ["creator", "admin"],
+  },
 ];
 
 const creatorAudience: NavItem[] = [

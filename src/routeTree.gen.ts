@@ -68,6 +68,8 @@ import { Route as AuthenticatedMusicRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/merch'
 import { Route as AuthenticatedListenRouteImport } from './routes/_authenticated/listen'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedFilmStudioRouteImport } from './routes/_authenticated/film-studio'
+import { Route as AuthenticatedFilmPlaylistsRouteImport } from './routes/_authenticated/film-playlists'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedEpkRouteImport } from './routes/_authenticated/epk'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
@@ -415,6 +417,17 @@ const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFilmStudioRoute = AuthenticatedFilmStudioRouteImport.update({
+  id: '/film-studio',
+  path: '/film-studio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFilmPlaylistsRoute =
+  AuthenticatedFilmPlaylistsRouteImport.update({
+    id: '/film-playlists',
+    path: '/film-playlists',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
   id: '/events',
   path: '/events',
@@ -721,6 +734,8 @@ export interface FileRoutesByFullPath {
   '/discover': typeof AuthenticatedDiscoverRoute
   '/epk': typeof AuthenticatedEpkRoute
   '/events': typeof AuthenticatedEventsRoute
+  '/film-playlists': typeof AuthenticatedFilmPlaylistsRoute
+  '/film-studio': typeof AuthenticatedFilmStudioRoute
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
   '/merch': typeof AuthenticatedMerchRoute
@@ -829,6 +844,8 @@ export interface FileRoutesByTo {
   '/discover': typeof AuthenticatedDiscoverRoute
   '/epk': typeof AuthenticatedEpkRoute
   '/events': typeof AuthenticatedEventsRoute
+  '/film-playlists': typeof AuthenticatedFilmPlaylistsRoute
+  '/film-studio': typeof AuthenticatedFilmStudioRoute
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
   '/merch': typeof AuthenticatedMerchRoute
@@ -939,6 +956,8 @@ export interface FileRoutesById {
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
   '/_authenticated/epk': typeof AuthenticatedEpkRoute
   '/_authenticated/events': typeof AuthenticatedEventsRoute
+  '/_authenticated/film-playlists': typeof AuthenticatedFilmPlaylistsRoute
+  '/_authenticated/film-studio': typeof AuthenticatedFilmStudioRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/listen': typeof AuthenticatedListenRoute
   '/_authenticated/merch': typeof AuthenticatedMerchRoute
@@ -1049,6 +1068,8 @@ export interface FileRouteTypes {
     | '/discover'
     | '/epk'
     | '/events'
+    | '/film-playlists'
+    | '/film-studio'
     | '/home'
     | '/listen'
     | '/merch'
@@ -1157,6 +1178,8 @@ export interface FileRouteTypes {
     | '/discover'
     | '/epk'
     | '/events'
+    | '/film-playlists'
+    | '/film-studio'
     | '/home'
     | '/listen'
     | '/merch'
@@ -1266,6 +1289,8 @@ export interface FileRouteTypes {
     | '/_authenticated/discover'
     | '/_authenticated/epk'
     | '/_authenticated/events'
+    | '/_authenticated/film-playlists'
+    | '/_authenticated/film-studio'
     | '/_authenticated/home'
     | '/_authenticated/listen'
     | '/_authenticated/merch'
@@ -1802,6 +1827,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/film-studio': {
+      id: '/_authenticated/film-studio'
+      path: '/film-studio'
+      fullPath: '/film-studio'
+      preLoaderRoute: typeof AuthenticatedFilmStudioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/film-playlists': {
+      id: '/_authenticated/film-playlists'
+      path: '/film-playlists'
+      fullPath: '/film-playlists'
+      preLoaderRoute: typeof AuthenticatedFilmPlaylistsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/events': {
       id: '/_authenticated/events'
       path: '/events'
@@ -2158,6 +2197,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
   AuthenticatedEpkRoute: typeof AuthenticatedEpkRoute
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
+  AuthenticatedFilmPlaylistsRoute: typeof AuthenticatedFilmPlaylistsRoute
+  AuthenticatedFilmStudioRoute: typeof AuthenticatedFilmStudioRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedListenRoute: typeof AuthenticatedListenRoute
   AuthenticatedMerchRoute: typeof AuthenticatedMerchRoute
@@ -2219,6 +2260,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
   AuthenticatedEpkRoute: AuthenticatedEpkRoute,
   AuthenticatedEventsRoute: AuthenticatedEventsRoute,
+  AuthenticatedFilmPlaylistsRoute: AuthenticatedFilmPlaylistsRoute,
+  AuthenticatedFilmStudioRoute: AuthenticatedFilmStudioRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedListenRoute: AuthenticatedListenRoute,
   AuthenticatedMerchRoute: AuthenticatedMerchRoute,
