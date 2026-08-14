@@ -22,6 +22,14 @@ interface SharedPlaylistPlayerProps {
   initialTrackId?: string;
 }
 
+interface ActivePlaybackProgress {
+  playbackId: string;
+  slug: string;
+  trackId: string;
+  durationSec: number;
+  positionSec: number;
+}
+
 function getAudioErrorMessage(audioElement: HTMLAudioElement): string {
   const mediaError = audioElement.error;
 
@@ -51,6 +59,9 @@ export function SharedPlaylistPlayer({
   const audioRef = useRef<HTMLAudioElement>(null);
   const recordedTracks = useRef(new Set<string>());
   const shouldAutoplayRef = useRef(false);
+  const progressRef = useRef<ActivePlaybackProgress | null>(null);
+  const listenedSinceFlushRef = useRef(0);
+  const lastObservedTimeRef = useRef(0);
 
   const initialIndex = initialTrackId ? tracks.findIndex((item) => item.id === initialTrackId) : -1;
 
@@ -86,6 +97,11 @@ export function SharedPlaylistPlayer({
    */
   useEffect(() => {
     const audio = audioRef.current;
+
+    void flushProgress();
+    progressRef.current = null;
+    listenedSinceFlushRef.current = 0;
+    lastObservedTimeRef.current = 0;
 
     setElapsed(0);
     setAudioDuration(0);
@@ -126,6 +142,20 @@ export function SharedPlaylistPlayer({
       void playWhenReady();
     }
   }, [current, track?.audio_url]);
+
+  function flushProgress(completed = false) {
+    const progress = progressRef.current;
+    const listenedDeltaSec = listenedSinceFlushRef.current;
+
+    if (!progress || (listenedDeltaSec <= 0 && !completed)) return Promise.resolve();
+
+    listenedSinceFlushRef.current = 0;
+    return activityService.recordProgress({
+      ...progress,
+      listenedDeltaSec,
+      completed,
+    });
+  }
 
   if (!track) {
     return (
@@ -226,6 +256,14 @@ export function SharedPlaylistPlayer({
   function handleEnded() {
     const audio = audioRef.current;
 
+    if (progressRef.current && audio) {
+      progressRef.current.positionSec = audio.duration || progressRef.current.durationSec;
+    }
+    void flushProgress(true);
+    progressRef.current = null;
+    listenedSinceFlushRef.current = 0;
+    lastObservedTimeRef.current = 0;
+
     if (repeat && audio) {
       audio.currentTime = 0;
       void startPlayback();
@@ -319,6 +357,19 @@ export function SharedPlaylistPlayer({
           setLoadingAudio(false);
           setPlaybackError(null);
 
+          const audio = audioRef.current;
+          if (playlistSlug && audio && (!progressRef.current || progressRef.current.trackId !== track.id)) {
+            progressRef.current = {
+              playbackId: crypto.randomUUID(),
+              slug: playlistSlug,
+              trackId: track.id,
+              durationSec: audio.duration || track.duration_sec || 1,
+              positionSec: audio.currentTime,
+            };
+            listenedSinceFlushRef.current = 0;
+          }
+          lastObservedTimeRef.current = audio?.currentTime || 0;
+
           if (playlistSlug && !recordedTracks.current.has(track.id)) {
             recordedTracks.current.add(track.id);
 
@@ -327,9 +378,33 @@ export function SharedPlaylistPlayer({
         }}
         onPause={() => {
           setPlaying(false);
+          void flushProgress();
         }}
         onTimeUpdate={(event) => {
-          setElapsed(event.currentTarget.currentTime);
+          const audio = event.currentTarget;
+          const currentTime = audio.currentTime;
+          const delta = currentTime - lastObservedTimeRef.current;
+
+          setElapsed(currentTime);
+          if (progressRef.current) {
+            progressRef.current.positionSec = currentTime;
+            progressRef.current.durationSec = audio.duration || progressRef.current.durationSec;
+          }
+
+          // Normal playback advances gradually. Large jumps are seeks and must
+          // not be added to listening time.
+          if (!audio.paused && delta > 0 && delta <= 2.5) {
+            listenedSinceFlushRef.current += delta;
+          }
+          lastObservedTimeRef.current = currentTime;
+
+          if (listenedSinceFlushRef.current >= 5) {
+            void flushProgress();
+          }
+        }}
+        onSeeked={(event) => {
+          lastObservedTimeRef.current = event.currentTarget.currentTime;
+          if (progressRef.current) progressRef.current.positionSec = event.currentTarget.currentTime;
         }}
         onEnded={handleEnded}
         onError={(event) => {
