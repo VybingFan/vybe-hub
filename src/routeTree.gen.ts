@@ -73,6 +73,7 @@ import { Route as AuthenticatedEpkRouteImport } from './routes/_authenticated/ep
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCreatorSupportRouteImport } from './routes/_authenticated/creator-support'
+import { Route as AuthenticatedCreatorFocusesRouteImport } from './routes/_authenticated/creator-focuses'
 import { Route as AuthenticatedCreatorComplianceRouteImport } from './routes/_authenticated/creator-compliance'
 import { Route as AuthenticatedCreatorAnalyticsRouteImport } from './routes/_authenticated/creator-analytics'
 import { Route as AuthenticatedContentContinuityRouteImport } from './routes/_authenticated/content-continuity'
@@ -105,6 +106,7 @@ import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_authenticated/admin_.memberships'
 import { Route as AuthenticatedAdminMembershipAuditRouteImport } from './routes/_authenticated/admin_.membership-audit'
 import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin_.creators'
+import { Route as AuthenticatedAdminCreatorFocusesRouteImport } from './routes/_authenticated/admin_.creator-focuses'
 import { Route as AuthenticatedAdminCopyrightRouteImport } from './routes/_authenticated/admin_.copyright'
 import { Route as AuthenticatedAdminCommerceRightsRouteImport } from './routes/_authenticated/admin_.commerce-rights'
 import { Route as AuthenticatedAdminBusinessesRouteImport } from './routes/_authenticated/admin_.businesses'
@@ -439,6 +441,12 @@ const AuthenticatedCreatorSupportRoute =
     path: '/creator-support',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCreatorFocusesRoute =
+  AuthenticatedCreatorFocusesRouteImport.update({
+    id: '/creator-focuses',
+    path: '/creator-focuses',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCreatorComplianceRoute =
   AuthenticatedCreatorComplianceRouteImport.update({
     id: '/creator-compliance',
@@ -618,6 +626,12 @@ const AuthenticatedAdminCreatorsRoute =
     path: '/admin/creators',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminCreatorFocusesRoute =
+  AuthenticatedAdminCreatorFocusesRouteImport.update({
+    id: '/admin_/creator-focuses',
+    path: '/admin/creator-focuses',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminCopyrightRoute =
   AuthenticatedAdminCopyrightRouteImport.update({
     id: '/admin_/copyright',
@@ -701,6 +715,7 @@ export interface FileRoutesByFullPath {
   '/content-continuity': typeof AuthenticatedContentContinuityRoute
   '/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
   '/creator-compliance': typeof AuthenticatedCreatorComplianceRoute
+  '/creator-focuses': typeof AuthenticatedCreatorFocusesRoute
   '/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
@@ -752,6 +767,7 @@ export interface FileRoutesByFullPath {
   '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/admin/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
+  '/admin/creator-focuses': typeof AuthenticatedAdminCreatorFocusesRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/membership-audit': typeof AuthenticatedAdminMembershipAuditRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
@@ -807,6 +823,7 @@ export interface FileRoutesByTo {
   '/content-continuity': typeof AuthenticatedContentContinuityRoute
   '/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
   '/creator-compliance': typeof AuthenticatedCreatorComplianceRoute
+  '/creator-focuses': typeof AuthenticatedCreatorFocusesRoute
   '/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
@@ -858,6 +875,7 @@ export interface FileRoutesByTo {
   '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/admin/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
   '/admin/copyright': typeof AuthenticatedAdminCopyrightRoute
+  '/admin/creator-focuses': typeof AuthenticatedAdminCreatorFocusesRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/membership-audit': typeof AuthenticatedAdminMembershipAuditRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
@@ -915,6 +933,7 @@ export interface FileRoutesById {
   '/_authenticated/content-continuity': typeof AuthenticatedContentContinuityRoute
   '/_authenticated/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
   '/_authenticated/creator-compliance': typeof AuthenticatedCreatorComplianceRoute
+  '/_authenticated/creator-focuses': typeof AuthenticatedCreatorFocusesRoute
   '/_authenticated/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
@@ -966,6 +985,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/_authenticated/admin_/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
   '/_authenticated/admin_/copyright': typeof AuthenticatedAdminCopyrightRoute
+  '/_authenticated/admin_/creator-focuses': typeof AuthenticatedAdminCreatorFocusesRoute
   '/_authenticated/admin_/creators': typeof AuthenticatedAdminCreatorsRoute
   '/_authenticated/admin_/membership-audit': typeof AuthenticatedAdminMembershipAuditRoute
   '/_authenticated/admin_/memberships': typeof AuthenticatedAdminMembershipsRoute
@@ -1023,6 +1043,7 @@ export interface FileRouteTypes {
     | '/content-continuity'
     | '/creator-analytics'
     | '/creator-compliance'
+    | '/creator-focuses'
     | '/creator-support'
     | '/dashboard'
     | '/discover'
@@ -1074,6 +1095,7 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/commerce-rights'
     | '/admin/copyright'
+    | '/admin/creator-focuses'
     | '/admin/creators'
     | '/admin/membership-audit'
     | '/admin/memberships'
@@ -1129,6 +1151,7 @@ export interface FileRouteTypes {
     | '/content-continuity'
     | '/creator-analytics'
     | '/creator-compliance'
+    | '/creator-focuses'
     | '/creator-support'
     | '/dashboard'
     | '/discover'
@@ -1180,6 +1203,7 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/commerce-rights'
     | '/admin/copyright'
+    | '/admin/creator-focuses'
     | '/admin/creators'
     | '/admin/membership-audit'
     | '/admin/memberships'
@@ -1236,6 +1260,7 @@ export interface FileRouteTypes {
     | '/_authenticated/content-continuity'
     | '/_authenticated/creator-analytics'
     | '/_authenticated/creator-compliance'
+    | '/_authenticated/creator-focuses'
     | '/_authenticated/creator-support'
     | '/_authenticated/dashboard'
     | '/_authenticated/discover'
@@ -1287,6 +1312,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/businesses'
     | '/_authenticated/admin_/commerce-rights'
     | '/_authenticated/admin_/copyright'
+    | '/_authenticated/admin_/creator-focuses'
     | '/_authenticated/admin_/creators'
     | '/_authenticated/admin_/membership-audit'
     | '/_authenticated/admin_/memberships'
@@ -1811,6 +1837,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCreatorSupportRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/creator-focuses': {
+      id: '/_authenticated/creator-focuses'
+      path: '/creator-focuses'
+      fullPath: '/creator-focuses'
+      preLoaderRoute: typeof AuthenticatedCreatorFocusesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/creator-compliance': {
       id: '/_authenticated/creator-compliance'
       path: '/creator-compliance'
@@ -2035,6 +2068,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCreatorsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/creator-focuses': {
+      id: '/_authenticated/admin_/creator-focuses'
+      path: '/admin/creator-focuses'
+      fullPath: '/admin/creator-focuses'
+      preLoaderRoute: typeof AuthenticatedAdminCreatorFocusesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/copyright': {
       id: '/_authenticated/admin_/copyright'
       path: '/admin/copyright'
@@ -2112,6 +2152,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedContentContinuityRoute: typeof AuthenticatedContentContinuityRoute
   AuthenticatedCreatorAnalyticsRoute: typeof AuthenticatedCreatorAnalyticsRoute
   AuthenticatedCreatorComplianceRoute: typeof AuthenticatedCreatorComplianceRoute
+  AuthenticatedCreatorFocusesRoute: typeof AuthenticatedCreatorFocusesRoute
   AuthenticatedCreatorSupportRoute: typeof AuthenticatedCreatorSupportRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
@@ -2139,6 +2180,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminBusinessesRoute: typeof AuthenticatedAdminBusinessesRoute
   AuthenticatedAdminCommerceRightsRoute: typeof AuthenticatedAdminCommerceRightsRoute
   AuthenticatedAdminCopyrightRoute: typeof AuthenticatedAdminCopyrightRoute
+  AuthenticatedAdminCreatorFocusesRoute: typeof AuthenticatedAdminCreatorFocusesRoute
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
   AuthenticatedAdminMembershipAuditRoute: typeof AuthenticatedAdminMembershipAuditRoute
   AuthenticatedAdminMembershipsRoute: typeof AuthenticatedAdminMembershipsRoute
@@ -2171,6 +2213,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedContentContinuityRoute: AuthenticatedContentContinuityRoute,
   AuthenticatedCreatorAnalyticsRoute: AuthenticatedCreatorAnalyticsRoute,
   AuthenticatedCreatorComplianceRoute: AuthenticatedCreatorComplianceRoute,
+  AuthenticatedCreatorFocusesRoute: AuthenticatedCreatorFocusesRoute,
   AuthenticatedCreatorSupportRoute: AuthenticatedCreatorSupportRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
@@ -2198,6 +2241,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminBusinessesRoute: AuthenticatedAdminBusinessesRoute,
   AuthenticatedAdminCommerceRightsRoute: AuthenticatedAdminCommerceRightsRoute,
   AuthenticatedAdminCopyrightRoute: AuthenticatedAdminCopyrightRoute,
+  AuthenticatedAdminCreatorFocusesRoute: AuthenticatedAdminCreatorFocusesRoute,
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
   AuthenticatedAdminMembershipAuditRoute:
     AuthenticatedAdminMembershipAuditRoute,

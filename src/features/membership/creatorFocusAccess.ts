@@ -1,12 +1,4 @@
-export type CreatorFocusCode =
-  | "music"
-  | "film"
-  | "theater"
-  | "writing"
-  | "visual_art"
-  | "podcasting"
-  | "dance";
-
+export type CreatorFocusCode = "music" | "film" | "theater" | "writing" | "visual_art" | "podcasting" | "dance";
 export type CreatorFocusLaunchState = "available" | "foundation" | "planned";
 export type CreatorFocusAccessKind = "primary" | "additional";
 export type CreatorFocusAccessStatus = "active" | "grace" | "inactive";
@@ -27,6 +19,7 @@ export interface CreatorFocusAccessItem {
 export interface CreatorFocusAccessSummary {
   primary_focus: CreatorFocusCode;
   focus_limit: number;
+  eligibility_limit: number;
   active_focus_count: number;
   can_add_second_focus: boolean;
   can_use_multi_focus: boolean;

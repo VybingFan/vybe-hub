@@ -206,6 +206,12 @@ const creatorGrowth: NavItem[] = [
     allow: ["creator", "admin"],
   },
   {
+    title: "Creator Focuses",
+    url: "/creator-focuses",
+    icon: Workflow,
+    allow: ["creator", "admin"],
+  },
+  {
     title: "Creator Settings",
     url: "/settings",
     icon: Settings,
@@ -366,6 +372,13 @@ export function AppSidebar() {
                     "admin.finance.read",
                     "admin.creator.membership",
                   ],
+                },
+                {
+                  title: "Creator Focus Access",
+                  url: "/admin/creator-focuses",
+                  icon: Workflow,
+                  allow: ["admin"],
+                  permissionAnyOf: ["admin.creator.read", "admin.creator.manage", "admin.creator.membership"],
                 },
                 {
                   title: "Membership & Privacy Audit",

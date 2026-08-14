@@ -1,28 +1,40 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { CreatorFocusAccessSummary, CreatorFocusCode } from "@/features/membership/creatorFocusAccess";
+import type { CreatorFocusAccessSummary, CreatorFocusCode, CreatorFocusLaunchState } from "@/features/membership/creatorFocusAccess";
+
+export interface CreatorFocusCatalogItem {
+  focus_code: CreatorFocusCode;
+  public_name: string;
+  description: string;
+  launch_state: CreatorFocusLaunchState;
+  sort_order: number;
+}
 
 export const creatorFocusService = {
+  async listCatalog(): Promise<CreatorFocusCatalogItem[]> {
+    const { data, error } = await supabase.from("creator_focus_catalog" as any).select("focus_code,public_name,description,launch_state,sort_order").order("sort_order");
+    if (error) throw error;
+    return (data || []) as unknown as CreatorFocusCatalogItem[];
+  },
   async getMine(): Promise<CreatorFocusAccessSummary> {
     const { data, error } = await (supabase.rpc as any)("get_my_creator_focus_access");
     if (error) throw error;
     if (!data) throw new Error("Creator focus access is unavailable");
     return data as CreatorFocusAccessSummary;
   },
-
-  async setPrimary(focusCode: CreatorFocusCode, confirmed: boolean) {
-    const { error } = await (supabase.rpc as any)("set_my_primary_creator_focus", {
-      _focus_code: focusCode,
-      _confirmed: confirmed,
-    });
+  async addFocus(focusCode: CreatorFocusCode) {
+    const { error } = await (supabase.rpc as any)("add_my_creator_focus", { _focus_code: focusCode });
     if (error) throw error;
   },
-
+  async removeFocus(focusCode: CreatorFocusCode, confirmed: boolean) {
+    const { error } = await (supabase.rpc as any)("remove_my_additional_focus", { _focus_code: focusCode, _confirmed: confirmed });
+    if (error) throw error;
+  },
+  async setPrimary(focusCode: CreatorFocusCode, confirmed: boolean) {
+    const { error } = await (supabase.rpc as any)("set_my_primary_creator_focus", { _focus_code: focusCode, _confirmed: confirmed });
+    if (error) throw error;
+  },
   async adminSetAccess(creatorId: string, focusCode: CreatorFocusCode, enabled: boolean) {
-    const { error } = await (supabase.rpc as any)("admin_set_creator_focus_access", {
-      _creator_id: creatorId,
-      _focus_code: focusCode,
-      _enabled: enabled,
-    });
+    const { error } = await (supabase.rpc as any)("admin_set_creator_focus_access", { _creator_id: creatorId, _focus_code: focusCode, _enabled: enabled });
     if (error) throw error;
   },
 };
