@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { CreatorFocusGuard } from "@/components/membership/CreatorFocusGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -39,7 +40,9 @@ import { filmPlaylistService } from "@/services/playlists/filmPlaylistService";
 export const Route = createFileRoute("/_authenticated/film-playlists")({
   component: () => (
     <RoleGuard allow={["creator", "admin"]}>
-      <FilmPlaylistWorkspace />
+      <CreatorFocusGuard focus="film" title="Film & Video workspace access required" description="Add Film & Video through Creator Focuses. Changing a profile label cannot unlock this workspace.">
+        <FilmPlaylistWorkspace />
+      </CreatorFocusGuard>
     </RoleGuard>
   ),
 });

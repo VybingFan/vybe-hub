@@ -8,6 +8,8 @@ export type CreatorCapability =
   | "video.library"
   | "video.native_upload"
   | "film.project_media_review"
+  | "support.priority"
+  | "team.workspace"
   | "commerce.prepare"
   | "creator_mode.browse";
 
@@ -18,6 +20,8 @@ const CAPABILITY_PLANS: Record<CreatorCapability, readonly PublicCreatorPlanCode
   "video.library": ["creator_plus", "creator_pro", "creator_studio"],
   "video.native_upload": ["creator_plus", "creator_pro", "creator_studio"],
   "film.project_media_review": ["creator_plus", "creator_pro", "creator_studio"],
+  "support.priority": ["creator_plus", "creator_pro", "creator_studio"],
+  "team.workspace": ["creator_studio"],
   "commerce.prepare": ["creator_plus", "creator_pro", "creator_studio"],
   "creator_mode.browse": ["creator_pro", "creator_studio"],
 };
