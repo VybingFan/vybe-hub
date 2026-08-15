@@ -16,6 +16,7 @@ import {
   type Profile,
 } from "@/services/auth/authService";
 import type { AppRole, SelectableRole } from "@/features/auth/roles";
+import { operationsSessionService } from "@/services/admin/operationsSessionService";
 
 interface AuthContextValue {
   user: User | null;
@@ -125,6 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await authService.signUp(email, password, displayName, legalPolicyVersion);
       },
       signOut: async () => {
+        await operationsSessionService.end().catch(() => undefined);
         await authService.signOut();
       },
       sendPasswordReset: (email) => authService.sendPasswordReset(email),

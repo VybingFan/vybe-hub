@@ -29,6 +29,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideoVideoIdRouteImport } from './routes/video.$videoId'
 import { Route as PlaylistSlugRouteImport } from './routes/playlist.$slug'
+import { Route as OperationsSignInRouteImport } from './routes/operations.sign-in'
 import { Route as ExperienceWatchRouteImport } from './routes/experience.watch'
 import { Route as ExperienceReadRouteImport } from './routes/experience.read'
 import { Route as ExperiencePlayRouteImport } from './routes/experience.play'
@@ -218,6 +219,11 @@ const VideoVideoIdRoute = VideoVideoIdRouteImport.update({
 const PlaylistSlugRoute = PlaylistSlugRouteImport.update({
   id: '/playlist/$slug',
   path: '/playlist/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperationsSignInRoute = OperationsSignInRouteImport.update({
+  id: '/operations/sign-in',
+  path: '/operations/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExperienceWatchRoute = ExperienceWatchRouteImport.update({
@@ -790,6 +796,7 @@ export interface FileRoutesByFullPath {
   '/experience/play': typeof ExperiencePlayRoute
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
+  '/operations/sign-in': typeof OperationsSignInRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
@@ -902,6 +909,7 @@ export interface FileRoutesByTo {
   '/experience/play': typeof ExperiencePlayRoute
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
+  '/operations/sign-in': typeof OperationsSignInRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
@@ -1016,6 +1024,7 @@ export interface FileRoutesById {
   '/experience/play': typeof ExperiencePlayRoute
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
+  '/operations/sign-in': typeof OperationsSignInRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/_authenticated/admin_/accounts': typeof AuthenticatedAdminAccountsRoute
@@ -1130,6 +1139,7 @@ export interface FileRouteTypes {
     | '/experience/play'
     | '/experience/read'
     | '/experience/watch'
+    | '/operations/sign-in'
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/admin/accounts'
@@ -1242,6 +1252,7 @@ export interface FileRouteTypes {
     | '/experience/play'
     | '/experience/read'
     | '/experience/watch'
+    | '/operations/sign-in'
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/admin/accounts'
@@ -1355,6 +1366,7 @@ export interface FileRouteTypes {
     | '/experience/play'
     | '/experience/read'
     | '/experience/watch'
+    | '/operations/sign-in'
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/_authenticated/admin_/accounts'
@@ -1427,6 +1439,7 @@ export interface RootRouteChildren {
   ExperiencePlayRoute: typeof ExperiencePlayRoute
   ExperienceReadRoute: typeof ExperienceReadRoute
   ExperienceWatchRoute: typeof ExperienceWatchRoute
+  OperationsSignInRoute: typeof OperationsSignInRoute
   PlaylistSlugRoute: typeof PlaylistSlugRoute
   VideoVideoIdRoute: typeof VideoVideoIdRoute
   ApiStripeCheckoutRoute: typeof ApiStripeCheckoutRoute
@@ -1578,6 +1591,13 @@ declare module '@tanstack/react-router' {
       path: '/playlist/$slug'
       fullPath: '/playlist/$slug'
       preLoaderRoute: typeof PlaylistSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operations/sign-in': {
+      id: '/operations/sign-in'
+      path: '/operations/sign-in'
+      fullPath: '/operations/sign-in'
+      preLoaderRoute: typeof OperationsSignInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/experience/watch': {
@@ -2411,6 +2431,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExperiencePlayRoute: ExperiencePlayRoute,
   ExperienceReadRoute: ExperienceReadRoute,
   ExperienceWatchRoute: ExperienceWatchRoute,
+  OperationsSignInRoute: OperationsSignInRoute,
   PlaylistSlugRoute: PlaylistSlugRoute,
   VideoVideoIdRoute: VideoVideoIdRoute,
   ApiStripeCheckoutRoute: ApiStripeCheckoutRoute,

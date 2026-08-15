@@ -3,7 +3,7 @@ import type { CreatorCapability } from "@/features/membership/access";
 import type { CreatorFocusCode } from "@/features/membership/creatorFocusAccess";
 
 export type VybeExperience = "public" | "supporter" | "creator_studio" | "business_portal" | "back_office" | "account" | "server_api";
-export type RouteProtection = "public" | "session" | "role" | "permission" | "membership" | "focus" | "signature";
+export type RouteProtection = "public" | "session" | "operations_session" | "role" | "permission" | "membership" | "focus" | "signature";
 
 export interface RouteAccessRule {
   id: string;
@@ -25,7 +25,7 @@ const creatorRoles = ["creator", "admin"] as const;
  * must remain above broader families.
  */
 export const ROUTE_ACCESS_REGISTRY: readonly RouteAccessRule[] = [
-  { id: "back-office", experience: "back_office", paths: ["/admin", "/admin/*"], roles: ["admin"], protection: ["session", "role", "permission"], followUp: "V24.44B" },
+  { id: "back-office", experience: "back_office", paths: ["/admin", "/admin/*"], roles: ["admin"], protection: ["session", "operations_session", "role", "permission"], followUp: "V24.44C" },
   { id: "business-portal", experience: "business_portal", paths: ["/business"], roles: ["business", "admin"], protection: ["session", "role"], followUp: "V24.44D" },
   { id: "creator-video", experience: "creator_studio", paths: ["/videos"], roles: creatorRoles, protection: ["session", "role", "membership"], capability: "video.library" },
   { id: "creator-film-review", experience: "creator_studio", paths: ["/film-project-media"], roles: creatorRoles, protection: ["session", "role", "membership", "focus"], capability: "film.project_media_review", focus: "film" },
@@ -53,7 +53,7 @@ export function getRouteAccessRule(pathname: string) {
 }
 
 export const ACCESS_AUDIT_FOLLOW_UPS = [
-  { bundle: "V24.44B", finding: "Back Office still uses the shared authenticated session and main application origin." },
+  { bundle: "V24.44B", finding: "Back Office now requires a short-lived Operations session; set VITE_OPERATIONS_HOST when the production staff origin is provisioned." },
   { bundle: "V24.44C", finding: "Operations routes and modules still exist in the ordinary application bundle." },
   { bundle: "V24.44D", finding: "The current business route is a foundation, not a fully separated advertiser portal." },
   { bundle: "V24.44E", finding: "Public discovery eligibility needs one consolidated database-enforced publishing decision." },

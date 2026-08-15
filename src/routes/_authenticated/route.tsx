@@ -1,7 +1,8 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { LegalAcceptanceGate } from "@/components/legal/LegalAcceptanceGate";
 import { IdentityModeBar } from "@/components/identity/IdentityModeBar";
+import { OperationsBoundary } from "@/components/auth/OperationsBoundary";
 
 /**
  * Integration-managed auth gate. Client-only (ssr:false) because the Supabase
@@ -14,11 +15,12 @@ export const Route = createFileRoute("/_authenticated")({
     if (error || !data.user) throw redirect({ to: "/auth/sign-in" });
     return { user: data.user };
   },
-  component: () => (
-    <LegalAcceptanceGate>
-      <IdentityModeBar />
-      <Outlet />
-    </LegalAcceptanceGate>
-  ),
+  component: AuthenticatedLayout,
 });
+
+function AuthenticatedLayout() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const operations = pathname === "/admin" || pathname.startsWith("/admin/");
+  return <OperationsBoundary active={operations}><LegalAcceptanceGate><IdentityModeBar /><Outlet /></LegalAcceptanceGate></OperationsBoundary>;
+}
 
