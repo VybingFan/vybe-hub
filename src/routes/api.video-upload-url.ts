@@ -17,6 +17,14 @@ export const Route = createFileRoute("/api/video-upload-url")({
           return Response.json({ error: "Sign in to upload a video." }, { status: 401 });
         }
 
+        const input = (await request.json().catch(() => ({}))) as { fileName?: string; fileSize?: number };
+        if (!input.fileName || !Number.isFinite(input.fileSize) || Number(input.fileSize) <= 0) {
+          return Response.json({ error: "Choose a valid video file." }, { status: 400 });
+        }
+        if (Number(input.fileSize) > 200 * 1024 * 1024) {
+          return Response.json({ error: "This direct uploader currently accepts files up to 200MB." }, { status: 413 });
+        }
+
         const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
         const apiToken = process.env.CLOUDFLARE_STREAM_API_TOKEN;
         if (!accountId || !apiToken) {
@@ -89,7 +97,15 @@ export const Route = createFileRoute("/api/video-upload-url")({
               Authorization: `Bearer ${apiToken}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ maxDurationSeconds: limits.maxDurationSeconds }),
+            body: JSON.stringify({
+              maxDurationSeconds: limits.maxDurationSeconds,
+              expiry: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+              creator: userId,
+              meta: { creatorId: userId, originalFileName: input.fileName.slice(0, 200) },
+              allowedOrigins: (process.env.CLOUDFLARE_STREAM_ALLOWED_ORIGINS || "")
+                .split(",").map((value) => value.trim()).filter(Boolean),
+              requireSignedURLs: false,
+            }),
           },
         );
         const cloudflare = (await cloudflareResponse.json()) as {

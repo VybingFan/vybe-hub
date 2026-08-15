@@ -47,6 +47,7 @@ import { Route as AuthOnboardingRouteImport } from './routes/auth.onboarding'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as ArtistUsernameRouteImport } from './routes/artist.$username'
 import { Route as ApiVideoUploadUrlRouteImport } from './routes/api.video-upload-url'
+import { Route as ApiVideoStatusRouteImport } from './routes/api.video-status'
 import { Route as ApiSecurePlaylistRouteImport } from './routes/api.secure-playlist'
 import { Route as ApiAdminTeamInviteRouteImport } from './routes/api.admin-team-invite'
 import { Route as ApiAccountDeletionRouteImport } from './routes/api.account-deletion'
@@ -307,6 +308,11 @@ const ArtistUsernameRoute = ArtistUsernameRouteImport.update({
 const ApiVideoUploadUrlRoute = ApiVideoUploadUrlRouteImport.update({
   id: '/api/video-upload-url',
   path: '/api/video-upload-url',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVideoStatusRoute = ApiVideoStatusRouteImport.update({
+  id: '/api/video-status',
+  path: '/api/video-status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSecurePlaylistRoute = ApiSecurePlaylistRouteImport.update({
@@ -765,6 +771,7 @@ export interface FileRoutesByFullPath {
   '/api/account-deletion': typeof ApiAccountDeletionRoute
   '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
   '/api/secure-playlist': typeof ApiSecurePlaylistRoute
+  '/api/video-status': typeof ApiVideoStatusRoute
   '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -876,6 +883,7 @@ export interface FileRoutesByTo {
   '/api/account-deletion': typeof ApiAccountDeletionRoute
   '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
   '/api/secure-playlist': typeof ApiSecurePlaylistRoute
+  '/api/video-status': typeof ApiVideoStatusRoute
   '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -989,6 +997,7 @@ export interface FileRoutesById {
   '/api/account-deletion': typeof ApiAccountDeletionRoute
   '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
   '/api/secure-playlist': typeof ApiSecurePlaylistRoute
+  '/api/video-status': typeof ApiVideoStatusRoute
   '/api/video-upload-url': typeof ApiVideoUploadUrlRoute
   '/artist/$username': typeof ArtistUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -1102,6 +1111,7 @@ export interface FileRouteTypes {
     | '/api/account-deletion'
     | '/api/admin-team-invite'
     | '/api/secure-playlist'
+    | '/api/video-status'
     | '/api/video-upload-url'
     | '/artist/$username'
     | '/auth/forgot-password'
@@ -1213,6 +1223,7 @@ export interface FileRouteTypes {
     | '/api/account-deletion'
     | '/api/admin-team-invite'
     | '/api/secure-playlist'
+    | '/api/video-status'
     | '/api/video-upload-url'
     | '/artist/$username'
     | '/auth/forgot-password'
@@ -1325,6 +1336,7 @@ export interface FileRouteTypes {
     | '/api/account-deletion'
     | '/api/admin-team-invite'
     | '/api/secure-playlist'
+    | '/api/video-status'
     | '/api/video-upload-url'
     | '/artist/$username'
     | '/auth/forgot-password'
@@ -1402,6 +1414,7 @@ export interface RootRouteChildren {
   ApiAccountDeletionRoute: typeof ApiAccountDeletionRoute
   ApiAdminTeamInviteRoute: typeof ApiAdminTeamInviteRoute
   ApiSecurePlaylistRoute: typeof ApiSecurePlaylistRoute
+  ApiVideoStatusRoute: typeof ApiVideoStatusRoute
   ApiVideoUploadUrlRoute: typeof ApiVideoUploadUrlRoute
   ArtistUsernameRoute: typeof ArtistUsernameRoute
   CopyrightReportRoute: typeof CopyrightReportRoute
@@ -1691,6 +1704,13 @@ declare module '@tanstack/react-router' {
       path: '/api/video-upload-url'
       fullPath: '/api/video-upload-url'
       preLoaderRoute: typeof ApiVideoUploadUrlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/video-status': {
+      id: '/api/video-status'
+      path: '/api/video-status'
+      fullPath: '/api/video-status'
+      preLoaderRoute: typeof ApiVideoStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/secure-playlist': {
@@ -2378,6 +2398,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAccountDeletionRoute: ApiAccountDeletionRoute,
   ApiAdminTeamInviteRoute: ApiAdminTeamInviteRoute,
   ApiSecurePlaylistRoute: ApiSecurePlaylistRoute,
+  ApiVideoStatusRoute: ApiVideoStatusRoute,
   ApiVideoUploadUrlRoute: ApiVideoUploadUrlRoute,
   ArtistUsernameRoute: ArtistUsernameRoute,
   CopyrightReportRoute: CopyrightReportRoute,

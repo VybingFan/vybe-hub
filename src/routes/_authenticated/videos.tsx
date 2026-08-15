@@ -14,6 +14,7 @@ import {
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { VideoEditor } from "@/components/video/VideoEditor";
+import { NativeVideoProcessingMonitor } from "@/components/video/NativeVideoProcessingMonitor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -112,6 +113,7 @@ function VideoStudio() {
       </Card>
 
       <NativeUploadCard creatorId={user?.id} />
+      <NativeVideoProcessingMonitor creatorId={user?.id} videos={videos} />
 
       <div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
         <form
