@@ -69,6 +69,7 @@ import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedListenRouteImport } from './routes/_authenticated/listen'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedFilmStudioRouteImport } from './routes/_authenticated/film-studio'
+import { Route as AuthenticatedFilmProjectMediaRouteImport } from './routes/_authenticated/film-project-media'
 import { Route as AuthenticatedFilmPlaylistsRouteImport } from './routes/_authenticated/film-playlists'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedEpkRouteImport } from './routes/_authenticated/epk'
@@ -422,6 +423,12 @@ const AuthenticatedFilmStudioRoute = AuthenticatedFilmStudioRouteImport.update({
   path: '/film-studio',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFilmProjectMediaRoute =
+  AuthenticatedFilmProjectMediaRouteImport.update({
+    id: '/film-project-media',
+    path: '/film-project-media',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFilmPlaylistsRoute =
   AuthenticatedFilmPlaylistsRouteImport.update({
     id: '/film-playlists',
@@ -735,6 +742,7 @@ export interface FileRoutesByFullPath {
   '/epk': typeof AuthenticatedEpkRoute
   '/events': typeof AuthenticatedEventsRoute
   '/film-playlists': typeof AuthenticatedFilmPlaylistsRoute
+  '/film-project-media': typeof AuthenticatedFilmProjectMediaRoute
   '/film-studio': typeof AuthenticatedFilmStudioRoute
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
@@ -845,6 +853,7 @@ export interface FileRoutesByTo {
   '/epk': typeof AuthenticatedEpkRoute
   '/events': typeof AuthenticatedEventsRoute
   '/film-playlists': typeof AuthenticatedFilmPlaylistsRoute
+  '/film-project-media': typeof AuthenticatedFilmProjectMediaRoute
   '/film-studio': typeof AuthenticatedFilmStudioRoute
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
@@ -957,6 +966,7 @@ export interface FileRoutesById {
   '/_authenticated/epk': typeof AuthenticatedEpkRoute
   '/_authenticated/events': typeof AuthenticatedEventsRoute
   '/_authenticated/film-playlists': typeof AuthenticatedFilmPlaylistsRoute
+  '/_authenticated/film-project-media': typeof AuthenticatedFilmProjectMediaRoute
   '/_authenticated/film-studio': typeof AuthenticatedFilmStudioRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/listen': typeof AuthenticatedListenRoute
@@ -1069,6 +1079,7 @@ export interface FileRouteTypes {
     | '/epk'
     | '/events'
     | '/film-playlists'
+    | '/film-project-media'
     | '/film-studio'
     | '/home'
     | '/listen'
@@ -1179,6 +1190,7 @@ export interface FileRouteTypes {
     | '/epk'
     | '/events'
     | '/film-playlists'
+    | '/film-project-media'
     | '/film-studio'
     | '/home'
     | '/listen'
@@ -1290,6 +1302,7 @@ export interface FileRouteTypes {
     | '/_authenticated/epk'
     | '/_authenticated/events'
     | '/_authenticated/film-playlists'
+    | '/_authenticated/film-project-media'
     | '/_authenticated/film-studio'
     | '/_authenticated/home'
     | '/_authenticated/listen'
@@ -1834,6 +1847,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFilmStudioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/film-project-media': {
+      id: '/_authenticated/film-project-media'
+      path: '/film-project-media'
+      fullPath: '/film-project-media'
+      preLoaderRoute: typeof AuthenticatedFilmProjectMediaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/film-playlists': {
       id: '/_authenticated/film-playlists'
       path: '/film-playlists'
@@ -2198,6 +2218,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEpkRoute: typeof AuthenticatedEpkRoute
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
   AuthenticatedFilmPlaylistsRoute: typeof AuthenticatedFilmPlaylistsRoute
+  AuthenticatedFilmProjectMediaRoute: typeof AuthenticatedFilmProjectMediaRoute
   AuthenticatedFilmStudioRoute: typeof AuthenticatedFilmStudioRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedListenRoute: typeof AuthenticatedListenRoute
@@ -2261,6 +2282,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEpkRoute: AuthenticatedEpkRoute,
   AuthenticatedEventsRoute: AuthenticatedEventsRoute,
   AuthenticatedFilmPlaylistsRoute: AuthenticatedFilmPlaylistsRoute,
+  AuthenticatedFilmProjectMediaRoute: AuthenticatedFilmProjectMediaRoute,
   AuthenticatedFilmStudioRoute: AuthenticatedFilmStudioRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedListenRoute: AuthenticatedListenRoute,

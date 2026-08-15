@@ -160,6 +160,12 @@ const creatorStudio: NavItem[] = [
     icon: Clapperboard,
     allow: ["creator", "admin"],
   },
+  {
+    title: "Project Media & Review",
+    url: "/film-project-media",
+    icon: Clapperboard,
+    allow: ["creator", "admin"],
+  },
 ];
 
 const creatorAudience: NavItem[] = [
