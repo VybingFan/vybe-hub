@@ -104,6 +104,9 @@ function FilmPlaylistWorkspace() {
     () => new Set(items.flatMap((item) => (item.video_id ? [item.video_id] : []))),
     [items],
   );
+  const effectivePlan = setup.data?.planCode === "founding_beta" ? "creator_pro" : setup.data?.planCode || "creator_free";
+  const canUsePassword = ["creator_plus", "creator_pro", "creator_studio"].includes(effectivePlan);
+  const canUseApprovedViewers = ["creator_pro", "creator_studio"].includes(effectivePlan);
 
   const move = (index: number, direction: -1 | 1) => {
     const nextIndex = index + direction;
@@ -181,7 +184,10 @@ function FilmPlaylistWorkspace() {
       setPurpose("Trailer playlist");
       setAccessMode("public");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not create film playlist");
+      const message = error && typeof error === "object" && "message" in error
+        ? String((error as { message: unknown }).message)
+        : "Could not create film playlist";
+      toast.error(message);
     }
   };
 
@@ -221,7 +227,20 @@ function FilmPlaylistWorkspace() {
           <div><h2 className="text-xl font-semibold">Create a film playlist</h2><p className="mt-1 text-sm text-muted-foreground">This release saves drafts. Sharing activates after the secure mixed-media viewer is installed.</p></div>
           <div><Label htmlFor="film-playlist-title">Title</Label><Input id="film-playlist-title" name="title" required maxLength={160} className="mt-2" placeholder="Festival trailer collection" /></div>
           <div><Label>Purpose</Label><Select value={purpose} onValueChange={(value) => setPurpose(value as typeof purpose)}><SelectTrigger className="mt-2"><SelectValue /></SelectTrigger><SelectContent>{FILM_PLAYLIST_PURPOSES.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></div>
-          <div><Label>Intended access</Label><Select value={accessMode} onValueChange={(value) => setAccessMode(value as PlaylistAccessMode)}><SelectTrigger className="mt-2"><SelectValue /></SelectTrigger><SelectContent>{Object.entries(ACCESS_LABELS).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent></Select></div>
+          <div>
+            <Label>Intended access</Label>
+            <Select value={accessMode} onValueChange={(value) => setAccessMode(value as PlaylistAccessMode)}>
+              <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="public">{ACCESS_LABELS.public}</SelectItem>
+                <SelectItem value="unlisted">{ACCESS_LABELS.unlisted}</SelectItem>
+                <SelectItem value="password" disabled={!canUsePassword}>{ACCESS_LABELS.password}{!canUsePassword ? " · Plus required" : ""}</SelectItem>
+                <SelectItem value="approved_listeners" disabled={!canUseApprovedViewers}>{ACCESS_LABELS.approved_listeners}{!canUseApprovedViewers ? " · Pro required" : ""}</SelectItem>
+                <SelectItem value="membership_only" disabled={!canUseApprovedViewers}>{ACCESS_LABELS.membership_only}{!canUseApprovedViewers ? " · Pro required" : ""}</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="mt-2 text-xs text-muted-foreground">Free: public and unlisted · Plus: password links · Pro/Studio: approved viewers and sign-in controls</p>
+          </div>
           <div><Label htmlFor="film-playlist-description">Description or creative brief</Label><Textarea id="film-playlist-description" name="description" maxLength={5000} className="mt-2 min-h-28" placeholder="Describe the collection, scene-review goal, or music direction." /></div>
 
           <div className="rounded-2xl border p-4">
