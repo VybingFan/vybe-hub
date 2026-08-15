@@ -24,6 +24,7 @@ function CreatorFocusesPage() {
   const { data: membership } = useMembership();
   const summary = useQuery({ queryKey: ["creator-focus-access"], queryFn: creatorFocusService.getMine });
   const catalog = useQuery({ queryKey: ["creator-focus-catalog"], queryFn: creatorFocusService.listCatalog });
+  const taxonomy = useQuery({ queryKey: ["creator-focus-taxonomy"], queryFn: creatorFocusService.listTaxonomy });
   const subscription = useQuery({ queryKey: ["creator-focus-subscription"], queryFn: focusSubscriptionService.getMine });
   const [confirmation, setConfirmation] = useState<Confirmation>(null);
   const refresh = async () => { await client.invalidateQueries({ queryKey: ["creator-focus-access"] }); };
@@ -75,7 +76,10 @@ function CreatorFocusesPage() {
         {(catalog.data || []).filter((item) => !accessCodes.has(item.focus_code)).map((item) => {
           const planned = item.launch_state === "planned";
           const room = count < capacity;
-          return <Card key={item.focus_code}><CardContent className="flex h-full flex-col gap-4 p-5"><div className="flex items-center justify-between"><Workflow className="h-5 w-5 text-primary" /><Badge variant="outline">{planned ? "Planned" : item.launch_state === "foundation" ? "Foundation" : "Available"}</Badge></div><div className="flex-1"><h3 className="font-semibold">{item.public_name}</h3><p className="mt-1 text-sm text-muted-foreground">{item.description}</p></div><Button disabled={planned || !room || action.isPending} variant={room && !planned ? "default" : "outline"} onClick={() => action.mutate({ kind: "add", code: item.focus_code })}>{planned ? "Coming later" : room ? "Add workspace" : <><LockKeyhole className="mr-2 h-4 w-4" />Upgrade required</>}</Button></CardContent></Card>;
+          const roles = taxonomy.data?.roles.filter((role) => role.focus_code === item.focus_code) || [];
+          const categories = taxonomy.data?.categories.filter((category) => category.focus_code === item.focus_code) || [];
+          const readiness = taxonomy.data?.readiness.find((entry) => entry.focus_code === item.focus_code);
+          return <Card key={item.focus_code}><CardContent className="flex h-full flex-col gap-4 p-5"><div className="flex items-center justify-between"><Workflow className="h-5 w-5 text-primary" /><Badge variant="outline">{planned ? "Planned" : item.launch_state === "foundation" ? "Foundation" : "Available"}</Badge></div><div className="flex-1"><h3 className="font-semibold">{item.public_name}</h3><p className="mt-1 text-sm text-muted-foreground">{item.description}</p>{readiness ? <p className="mt-3 text-xs text-primary">{readiness.public_message}</p> : null}<div className="mt-3 flex flex-wrap gap-1">{roles.slice(0,4).map((role) => <Badge key={role.role_code} variant="secondary">{role.public_name}</Badge>)}{roles.length > 4 ? <Badge variant="secondary">+{roles.length - 4} roles</Badge> : null}</div><p className="mt-3 text-xs text-muted-foreground">Discovery: {categories.map((category) => category.creator_discovery_categories?.public_name).filter(Boolean).join(" · ") || "Categories planned"}</p></div><Button disabled={planned || !room || action.isPending} variant={room && !planned ? "default" : "outline"} onClick={() => action.mutate({ kind: "add", code: item.focus_code })}>{planned ? "Coming later" : room ? "Add workspace" : <><LockKeyhole className="mr-2 h-4 w-4" />Upgrade required</>}</Button></CardContent></Card>;
         })}
       </div>
     </section>

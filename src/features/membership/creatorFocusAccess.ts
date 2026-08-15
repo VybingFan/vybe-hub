@@ -1,4 +1,4 @@
-export type CreatorFocusCode = "music" | "film" | "theater" | "writing" | "visual_art" | "podcasting" | "dance";
+export type CreatorFocusCode = "music" | "film" | "acting" | "comedy" | "theater" | "writing" | "dance" | "podcasting" | "visual_art";
 export type CreatorFocusLaunchState = "available" | "foundation" | "planned";
 export type CreatorFocusAccessKind = "primary" | "additional";
 export type CreatorFocusAccessStatus = "active" | "grace" | "inactive";
