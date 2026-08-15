@@ -32,6 +32,7 @@ export function CreatorContinuationPlayer({
   topTrackIds,
   creatorUserId,
   creatorName,
+  featuredCollectionLabel = "Artist’s Top 5",
   onSelect,
 }: {
   queue: Track[];
@@ -39,6 +40,7 @@ export function CreatorContinuationPlayer({
   topTrackIds: Set<string>;
   creatorUserId: string;
   creatorName: string;
+  featuredCollectionLabel?: string;
   onSelect: (id: string) => void;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -85,7 +87,7 @@ export function CreatorContinuationPlayer({
   );
   const next = nextIndex >= 0 ? queue[nextIndex] : undefined;
   const source = topTrackIds.has(track.id)
-    ? "Artist’s Top 5"
+    ? featuredCollectionLabel
     : "More from this creator";
 
   const choose = (nextTrack: Track | undefined) => {
@@ -286,7 +288,7 @@ export function CreatorContinuationPlayer({
               </div>
               <AlertDialogTitle className="text-2xl">
                 {choice === "top-five"
-                  ? `You finished ${creatorName}’s Top 5`
+                  ? `You finished ${creatorName}’s ${featuredCollectionLabel}`
                   : `You finished ${creatorName}’s available music`}
               </AlertDialogTitle>
               <AlertDialogDescription>

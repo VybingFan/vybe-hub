@@ -22,6 +22,7 @@ import { MUSIC_RIGHTS_POLICY_VERSION } from "@/constants/legal";
 import { creatorRightsService } from "@/services/rights/creatorRightsService";
 import { CreatorRightsCertificationGate } from "@/components/musicUpload/CreatorRightsCertificationGate";
 import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
+import { hasCreatorCapability } from "@/features/membership/access";
 
 export const Route = createFileRoute("/_authenticated/music_/upload")({
   component: () => (
@@ -45,6 +46,7 @@ function UploadPage() {
   });
   const activeRights =
     rightsStatus.data?.active === true ? rightsStatus.data : null;
+  const advancedWorkflow = hasCreatorCapability(membership?.plan_code, "music.workflow");
 
   const submitSingle = async (values: SingleUploadValues) => {
     if (!values.audio) throw new Error("Audio file required");
@@ -83,8 +85,8 @@ function UploadPage() {
         preview_duration_sec: values.preview_duration_sec,
         preview_start_sec: values.preview_start_sec,
         allow_download: values.allow_download,
-        workspace_category: values.workspace_category,
-        production_stage: values.production_stage,
+        workspace_category: advancedWorkflow ? values.workspace_category : "work_in_progress",
+        production_stage: advancedWorkflow ? values.production_stage : "recording",
       },
       audio: values.audio,
       cover: values.cover,
@@ -269,6 +271,7 @@ function UploadPage() {
               onSubmit={submitSingle}
               submitting={upload.isPending}
               defaultRightsBasis={activeRights.default_rights_basis}
+              advancedWorkflow={advancedWorkflow}
             />
           </TabsContent>
           <TabsContent value="album" className="mt-4">

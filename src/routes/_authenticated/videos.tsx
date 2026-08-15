@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { CreatorCapabilityGuard } from "@/components/membership/CreatorCapabilityGuard";
 import { VideoEditor } from "@/components/video/VideoEditor";
 import { NativeVideoProcessingMonitor } from "@/components/video/NativeVideoProcessingMonitor";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +46,9 @@ const MAX_DIRECT_UPLOAD_BYTES = 200 * 1024 * 1024;
 export const Route = createFileRoute("/_authenticated/videos")({
   component: () => (
     <RoleGuard allow={["creator", "admin"]}>
-      <VideoStudio />
+      <CreatorCapabilityGuard capability="video.library" requiredPlan="creator_plus" title="Video Library requires Creator Plus" description="Creator Free keeps its established music and profile benefits. Video publishing begins with Creator Plus.">
+        <VideoStudio />
+      </CreatorCapabilityGuard>
     </RoleGuard>
   ),
 });

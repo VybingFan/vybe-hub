@@ -3,6 +3,7 @@ import type { CreatorProfile, PersonalLink } from "@/features/profile/schema";
 import type { Track } from "@/features/music/schema";
 import type { MerchProduct } from "@/features/merch/schema";
 import type { CreatorVideo } from "@/features/video/schema";
+import type { CreatorPlanCode } from "@/features/membership/catalog";
 
 export interface PublicCreatorPage {
   profile: CreatorProfile;
@@ -10,6 +11,7 @@ export interface PublicCreatorPage {
   playlists: PublicCreatorPlaylist[];
   merch: MerchProduct[];
   videos: CreatorVideo[];
+  planCode: CreatorPlanCode;
 }
 
 export interface PublicCreatorPlaylist {
@@ -40,6 +42,12 @@ export const publicCreatorService = {
       .maybeSingle();
     if (error) throw error;
     if (!profile || !profile.username) return null;
+    const { data: publicPlan } = await (supabase.rpc as any)("get_public_creator_plan", { p_user_id: profile.user_id });
+    const planCode = (["creator_free", "creator_plus", "creator_pro", "creator_studio", "founding_beta"] as const).includes(publicPlan)
+      ? (publicPlan as CreatorPlanCode)
+      : "creator_free";
+    const publicLinkLimit = planCode === "creator_studio" ? 100 : planCode === "creator_pro" || planCode === "founding_beta" ? 25 : planCode === "creator_plus" ? 5 : 1;
+    const videoAllowed = planCode !== "creator_free";
 
     const [
       { data: rows, error: tracksError },
@@ -150,6 +158,17 @@ export const publicCreatorService = {
         })),
     );
 
+    const profileLinks: Array<["website" | "instagram" | "facebook" | "tiktok" | "youtube" | "spotify" | "apple_music" | "x", string]> = [
+      ["website", profile.website ?? ""], ["instagram", profile.instagram ?? ""], ["facebook", profile.facebook ?? ""], ["tiktok", profile.tiktok ?? ""],
+      ["youtube", profile.youtube ?? ""], ["spotify", profile.spotify ?? ""], ["apple_music", profile.apple_music ?? ""], ["x", profile.x ?? ""],
+    ];
+    let remainingLinks = publicLinkLimit;
+    const visibleLinks = Object.fromEntries(profileLinks.map(([key, value]) => {
+      const visible = value && remainingLinks > 0 ? value : "";
+      if (visible) remainingLinks -= 1;
+      return [key, visible];
+    }));
+    const visiblePersonalLinks = (Array.isArray(profile.personal_links) ? profile.personal_links as PersonalLink[] : []).slice(0, remainingLinks);
     return {
       profile: {
         ...profile,
@@ -159,26 +178,19 @@ export const publicCreatorService = {
           (await signedUrl("avatars", profile.avatar_path)) ||
           profile.avatar_url ||
           "",
-        cover_url:
+        cover_url: planCode === "creator_free" ? "" :
           (await signedUrl("avatars", profile.cover_path)) ||
           profile.cover_url ||
           "",
-        website: profile.website ?? "",
-        instagram: profile.instagram ?? "",
-        facebook: profile.facebook ?? "",
-        tiktok: profile.tiktok ?? "",
-        youtube: profile.youtube ?? "",
-        spotify: profile.spotify ?? "",
-        apple_music: profile.apple_music ?? "",
-        x: profile.x ?? "",
-        personal_links: Array.isArray(profile.personal_links)
-          ? (profile.personal_links as PersonalLink[])
-          : [],
+        genres: (profile.genres ?? []).slice(0, planCode === "creator_free" ? 1 : 5),
+        ...visibleLinks,
+        personal_links: visiblePersonalLinks,
       },
       tracks,
       playlists,
       merch: hydratedMerch,
-      videos: hydratedVideos,
+      videos: videoAllowed ? hydratedVideos : [],
+      planCode,
     };
   },
 };

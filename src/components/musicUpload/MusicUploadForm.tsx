@@ -66,6 +66,7 @@ interface Props {
   onSubmit: (values: SingleUploadValues) => Promise<void>;
   submitting?: boolean;
   defaultRightsBasis: MusicRightsBasis;
+  advancedWorkflow?: boolean;
 }
 
 const empty = (defaultRightsBasis: MusicRightsBasis): SingleUploadValues => ({
@@ -96,6 +97,7 @@ export function MusicUploadForm({
   onSubmit,
   submitting,
   defaultRightsBasis,
+  advancedWorkflow = false,
 }: Props) {
   const [values, setValues] = useState<SingleUploadValues>(() =>
     empty(defaultRightsBasis),
@@ -180,7 +182,7 @@ export function MusicUploadForm({
           />
         </div>
       </ProfileCard>
-      <ProfileCard
+      {advancedWorkflow ? <ProfileCard
         title="Place this song in your workspace"
         description="Choose why you are managing this song and where it is in the creative process. You can change either setting later from the Music Library."
       >
@@ -231,7 +233,7 @@ export function MusicUploadForm({
           example, a song may be "Looking for collaborators," currently
           "Recording," and shared only with approved listeners.
         </p>
-      </ProfileCard>
+      </ProfileCard> : null}
 
       <ProfileCard
         title="Who can find and hear this song?"

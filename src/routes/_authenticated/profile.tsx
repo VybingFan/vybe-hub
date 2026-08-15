@@ -22,6 +22,7 @@ import {
 } from "@/hooks/useSupporterProfile";
 import type { CreatorProfileInput } from "@/features/profile/schema";
 import type { SupporterProfileInput } from "@/features/supporter/schema";
+import { useMembership } from "@/hooks/useMembership";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -55,6 +56,7 @@ function CreatorProfileContent({
   const { data: profile, isLoading, error } = useCreatorProfile(userId);
   const { data: tracks = [] } = useCreatorTracks(userId);
   const save = useSaveCreatorProfile(userId);
+  const membership = useMembership(Boolean(userId));
   const [isEditing, setIsEditing] = useState(false);
   if (isLoading) return <Center />;
   if (error)
@@ -69,6 +71,15 @@ function CreatorProfileContent({
     setIsEditing(false);
   };
   const publicUrl = profile?.username ? `/artist/${profile.username}` : null;
+  const isFreeCreator = membership.data?.plan_code === "creator_free";
+  const previewProfile = isFreeCreator
+    ? {
+        ...profile,
+        cover_url: null,
+        cover_path: null,
+        genres: profile?.genres?.slice(0, 1) ?? [],
+      }
+    : profile;
 
   return (
     <div className="mx-auto max-w-5xl space-y-5">
@@ -84,6 +95,7 @@ function CreatorProfileContent({
           onSubmit={handleSave}
           onCancel={() => setIsEditing(false)}
           submitting={save.isPending}
+          planCode={membership.data?.plan_code}
         />
       ) : (
         <>
@@ -93,7 +105,7 @@ function CreatorProfileContent({
             onEditProfile={() => setIsEditing(true)}
           />
           <ProfileHeader
-            profile={profile ?? {}}
+            profile={previewProfile ?? {}}
             email={email}
             isEditing={false}
             onEditToggle={() => canEdit && setIsEditing(true)}

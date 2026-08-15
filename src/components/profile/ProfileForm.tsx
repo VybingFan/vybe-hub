@@ -18,6 +18,10 @@ import {
   type CreatorProfile,
   type CreatorProfileInput,
 } from "@/features/profile/schema";
+import type { CreatorPlanCode } from "@/features/membership/catalog";
+import { getCreatorEntitlements } from "@/features/membership/entitlements";
+import { hasCreatorCapability } from "@/features/membership/access";
+import { LockedFeatureCard } from "@/components/membership/LockedFeatureCard";
 
 interface Props {
   initial: CreatorProfile | null;
@@ -25,9 +29,13 @@ interface Props {
   onCancel: () => void;
   submitting?: boolean;
   userId: string;
+  planCode?: CreatorPlanCode;
 }
 
-export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId }: Props) {
+export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, planCode }: Props) {
+  const entitlements = getCreatorEntitlements(planCode);
+  const customCover = hasCreatorCapability(planCode, "profile.custom_cover");
+  const multipleGenres = hasCreatorCapability(planCode, "profile.multiple_genres");
   const defaults: CreatorProfileInput = initial
     ? {
         username: initial.username ?? "",
@@ -125,7 +133,7 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId }:
         title="Profile and cover images"
         description="Click either image to upload. Cover: 1600 × 400 px recommended. Profile: 800 × 800 px recommended. JPG, PNG, or WebP up to 8MB. Keep important details centered for mobile cropping."
       >
-        <label className="group relative block h-52 cursor-pointer overflow-hidden rounded-2xl border border-border bg-muted">
+        {customCover ? <label className="group relative block h-52 cursor-pointer overflow-hidden rounded-2xl border border-border bg-muted">
           <img
             src={coverPreview || "/banners/default-creator-banner.png"}
             alt="Cover preview"
@@ -146,7 +154,7 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId }:
             className="hidden"
             onChange={(event) => upload("cover", event.target.files?.[0])}
           />
-        </label>
+        </label> : <LockedFeatureCard compact title="Custom cover begins with Creator Plus" description="Creator Free uses the standard VYBE profile header." requiredPlan="creator_plus" />}
         <label className="group relative -mt-14 ml-6 block h-28 w-28 cursor-pointer overflow-hidden rounded-3xl border-4 border-card bg-muted shadow-elevated">
           <img
             src={avatarPreview || "/avatars/default-avatar.png"}
@@ -210,6 +218,7 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId }:
                     field.onChange(genres);
                     setValue("genre", genres[0] ?? "");
                   }}
+                  max={multipleGenres ? 5 : 1}
                 />
               )}
             />
@@ -233,7 +242,7 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId }:
 
       <ProfileCard
         title="Links & socials"
-        description="Website, social platforms, and custom links."
+        description={`Website, social platforms, and custom links. Your membership displays up to ${entitlements.limits.publicLinks} public link${entitlements.limits.publicLinks === 1 ? "" : "s"}.`}
       >
         <SocialLinksForm control={control} register={register} errors={errors} />
       </ProfileCard>

@@ -1,5 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { CreatorProfile, CreatorProfileInput, PersonalLink } from "@/features/profile/schema";
+import { membershipService } from "@/services/membership/membershipService";
+import { hasCreatorCapability } from "@/features/membership/access";
 
 type Row = Omit<CreatorProfile, "personal_links"> & { personal_links: unknown };
 
@@ -27,6 +29,10 @@ async function hydrate(row: Row): Promise<CreatorProfile> {
 
 export const creatorProfileService = {
   async uploadImage(userId: string, kind: "avatar" | "cover", file: File) {
+    if (kind === "cover") {
+      const membership = await membershipService.getMine();
+      if (!hasCreatorCapability(membership.plan_code, "profile.custom_cover")) throw new Error("Custom profile covers require Creator Plus or higher.");
+    }
     if (file.size > 8 * 1024 * 1024) throw new Error("Image must be 8MB or smaller");
     if (!file.type.startsWith("image/")) throw new Error("Choose an image file");
     const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";

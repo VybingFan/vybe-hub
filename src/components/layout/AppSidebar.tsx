@@ -42,6 +42,11 @@ import {
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/common/Logo";
 import { useUser } from "@/hooks/useUser";
+import { useMembership } from "@/hooks/useMembership";
+import { useQuery } from "@tanstack/react-query";
+import { creatorFocusService } from "@/services/membership/creatorFocusService";
+import { hasActiveCreatorFocus, hasCreatorCapability, type CreatorCapability } from "@/features/membership/access";
+import type { CreatorFocusCode } from "@/features/membership/creatorFocusAccess";
 import type { AppRole } from "@/features/auth/roles";
 import { adminNotificationService } from "@/services/admin/adminNotificationService";
 import {
@@ -56,6 +61,8 @@ interface NavItem {
   allow: AppRole[];
   badge?: number;
   permissionAnyOf?: string[];
+  capability?: CreatorCapability;
+  focus?: CreatorFocusCode;
 }
 
 const memberPrimary: NavItem[] = [
@@ -153,18 +160,22 @@ const creatorStudio: NavItem[] = [
     url: "/videos",
     icon: Clapperboard,
     allow: ["creator", "admin"],
+    capability: "video.library",
   },
   {
     title: "Film Studio",
     url: "/film-studio",
     icon: Clapperboard,
     allow: ["creator", "admin"],
+    focus: "film",
   },
   {
     title: "Project Media & Review",
     url: "/film-project-media",
     icon: Clapperboard,
     allow: ["creator", "admin"],
+    capability: "film.project_media_review",
+    focus: "film",
   },
 ];
 
@@ -200,6 +211,7 @@ const creatorGrowth: NavItem[] = [
     url: "/commerce",
     icon: CreditCard,
     allow: ["creator", "admin"],
+    capability: "commerce.prepare",
   },  {
     title: "Rights Review",
     url: "/admin/commerce-rights",
@@ -235,14 +247,25 @@ export function AppSidebar() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const { hasAnyRole } = useUser();
+  const { hasAnyRole, user } = useUser();
+  const membership = useMembership(Boolean(user?.id) && hasAnyRole(["creator"]));
+  const focusAccess = useQuery({
+    queryKey: ["creator-focus-access"],
+    queryFn: creatorFocusService.getMine,
+    enabled: Boolean(user?.id) && hasAnyRole(["creator"]),
+  });
   const isAdmin = hasAnyRole(["admin"]) && pathname.startsWith("/admin");
   const [pendingWork, setPendingWork] = useState(0);
   const [adminAccess, setAdminAccess] = useState<AdminAccess | null>(null);
   const isActive = (url: string) =>
     pathname === url || pathname.startsWith(url + "/");
   const visible = (items: NavItem[]) =>
-    items.filter((item) => hasAnyRole(item.allow));
+    items.filter((item) => {
+      if (!hasAnyRole(item.allow)) return false;
+      if (item.capability && !hasCreatorCapability(membership.data?.plan_code, item.capability)) return false;
+      if (item.focus && !hasActiveCreatorFocus(item.focus, focusAccess.data?.access)) return false;
+      return true;
+    });
 
   useEffect(() => {
     if (!isAdmin) {
@@ -497,7 +520,7 @@ export function AppSidebar() {
                 items={visible(creatorGrowth)}
                 isActive={isActive}
               />
-            ) : null}            {hasAnyRole(["creator"]) ? (
+            ) : null}            {hasAnyRole(["creator"]) && hasCreatorCapability(membership.data?.plan_code, "creator_mode.browse") ? (
               <NavGroup
                 label="Browse VYBE"
                 items={[{ title: "Explore the VYBE app", url: "/home", icon: Compass, allow: ["creator"] }]}

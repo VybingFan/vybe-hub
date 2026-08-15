@@ -33,6 +33,7 @@ export function PublicCreatorMusicExperience({
   creatorUserId,
   creatorName,
   initialTrackId,
+  featuredCollectionLabel = "Artist’s Top 5",
 }: {
   tracks: Track[];
   playlists: PublicCreatorPlaylist[];
@@ -40,6 +41,7 @@ export function PublicCreatorMusicExperience({
   creatorUserId: string;
   creatorName: string;
   initialTrackId?: string;
+  featuredCollectionLabel?: string;
 }) {
   const publicTracks = useMemo(
     () => tracks.filter((track) => track.show_on_public_profile !== false),
@@ -103,7 +105,7 @@ export function PublicCreatorMusicExperience({
               Selected by the artist
             </p>
             <h2 id="artist-top-five" className="mt-1 text-2xl font-semibold">
-              {topTracks.length ? "Artist’s Top 5" : "Start here"}
+              {topTracks.length ? featuredCollectionLabel : "Start here"}
             </h2>
           </div>
           <span className="text-xs text-muted-foreground">
@@ -156,13 +158,14 @@ export function PublicCreatorMusicExperience({
           topTrackIds={new Set(topTracks.map((track) => track.id))}
           creatorUserId={creatorUserId}
           creatorName={creatorName}
+          featuredCollectionLabel={featuredCollectionLabel}
           onSelect={setSelectedId}
         />
         <div className="mt-3 flex flex-col gap-2 rounded-2xl border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-medium">Continue with this creator</p>
             <p className="text-xs text-muted-foreground">
-              Top 5 first, then eligible public songs. Restricted music is excluded.
+              {featuredCollectionLabel} first, then eligible public songs. Restricted music is excluded.
             </p>
           </div>
           <select

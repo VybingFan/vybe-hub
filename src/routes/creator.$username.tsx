@@ -65,7 +65,8 @@ export function PublicArtistHome({
       </div>
     );
 
-  const { profile, tracks, playlists, merch, videos } = data;
+  const { profile, tracks, playlists, merch, videos, planCode } = data;
+  const compactProfile = planCode === "creator_free";
   const isOwner = user?.id === profile.user_id;
   const name = profile.artist_name || profile.display_name;
   const share = () =>
@@ -115,7 +116,7 @@ export function PublicArtistHome({
       </div>
       <main>
         <section className="relative">
-          <div className="h-36 overflow-hidden sm:h-44 md:h-56">
+          <div className={compactProfile ? "h-20 overflow-hidden sm:h-24" : "h-36 overflow-hidden sm:h-44 md:h-56"}>
             <img
               src={profile.cover_url || "/banners/default-creator-banner.png"}
               alt=""
@@ -173,7 +174,7 @@ export function PublicArtistHome({
         >
           <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6">
             <p className="mb-2 text-xs font-semibold uppercase tracking-[.16em] text-primary">
-              Explore everything {name} is sharing
+              {compactProfile ? `${name}'s VYBE creator profile` : `Explore everything ${name} is sharing`}
             </p>
             <div className="flex gap-2 overflow-x-auto pb-1">
               <CreatorSectionLink href="#music">Music</CreatorSectionLink>
@@ -199,6 +200,7 @@ export function PublicArtistHome({
             creatorUserId={profile.user_id}
             creatorName={name}
             initialTrackId={selectedTrackId}
+            featuredCollectionLabel={compactProfile ? "Featured Music" : undefined}
           />
         </section>
 

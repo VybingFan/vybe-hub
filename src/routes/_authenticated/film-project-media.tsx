@@ -4,6 +4,7 @@ import { useMutation,useQuery,useQueryClient } from "@tanstack/react-query";
 import { Clapperboard,ExternalLink,Film,Loader2,LockKeyhole,Plus,ShieldAlert,Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { CreatorCapabilityGuard } from "@/components/membership/CreatorCapabilityGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card,CardContent } from "@/components/ui/card";
@@ -16,7 +17,7 @@ import { useUser } from "@/hooks/useUser";
 import { creatorFocusService } from "@/services/membership/creatorFocusService";
 import { filmProjectMediaService,type CompletionState,type FilmMediaRole } from "@/services/film/filmProjectMediaService";
 
-export const Route=createFileRoute("/_authenticated/film-project-media")({component:()=> <RoleGuard allow={["creator","admin"]}><FilmProjectMediaPage/></RoleGuard>});
+export const Route=createFileRoute("/_authenticated/film-project-media")({component:()=> <RoleGuard allow={["creator","admin"]}><CreatorCapabilityGuard capability="film.project_media_review" requiredPlan="creator_plus" title="Project Media & Review requires Creator Plus" description="Private project-review planning is not included with Creator Free."><FilmProjectMediaPage/></CreatorCapabilityGuard></RoleGuard>});
 const ROLES:FilmMediaRole[]=["trailer","clip","scene","rough_cut","teaser","behind_the_scenes","other"];
 function FilmProjectMediaPage(){
  const {user}=useUser();const creatorId=user?.id;const client=useQueryClient();
