@@ -236,7 +236,7 @@ export function AppSidebar() {
     select: (state) => state.location.pathname,
   });
   const { hasAnyRole } = useUser();
-  const isAdmin = hasAnyRole(["admin"]);
+  const isAdmin = hasAnyRole(["admin"]) && pathname.startsWith("/admin");
   const [pendingWork, setPendingWork] = useState(0);
   const [adminAccess, setAdminAccess] = useState<AdminAccess | null>(null);
   const isActive = (url: string) =>

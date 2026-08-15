@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Bell, Search } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -26,12 +26,13 @@ import {
 
 export function TopNav() {
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const { signOut } = useAuth();
   const { profile, user, hasRole } = useUser();
   const { data: creatorProfile } = useCreatorProfile(hasRole("creator") ? user?.id : undefined);
   const { data: activity = [] } = useMyActivity(hasRole("creator") ? user?.id : undefined);
   const { data: connections = [] } = useMyConnections(hasRole("creator") ? user?.id : undefined);
-  const isAdmin = hasRole("admin");
+  const isAdmin = hasRole("admin") && pathname.startsWith("/admin");
   const [adminNotifications, setAdminNotifications] = useState<AdminNotification[]>([]);
   const [lastSeen, setLastSeen] = useState(() =>
     typeof window === "undefined"
