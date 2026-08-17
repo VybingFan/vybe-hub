@@ -86,7 +86,7 @@ export const publicCreatorService = {
     ]);
     if (tracksError) throw tracksError;
     if (merchError) throw merchError;
-    if (videosError) throw videosError;
+    if (videosError) console.warn("Public creator videos are unavailable", videosError);
     if (playlistsError) throw playlistsError;
 
     const tracks = (await Promise.all(
@@ -124,7 +124,7 @@ export const publicCreatorService = {
       })),
     );
     const hydratedVideos = await Promise.all(
-      ((videos ?? []) as unknown as CreatorVideo[]).map(async (video) => ({
+      ((videosError ? [] : videos ?? []) as unknown as CreatorVideo[]).map(async (video) => ({
         ...video,
         thumbnail_url:
           (await signedUrl("music-covers", video.thumbnail_path)) ||
