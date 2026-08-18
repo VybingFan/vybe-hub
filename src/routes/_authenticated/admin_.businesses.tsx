@@ -163,6 +163,15 @@ function BusinessOperationsPage() {
       toast.error(error instanceof Error ? error.message : "Could not update business request");
     }
   }
+  async function createCampaignFromSubmission(submission: OperationsBusinessSubmission) {
+    try {
+      await businessAdminService.createCampaignFromSubmission(submission.id);
+      toast.success("Draft campaign created from approved proposal");
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not create campaign from proposal");
+    }
+  }
   const verifiedBusinesses = useMemo(
     () => businesses.filter((business) => business.verification_status === "verified"),
     [businesses],
@@ -405,6 +414,7 @@ function BusinessOperationsPage() {
                     submission={submission}
                     events={reviewEvents.filter((event) => event.submission_id === submission.id)}
                     onAction={reviewSubmission}
+                    onCreateCampaign={createCampaignFromSubmission}
                   />
                 ))}
               </div>
@@ -505,6 +515,7 @@ function BusinessSubmissionReviewCard({
   submission,
   events,
   onAction,
+  onCreateCampaign,
 }: {
   submission: OperationsBusinessSubmission;
   events: BusinessSubmissionReviewEvent[];
@@ -514,6 +525,7 @@ function BusinessSubmissionReviewCard({
     businessResponse?: string | null,
     internalNotes?: string | null,
   ) => Promise<void>;
+  onCreateCampaign: (submission: OperationsBusinessSubmission) => Promise<void>;
 }) {
   const [businessResponse, setBusinessResponse] = useState(submission.business_response ?? "");
   const [internalNotes, setInternalNotes] = useState(submission.internal_notes ?? "");
@@ -639,6 +651,42 @@ function BusinessSubmissionReviewCard({
         </div>
       </AdminPermissionGuard>
 
+      {submission.request_type === "campaign_proposal" && submission.status === "approved" ? (
+        <div className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          {submission.linked_campaign_id ? (
+            <>
+              <p className="font-semibold">Operations campaign created</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Campaign ID: {submission.linked_campaign_id}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Continue setup in Campaign inventory. Proposal approval did not publish the campaign.
+              </p>
+            </>
+          ) : (
+            <AdminPermissionGuard anyOf={["admin.business.manage"]} silent>
+              <div>
+                <p className="font-semibold">Approved campaign proposal</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Create the controlled draft campaign record to begin Operations setup. This does not publish anything.
+                </p>
+                <Button
+                  type="button"
+                  className="mt-3"
+                  size="sm"
+                  onClick={() => {
+                    if (window.confirm(`Create a draft campaign from "${submission.title}"?`)) {
+                      void onCreateCampaign(submission);
+                    }
+                  }}
+                >
+                  Create Draft Campaign
+                </Button>
+              </div>
+            </AdminPermissionGuard>
+          )}
+        </div>
+      ) : null}
       <div className="mt-5 border-t pt-4">
         <p className="text-sm font-semibold">Review history</p>
         {events.length ? (

@@ -169,6 +169,7 @@ export type OperationsBusinessSubmission = {
   reviewed_at: string | null;
   business_response: string | null;
   internal_notes: string | null;
+  linked_campaign_id: string | null;
   created_at: string;
   updated_at: string;
   business_profiles: { public_name: string; verification_status: string } | null;
@@ -324,7 +325,7 @@ export const businessAdminService = {
   async listBusinessSubmissions(): Promise<OperationsBusinessSubmission[]> {
     const { data, error } = await (supabase.from("business_submissions") as any)
       .select(
-        "id,business_id,request_type,title,summary,request_payload,status,created_by,submitted_at,reviewed_by,reviewed_at,business_response,internal_notes,created_at,updated_at,business_profiles(public_name,verification_status)",
+        "id,business_id,request_type,title,summary,request_payload,status,created_by,submitted_at,reviewed_by,reviewed_at,business_response,internal_notes,linked_campaign_id,created_at,updated_at,business_profiles(public_name,verification_status)",
       )
       .neq("status", "draft")
       .order("updated_at", { ascending: false });
@@ -356,6 +357,14 @@ export const businessAdminService = {
     });
     if (error) throw new Error(error.message);
     return data as OperationsBusinessSubmission;
+  },
+  async createCampaignFromSubmission(submissionId: string): Promise<CampaignRecord> {
+    const { data, error } = await (supabase.rpc as any)(
+      "create_campaign_from_business_submission",
+      { p_submission_id: submissionId },
+    );
+    if (error) throw new Error(error.message);
+    return data as CampaignRecord;
   },
   async createBusiness(input: NewBusiness): Promise<void> {
     const now = new Date();
