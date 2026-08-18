@@ -524,18 +524,32 @@ export function AppSidebar() {
               />
             ) : null}
             {hasAnyRole(["business"]) ? (
-              <NavGroup
-                label="Business Studio"
-                items={[
-                  {
-                    title: "Business Overview",
-                    url: "/business",
-                    icon: BriefcaseBusiness,
-                    allow: ["business", "admin"],
-                  },
-                ]}
-                isActive={isActive}
-              />
+              <>
+                <NavGroup
+                  label="Business Portal"
+                  items={[
+                    {
+                      title: "Business Overview",
+                      url: "/business",
+                      icon: BriefcaseBusiness,
+                      allow: ["business", "admin"],
+                    },
+                  ]}
+                  isActive={isActive}
+                />
+                <NavGroup
+                  label="VYBE"
+                  items={[
+                    {
+                      title: "Explore VYBE",
+                      url: "/home",
+                      icon: Compass,
+                      allow: ["business"],
+                    },
+                  ]}
+                  isActive={isActive}
+                />
+              </>
             ) : null}
             {hasAnyRole(["supporter"]) && !hasAnyRole(["creator", "admin"]) ? (
               <NavGroup
