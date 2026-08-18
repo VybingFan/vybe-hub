@@ -297,7 +297,7 @@ export function AppSidebar() {
               label="Operations"
               items={[
                 {
-                  title: "Overview",
+                  title: "Back Office Home",
                   url: "/admin",
                   icon: LayoutDashboard,
                   allow: ["admin"],
@@ -490,6 +490,20 @@ export function AppSidebar() {
           </>
         ) : (
           <>
+            {hasAnyRole(["admin"]) ? (
+              <NavGroup
+                label="Staff"
+                items={[
+                  {
+                    title: "Open Back Office",
+                    url: "/admin",
+                    icon: LayoutDashboard,
+                    allow: ["admin"],
+                  },
+                ]}
+                isActive={isActive}
+              />
+            ) : null}
             {!hasAnyRole(["creator"]) ? (
               <>
                 <NavGroup label="Your VYBE" items={visible(memberPrimary)} isActive={isActive} />

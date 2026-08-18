@@ -205,53 +205,7 @@ function AdminPage() {
           </Card>
         ) : null}
 
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-xl font-semibold">Work areas</h2>
-            <p className="text-sm text-muted-foreground">
-              Move directly to the part of VYBE that needs attention.
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            <WorkAreaCard
-              icon={Users}
-              title="Creator operations"
-              description="Search accounts, review roles, plans, and catalog activity."
-              to="/admin/creators"
-              action="Open directory"
-            />
-            <WorkAreaCard
-              icon={Copyright}
-              title="Rights and moderation"
-              description="Monitor scanning, review cases, and manage copyright reports."
-              to="/admin/rights"
-              action="Open rights workspace"
-            />
-            <WorkAreaCard
-              icon={Gamepad2}
-              title="Play operations"
-              description="Review live experiences, release gates, and the Play roadmap."
-              to="/admin/play"
-              action="Open Play board"
-            />
-            <WorkAreaCard
-              icon={BriefcaseBusiness}
-              title="Business operations"
-              description="Qualify partners, manage campaigns, verify analytics, and maintain records."
-              to="/admin/businesses"
-              action="Open business workspace"
-            />
-            {canManageAdminTeam ? (
-              <WorkAreaCard
-                icon={UserCog}
-                title="Administrator team"
-                description="Invite administrators and assign only the operational roles they need."
-                to="/admin/team"
-                action="Manage administrator access"
-              />
-            ) : null}
-          </div>
-        </section>
+        <BackOfficeLaunchpad summary={summary} workQueue={workQueue} canManageAdminTeam={canManageAdminTeam} />
 
         <Card id="invitation-management">
           <CardHeader>
@@ -435,6 +389,161 @@ function LimitedAdminHome({ access }: { access: AdminAccess }) {
   );
 }
 
+function BackOfficeLaunchpad({
+  summary,
+  workQueue,
+  canManageAdminTeam,
+}: {
+  summary: BackOfficeSummary | null;
+  workQueue: WorkQueueSummary | null;
+  canManageAdminTeam: boolean;
+}) {
+  const rightsAttention = summary
+    ? summary.attention.rights_jobs_queued +
+      summary.attention.rights_jobs_failed +
+      summary.attention.rights_jobs_flagged +
+      summary.attention.moderation_cases_open +
+      summary.attention.copyright_reports_open
+    : 0;
+
+  const businessWaiting = workQueue
+    ? workQueue.business_applications + workQueue.campaign_reviews
+    : 0;
+
+  return (
+    <section className="space-y-4">
+      <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+        <div>
+          <h2 className="text-xl font-semibold">What needs work?</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Open the area you need. Detailed tools remain inside each workspace.
+          </p>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Assignment workflow foundation comes next.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <BackOfficeActionCard
+          icon={BellRing}
+          title="Needs Attention"
+          description="Open the shared work queue for items that need VYBE review or follow-up."
+          to="/admin/work-queue"
+          action="Open work queue"
+          count={workQueue?.unread ?? 0}
+          countLabel="waiting"
+          attention={(workQueue?.unread ?? 0) > 0}
+        />
+        <BackOfficeActionCard
+          icon={Users}
+          title="Creator Operations"
+          description="Creator accounts, access, catalog activity, plans, and creator support work."
+          to="/admin/creators"
+          action="Open creator operations"
+          count={summary?.accounts.creators}
+          countLabel="creators"
+        />
+        <BackOfficeActionCard
+          icon={BriefcaseBusiness}
+          title="Business Operations"
+          description="Business requests, partner records, proposals, campaigns, offers, and approvals."
+          to="/admin/businesses"
+          action="Open business operations"
+          count={workQueue ? businessWaiting : undefined}
+          countLabel="waiting"
+          attention={businessWaiting > 0}
+        />
+        <BackOfficeActionCard
+          icon={Copyright}
+          title="Rights & Content"
+          description="Music rights, copyright, moderation, scans, and content review."
+          to="/admin/rights"
+          action="Open rights & content"
+          count={summary ? rightsAttention : undefined}
+          countLabel="attention items"
+          attention={rightsAttention > 0}
+        />
+        <BackOfficeActionCard
+          icon={Users}
+          title="Accounts & Memberships"
+          description="Member records, account review, access, memberships, and privacy operations."
+          to="/admin/accounts"
+          action="Open accounts"
+          count={summary?.accounts.total}
+          countLabel="accounts"
+        />
+        <BackOfficeActionCard
+          icon={Activity}
+          title="Platform Health"
+          description="System health, operating readiness, and platform-level review."
+          to="/admin/system-health"
+          action="Open platform health"
+        />
+        {canManageAdminTeam ? (
+          <BackOfficeActionCard
+            icon={UserCog}
+            title="Admin Team"
+            description="Manage authorized staff access. Assignment controls will build from here."
+            to="/admin/team"
+            action="Open admin team"
+          />
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function BackOfficeActionCard({
+  icon: Icon,
+  title,
+  description,
+  to,
+  action,
+  count,
+  countLabel,
+  attention = false,
+}: {
+  icon: typeof Users;
+  title: string;
+  description: string;
+  to:
+    | "/admin/work-queue"
+    | "/admin/creators"
+    | "/admin/businesses"
+    | "/admin/rights"
+    | "/admin/accounts"
+    | "/admin/system-health"
+    | "/admin/team";
+  action: string;
+  count?: number;
+  countLabel?: string;
+  attention?: boolean;
+}) {
+  return (
+    <Card className={attention ? "border-primary/40 bg-primary/5" : "flex h-full flex-col"}>
+      <CardContent className="flex h-full flex-col p-5">
+        <div className="flex items-start justify-between gap-3">
+          <span className="rounded-xl bg-primary/10 p-2 text-primary">
+            <Icon className="h-5 w-5" />
+          </span>
+          {typeof count === "number" ? (
+            <Badge variant={attention ? "default" : "secondary"}>
+              {count} {countLabel}
+            </Badge>
+          ) : null}
+        </div>
+        <p className="mt-4 font-semibold">{title}</p>
+        <p className="mt-2 flex-1 text-sm leading-6 text-muted-foreground">{description}</p>
+        <Button asChild variant={attention ? "default" : "outline"} className="mt-5">
+          <Link to={to}>
+            {action} <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 function BackOfficeOverview({ summary }: { summary: BackOfficeSummary }) {
   const attentionTotal =
     summary.attention.rights_jobs_queued +
