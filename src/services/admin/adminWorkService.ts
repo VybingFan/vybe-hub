@@ -58,6 +58,12 @@ export const adminWorkService = {
     return data.user?.id ?? null;
   },
 
+  async syncAlerts(): Promise<{ inserted: number; refreshed: number }> {
+    return rpc<{ inserted: number; refreshed: number }>(
+      "sync_admin_notifications_to_work_items",
+    );
+  },
+
   async summary(): Promise<AdminWorkSummary> {
     return rpc<AdminWorkSummary>("get_my_admin_work_summary");
   },

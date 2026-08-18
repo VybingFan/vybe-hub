@@ -71,6 +71,7 @@ function WorkQueuePage() {
 
   const load = useCallback(async () => {
     try {
+      await adminWorkService.syncAlerts();
       const [nextSummary, nextNotifications, nextItems, nextAccess, nextWorkSummary, userId] =
         await Promise.all([
           adminNotificationService.summary(),
