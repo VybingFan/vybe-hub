@@ -155,6 +155,44 @@ export type AdminCampaignReportRecord = CampaignReportRecord & {
   } | null;
 };
 
+export type OperationsBusinessSubmission = {
+  id: string;
+  business_id: string;
+  request_type: "campaign_proposal" | "offer_proposal" | "sponsorship_placement" | "creative_brief";
+  title: string;
+  summary: string;
+  request_payload: Record<string, unknown>;
+  status: "draft" | "submitted" | "under_review" | "approved" | "declined" | "withdrawn";
+  created_by: string;
+  submitted_at: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  business_response: string | null;
+  internal_notes: string | null;
+  created_at: string;
+  updated_at: string;
+  business_profiles: { public_name: string; verification_status: string } | null;
+};
+
+export type BusinessSubmissionReviewEvent = {
+  id: string;
+  submission_id: string;
+  business_id: string;
+  actor_user_id: string;
+  action: "start_review" | "approve" | "decline" | "update_response" | "update_internal_notes";
+  from_status: string;
+  to_status: string;
+  business_response: string | null;
+  internal_notes: string | null;
+  created_at: string;
+};
+
+export type BusinessSubmissionReviewAction =
+  | "start_review"
+  | "approve"
+  | "decline"
+  | "update_response"
+  | "update_internal_notes";
 type NewBusiness = {
   publicName: string;
   slug: string;
@@ -283,6 +321,42 @@ export const businessAdminService = {
     });
   },
 
+  async listBusinessSubmissions(): Promise<OperationsBusinessSubmission[]> {
+    const { data, error } = await (supabase.from("business_submissions") as any)
+      .select(
+        "id,business_id,request_type,title,summary,request_payload,status,created_by,submitted_at,reviewed_by,reviewed_at,business_response,internal_notes,created_at,updated_at,business_profiles(public_name,verification_status)",
+      )
+      .neq("status", "draft")
+      .order("updated_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as OperationsBusinessSubmission[];
+  },
+
+  async listBusinessSubmissionReviewEvents(): Promise<BusinessSubmissionReviewEvent[]> {
+    const { data, error } = await (supabase.from("business_submission_review_events") as any)
+      .select(
+        "id,submission_id,business_id,actor_user_id,action,from_status,to_status,business_response,internal_notes,created_at",
+      )
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as BusinessSubmissionReviewEvent[];
+  },
+
+  async reviewBusinessSubmission(input: {
+    submissionId: string;
+    action: BusinessSubmissionReviewAction;
+    businessResponse?: string | null;
+    internalNotes?: string | null;
+  }): Promise<OperationsBusinessSubmission> {
+    const { data, error } = await (supabase.rpc as any)("review_business_submission", {
+      p_submission_id: input.submissionId,
+      p_action: input.action,
+      p_business_response: input.businessResponse ?? null,
+      p_internal_notes: input.internalNotes ?? null,
+    });
+    if (error) throw new Error(error.message);
+    return data as OperationsBusinessSubmission;
+  },
   async createBusiness(input: NewBusiness): Promise<void> {
     const now = new Date();
     const duration =

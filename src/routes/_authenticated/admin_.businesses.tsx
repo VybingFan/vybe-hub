@@ -26,6 +26,9 @@ import {
   type BusinessRecord,
   type BusinessSummary,
   type CampaignRecord,
+  type OperationsBusinessSubmission,
+  type BusinessSubmissionReviewEvent,
+  type BusinessSubmissionReviewAction,
 } from "@/services/business/businessAdminService";
 
 export const Route = createFileRoute("/_authenticated/admin_/businesses")({
@@ -42,6 +45,8 @@ function BusinessOperationsPage() {
   const [summary, setSummary] = useState<BusinessSummary | null>(null);
   const [businesses, setBusinesses] = useState<BusinessRecord[]>([]);
   const [campaigns, setCampaigns] = useState<CampaignRecord[]>([]);
+  const [submissions, setSubmissions] = useState<OperationsBusinessSubmission[]>([]);
+  const [reviewEvents, setReviewEvents] = useState<BusinessSubmissionReviewEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingBusiness, setSavingBusiness] = useState(false);
   const [savingCampaign, setSavingCampaign] = useState(false);
@@ -49,14 +54,19 @@ function BusinessOperationsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [nextSummary, nextBusinesses, nextCampaigns] = await Promise.all([
-        businessAdminService.getSummary(),
-        businessAdminService.listBusinesses(),
-        businessAdminService.listCampaigns(),
-      ]);
+      const [nextSummary, nextBusinesses, nextCampaigns, nextSubmissions, nextReviewEvents] =
+        await Promise.all([
+          businessAdminService.getSummary(),
+          businessAdminService.listBusinesses(),
+          businessAdminService.listCampaigns(),
+          businessAdminService.listBusinessSubmissions(),
+          businessAdminService.listBusinessSubmissionReviewEvents(),
+        ]);
       setSummary(nextSummary);
       setBusinesses(nextBusinesses);
       setCampaigns(nextCampaigns);
+      setSubmissions(nextSubmissions);
+      setReviewEvents(nextReviewEvents);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not load business operations");
     } finally {
@@ -124,6 +134,35 @@ function BusinessOperationsPage() {
     }
   }
 
+  async function reviewSubmission(
+    submissionId: string,
+    action: BusinessSubmissionReviewAction,
+    businessResponse?: string | null,
+    internalNotes?: string | null,
+  ) {
+    try {
+      await businessAdminService.reviewBusinessSubmission({
+        submissionId,
+        action,
+        businessResponse,
+        internalNotes,
+      });
+      const message =
+        action === "start_review"
+          ? "Business request moved into review"
+          : action === "approve"
+            ? "Business request approved"
+            : action === "decline"
+              ? "Business request declined"
+              : action === "update_response"
+                ? "Business-visible response saved"
+                : "Internal notes saved";
+      toast.success(message);
+      await load();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not update business request");
+    }
+  }
   const verifiedBusinesses = useMemo(
     () => businesses.filter((business) => business.verification_status === "verified"),
     [businesses],
@@ -171,7 +210,7 @@ function BusinessOperationsPage() {
             {summary
               ? `Business summary refreshed ${new Date(summary.generated_at).toLocaleString()}`
               : loading
-                ? "Loading business operations…"
+                ? "Loading business operationsâ€¦"
                 : "Business summary unavailable"}
           </p>
         </header>
@@ -237,7 +276,7 @@ function BusinessOperationsPage() {
                 </div>
                 <div className="sm:col-span-2">
                   <Button disabled={savingBusiness}>
-                    {savingBusiness ? "Creating…" : "Create partner record"}
+                    {savingBusiness ? "Creatingâ€¦" : "Create partner record"}
                   </Button>
                 </div>
               </form>
@@ -287,7 +326,7 @@ function BusinessOperationsPage() {
                   />
                 </div>
                 <Button disabled={savingCampaign || verifiedBusinesses.length === 0}>
-                  {savingCampaign ? "Creating…" : "Create draft campaign"}
+                  {savingCampaign ? "Creatingâ€¦" : "Create draft campaign"}
                 </Button>
               </form>
             </CardContent>
@@ -324,7 +363,7 @@ function BusinessOperationsPage() {
                       </div>
                     </div>
                     <p className="mt-3 text-xs text-muted-foreground">
-                      {business.contact_email} · /business/{business.slug}
+                      {business.contact_email} Â· /business/{business.slug}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {business.package_code
@@ -352,6 +391,29 @@ function BusinessOperationsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
+              <BriefcaseBusiness className="h-5 w-5 text-primary" /> Incoming business requests
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {submissions.length === 0 ? (
+              <EmptyCopy>No submitted business proposals or requests yet.</EmptyCopy>
+            ) : (
+              <div className="space-y-4">
+                {submissions.map((submission) => (
+                  <BusinessSubmissionReviewCard
+                    key={submission.id}
+                    submission={submission}
+                    events={reviewEvents.filter((event) => event.submission_id === submission.id)}
+                    onAction={reviewSubmission}
+                  />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-primary" /> Campaign inventory
             </CardTitle>
           </CardHeader>
@@ -372,7 +434,7 @@ function BusinessOperationsPage() {
                     <div>
                       <p className="font-semibold">{campaign.name}</p>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        {campaign.business_profiles?.public_name ?? "Business"} ·{" "}
+                        {campaign.business_profiles?.public_name ?? "Business"} Â·{" "}
                         {campaign.objective}
                       </p>
                     </div>
@@ -432,6 +494,176 @@ function BusinessSummaryCards({ summary }: { summary: BusinessSummary }) {
   );
 }
 
+const requestTypeLabels: Record<OperationsBusinessSubmission["request_type"], string> = {
+  campaign_proposal: "Campaign Proposal",
+  offer_proposal: "Offer Proposal",
+  sponsorship_placement: "Sponsorship / Placement Request",
+  creative_brief: "Creative Brief",
+};
+
+function BusinessSubmissionReviewCard({
+  submission,
+  events,
+  onAction,
+}: {
+  submission: OperationsBusinessSubmission;
+  events: BusinessSubmissionReviewEvent[];
+  onAction: (
+    submissionId: string,
+    action: BusinessSubmissionReviewAction,
+    businessResponse?: string | null,
+    internalNotes?: string | null,
+  ) => Promise<void>;
+}) {
+  const [businessResponse, setBusinessResponse] = useState(submission.business_response ?? "");
+  const [internalNotes, setInternalNotes] = useState(submission.internal_notes ?? "");
+
+  useEffect(() => {
+    setBusinessResponse(submission.business_response ?? "");
+    setInternalNotes(submission.internal_notes ?? "");
+  }, [submission.business_response, submission.internal_notes]);
+
+  const reviewStarted = ["under_review", "approved", "declined"].includes(submission.status);
+  const payload = Object.entries(submission.request_payload ?? {}).filter(
+    ([, value]) => value !== null && value !== undefined && String(value).trim() !== "",
+  );
+
+  return (
+    <div className="rounded-2xl border p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="font-semibold">{submission.title}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {submission.business_profiles?.public_name ?? "Business"} Â·{" "}
+            {requestTypeLabels[submission.request_type]}
+          </p>
+        </div>
+        <Badge variant={submission.status === "under_review" ? "default" : "outline"} className="capitalize">
+          {submission.status.replaceAll("_", " ")}
+        </Badge>
+      </div>
+
+      <p className="mt-4 text-sm leading-6">{submission.summary}</p>
+
+      {payload.length ? (
+        <div className="mt-4 grid gap-2 rounded-xl bg-muted/50 p-4 text-sm sm:grid-cols-2">
+          {payload.map(([key, value]) => (
+            <div key={key}>
+              <span className="font-medium capitalize">{key.replaceAll("_", " ")}:</span>{" "}
+              <span className="text-muted-foreground">{String(value)}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-xs text-muted-foreground">
+        <span>
+          Submitted: {submission.submitted_at ? new Date(submission.submitted_at).toLocaleString() : "â€”"}
+        </span>
+        {submission.reviewed_at ? (
+          <span>Last reviewed: {new Date(submission.reviewed_at).toLocaleString()}</span>
+        ) : null}
+      </div>
+
+      <AdminPermissionGuard anyOf={["admin.business.manage"]} silent>
+        <div className="mt-5 space-y-4 border-t pt-5">
+          {submission.status === "submitted" ? (
+            <Button size="sm" onClick={() => void onAction(submission.id, "start_review")}>
+              Start Review
+            </Button>
+          ) : null}
+
+          {reviewStarted ? (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor={`business-response-${submission.id}`}>Business-visible response</Label>
+                <Textarea
+                  id={`business-response-${submission.id}`}
+                  value={businessResponse}
+                  onChange={(event) => setBusinessResponse(event.target.value)}
+                  placeholder="This message is visible to the business in its portal."
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => void onAction(submission.id, "update_response", businessResponse, null)}
+                >
+                  Save Business Response
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor={`internal-notes-${submission.id}`}>Private Operations notes</Label>
+                <Textarea
+                  id={`internal-notes-${submission.id}`}
+                  value={internalNotes}
+                  onChange={(event) => setInternalNotes(event.target.value)}
+                  placeholder="Internal only. Never shown in the Business Portal."
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => void onAction(submission.id, "update_internal_notes", null, internalNotes)}
+                >
+                  Save Internal Notes
+                </Button>
+              </div>
+            </>
+          ) : null}
+
+          {submission.status === "under_review" ? (
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => void onAction(submission.id, "approve", businessResponse, internalNotes)}
+              >
+                Approve Request
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="destructive"
+                onClick={() => {
+                  if (window.confirm(`Decline "${submission.title}"?`)) {
+                    void onAction(submission.id, "decline", businessResponse, internalNotes);
+                  }
+                }}
+              >
+                Decline Request
+              </Button>
+            </div>
+          ) : null}
+        </div>
+      </AdminPermissionGuard>
+
+      <div className="mt-5 border-t pt-4">
+        <p className="text-sm font-semibold">Review history</p>
+        {events.length ? (
+          <div className="mt-3 space-y-2">
+            {events.map((event) => (
+              <div key={event.id} className="rounded-xl bg-muted/40 p-3 text-xs">
+                <div className="flex flex-wrap justify-between gap-2">
+                  <span className="font-medium capitalize">{event.action.replaceAll("_", " ")}</span>
+                  <span className="text-muted-foreground">
+                    {new Date(event.created_at).toLocaleString()}
+                  </span>
+                </div>
+                <p className="mt-1 text-muted-foreground">
+                  {event.from_status.replaceAll("_", " ")} â†’ {event.to_status.replaceAll("_", " ")}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-2 text-xs text-muted-foreground">No review actions recorded yet.</p>
+        )}
+      </div>
+    </div>
+  );
+}
 function Field({
   label,
   ...props
