@@ -23,6 +23,7 @@ import { Route as CreatorRouteImport } from './routes/creator_'
 import { Route as CreatorMembershipsRouteImport } from './routes/creator-memberships'
 import { Route as CopyrightRouteImport } from './routes/copyright'
 import { Route as CommunityGuidelinesRouteImport } from './routes/community-guidelines'
+import { Route as BuildWithVybeRouteImport } from './routes/build-with-vybe'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -37,6 +38,8 @@ import { Route as ExperienceListenRouteImport } from './routes/experience.listen
 import { Route as ExperienceEventsRouteImport } from './routes/experience.events'
 import { Route as ExperienceCommunitiesRouteImport } from './routes/experience.communities'
 import { Route as DemoCreatorRouteImport } from './routes/demo.creator'
+import { Route as CreatorSignUpRouteImport } from './routes/creator.sign-up'
+import { Route as CreatorSignInRouteImport } from './routes/creator.sign-in'
 import { Route as CreatorUsernameRouteImport } from './routes/creator.$username'
 import { Route as CreatorInviteTokenRouteImport } from './routes/creator-invite.$token'
 import { Route as CopyrightReportRouteImport } from './routes/copyright_.report'
@@ -192,6 +195,11 @@ const CommunityGuidelinesRoute = CommunityGuidelinesRouteImport.update({
   path: '/community-guidelines',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BuildWithVybeRoute = BuildWithVybeRouteImport.update({
+  id: '/build-with-vybe',
+  path: '/build-with-vybe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -259,6 +267,16 @@ const ExperienceCommunitiesRoute = ExperienceCommunitiesRouteImport.update({
 const DemoCreatorRoute = DemoCreatorRouteImport.update({
   id: '/demo/creator',
   path: '/demo/creator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorSignUpRoute = CreatorSignUpRouteImport.update({
+  id: '/creator/sign-up',
+  path: '/creator/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorSignInRoute = CreatorSignInRouteImport.update({
+  id: '/creator/sign-in',
+  path: '/creator/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreatorUsernameRoute = CreatorUsernameRouteImport.update({
@@ -723,6 +741,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
+  '/build-with-vybe': typeof BuildWithVybeRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/copyright': typeof CopyrightRoute
   '/creator-memberships': typeof CreatorMembershipsRoute
@@ -789,6 +808,8 @@ export interface FileRoutesByFullPath {
   '/copyright/report': typeof CopyrightReportRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
+  '/creator/sign-in': typeof CreatorSignInRoute
+  '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/events': typeof ExperienceEventsRoute
@@ -836,6 +857,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
+  '/build-with-vybe': typeof BuildWithVybeRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/copyright': typeof CopyrightRoute
   '/creator-memberships': typeof CreatorMembershipsRoute
@@ -902,6 +924,8 @@ export interface FileRoutesByTo {
   '/copyright/report': typeof CopyrightReportRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
+  '/creator/sign-in': typeof CreatorSignInRoute
+  '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/events': typeof ExperienceEventsRoute
@@ -951,6 +975,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
+  '/build-with-vybe': typeof BuildWithVybeRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/copyright': typeof CopyrightRoute
   '/creator-memberships': typeof CreatorMembershipsRoute
@@ -1017,6 +1042,8 @@ export interface FileRoutesById {
   '/copyright_/report': typeof CopyrightReportRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
+  '/creator/sign-in': typeof CreatorSignInRoute
+  '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/events': typeof ExperienceEventsRoute
@@ -1066,6 +1093,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/build-with-vybe'
     | '/community-guidelines'
     | '/copyright'
     | '/creator-memberships'
@@ -1132,6 +1160,8 @@ export interface FileRouteTypes {
     | '/copyright/report'
     | '/creator-invite/$token'
     | '/creator/$username'
+    | '/creator/sign-in'
+    | '/creator/sign-up'
     | '/demo/creator'
     | '/experience/communities'
     | '/experience/events'
@@ -1179,6 +1209,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/build-with-vybe'
     | '/community-guidelines'
     | '/copyright'
     | '/creator-memberships'
@@ -1245,6 +1276,8 @@ export interface FileRouteTypes {
     | '/copyright/report'
     | '/creator-invite/$token'
     | '/creator/$username'
+    | '/creator/sign-in'
+    | '/creator/sign-up'
     | '/demo/creator'
     | '/experience/communities'
     | '/experience/events'
@@ -1293,6 +1326,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/auth'
+    | '/build-with-vybe'
     | '/community-guidelines'
     | '/copyright'
     | '/creator-memberships'
@@ -1359,6 +1393,8 @@ export interface FileRouteTypes {
     | '/copyright_/report'
     | '/creator-invite/$token'
     | '/creator/$username'
+    | '/creator/sign-in'
+    | '/creator/sign-up'
     | '/demo/creator'
     | '/experience/communities'
     | '/experience/events'
@@ -1408,6 +1444,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRouteWithChildren
+  BuildWithVybeRoute: typeof BuildWithVybeRoute
   CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
   CopyrightRoute: typeof CopyrightRoute
   CreatorMembershipsRoute: typeof CreatorMembershipsRoute
@@ -1432,6 +1469,8 @@ export interface RootRouteChildren {
   CopyrightReportRoute: typeof CopyrightReportRoute
   CreatorInviteTokenRoute: typeof CreatorInviteTokenRoute
   CreatorUsernameRoute: typeof CreatorUsernameRoute
+  CreatorSignInRoute: typeof CreatorSignInRoute
+  CreatorSignUpRoute: typeof CreatorSignUpRoute
   DemoCreatorRoute: typeof DemoCreatorRoute
   ExperienceCommunitiesRoute: typeof ExperienceCommunitiesRoute
   ExperienceEventsRoute: typeof ExperienceEventsRoute
@@ -1551,6 +1590,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommunityGuidelinesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/build-with-vybe': {
+      id: '/build-with-vybe'
+      path: '/build-with-vybe'
+      fullPath: '/build-with-vybe'
+      preLoaderRoute: typeof BuildWithVybeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -1647,6 +1693,20 @@ declare module '@tanstack/react-router' {
       path: '/demo/creator'
       fullPath: '/demo/creator'
       preLoaderRoute: typeof DemoCreatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creator/sign-up': {
+      id: '/creator/sign-up'
+      path: '/creator/sign-up'
+      fullPath: '/creator/sign-up'
+      preLoaderRoute: typeof CreatorSignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creator/sign-in': {
+      id: '/creator/sign-in'
+      path: '/creator/sign-in'
+      fullPath: '/creator/sign-in'
+      preLoaderRoute: typeof CreatorSignInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/creator/$username': {
@@ -2400,6 +2460,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRouteWithChildren,
+  BuildWithVybeRoute: BuildWithVybeRoute,
   CommunityGuidelinesRoute: CommunityGuidelinesRoute,
   CopyrightRoute: CopyrightRoute,
   CreatorMembershipsRoute: CreatorMembershipsRoute,
@@ -2424,6 +2485,8 @@ const rootRouteChildren: RootRouteChildren = {
   CopyrightReportRoute: CopyrightReportRoute,
   CreatorInviteTokenRoute: CreatorInviteTokenRoute,
   CreatorUsernameRoute: CreatorUsernameRoute,
+  CreatorSignInRoute: CreatorSignInRoute,
+  CreatorSignUpRoute: CreatorSignUpRoute,
   DemoCreatorRoute: DemoCreatorRoute,
   ExperienceCommunitiesRoute: ExperienceCommunitiesRoute,
   ExperienceEventsRoute: ExperienceEventsRoute,

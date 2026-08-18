@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/common/Logo";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import {
-  BUILD_ON_VYBE_LINKS,
   COMMUNITY_LINKS,
   EXPERIENCE_LINKS,
   MORE_LINKS,
@@ -26,12 +25,12 @@ export function MarketingNav() {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const { user, primaryRole, defaultRoute, isLoading } = useUser();
-  const appLabel =
-    primaryRole === "admin"
-      ? "Open Admin"
-      : primaryRole === "creator"
-        ? "Open Creator Studio"
-        : "Member Home";
+  const professionalCta =
+    primaryRole === "creator"
+      ? { label: "Open Creator Studio", href: defaultRoute }
+      : primaryRole === "business"
+        ? { label: "Open Business Portal", href: defaultRoute }
+        : null;
   const memberName = String(user?.user_metadata?.display_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "VYBE member");
 
   return (
@@ -46,8 +45,7 @@ export function MarketingNav() {
           <NavDropdown label="Explore" items={EXPERIENCE_LINKS} />
           <NavDropdown label="Community" items={COMMUNITY_LINKS} />
           <PublicLink link={NAV_LINKS[1]} pathname={pathname} />
-          <NavDropdown label="Build on VYBE" items={BUILD_ON_VYBE_LINKS} detailed />
-          <NavDropdown label="More" items={MORE_LINKS} />
+          <NavDropdown label="More" items={[...MORE_LINKS, { label: "Build With VYBE", to: "/build-with-vybe" }]} />
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
@@ -61,15 +59,14 @@ export function MarketingNav() {
               <Button asChild variant="outline">
                 <Link to="/my-vybe">My VYBE</Link>
               </Button>
-              <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
-                <a href={defaultRoute}>{appLabel}</a>
-              </Button>
+              {professionalCta ? (
+                <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
+                  <a href={professionalCta.href}>{professionalCta.label}</a>
+                </Button>
+              ) : null}
             </div>
           ) : !isLoading ? (
             <>
-              <Button asChild variant="ghost">
-                <Link to="/creator">Creators</Link>
-              </Button>
               <Button asChild variant="ghost">
                 <Link to="/auth/sign-in">Supporter Sign In</Link>
               </Button>
@@ -99,8 +96,7 @@ export function MarketingNav() {
             />
             <MobileSection title="Explore VYBE" items={EXPERIENCE_LINKS} />
             <MobileSection title="Community" items={COMMUNITY_LINKS} />
-            <MobileSection title="Build on VYBE" items={BUILD_ON_VYBE_LINKS} />
-            <MobileSection title="More" items={MORE_LINKS} />
+            <MobileSection title="More" items={[...MORE_LINKS, { label: "Build With VYBE", to: "/build-with-vybe" }]} />
             <div className="border-t border-border/50 pt-4">
               <ThemeToggle showLabel />
             </div>
@@ -111,13 +107,14 @@ export function MarketingNav() {
                   <UserRound className="h-4 w-4 text-primary" /> Signed in as {memberName}
                 </p>
                 <Button asChild variant="outline" className="w-full"><Link to="/my-vybe">My VYBE</Link></Button>
-                <Button asChild className="w-full bg-gradient-brand text-primary-foreground"><a href={defaultRoute}>{appLabel}</a></Button>
+                {professionalCta ? (
+                  <Button asChild className="w-full bg-gradient-brand text-primary-foreground">
+                    <a href={professionalCta.href}>{professionalCta.label}</a>
+                  </Button>
+                ) : null}
               </div>
             ) : !isLoading ? (
               <div className="space-y-2 border-t border-border/50 pt-4">
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/creator">Creator Start</Link>
-                </Button>
                 <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
                   <Button asChild variant="outline">
                     <Link to="/auth/sign-in">Supporter Sign In</Link>

@@ -122,7 +122,7 @@ function ForArtists() {
                   size="lg"
                   className="bg-gradient-brand text-primary-foreground shadow-glow"
                 >
-                  <Link to="/auth/sign-up">
+                  <Link to="/creator/sign-up">
                     Start free <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -369,7 +369,7 @@ function ForArtists() {
               </div>
               <div className="mt-9 flex flex-wrap gap-3">
                 <Button asChild size="lg" className="bg-gradient-brand text-primary-foreground">
-                  <Link to="/auth/sign-up">
+                  <Link to="/creator/sign-up">
                     Create your free account <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -451,7 +451,7 @@ function ForArtists() {
                 size="lg"
                 className="bg-gradient-brand text-primary-foreground shadow-glow"
               >
-                <Link to="/auth/sign-up">
+                <Link to="/creator/sign-up">
                   Start with Creator Free <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

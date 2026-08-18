@@ -47,7 +47,7 @@ function OnboardingPage() {
     isAuthenticated: useAuth().isAuthenticated,
   };
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<SelectableRole>(role ?? "creator");
+  const [selected, setSelected] = useState<SelectableRole>(role ?? "supporter");
   const [saving, setSaving] = useState(false);
 
   if (isLoading) {
