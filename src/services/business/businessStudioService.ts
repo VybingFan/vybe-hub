@@ -17,12 +17,63 @@ export type MyBusiness = {
   package_ends_at: string | null;
 };
 
+export type BusinessSubmissionType =
+  | "campaign_proposal"
+  | "offer_proposal"
+  | "sponsorship_placement"
+  | "creative_brief";
+
+export type BusinessSubmissionStatus =
+  | "draft"
+  | "submitted"
+  | "under_review"
+  | "approved"
+  | "declined"
+  | "withdrawn";
+
+export type BusinessSubmission = {
+  id: string;
+  business_id: string;
+  request_type: BusinessSubmissionType;
+  title: string;
+  summary: string;
+  request_payload: Record<string, unknown>;
+  status: BusinessSubmissionStatus;
+  created_by: string;
+  submitted_at: string | null;
+  reviewed_at: string | null;
+  business_response: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessSubmissionInput = {
+  requestType: BusinessSubmissionType;
+  title: string;
+  summary: string;
+  objective?: string;
+  targetAudience?: string;
+  requestedTiming?: string;
+  budgetRange?: string;
+  destinationUrl?: string;
+  additionalDetails?: string;
+};
+
+function submissionPayload(input: BusinessSubmissionInput) {
+  return {
+    objective: input.objective?.trim() || null,
+    target_audience: input.targetAudience?.trim() || null,
+    requested_timing: input.requestedTiming?.trim() || null,
+    budget_range: input.budgetRange?.trim() || null,
+    destination_url: input.destinationUrl?.trim() || null,
+    additional_details: input.additionalDetails?.trim() || null,
+  };
+}
+
 export const businessStudioService = {
   async getMine(): Promise<MyBusiness | null> {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) throw new Error("Sign in required");
-    // Types are regenerated after the migration reaches the remote project.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await supabase
       .from("business_profiles")
       .select(
@@ -47,7 +98,6 @@ export const businessStudioService = {
   }): Promise<void> {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) throw new Error("Sign in required");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await supabase.from("business_profiles").insert({
       owner_user_id: auth.user.id,
       created_by: auth.user.id,
@@ -67,7 +117,6 @@ export const businessStudioService = {
   },
 
   async listCampaigns(businessId: string) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await supabase
       .from("business_campaigns")
       .select("id,name,objective,status,starts_at,ends_at,created_at")
@@ -75,5 +124,82 @@ export const businessStudioService = {
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data ?? [];
+  },
+
+  async listSubmissions(businessId: string): Promise<BusinessSubmission[]> {
+    const { data, error } = await (supabase.from("business_submissions") as any)
+      .select(
+        "id,business_id,request_type,title,summary,request_payload,status,created_by,submitted_at,reviewed_at,business_response,created_at,updated_at",
+      )
+      .eq("business_id", businessId)
+      .order("updated_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as BusinessSubmission[];
+  },
+
+  async createSubmission(
+    businessId: string,
+    input: BusinessSubmissionInput,
+  ): Promise<BusinessSubmission> {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) throw new Error("Sign in required");
+    const { data, error } = await (supabase.from("business_submissions") as any)
+      .insert({
+        business_id: businessId,
+        request_type: input.requestType,
+        title: input.title.trim(),
+        summary: input.summary.trim(),
+        request_payload: submissionPayload(input),
+        status: "draft",
+        created_by: auth.user.id,
+      })
+      .select(
+        "id,business_id,request_type,title,summary,request_payload,status,created_by,submitted_at,reviewed_at,business_response,created_at,updated_at",
+      )
+      .single();
+    if (error) throw new Error(error.message);
+    return data as BusinessSubmission;
+  },
+
+  async updateDraft(
+    businessId: string,
+    submissionId: string,
+    input: BusinessSubmissionInput,
+  ): Promise<BusinessSubmission> {
+    const { data, error } = await (supabase.from("business_submissions") as any)
+      .update({
+        request_type: input.requestType,
+        title: input.title.trim(),
+        summary: input.summary.trim(),
+        request_payload: submissionPayload(input),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", submissionId)
+      .eq("business_id", businessId)
+      .eq("status", "draft")
+      .select(
+        "id,business_id,request_type,title,summary,request_payload,status,created_by,submitted_at,reviewed_at,business_response,created_at,updated_at",
+      )
+      .single();
+    if (error) throw new Error(error.message);
+    return data as BusinessSubmission;
+  },
+
+  async deleteDraft(businessId: string, submissionId: string): Promise<void> {
+    const { error } = await (supabase.from("business_submissions") as any)
+      .delete()
+      .eq("id", submissionId)
+      .eq("business_id", businessId)
+      .eq("status", "draft");
+    if (error) throw new Error(error.message);
+  },
+
+  async submitDraft(submissionId: string): Promise<BusinessSubmission> {
+    const { data, error } = await (supabase.rpc as any)(
+      "submit_my_business_submission",
+      { p_submission_id: submissionId },
+    );
+    if (error) throw new Error(error.message);
+    return data as BusinessSubmission;
   },
 };
