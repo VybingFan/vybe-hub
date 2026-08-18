@@ -48,11 +48,7 @@ import { creatorFocusService } from "@/services/membership/creatorFocusService";
 import { hasActiveCreatorFocus, hasCreatorCapability, type CreatorCapability } from "@/features/membership/access";
 import type { CreatorFocusCode } from "@/features/membership/creatorFocusAccess";
 import type { AppRole } from "@/features/auth/roles";
-import { adminNotificationService } from "@/services/admin/adminNotificationService";
-import {
-  adminTeamService,
-  type AdminAccess,
-} from "@/services/admin/adminTeamService";
+import type { AdminAccess } from "@/services/admin/adminTeamService";
 
 interface NavItem {
   title: string;
@@ -272,8 +268,8 @@ export function AppSidebar() {
       setAdminAccess(null);
       return;
     }
-    void adminTeamService
-      .getMyAccess()
+    void import("@/services/admin/adminTeamService")
+      .then(({ adminTeamService }) => adminTeamService.getMyAccess())
       .then(setAdminAccess)
       .catch(() => setAdminAccess(null));
   }, [isAdmin, pathname]);
@@ -281,8 +277,8 @@ export function AppSidebar() {
   useEffect(() => {
     if (!isAdmin || !adminAccess?.permissions.includes("admin.work_queue.read"))
       return;
-    void adminNotificationService
-      .summary()
+    void import("@/services/admin/adminNotificationService")
+      .then(({ adminNotificationService }) => adminNotificationService.summary())
       .then((summary) => setPendingWork(summary.unread))
       .catch(() => undefined);
   }, [isAdmin, pathname, adminAccess]);

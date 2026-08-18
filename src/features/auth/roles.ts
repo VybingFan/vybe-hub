@@ -43,7 +43,7 @@ export const DEFAULT_ROUTE_FOR_ROLE: Record<AppRole, string> = {
   creator: "/dashboard",
   supporter: "/discover",
   business: "/business",
-  admin: "/admin",
+  admin: "/home",
 };
 
 /** Which roles are allowed to view each protected surface. */

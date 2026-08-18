@@ -19,10 +19,7 @@ import { useUser } from "@/hooks/useUser";
 import { useMyActivity } from "@/hooks/useActivity";
 import { playNotificationChime } from "@/lib/notificationSound";
 import { useMyConnections } from "@/hooks/useConnections";
-import {
-  adminNotificationService,
-  type AdminNotification,
-} from "@/services/admin/adminNotificationService";
+import type { AdminNotification } from "@/services/admin/adminNotificationService";
 
 export function TopNav() {
   const navigate = useNavigate();
@@ -61,8 +58,8 @@ export function TopNav() {
   useEffect(() => {
     if (!isAdmin) return;
     const load = () => {
-      void adminNotificationService
-        .list()
+      void import("@/services/admin/adminNotificationService")
+        .then(({ adminNotificationService }) => adminNotificationService.list())
         .then(setAdminNotifications)
         .catch(() => undefined);
     };
@@ -152,7 +149,11 @@ export function TopNav() {
                   className="items-start py-3"
                   asChild
                   onSelect={() => {
-                    if (item.status === "unread") void adminNotificationService.markRead(item.id);
+                    if (item.status === "unread") {
+                      void import("@/services/admin/adminNotificationService").then(
+                        ({ adminNotificationService }) => adminNotificationService.markRead(item.id),
+                      );
+                    }
                   }}
                 >
                   <Link to={item.action_path || "/admin/work-queue"}>
