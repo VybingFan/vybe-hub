@@ -1,0 +1,64 @@
+{
+  "id": "/operations",
+  "name": "VYBE Back Office",
+  "short_name": "VYBE Back Office",
+  "description": "Secure VYBE Operations and Back Office workspace for authorized staff.",
+  "start_url": "/admin?source=back-office-pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#08070d",
+  "theme_color": "#08070d",
+  "categories": [
+    "business",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/pwa/back-office/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa/back-office/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa/back-office/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Work Queue",
+      "short_name": "Work Queue",
+      "description": "Open assigned and unassigned Back Office work.",
+      "url": "/admin/work-queue?source=back-office-pwa",
+      "icons": [
+        {
+          "src": "/pwa/back-office/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Back Office Home",
+      "short_name": "Back Office",
+      "description": "Open the VYBE Back Office dashboard.",
+      "url": "/admin?source=back-office-pwa",
+      "icons": [
+        {
+          "src": "/pwa/back-office/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

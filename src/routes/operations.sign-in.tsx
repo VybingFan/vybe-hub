@@ -3,6 +3,7 @@ import { useState, type FormEvent } from "react";
 import { ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { BackOfficeInstallCard } from "@/components/pwa/BackOfficeInstallCard";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signInSchema } from "@/features/auth/roles";
@@ -76,6 +77,7 @@ function OperationsSignInPage() {
             {loading ? "Authorizing…" : "Enter Operations"}
           </Button>
         </form>
+        <BackOfficeInstallCard />
         <p className="mt-5 text-xs leading-5 text-slate-500">
           Operations authorization expires after 8 hours or 30 minutes of inactivity. MFA enforcement is not yet enabled.
         </p>

@@ -15,6 +15,7 @@ import { AuthProvider } from "@/providers/AuthProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { PwaRegistration } from "@/components/pwa/PwaRegistration";
 import { PwaInstallProvider } from "@/components/pwa/PwaInstallProvider";
+import { BackOfficePwaIdentity } from "@/components/pwa/BackOfficePwaIdentity";
 
 const themeInitializationScript = `
   (function () {
@@ -175,6 +176,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemePreference />
+      <BackOfficePwaIdentity />
       <PwaRegistration />
       <PwaInstallProvider>
         <AuthProvider>
@@ -195,4 +197,3 @@ function ThemePreference() {
   }, []);
   return null;
 }
-
