@@ -22,9 +22,47 @@ const GAME_COVERS = {
   daily_vybe: "/images/play/games/beat-blitz-cover-v1.webp",
 } as const;
 
+const FOCUS_FILTERS = [
+  { key: "all", label: "All" },
+  { key: "music", label: "Music" },
+  { key: "film", label: "Film / Video" },
+  { key: "acting", label: "Acting" },
+  { key: "theater", label: "Theater" },
+  { key: "comedy", label: "Comedy" },
+  { key: "podcasting", label: "Podcasting" },
+  { key: "writing", label: "Writing / Poetry" },
+  { key: "dance", label: "Dance" },
+  { key: "visual_art", label: "Visual Art" },
+  { key: "cross_focus", label: "Connect the VYBE" },
+] as const;
+
+type FocusFilter = (typeof FOCUS_FILTERS)[number]["key"];
+
+function focusLabel(pack: ReleasedPlayGamePack) {
+  if (pack.focus_scope === "cross_focus") return "Connect the VYBE";
+  if (pack.focus_scope === "legacy") return "Music";
+  return FOCUS_FILTERS.find((entry) => entry.key === pack.creator_focus)?.label ?? "VYBE";
+}
+
+function coverFor(pack: ReleasedPlayGamePack) {
+  return pack.artwork_url || GAME_COVERS[pack.game_type];
+}
+
+function stylePromptLabel(pack: ReleasedPlayGamePack) {
+  if (pack.game_style === "true_or_made_up") return "True or made up?";
+  if (pack.game_style === "fact_or_myth") return "Fact or myth?";
+  if (pack.game_style === "real_or_made_up") return "Real or made up?";
+  if (pack.game_style === "speed_round") return "Speed round";
+  if (pack.game_style === "origin_challenge") return "Origin challenge";
+  if (pack.game_type === "hidden_gems") return "Clue";
+  if (pack.game_type === "daily_vybe") return "Daily prompt";
+  return "Question";
+}
+
 export function PublishedGamePacks() {
   const [packs, setPacks] = useState<ReleasedPlayGamePack[]>([]);
   const [selectedPackId, setSelectedPackId] = useState<string | null>(null);
+  const [selectedFocus, setSelectedFocus] = useState<FocusFilter>("all");
 
   useEffect(() => {
     let active = true;
@@ -44,13 +82,17 @@ export function PublishedGamePacks() {
   }, []);
 
   if (!packs.length) return null;
+  const filteredPacks = packs.filter((pack) => {
+    if (selectedFocus === "all") return true;
+    if (selectedFocus === "cross_focus") return pack.focus_scope === "cross_focus";
+    if (selectedFocus === "music") {
+      return pack.focus_scope === "legacy" || pack.creator_focus === "music";
+    }
+    return pack.creator_focus === selectedFocus;
+  });
   const selectedPack = packs.find((pack) => pack.id === selectedPackId) ?? null;
 
   function choosePack(pack: ReleasedPlayGamePack) {
-    if (pack.game_type === "beat_blitz") {
-      document.getElementById("trivia")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
-    }
     setSelectedPackId(pack.id);
     window.requestAnimationFrame(() => {
       document.getElementById("selected-game")?.scrollIntoView({
@@ -68,8 +110,28 @@ export function PublishedGamePacks() {
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
           Pick any active game below. New reviewed game packs appear here automatically.
         </p>
+        <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label="Filter VYBE games by creator focus">
+          {FOCUS_FILTERS.map((focus) => (
+            <button
+              key={focus.key}
+              type="button"
+              aria-pressed={selectedFocus === focus.key}
+              onClick={() => {
+                setSelectedFocus(focus.key);
+                setSelectedPackId(null);
+              }}
+              className={`rounded-full border px-3 py-2 text-sm transition ${
+                selectedFocus === focus.key
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background hover:border-primary/50"
+              }`}
+            >
+              {focus.label}
+            </button>
+          ))}
+        </div>
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {packs.map((pack) => {
+          {filteredPacks.map((pack) => {
             const Icon =
               pack.game_type === "beat_blitz"
                 ? Gamepad2
@@ -97,7 +159,7 @@ export function PublishedGamePacks() {
               >
                 <div className="-mx-5 -mt-5 mb-5 aspect-video overflow-hidden rounded-t-[1.45rem] bg-muted">
                   <img
-                    src={GAME_COVERS[pack.game_type]}
+                    src={coverFor(pack)}
                     alt=""
                     loading="lazy"
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
@@ -107,7 +169,10 @@ export function PublishedGamePacks() {
                   <Icon className="h-5 w-5 text-primary" />
                   <Badge variant="outline">{itemCount} to play</Badge>
                 </div>
-                <h3 className="mt-5 font-semibold">{pack.title}</h3>
+                <p className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-primary">
+                  {focusLabel(pack)}{pack.topic ? ` · ${pack.topic}` : ""}
+                </p>
+                <h3 className="mt-2 font-semibold">{pack.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{pack.description}</p>
                 <p className="mt-4 text-xs font-medium uppercase tracking-wider text-primary">
                   Play now
@@ -167,7 +232,7 @@ function ChoicePlayer({ pack }: { pack: ReleasedPlayGamePack }) {
     <article className="overflow-hidden rounded-[2rem] border border-primary/25 bg-card shadow-xl shadow-primary/5">
       <div className="relative aspect-[16/7] overflow-hidden bg-muted">
         <img
-          src={GAME_COVERS[pack.game_type]}
+          src={coverFor(pack)}
           alt=""
           loading="lazy"
           className="h-full w-full object-cover"
@@ -191,10 +256,19 @@ function ChoicePlayer({ pack }: { pack: ReleasedPlayGamePack }) {
             <p className="text-2xl font-semibold">
               {score} of {playable.length}
             </p>
-            <Button className="mt-5" onClick={restart}>
-              <RotateCcw className="mr-2 h-4 w-4" />
-              Play again
-            </Button>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Button onClick={restart}>
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Play again
+              </Button>
+              {pack.discovery_url ? (
+                <Button asChild variant="outline">
+                  <a href={pack.discovery_url}>
+                    Discover creators <ArrowRight className="ml-2 h-4 w-4" />
+                  </a>
+                </Button>
+              ) : null}
+            </div>
           </div>
         ) : (
           <div className="mt-7">
@@ -205,7 +279,7 @@ function ChoicePlayer({ pack }: { pack: ReleasedPlayGamePack }) {
               />
             </div>
             <p className="text-xs font-medium uppercase tracking-wider text-primary">
-              {pack.game_type === "hidden_gems" ? "Clue" : "Daily prompt"} {index + 1} of{" "}
+              {stylePromptLabel(pack)} {index + 1} of{" "}
               {playable.length}
             </p>
             <p className="mt-2 text-lg font-semibold leading-7">{item.prompt}</p>
@@ -279,7 +353,7 @@ function MatchPlayer({ pack }: { pack: ReleasedPlayGamePack }) {
     <article className="overflow-hidden rounded-[2rem] border border-violet-400/25 bg-card shadow-xl shadow-violet-500/5">
       <div className="relative aspect-[16/7] overflow-hidden bg-muted">
         <img
-          src={GAME_COVERS.vybe_match}
+          src={coverFor(pack)}
           alt=""
           loading="lazy"
           className="h-full w-full object-cover"
@@ -301,9 +375,18 @@ function MatchPlayer({ pack }: { pack: ReleasedPlayGamePack }) {
             <p className="mt-4 text-2xl font-semibold">
               You matched {score} of {matches.length}
             </p>
-            <Button className="mt-5" onClick={restart}>
-              <RotateCcw className="mr-2 h-4 w-4" /> Play again
-            </Button>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Button onClick={restart}>
+                <RotateCcw className="mr-2 h-4 w-4" /> Play again
+              </Button>
+              {pack.discovery_url ? (
+                <Button asChild variant="outline">
+                  <a href={pack.discovery_url}>
+                    Discover creators <ArrowRight className="ml-2 h-4 w-4" />
+                  </a>
+                </Button>
+              ) : null}
+            </div>
           </div>
         ) : (
           <>

@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { CreatorFocusCode } from "@/features/membership/creatorFocusAccess";
 import type {
   PlayContentItem,
   PlayContentStatus,
@@ -12,6 +13,28 @@ export type PlayGameType = Extract<
   "beat_blitz" | "vybe_match" | "hidden_gems" | "daily_vybe"
 >;
 export type PlayGamePackStatus = Exclude<PlayContentStatus, "rights_review">;
+export type PlayFocusScope = "legacy" | "single_focus" | "cross_focus";
+export type PlayGameStyle =
+  | "choice"
+  | "match"
+  | "clue_reveal"
+  | "daily_prompt"
+  | "true_or_made_up"
+  | "fact_or_myth"
+  | "real_or_made_up"
+  | "three_clue"
+  | "progressive_clue"
+  | "speed_round"
+  | "timeline"
+  | "origin_challenge"
+  | "story_reveal"
+  | "connection_chain"
+  | "missing_link"
+  | "multi_select"
+  | "preference"
+  | "supporter_choice"
+  | "open_response"
+  | "vybe_switch";
 
 export interface PlayGamePack {
   id: string;
@@ -20,6 +43,13 @@ export interface PlayGamePack {
   title: string;
   description: string;
   genre: string;
+  focus_scope: PlayFocusScope;
+  creator_focus: CreatorFocusCode | null;
+  topic: string;
+  game_style: PlayGameStyle | string;
+  artwork_url: string | null;
+  discovery_url: string | null;
+  featured: boolean;
   status: PlayGamePackStatus;
   visibility: "public" | "account_required";
   scheduled_start_at: string | null;
@@ -89,13 +119,20 @@ export const playGamePackService = {
   },
 
   async save(input: PlayGamePackDraft): Promise<PlayGamePack> {
-    const { data, error } = await client.rpc<PlayGamePack>("save_play_game_pack_v24_33", {
+    const { data, error } = await client.rpc<PlayGamePack>("save_play_game_pack_v24_46a1", {
       _id: input.id ?? null,
       _pack_key: input.pack_key,
       _game_type: input.game_type,
       _title: input.title,
       _description: input.description,
       _genre: input.genre,
+      _focus_scope: input.focus_scope,
+      _creator_focus: input.creator_focus,
+      _topic: input.topic,
+      _game_style: input.game_style,
+      _artwork_url: input.artwork_url,
+      _discovery_url: input.discovery_url,
+      _featured: input.featured,
       _visibility: input.visibility,
       _scheduled_start_at: input.scheduled_start_at,
       _scheduled_end_at: input.scheduled_end_at,

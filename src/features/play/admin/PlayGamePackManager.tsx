@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PLAY_GENRES } from "@/features/play/content";
 import { HIP_HOP_STARTER_PACKS } from "@/features/play/content-packs/hipHopStarterPacks";
+import { NON_MUSIC_PLAY_BLUEPRINTS } from "@/features/play/content-packs/nonMusicPlayBlueprints";
 import {
   playGamePackService,
   type PlayGamePack,
@@ -43,6 +44,13 @@ const emptyPack: PlayGamePackDraft = {
   title: "",
   description: "",
   genre: "Mixed VYBE",
+  focus_scope: "legacy",
+  creator_focus: null,
+  topic: "",
+  game_style: "choice",
+  artwork_url: null,
+  discovery_url: null,
+  featured: false,
   visibility: "public",
   scheduled_start_at: null,
   scheduled_end_at: null,
@@ -92,6 +100,14 @@ export function PlayGamePackManager({
       game_type: type,
       title: template.label,
       description: template.description,
+      game_style:
+        type === "vybe_match"
+          ? "match"
+          : type === "hidden_gems"
+            ? "clue_reveal"
+            : type === "daily_vybe"
+              ? "daily_prompt"
+              : "choice",
     });
     setSelected(null);
   }
@@ -105,6 +121,13 @@ export function PlayGamePackManager({
       title: pack.title,
       description: pack.description,
       genre: pack.genre,
+      focus_scope: pack.focus_scope,
+      creator_focus: pack.creator_focus,
+      topic: pack.topic,
+      game_style: pack.game_style,
+      artwork_url: pack.artwork_url,
+      discovery_url: pack.discovery_url,
+      featured: pack.featured,
       visibility: pack.visibility,
       scheduled_start_at: pack.scheduled_start_at,
       scheduled_end_at: pack.scheduled_end_at,
@@ -223,6 +246,31 @@ export function PlayGamePackManager({
     }
   }
 
+  async function installBlueprint(packKey: string) {
+    const blueprint = NON_MUSIC_PLAY_BLUEPRINTS.find((entry) => entry.pack_key === packKey);
+    if (!blueprint) return;
+    setBusy(true);
+    try {
+      const pack = await playGamePackService.save({
+        ...blueprint,
+        id: null,
+        genre: "Mixed VYBE",
+        visibility: "public",
+        scheduled_start_at: null,
+        scheduled_end_at: null,
+      });
+      setSelected(pack);
+      editPack(pack);
+      await load();
+      onContentChanged();
+      toast.success(`${blueprint.title} draft created. Add verified content before review.`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "The game blueprint could not be created.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -251,7 +299,31 @@ export function PlayGamePackManager({
                     <span>
                       <span className="block font-semibold">{starter.title}</span>
                       <span className="mt-1 block whitespace-normal text-xs font-normal text-muted-foreground">
-                        {starter.items.length} editable items · installs as draft
+                        {starter.items.length} editable items Â· installs as draft
+                      </span>
+                    </span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="mb-3 text-sm font-semibold">Prepared non-music game blueprints</p>
+              <p className="mb-3 text-xs leading-5 text-muted-foreground">
+                Creates the structured draft and artwork assignment only. Add sourced, verified items before review.
+              </p>
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {NON_MUSIC_PLAY_BLUEPRINTS.map((blueprint) => (
+                  <Button
+                    key={blueprint.pack_key}
+                    variant="outline"
+                    className="h-auto justify-start p-4 text-left"
+                    disabled={busy || packs.some((pack) => pack.pack_key === blueprint.pack_key)}
+                    onClick={() => void installBlueprint(blueprint.pack_key)}
+                  >
+                    <span>
+                      <span className="block font-semibold">{blueprint.title}</span>
+                      <span className="mt-1 block whitespace-normal text-xs font-normal text-muted-foreground">
+                        {blueprint.creator_focus ?? "Cross-focus"} · {blueprint.topic} · {blueprint.game_style.replaceAll("_", " ")}
                       </span>
                     </span>
                   </Button>
@@ -295,7 +367,7 @@ export function PlayGamePackManager({
                     <div>
                       <p className="font-semibold">{pack.title}</p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {pack.genre} · {itemCount[pack.id] ?? 0} items · v{pack.version}
+                        {pack.genre} Â· {itemCount[pack.id] ?? 0} items Â· v{pack.version}
                       </p>
                     </div>
                     <Badge variant={pack.status === "active" ? "default" : "outline"}>
@@ -352,18 +424,114 @@ export function PlayGamePackManager({
                 onChange={(event) => setDraft({ ...draft, description: event.target.value })}
               />
             </Field>
-            <Field label="Category">
-              <select
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                value={draft.genre}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Focus scope">
+                <select
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={draft.focus_scope}
+                  disabled={!canEdit}
+                  onChange={(event) => {
+                    const focus_scope = event.target.value as PlayGamePackDraft["focus_scope"];
+                    setDraft({
+                      ...draft,
+                      focus_scope,
+                      creator_focus:
+                        focus_scope === "single_focus" ? draft.creator_focus ?? "music" : null,
+                    });
+                  }}
+                >
+                  <option value="legacy">Legacy / Music pilot</option>
+                  <option value="single_focus">Single creator focus</option>
+                  <option value="cross_focus">Cross-focus</option>
+                </select>
+              </Field>
+              {draft.focus_scope === "single_focus" ? (
+                <Field label="Creator Focus">
+                  <select
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    value={draft.creator_focus ?? "music"}
+                    disabled={!canEdit}
+                    onChange={(event) =>
+                      setDraft({
+                        ...draft,
+                        creator_focus: event.target.value as NonNullable<PlayGamePackDraft["creator_focus"]>,
+                      })
+                    }
+                  >
+                    <option value="music">Music</option>
+                    <option value="film">Film / Video</option>
+                    <option value="acting">Acting</option>
+                    <option value="theater">Theater</option>
+                    <option value="comedy">Comedy</option>
+                    <option value="podcasting">Podcasting</option>
+                    <option value="writing">Writing / Poetry</option>
+                    <option value="dance">Dance</option>
+                    <option value="visual_art">Visual Art</option>
+                  </select>
+                </Field>
+              ) : null}
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Topic / category">
+                <Input
+                  value={draft.topic}
+                  disabled={!canEdit}
+                  placeholder="Behind the Scenes"
+                  onChange={(event) => setDraft({ ...draft, topic: event.target.value })}
+                />
+              </Field>
+              <Field label="Game style">
+                <Input
+                  value={draft.game_style}
+                  disabled={!canEdit}
+                  placeholder="choice"
+                  onChange={(event) => setDraft({ ...draft, game_style: event.target.value })}
+                />
+              </Field>
+            </div>
+            {(draft.focus_scope === "legacy" || draft.creator_focus === "music") ? (
+              <Field label="Music genre">
+                <select
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={draft.genre}
+                  disabled={!canEdit}
+                  onChange={(event) => setDraft({ ...draft, genre: event.target.value })}
+                >
+                  {PLAY_GENRES.map((genre) => (
+                    <option key={genre}>{genre}</option>
+                  ))}
+                </select>
+              </Field>
+            ) : null}
+            <Field label="Artwork URL">
+              <Input
+                value={draft.artwork_url ?? ""}
                 disabled={!canEdit}
-                onChange={(event) => setDraft({ ...draft, genre: event.target.value })}
-              >
-                {PLAY_GENRES.map((genre) => (
-                  <option key={genre}>{genre}</option>
-                ))}
-              </select>
+                placeholder="/images/play/focus-packs/..."
+                onChange={(event) =>
+                  setDraft({ ...draft, artwork_url: event.target.value.trim() || null })
+                }
+              />
             </Field>
+            <Field label="Pack discovery URL">
+              <Input
+                value={draft.discovery_url ?? ""}
+                disabled={!canEdit}
+                placeholder="/explore"
+                onChange={(event) =>
+                  setDraft({ ...draft, discovery_url: event.target.value.trim() || null })
+                }
+              />
+            </Field>
+            <label className="flex items-center gap-3 rounded-xl border border-border p-3 text-sm">
+              <input
+                type="checkbox"
+                checked={draft.featured}
+                disabled={!canEdit}
+                onChange={(event) => setDraft({ ...draft, featured: event.target.checked })}
+              />
+              Feature this game pack
+            </label>
             {canEdit ? (
               <Button onClick={() => void savePack()} disabled={busy}>
                 {busy ? (
