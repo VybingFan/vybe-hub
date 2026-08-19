@@ -16,6 +16,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { PwaRegistration } from "@/components/pwa/PwaRegistration";
 import { PwaInstallProvider } from "@/components/pwa/PwaInstallProvider";
 import { BackOfficePwaIdentity } from "@/components/pwa/BackOfficePwaIdentity";
+import { BackOfficeNotificationMonitor } from "@/components/admin/BackOfficeNotificationMonitor";
 
 const themeInitializationScript = `
   (function () {
@@ -180,6 +181,7 @@ function RootComponent() {
       <PwaRegistration />
       <PwaInstallProvider>
         <AuthProvider>
+          <BackOfficeNotificationMonitor />
           <Outlet />
           <Toaster />
         </AuthProvider>

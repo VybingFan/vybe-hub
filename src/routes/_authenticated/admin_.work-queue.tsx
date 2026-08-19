@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
+import { BackOfficeNotificationControls } from "@/components/admin/BackOfficeNotificationControls";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -212,6 +213,8 @@ function WorkQueuePage() {
             value={workSummary?.overdue ?? 0}
           />
         </div>
+
+        <BackOfficeNotificationControls />
 
         {showCreate && canManage ? (
           <Card>

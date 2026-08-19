@@ -1,4 +1,4 @@
-const CACHE_NAME = "vybe-v24-45d";
+const CACHE_NAME = "vybe-v24-45e";
 const OFFLINE_URL = "/offline.html";
 const OFFLINE_PLAY_URL = "/experience/play";
 const SAFE_STATIC_PREFIXES = ["/assets/", "/branding/", "/pwa/"];
@@ -24,7 +24,35 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("message", (event) => {
-  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+    return;
+  }
+
+  if (event.data?.type === "BACK_OFFICE_NOTIFY" && event.data.notification) {
+    const payload = event.data.notification;
+    event.waitUntil(
+      self.registration.showNotification(payload.title || "VYBE Back Office", payload.options || {}),
+    );
+  }
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || "/admin/work-queue";
+
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async (clients) => {
+      for (const client of clients) {
+        if ("focus" in client) {
+          await client.focus();
+          if ("navigate" in client) return client.navigate(targetUrl);
+          return client;
+        }
+      }
+      return self.clients.openWindow(targetUrl);
+    }),
+  );
 });
 
 self.addEventListener("activate", (event) => {
