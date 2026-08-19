@@ -34,6 +34,7 @@ export function CreatorContinuationPlayer({
   creatorName,
   featuredCollectionLabel = "Artist’s Top 5",
   onSelect,
+  docked = false,
 }: {
   queue: Track[];
   selectedId?: string;
@@ -42,6 +43,7 @@ export function CreatorContinuationPlayer({
   creatorName: string;
   featuredCollectionLabel?: string;
   onSelect: (id: string) => void;
+  docked?: boolean;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const mounted = useRef(false);
@@ -136,7 +138,14 @@ export function CreatorContinuationPlayer({
 
   return (
     <>
-      <div className="mt-4 overflow-hidden rounded-3xl border border-primary/20 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,.22),transparent_42%),linear-gradient(135deg,hsl(var(--card)),hsl(var(--background)))] shadow-elevated">
+      <div
+        className={cn(
+          "overflow-hidden border border-primary/20 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,.22),transparent_42%),linear-gradient(135deg,hsl(var(--card)),hsl(var(--background)))] shadow-elevated",
+          docked
+            ? "fixed inset-x-0 bottom-0 z-50 rounded-none border-x-0 border-b-0"
+            : "mt-4 rounded-3xl",
+        )}
+      >
         <audio
           ref={audioRef}
           src={track.audio_url}
@@ -157,8 +166,15 @@ export function CreatorContinuationPlayer({
           }}
           onEnded={ended}
         />
-        <div className="grid gap-5 p-4 sm:grid-cols-[7rem_1fr] sm:p-6">
-          <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-brand">
+        <div
+          className={cn(
+            "grid gap-5",
+            docked
+              ? "grid-cols-[3.5rem_1fr] items-center px-4 py-3 sm:grid-cols-[4rem_1fr] sm:px-6"
+              : "p-4 sm:grid-cols-[7rem_1fr] sm:p-6",
+          )}
+        >
+          <div className={cn("aspect-square overflow-hidden bg-gradient-brand", docked ? "rounded-xl" : "rounded-2xl")}>
             {track.cover_url ? (
               <img
                 src={track.cover_url}
@@ -172,17 +188,17 @@ export function CreatorContinuationPlayer({
             )}
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[.2em] text-primary">
+            <p className={cn("text-xs font-semibold uppercase tracking-[.2em] text-primary", docked && "hidden sm:block")}>
               {source}
             </p>
-            <h3 className="mt-1 truncate text-2xl font-semibold">
+            <h3 className={cn("mt-1 truncate font-semibold", docked ? "text-base sm:text-lg" : "text-2xl")}>
               {track.title}
             </h3>
             <p className="truncate text-sm text-muted-foreground">
               {track.primary_artist_name || "VYBE artist"}
               {track.genre ? ` · ${track.genre}` : ""}
             </p>
-            <div className="mt-4">
+            <div className={cn("mt-4", docked && "hidden")}>
               <Slider
                 min={0}
                 max={Math.max(duration, 1)}
@@ -195,11 +211,11 @@ export function CreatorContinuationPlayer({
                 }}
               />
             </div>
-            <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+            <div className={cn("mt-1 justify-between text-xs text-muted-foreground", docked ? "hidden" : "flex")}>
               <span>{formatDuration(elapsed)}</span>
               <span>{formatDuration(duration)}</span>
             </div>
-            <div className="mt-3 flex items-center justify-between gap-3">
+            <div className={cn("flex items-center justify-between gap-3", docked ? "mt-2" : "mt-3")}>
               <div className="flex items-center gap-1">
                 <Button
                   type="button"
@@ -267,7 +283,7 @@ export function CreatorContinuationPlayer({
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap justify-between gap-2 border-t px-4 py-3 text-xs text-muted-foreground sm:px-6">
+        <div className={cn("flex-wrap justify-between gap-2 border-t px-4 py-3 text-xs text-muted-foreground sm:px-6", docked ? "hidden" : "flex")}>
           <span>
             Queue {index + 1} of {queue.length}
           </span>
@@ -277,6 +293,21 @@ export function CreatorContinuationPlayer({
               : "End of this creator’s available music"}
           </span>
         </div>
+        {docked ? (
+          <div className="border-t border-primary/20 px-4 pb-2 sm:px-6">
+            <Slider
+              min={0}
+              max={Math.max(duration, 1)}
+              step={0.1}
+              value={[Math.min(elapsed, Math.max(duration, 1))]}
+              onValueChange={([value]) => {
+                if (audioRef.current) audioRef.current.currentTime = value;
+                setElapsed(value);
+              }}
+              aria-label="Docked track progress"
+            />
+          </div>
+        ) : null}
       </div>
 
       <AlertDialog open={choice !== null} onOpenChange={(open) => !open && setChoice(null)}>

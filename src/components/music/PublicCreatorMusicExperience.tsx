@@ -97,7 +97,7 @@ export function PublicCreatorMusicExperience({
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 pb-32 sm:pb-36">
       <section aria-labelledby="artist-top-five">
         <div className="flex items-end justify-between gap-4">
           <div>
@@ -160,6 +160,7 @@ export function PublicCreatorMusicExperience({
           creatorName={creatorName}
           featuredCollectionLabel={featuredCollectionLabel}
           onSelect={setSelectedId}
+          docked
         />
         <div className="mt-3 flex flex-col gap-2 rounded-2xl border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
