@@ -25,6 +25,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PLAY_GENRES, PLAY_RELEASE_CHECKS } from "@/features/play/content";
 import { PlayGamePackManager } from "@/features/play/admin/PlayGamePackManager";
+import type { PlayGamePack } from "@/services/play/playGamePackService";
 import { adminTeamService, type AdminAccess } from "@/services/admin/adminTeamService";
 import {
   playContentAdminService,
@@ -100,6 +101,8 @@ function PlayContentWorkspace() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [selectedPack, setSelectedPack] = useState<PlayGamePack | null>(null);
+  const [showAdvancedInventory, setShowAdvancedInventory] = useState(false);
   const canEdit = access?.permissions.includes("admin.content.moderate") ?? false;
   const canPublish = access?.permissions.includes("admin.content.publish") ?? false;
   const canRightsReview = access?.permissions.includes("admin.rights.review") ?? false;
@@ -135,8 +138,24 @@ function PlayContentWorkspace() {
     [items],
   );
 
+  const visibleItems = useMemo(() => {
+    if (showAdvancedInventory) return items;
+    if (!selectedPack) return [];
+    return items
+      .filter((item) => item.game_pack_id === selectedPack.id)
+      .sort((a, b) => (a.position ?? 9999) - (b.position ?? 9999));
+  }, [items, selectedPack, showAdvancedInventory]);
+
   function startNew() {
-    setDraft(emptyDraft);
+    setDraft({
+      ...emptyDraft,
+      experience_type: selectedPack?.game_type ?? "beat_blitz",
+      genre: selectedPack?.genre ?? "Mixed VYBE",
+      game_pack_id: selectedPack?.id ?? null,
+      position: selectedPack
+        ? items.filter((item) => item.game_pack_id === selectedPack.id).length + 1
+        : null,
+    });
     setChoicesText("");
     setAnswerText("");
     setMatchesText("");
@@ -260,7 +279,7 @@ function PlayContentWorkspace() {
         <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
-              Play content library
+              Play Operations
             </h1>
             <p className="mt-2 max-w-3xl leading-7 text-muted-foreground">
               Create, review, schedule, publish, pause, and revise reusable game content without
@@ -301,13 +320,52 @@ function PlayContentWorkspace() {
         canEdit={canEdit}
         canPublish={canPublish}
         onContentChanged={() => void load()}
+        onSelectedPackChange={(pack) => {
+          setSelectedPack(pack);
+          setShowAdvancedInventory(false);
+          if (pack) {
+            setDraft(emptyDraft);
+            setChoicesText("");
+            setAnswerText("");
+            setMatchesText("");
+          }
+        }}
       />
 
+      <Card>
+        <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
+          <div>
+            <p className="font-semibold">
+              {showAdvancedInventory
+                ? "Advanced content inventory"
+                : selectedPack
+                  ? `${selectedPack.title} content`
+                  : "Select a game pack to manage its content"}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {showAdvancedInventory
+                ? "Shows every Play content item across all packs and standalone experiences."
+                : selectedPack
+                  ? `${visibleItems.length} item${visibleItems.length === 1 ? "" : "s"} in this game pack.`
+                  : "Questions stay grouped under their game instead of filling the main Play Operations page."}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setShowAdvancedInventory((current) => !current)}
+          >
+            {showAdvancedInventory ? "Return to selected game" : "Advanced inventory"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {(selectedPack || showAdvancedInventory) ? (
       <div className="grid gap-8 xl:grid-cols-[1.05fr_0.95fr]">
         <Card>
           <CardHeader className="flex-row items-center justify-between gap-3">
             <CardTitle className="flex items-center gap-2">
-              <Database className="h-5 w-5 text-primary" /> Inventory
+              <Database className="h-5 w-5 text-primary" />{" "}
+              {showAdvancedInventory ? "Advanced inventory" : "Game content"}
             </CardTitle>
             {canEdit ? (
               <Button size="sm" onClick={startNew}>
@@ -320,8 +378,8 @@ function PlayContentWorkspace() {
               <div className="flex min-h-40 items-center justify-center">
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
-            ) : items.length ? (
-              items.map((item) => (
+            ) : visibleItems.length ? (
+              visibleItems.map((item) => (
                 <div key={item.id} className="rounded-2xl border border-border p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
@@ -332,7 +390,7 @@ function PlayContentWorkspace() {
                         </Badge>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {EXPERIENCE_LABELS[item.experience_type]} · {item.genre} · v{item.version}
+                        {EXPERIENCE_LABELS[item.experience_type]} | {item.genre} | v{item.version}
                       </p>
                       <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
                         {item.prompt}
@@ -467,9 +525,9 @@ function PlayContentWorkspace() {
                 options={Object.entries(EXPERIENCE_LABELS)}
               />
               <SelectField
-                label="Genre"
+                label={selectedPack && !showAdvancedInventory ? "Inherited category" : "Genre"}
                 value={draft.genre}
-                disabled={!canEdit}
+                disabled={!canEdit || Boolean(selectedPack && !showAdvancedInventory)}
                 onChange={(value) => setDraft({ ...draft, genre: value })}
                 options={PLAY_GENRES.map((genre) => [genre, genre])}
               />
@@ -633,6 +691,7 @@ function PlayContentWorkspace() {
           </CardContent>
         </Card>
       </div>
+      ) : null}
 
       <Card>
         <CardHeader>

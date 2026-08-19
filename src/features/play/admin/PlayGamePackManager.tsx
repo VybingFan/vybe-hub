@@ -62,10 +62,12 @@ export function PlayGamePackManager({
   canEdit,
   canPublish,
   onContentChanged,
+  onSelectedPackChange,
 }: {
   canEdit: boolean;
   canPublish: boolean;
   onContentChanged: () => void;
+  onSelectedPackChange?: (pack: PlayGamePack | null) => void;
 }) {
   const [packs, setPacks] = useState<PlayGamePack[]>([]);
   const [draft, setDraft] = useState<PlayGamePackDraft>(emptyPack);
@@ -110,10 +112,12 @@ export function PlayGamePackManager({
               : "choice",
     });
     setSelected(null);
+    onSelectedPackChange?.(null);
   }
 
   function editPack(pack: PlayGamePack) {
     setSelected(pack);
+    onSelectedPackChange?.(pack);
     setDraft({
       id: pack.id,
       pack_key: pack.pack_key,
@@ -146,6 +150,7 @@ export function PlayGamePackManager({
         pack_key: slug(draft.pack_key),
       });
       setSelected(saved);
+      onSelectedPackChange?.(saved);
       editPack(saved);
       await load();
       toast.success(draft.id ? "Game pack updated." : "Ready game pack created.");
@@ -161,6 +166,7 @@ export function PlayGamePackManager({
     try {
       const saved = await playGamePackService.setStatus(pack.id, status);
       setSelected(saved);
+      onSelectedPackChange?.(saved);
       await load();
       toast.success(`Game pack changed to ${status.replaceAll("_", " ")}.`);
     } catch (error) {
@@ -233,6 +239,7 @@ export function PlayGamePackManager({
         });
       }
       setSelected(pack);
+      onSelectedPackChange?.(pack);
       editPack(pack);
       await load();
       onContentChanged();
@@ -260,6 +267,7 @@ export function PlayGamePackManager({
         scheduled_end_at: null,
       });
       setSelected(pack);
+      onSelectedPackChange?.(pack);
       editPack(pack);
       await load();
       onContentChanged();
@@ -299,7 +307,7 @@ export function PlayGamePackManager({
                     <span>
                       <span className="block font-semibold">{starter.title}</span>
                       <span className="mt-1 block whitespace-normal text-xs font-normal text-muted-foreground">
-                        {starter.items.length} editable items Â· installs as draft
+                        {starter.items.length} editable items | installs as draft
                       </span>
                     </span>
                   </Button>
@@ -323,7 +331,7 @@ export function PlayGamePackManager({
                     <span>
                       <span className="block font-semibold">{blueprint.title}</span>
                       <span className="mt-1 block whitespace-normal text-xs font-normal text-muted-foreground">
-                        {blueprint.creator_focus ?? "Cross-focus"} · {blueprint.topic} · {blueprint.game_style.replaceAll("_", " ")}
+                        {blueprint.creator_focus ?? "Cross-focus"} | {blueprint.topic} | {blueprint.game_style.replaceAll("_", " ")}
                       </span>
                     </span>
                   </Button>
@@ -367,7 +375,11 @@ export function PlayGamePackManager({
                     <div>
                       <p className="font-semibold">{pack.title}</p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {pack.genre} Â· {itemCount[pack.id] ?? 0} items Â· v{pack.version}
+                        {pack.focus_scope === "cross_focus"
+                          ? "Connect the VYBE"
+                          : pack.creator_focus
+                            ? pack.creator_focus.replaceAll("_", " ")
+                            : pack.genre} | {itemCount[pack.id] ?? 0} items | v{pack.version}
                       </p>
                     </div>
                     <Badge variant={pack.status === "active" ? "default" : "outline"}>
