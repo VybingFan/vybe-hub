@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
-import { Bookmark, Loader2, Music2 } from "lucide-react";
+import { Bookmark, Loader2, Music2, Play } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { SharedPlaylistPlayer } from "@/components/playlists/SharedPlaylistPlayer";
 import { getActiveIdentity } from "@/components/identity/IdentityModeBar";
 import { savedMusicService, type SupporterMusicList } from "@/services/engagement/savedMusicService";
 
 export function SavedMusicLists() {
   const [lists, setLists] = useState<SupporterMusicList[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeListId, setActiveListId] = useState<string | null>(null);
+  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -42,10 +46,32 @@ export function SavedMusicLists() {
                 <div className="flex items-center gap-3"><Bookmark className="h-5 w-5 text-primary" /><div><h3 className="font-semibold">{list.name}</h3><p className="text-xs text-muted-foreground">{list.supporter_music_list_items?.length ?? 0} saved song(s)</p></div></div>
                 <div className="mt-4 divide-y rounded-xl border">
                   {(list.supporter_music_list_items ?? []).map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 p-3"><Music2 className="h-4 w-4 text-muted-foreground" /><div className="min-w-0"><p className="truncate text-sm font-medium">{item.tracks?.title ?? "Saved song"}</p><p className="truncate text-xs text-muted-foreground">{item.tracks?.primary_artist_name ?? "VYBE creator"}</p></div></div>
+                    <div key={item.id} className="flex items-center gap-3 p-3">
+                      <Music2 className="h-4 w-4 text-muted-foreground" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">{item.tracks?.title ?? "Saved song"}</p>
+                        <p className="truncate text-xs text-muted-foreground">{item.tracks?.primary_artist_name ?? "VYBE creator"}</p>
+                      </div>
+                      {item.tracks?.audio_url ? (
+                        <Button type="button" variant="ghost" size="sm" onClick={() => { setActiveListId(list.id); setSelectedTrackId(item.track_id); }}>
+                          <Play className="mr-2 h-4 w-4" /> Play
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Unavailable</span>
+                      )}
+                    </div>
                   ))}
                   {!list.supporter_music_list_items?.length ? <p className="p-3 text-sm text-muted-foreground">No songs saved yet.</p> : null}
                 </div>
+                {activeListId === list.id ? (
+                  <div className="mt-5">
+                    <SharedPlaylistPlayer
+                      tracks={(list.supporter_music_list_items ?? []).map((item) => item.tracks).filter((track): track is NonNullable<typeof track> => Boolean(track))}
+                      initialTrackId={selectedTrackId ?? undefined}
+                      queueLabel={`Up next in ${list.name}`}
+                    />
+                  </div>
+                ) : null}
               </CardContent>
             </Card>
           ))}

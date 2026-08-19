@@ -20,6 +20,7 @@ interface SharedPlaylistPlayerProps {
   tracks: Track[];
   playlistSlug?: string;
   initialTrackId?: string;
+  queueLabel?: string;
 }
 
 interface ActivePlaybackProgress {
@@ -55,6 +56,7 @@ export function SharedPlaylistPlayer({
   tracks,
   playlistSlug,
   initialTrackId,
+  queueLabel = "Playlist queue",
 }: SharedPlaylistPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const recordedTracks = useRef(new Set<string>());
@@ -586,7 +588,7 @@ export function SharedPlaylistPlayer({
 
       <div className="border-t border-border/70 p-2 sm:p-3 md:p-5">
         <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-[.18em] text-muted-foreground sm:px-4">
-          More from this creator
+          {queueLabel}
         </p>
 
         {tracks.map((item, index) => (

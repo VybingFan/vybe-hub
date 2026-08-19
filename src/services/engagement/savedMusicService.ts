@@ -1,7 +1,33 @@
 import { getActiveIdentity } from "@/components/identity/IdentityModeBar";
 import { supabase } from "@/integrations/supabase/client";
+import type { Track } from "@/features/music/schema";
 
 const database = supabase as any;
+
+const AUDIO_BUCKET = "music-audio";
+const COVER_BUCKET = "music-covers";
+const PREVIEW_BUCKET = "music-previews";
+const SIGNED_URL_TTL = 60 * 60 * 6;
+
+async function signedUrl(bucket: string, path: string | null | undefined): Promise<string | null> {
+  if (!path) return null;
+  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, SIGNED_URL_TTL);
+  if (error) return null;
+  return data?.signedUrl ?? null;
+}
+
+async function hydrateSavedTrack(row: Track): Promise<Track> {
+  return {
+    ...row,
+    audio_url:
+      row.playback_mode === "preview"
+        ? (await signedUrl(PREVIEW_BUCKET, row.preview_audio_path ?? null)) ?? ""
+        : row.playback_mode === "none"
+          ? ""
+          : (await signedUrl(AUDIO_BUCKET, row.audio_url)) ?? "",
+    cover_url: await signedUrl(COVER_BUCKET, row.cover_url),
+  };
+}
 
 export type SupporterMusicList = {
   id: string;
@@ -10,11 +36,7 @@ export type SupporterMusicList = {
   supporter_music_list_items?: Array<{
     id: string;
     track_id: string;
-    tracks?: {
-      id: string;
-      title: string;
-      primary_artist_name?: string | null;
-    } | null;
+    tracks?: Track | null;
   }>;
 };
 
@@ -31,12 +53,23 @@ export const savedMusicService = {
     const identity = supporterIdentity();
     const { data, error } = await database
       .from("supporter_music_lists")
-      .select("id,name,is_default,supporter_music_list_items(id,track_id,tracks(id,title,primary_artist_name))")
+      .select("id,name,is_default,supporter_music_list_items(id,track_id,tracks(*))")
       .eq("owner_identity_id", identity.id)
       .order("is_default", { ascending: false })
       .order("name", { ascending: true });
     if (error) throw error;
-    return data ?? [];
+
+    return Promise.all(
+      (data ?? []).map(async (list: SupporterMusicList) => ({
+        ...list,
+        supporter_music_list_items: await Promise.all(
+          (list.supporter_music_list_items ?? []).map(async (item) => ({
+            ...item,
+            tracks: item.tracks ? await hydrateSavedTrack(item.tracks) : null,
+          })),
+        ),
+      })),
+    );
   },
 
   async ensureDefault(): Promise<SupporterMusicList> {
