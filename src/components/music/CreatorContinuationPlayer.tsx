@@ -142,7 +142,7 @@ export function CreatorContinuationPlayer({
         className={cn(
           "overflow-hidden border border-primary/20 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,.22),transparent_42%),linear-gradient(135deg,hsl(var(--card)),hsl(var(--background)))] shadow-elevated",
           docked
-            ? "fixed inset-x-0 bottom-0 z-50 rounded-none border-x-0 border-b-0"
+            ? "fixed inset-x-0 bottom-0 z-50 rounded-none border-x-0 border-b-0 bg-background/95 shadow-[0_-10px_30px_rgba(0,0,0,.45)] backdrop-blur-xl"
             : "mt-4 rounded-3xl",
         )}
       >
@@ -168,13 +168,10 @@ export function CreatorContinuationPlayer({
         />
         <div
           className={cn(
-            "grid gap-5",
-            docked
-              ? "grid-cols-[3.5rem_1fr] items-center px-4 py-3 sm:grid-cols-[4rem_1fr] sm:px-6"
-              : "p-4 sm:grid-cols-[7rem_1fr] sm:p-6",
+            docked ? "grid min-h-[76px] grid-cols-[3.25rem_minmax(0,1fr)] items-center gap-x-3 gap-y-1 px-3 py-2 sm:grid-cols-[3.5rem_minmax(180px,1fr)_auto] sm:px-5" : "grid gap-5 p-4 sm:grid-cols-[7rem_1fr] sm:p-6",
           )}
         >
-          <div className={cn("aspect-square overflow-hidden bg-gradient-brand", docked ? "rounded-xl" : "rounded-2xl")}>
+          <div className={cn("aspect-square overflow-hidden bg-gradient-brand", docked ? "h-12 w-12 rounded-lg sm:h-14 sm:w-14" : "rounded-2xl")}>
             {track.cover_url ? (
               <img
                 src={track.cover_url}
@@ -188,13 +185,13 @@ export function CreatorContinuationPlayer({
             )}
           </div>
           <div className="min-w-0">
-            <p className={cn("text-xs font-semibold uppercase tracking-[.2em] text-primary", docked && "hidden sm:block")}>
+            <p className={cn("text-xs font-semibold uppercase tracking-[.2em] text-primary", docked && "hidden")}>
               {source}
             </p>
-            <h3 className={cn("mt-1 truncate font-semibold", docked ? "text-base sm:text-lg" : "text-2xl")}>
+            <h3 className={cn("mt-1 truncate font-semibold", docked ? "text-sm sm:text-base" : "text-2xl")}>
               {track.title}
             </h3>
-            <p className="truncate text-sm text-muted-foreground">
+            <p className={cn("truncate text-sm text-muted-foreground", docked && "text-xs")}>
               {track.primary_artist_name || "VYBE artist"}
               {track.genre ? ` · ${track.genre}` : ""}
             </p>
@@ -215,7 +212,7 @@ export function CreatorContinuationPlayer({
               <span>{formatDuration(elapsed)}</span>
               <span>{formatDuration(duration)}</span>
             </div>
-            <div className={cn("flex items-center justify-between gap-3", docked ? "mt-2" : "mt-3")}>
+            <div className={cn("flex items-center justify-between gap-2", docked ? "col-span-2 mt-1 sm:col-span-1 sm:col-start-3 sm:row-start-1 sm:mt-0" : "mt-3")}>
               <div className="flex items-center gap-1">
                 <Button
                   type="button"
@@ -230,7 +227,7 @@ export function CreatorContinuationPlayer({
                 <Button
                   type="button"
                   size="icon"
-                  className="h-12 w-12 rounded-full bg-gradient-brand text-white"
+                  className={cn("rounded-full bg-gradient-brand text-white", docked ? "h-10 w-10 sm:h-11 sm:w-11" : "h-12 w-12")}
                   onClick={() =>
                     audioRef.current?.paused
                       ? void audioRef.current.play()
@@ -266,7 +263,7 @@ export function CreatorContinuationPlayer({
                 </Button>
               </div>
               <TrackSupportActions trackId={track.id} />
-              <div className="hidden w-36 items-center gap-2 sm:flex">
+              <div className="hidden w-28 items-center gap-2 lg:flex">
                 {volume === 0 ? (
                   <VolumeX className="h-4 w-4" />
                 ) : (
@@ -294,7 +291,7 @@ export function CreatorContinuationPlayer({
           </span>
         </div>
         {docked ? (
-          <div className="border-t border-primary/20 px-4 pb-2 sm:px-6">
+          <div className="border-t border-primary/20 px-3 pb-1 sm:px-5">
             <Slider
               min={0}
               max={Math.max(duration, 1)}
