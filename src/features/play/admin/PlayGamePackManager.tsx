@@ -75,6 +75,7 @@ export function PlayGamePackManager({
   const [itemCount, setItemCount] = useState<Record<string, number>>({});
   const [batchText, setBatchText] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showCreateTools, setShowCreateTools] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -112,11 +113,13 @@ export function PlayGamePackManager({
               : "choice",
     });
     setSelected(null);
+    setShowCreateTools(true);
     onSelectedPackChange?.(null);
   }
 
   function editPack(pack: PlayGamePack) {
     setSelected(pack);
+    setShowCreateTools(false);
     onSelectedPackChange?.(pack);
     setDraft({
       id: pack.id,
@@ -283,16 +286,32 @@ export function PlayGamePackManager({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Boxes className="h-5 w-5 text-primary" /> Ready game packs
+          <Boxes className="h-5 w-5 text-primary" /> Game packs
         </CardTitle>
         <p className="text-sm leading-6 text-muted-foreground">
-          Choose a developed game format, load a complete content batch, then edit individual items
-          below only when needed.
+          Select an existing game to manage its pack and content. Open Create / add game only when building something new.
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
         {canEdit ? (
-          <div className="space-y-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border p-4">
+            <div>
+              <p className="font-semibold">Create / add game</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Prepared games, blueprints, and blank formats stay out of the way until you need them.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setShowCreateTools((current) => !current)}
+            >
+              {showCreateTools ? "Hide creation tools" : "Open creation tools"}
+            </Button>
+          </div>
+        ) : null}
+
+        {canEdit && showCreateTools ? (
+          <div className="space-y-5 rounded-2xl border border-border p-5">
             <div>
               <p className="mb-3 text-sm font-semibold">Install a prepared hip-hop game</p>
               <div className="grid gap-3 lg:grid-cols-3">
@@ -361,7 +380,7 @@ export function PlayGamePackManager({
           </div>
         ) : null}
 
-        <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+        <div className={selected || showCreateTools ? "grid gap-6 xl:grid-cols-[1fr_1fr]" : "grid gap-6"}>
           <div className="space-y-3">
             {packs.length ? (
               packs.map((pack) => (
@@ -395,6 +414,7 @@ export function PlayGamePackManager({
             )}
           </div>
 
+          {(selected || showCreateTools) ? (
           <div className="space-y-4 rounded-2xl border border-border p-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Pack key">
@@ -628,6 +648,7 @@ export function PlayGamePackManager({
               </div>
             ) : null}
           </div>
+          ) : null}
         </div>
       </CardContent>
     </Card>
