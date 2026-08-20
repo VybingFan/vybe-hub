@@ -10,6 +10,7 @@ import {
   SkipForward,
   Volume2,
   VolumeX,
+  Maximize2,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -25,6 +26,9 @@ import { formatDuration, type Track } from "@/features/music/schema";
 import { cn } from "@/lib/utils";
 import { FollowCreatorButton } from "@/components/engagement/FollowCreatorButton";
 import { TrackSupportActions } from "@/components/engagement/TrackSupportActions";
+import { ImmersiveNowPlaying } from "@/components/music/ImmersiveNowPlaying";
+import { getNowPlayingExperienceLevel } from "@/features/membership/entitlements";
+import type { CreatorPlanCode } from "@/features/membership/catalog";
 
 export function CreatorContinuationPlayer({
   queue,
@@ -35,6 +39,7 @@ export function CreatorContinuationPlayer({
   featuredCollectionLabel = "Artist’s Top 5",
   onSelect,
   docked = false,
+  planCode,
 }: {
   queue: Track[];
   selectedId?: string;
@@ -44,6 +49,7 @@ export function CreatorContinuationPlayer({
   featuredCollectionLabel?: string;
   onSelect: (id: string) => void;
   docked?: boolean;
+  planCode?: CreatorPlanCode | null;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const mounted = useRef(false);
@@ -60,6 +66,9 @@ export function CreatorContinuationPlayer({
   const [volume, setVolume] = useState(0.85);
   const [repeat, setRepeat] = useState(false);
   const [choice, setChoice] = useState<"top-five" | "library" | null>(null);
+  const [nowPlayingOpen, setNowPlayingOpen] = useState(false);
+  const nowPlayingLevel = getNowPlayingExperienceLevel(planCode);
+  const canExpandNowPlaying = nowPlayingLevel !== "standard";
 
   useEffect(() => {
     if (!mounted.current) {
@@ -261,6 +270,18 @@ export function CreatorContinuationPlayer({
                 >
                   <Repeat2 />
                 </Button>
+                {canExpandNowPlaying ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setNowPlayingOpen(true)}
+                    aria-label="Open immersive Now Playing"
+                    title="Open Now Playing"
+                  >
+                    <Maximize2 />
+                  </Button>
+                ) : null}
               </div>
               <TrackSupportActions trackId={track.id} />
               <div className="hidden w-28 items-center gap-2 lg:flex">
@@ -306,6 +327,35 @@ export function CreatorContinuationPlayer({
           </div>
         ) : null}
       </div>
+
+      <ImmersiveNowPlaying
+        open={nowPlayingOpen && canExpandNowPlaying}
+        track={track}
+        creatorUserId={creatorUserId}
+        creatorName={creatorName}
+        level={nowPlayingLevel}
+        playing={playing}
+        elapsed={elapsed}
+        duration={duration}
+        volume={volume}
+        repeat={repeat}
+        canPrevious={index > 0}
+        canNext={Boolean(next)}
+        onClose={() => setNowPlayingOpen(false)}
+        onTogglePlayback={() =>
+          audioRef.current?.paused
+            ? void audioRef.current.play()
+            : audioRef.current?.pause()
+        }
+        onPrevious={() => choose(queue[index - 1])}
+        onNext={() => choose(next)}
+        onToggleRepeat={() => setRepeat((value) => !value)}
+        onSeek={(value) => {
+          if (audioRef.current) audioRef.current.currentTime = value;
+          setElapsed(value);
+        }}
+        onVolumeChange={(value) => changeVolume([value])}
+      />
 
       <AlertDialog open={choice !== null} onOpenChange={(open) => !open && setChoice(null)}>
         <AlertDialogContent className="max-w-lg overflow-hidden border-primary/20 p-0">

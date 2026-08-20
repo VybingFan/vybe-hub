@@ -33,6 +33,7 @@ export function PublicCreatorMusicExperience({
   creatorUserId,
   creatorName,
   initialTrackId,
+  planCode,
   featuredCollectionLabel = "Artist’s Top 5",
 }: {
   tracks: Track[];
@@ -41,6 +42,7 @@ export function PublicCreatorMusicExperience({
   creatorUserId: string;
   creatorName: string;
   initialTrackId?: string;
+  planCode?: import("@/features/membership/catalog").CreatorPlanCode | null;
   featuredCollectionLabel?: string;
 }) {
   const publicTracks = useMemo(
@@ -160,6 +162,7 @@ export function PublicCreatorMusicExperience({
           creatorName={creatorName}
           featuredCollectionLabel={featuredCollectionLabel}
           onSelect={setSelectedId}
+          planCode={planCode}
           docked
         />
         <div className="mt-3 flex flex-col gap-2 rounded-2xl border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">

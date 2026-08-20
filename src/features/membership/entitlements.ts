@@ -6,3 +6,19 @@ export function getCreatorEntitlements(plan?:CreatorPlanCode|null){const effecti
 export function hasCreatorFeature(plan:CreatorPlanCode|null|undefined,feature:CreatorFeature){return getCreatorEntitlements(plan).features.has(feature)}
 export function minimumPlanForFeature(feature:CreatorFeature):PublicCreatorPlanCode{return CREATOR_PLAN_CATALOG.find(p=>features[p.code].includes(feature))?.code??"creator_studio"}
 
+export type NowPlayingExperienceLevel = "standard" | "immersive" | "motion" | "motion_plus";
+
+export function getNowPlayingExperienceLevel(
+  plan?: CreatorPlanCode | null,
+): NowPlayingExperienceLevel {
+  switch (normalizeCreatorPlan(plan)) {
+    case "creator_plus":
+      return "immersive";
+    case "creator_pro":
+      return "motion";
+    case "creator_studio":
+      return "motion_plus";
+    default:
+      return "standard";
+  }
+}

@@ -203,6 +203,7 @@ export function PublicArtistHome({
             creatorName={name}
             initialTrackId={selectedTrackId}
             featuredCollectionLabel={compactProfile ? "Featured Music" : undefined}
+            planCode={planCode}
           />
         </section>
 
