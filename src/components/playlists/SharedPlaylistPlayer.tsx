@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  Expand,
   LockKeyhole,
   Pause,
   Play,
@@ -9,6 +10,7 @@ import {
   SkipForward,
   Volume2,
   VolumeX,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -77,6 +79,7 @@ export function SharedPlaylistPlayer({
   const [shuffle, setShuffle] = useState(false);
   const [loadingAudio, setLoadingAudio] = useState(false);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const track = tracks[current];
 
@@ -423,8 +426,8 @@ export function SharedPlaylistPlayer({
         }}
       />
 
-      <div className="grid gap-6 p-4 sm:p-6 md:grid-cols-[220px_1fr] md:gap-7 md:p-8">
-        <div className="mx-auto aspect-square w-full max-w-xs overflow-hidden rounded-2xl bg-gradient-brand md:max-w-none">
+      <div className="grid grid-cols-[96px_minmax(0,1fr)] gap-4 p-4 sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-6 sm:p-6 md:grid-cols-[180px_minmax(0,1fr)] md:p-7">
+        <button type="button" onClick={() => setDetailOpen(true)} className={cn("group relative aspect-square w-full overflow-hidden rounded-2xl bg-gradient-brand text-left shadow-lg transition hover:scale-[1.015]", playing && "ring-2 ring-fuchsia-400/40")} aria-label={`Open details for ${track.title}`}>
           {track.cover_url ? (
             <img
               src={track.cover_url}
@@ -436,19 +439,22 @@ export function SharedPlaylistPlayer({
               V
             </div>
           )}
-        </div>
+          <span className="absolute bottom-2 right-2 rounded-full bg-black/65 p-2 text-white opacity-90 backdrop-blur transition group-hover:scale-105">
+            <Expand className="h-4 w-4" />
+          </span>
+        </button>
 
         <div className="flex min-w-0 flex-col justify-center">
           <p className="text-xs font-semibold uppercase tracking-[.2em] text-primary">
             Now playing
           </p>
 
-          <h2 className="mt-2 line-clamp-2 text-2xl font-semibold sm:text-3xl">{track.title}</h2>
+          <button type="button" onClick={() => setDetailOpen(true)} className="mt-2 line-clamp-2 text-left text-xl font-semibold transition hover:text-fuchsia-200 sm:text-2xl" aria-label={`Open details for ${track.title}`}>{track.title}</button>
 
           <div className="mt-2 flex flex-wrap items-center gap-2 text-muted-foreground">
             {track.playback_mode === "preview" ? (
               <span className="rounded-full border px-2 py-0.5 text-xs">
-                Preview · {track.preview_duration_sec}s
+                Preview Â· {track.preview_duration_sec}s
               </span>
             ) : null}
 
@@ -460,7 +466,7 @@ export function SharedPlaylistPlayer({
             ) : null}
 
             {loadingAudio ? (
-              <span className="rounded-full border px-2 py-0.5 text-xs">Loading audio…</span>
+              <span className="rounded-full border px-2 py-0.5 text-xs">Loading audioâ€¦</span>
             ) : null}
           </div>
 
@@ -471,7 +477,7 @@ export function SharedPlaylistPlayer({
               ? ` feat. ${track.featured_artist_names.join(", ")}`
               : ""}
 
-            {track.genre ? ` · ${track.genre}` : ""}
+            {track.genre ? ` Â· ${track.genre}` : ""}
           </p>
 
           {playbackError ? (
@@ -525,7 +531,7 @@ export function SharedPlaylistPlayer({
             <Button
               type="button"
               size="icon"
-              className="h-14 w-14 rounded-full bg-gradient-brand text-white"
+              className="h-12 w-12 rounded-full bg-gradient-brand text-white sm:h-14 sm:w-14"
               onClick={() => void togglePlayback()}
               disabled={!canPlay || loadingAudio}
               aria-label={playing ? "Pause" : "Play"}
@@ -561,7 +567,7 @@ export function SharedPlaylistPlayer({
             </Button>
           </div>
 
-          <div className="mx-auto mt-4 flex w-full max-w-52 items-center gap-3">
+          <div className="mx-auto mt-3 hidden w-full max-w-52 items-center gap-3 sm:flex">
             <Button
               type="button"
               variant="ghost"
@@ -602,7 +608,7 @@ export function SharedPlaylistPlayer({
             )}
           >
             <span className="w-6 text-center text-xs text-muted-foreground">
-              {index === current && playing ? "▶" : index + 1}
+              {index === current && playing ? "â–¶" : index + 1}
             </span>
 
             <span className="min-w-0 flex-1">
@@ -623,6 +629,52 @@ export function SharedPlaylistPlayer({
           </button>
         ))}
       </div>
+
+      {detailOpen ? (
+        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/80 p-3 backdrop-blur-md sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label={`Song details for ${track.title}`}>
+          <div className="relative max-h-[94vh] w-full max-w-3xl overflow-y-auto rounded-[2rem] border border-white/15 bg-[#0b0c16] p-5 shadow-2xl sm:p-7">
+            <button type="button" onClick={() => setDetailOpen(false)} className="absolute right-4 top-4 z-10 rounded-full bg-black/55 p-2 text-white backdrop-blur transition hover:bg-black/75" aria-label="Close song details">
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="grid gap-6 sm:grid-cols-[minmax(0,280px)_1fr] sm:items-center">
+              <div className={cn("mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-[1.75rem] bg-gradient-brand shadow-2xl transition-transform duration-700", playing && "scale-[1.025]")}>
+                {track.cover_url ? (
+                  <img src={track.cover_url} alt={`${track.title} cover`} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-7xl font-bold text-white/90">V</div>
+                )}
+              </div>
+
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[.22em] text-fuchsia-300">Expanded song view</p>
+                <h3 className="mt-2 break-words text-3xl font-bold tracking-tight sm:text-4xl">{track.title}</h3>
+                <p className="mt-2 text-base text-white/65">
+                  {track.primary_artist_name || "Independent artist"}
+                  {track.featured_artist_names?.length ? ` feat. ${track.featured_artist_names.join(", ")}` : ""}
+                </p>
+                {track.genre ? <p className="mt-1 text-sm text-cyan-200/80">{track.genre}</p> : null}
+
+                <div className="mt-6">
+                  <Slider min={0} max={Math.max(displayedDuration, 1)} step={0.1} value={[Math.min(elapsed, Math.max(displayedDuration, 1))]} onValueChange={seek} disabled={!canPlay} aria-label="Expanded track progress" />
+                  <div className="mt-2 flex justify-between text-xs text-white/45">
+                    <span>{formatDuration(elapsed)}</span>
+                    <span>{formatDuration(displayedDuration)}</span>
+                  </div>
+                </div>
+
+                <div className="mt-5 flex items-center justify-center gap-4 sm:justify-start">
+                  <Button type="button" variant="ghost" size="icon" onClick={previousTrack} disabled={tracks.length < 2} aria-label="Previous song"><SkipBack /></Button>
+                  <Button type="button" size="icon" className="h-16 w-16 rounded-full bg-gradient-brand text-white" onClick={() => void togglePlayback()} disabled={!canPlay || loadingAudio} aria-label={playing ? "Pause" : "Play"}>
+                    {playing ? <Pause className="fill-current" /> : <Play className="ml-1 fill-current" />}
+                  </Button>
+                  <Button type="button" variant="ghost" size="icon" onClick={nextTrack} disabled={tracks.length < 2} aria-label="Next song"><SkipForward /></Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
