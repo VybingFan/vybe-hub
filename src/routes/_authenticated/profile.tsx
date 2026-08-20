@@ -162,6 +162,7 @@ function SupporterProfileContent({
       {isEditing ? (
         <SupporterProfileForm
           initial={profile ?? null}
+          userId={userId!}
           onSubmit={handleSave}
           onCancel={() => setIsEditing(false)}
           submitting={save.isPending}
