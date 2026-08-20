@@ -26,6 +26,7 @@ import { CreatorComments } from "@/components/engagement/CreatorComments";
 import { FollowCreatorButton } from "@/components/engagement/FollowCreatorButton";
 import { CreatorPlanBadge } from "@/components/membership/CreatorPlanBadge";
 import { PublicCreatorStories } from "@/components/stories/PublicCreatorStories";
+import { PublicCreatorUpdates } from "@/components/creator/PublicCreatorUpdates";
 
 export const Route = createFileRoute("/creator/$username")({
   component: CreatorPage,
@@ -178,6 +179,7 @@ export function PublicArtistHome({
             </p>
             <div className="flex gap-2 overflow-x-auto pb-1">
               <CreatorSectionLink href="#music">Music</CreatorSectionLink>
+              <CreatorSectionLink href="#happening">What's Happening</CreatorSectionLink>
               <CreatorSectionLink href="#about">About</CreatorSectionLink>
               {!!videos.length && (
                 <CreatorSectionLink href="#videos">Videos</CreatorSectionLink>
@@ -203,6 +205,8 @@ export function PublicArtistHome({
             featuredCollectionLabel={compactProfile ? "Featured Music" : undefined}
           />
         </section>
+
+        <PublicCreatorUpdates creatorId={profile.user_id} creatorName={name} />
 
         <PublicCreatorShop creatorId={profile.user_id} creatorName={name} />
         <section

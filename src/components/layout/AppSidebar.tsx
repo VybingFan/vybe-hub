@@ -135,6 +135,12 @@ const creatorStudio: NavItem[] = [
     allow: ["creator", "admin"],
   },
   {
+    title: "Events & Updates",
+    url: "/creator-updates",
+    icon: CalendarDays,
+    allow: ["creator", "admin"],
+  },
+  {
     title: "Music Library",
     url: "/music",
     icon: Music2,

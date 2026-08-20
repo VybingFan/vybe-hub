@@ -80,6 +80,7 @@ import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedEpkRouteImport } from './routes/_authenticated/epk'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCreatorUpdatesRouteImport } from './routes/_authenticated/creator-updates'
 import { Route as AuthenticatedCreatorSupportRouteImport } from './routes/_authenticated/creator-support'
 import { Route as AuthenticatedCreatorFocusesRouteImport } from './routes/_authenticated/creator-focuses'
 import { Route as AuthenticatedCreatorComplianceRouteImport } from './routes/_authenticated/creator-compliance'
@@ -485,6 +486,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCreatorUpdatesRoute =
+  AuthenticatedCreatorUpdatesRouteImport.update({
+    id: '/creator-updates',
+    path: '/creator-updates',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCreatorSupportRoute =
   AuthenticatedCreatorSupportRouteImport.update({
     id: '/creator-support',
@@ -768,6 +775,7 @@ export interface FileRoutesByFullPath {
   '/creator-compliance': typeof AuthenticatedCreatorComplianceRoute
   '/creator-focuses': typeof AuthenticatedCreatorFocusesRoute
   '/creator-support': typeof AuthenticatedCreatorSupportRoute
+  '/creator-updates': typeof AuthenticatedCreatorUpdatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/epk': typeof AuthenticatedEpkRoute
@@ -884,6 +892,7 @@ export interface FileRoutesByTo {
   '/creator-compliance': typeof AuthenticatedCreatorComplianceRoute
   '/creator-focuses': typeof AuthenticatedCreatorFocusesRoute
   '/creator-support': typeof AuthenticatedCreatorSupportRoute
+  '/creator-updates': typeof AuthenticatedCreatorUpdatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/epk': typeof AuthenticatedEpkRoute
@@ -1002,6 +1011,7 @@ export interface FileRoutesById {
   '/_authenticated/creator-compliance': typeof AuthenticatedCreatorComplianceRoute
   '/_authenticated/creator-focuses': typeof AuthenticatedCreatorFocusesRoute
   '/_authenticated/creator-support': typeof AuthenticatedCreatorSupportRoute
+  '/_authenticated/creator-updates': typeof AuthenticatedCreatorUpdatesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
   '/_authenticated/epk': typeof AuthenticatedEpkRoute
@@ -1120,6 +1130,7 @@ export interface FileRouteTypes {
     | '/creator-compliance'
     | '/creator-focuses'
     | '/creator-support'
+    | '/creator-updates'
     | '/dashboard'
     | '/discover'
     | '/epk'
@@ -1236,6 +1247,7 @@ export interface FileRouteTypes {
     | '/creator-compliance'
     | '/creator-focuses'
     | '/creator-support'
+    | '/creator-updates'
     | '/dashboard'
     | '/discover'
     | '/epk'
@@ -1353,6 +1365,7 @@ export interface FileRouteTypes {
     | '/_authenticated/creator-compliance'
     | '/_authenticated/creator-focuses'
     | '/_authenticated/creator-support'
+    | '/_authenticated/creator-updates'
     | '/_authenticated/dashboard'
     | '/_authenticated/discover'
     | '/_authenticated/epk'
@@ -1989,6 +2002,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/creator-updates': {
+      id: '/_authenticated/creator-updates'
+      path: '/creator-updates'
+      fullPath: '/creator-updates'
+      preLoaderRoute: typeof AuthenticatedCreatorUpdatesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/creator-support': {
       id: '/_authenticated/creator-support'
       path: '/creator-support'
@@ -2313,6 +2333,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCreatorComplianceRoute: typeof AuthenticatedCreatorComplianceRoute
   AuthenticatedCreatorFocusesRoute: typeof AuthenticatedCreatorFocusesRoute
   AuthenticatedCreatorSupportRoute: typeof AuthenticatedCreatorSupportRoute
+  AuthenticatedCreatorUpdatesRoute: typeof AuthenticatedCreatorUpdatesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
   AuthenticatedEpkRoute: typeof AuthenticatedEpkRoute
@@ -2377,6 +2398,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCreatorComplianceRoute: AuthenticatedCreatorComplianceRoute,
   AuthenticatedCreatorFocusesRoute: AuthenticatedCreatorFocusesRoute,
   AuthenticatedCreatorSupportRoute: AuthenticatedCreatorSupportRoute,
+  AuthenticatedCreatorUpdatesRoute: AuthenticatedCreatorUpdatesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
   AuthenticatedEpkRoute: AuthenticatedEpkRoute,
