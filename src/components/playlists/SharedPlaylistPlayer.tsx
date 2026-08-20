@@ -454,7 +454,7 @@ export function SharedPlaylistPlayer({
           <div className="mt-2 flex flex-wrap items-center gap-2 text-muted-foreground">
             {track.playback_mode === "preview" ? (
               <span className="rounded-full border px-2 py-0.5 text-xs">
-                Preview Â· {track.preview_duration_sec}s
+                Preview · {track.preview_duration_sec}s
               </span>
             ) : null}
 
@@ -466,7 +466,7 @@ export function SharedPlaylistPlayer({
             ) : null}
 
             {loadingAudio ? (
-              <span className="rounded-full border px-2 py-0.5 text-xs">Loading audioâ€¦</span>
+              <span className="rounded-full border px-2 py-0.5 text-xs">Loading audio…</span>
             ) : null}
           </div>
 
@@ -477,7 +477,7 @@ export function SharedPlaylistPlayer({
               ? ` feat. ${track.featured_artist_names.join(", ")}`
               : ""}
 
-            {track.genre ? ` Â· ${track.genre}` : ""}
+            {track.genre ? ` · ${track.genre}` : ""}
           </p>
 
           {playbackError ? (
@@ -608,7 +608,7 @@ export function SharedPlaylistPlayer({
             )}
           >
             <span className="w-6 text-center text-xs text-muted-foreground">
-              {index === current && playing ? "â–¶" : index + 1}
+              {index === current && playing ? "▶" : index + 1}
             </span>
 
             <span className="min-w-0 flex-1">
