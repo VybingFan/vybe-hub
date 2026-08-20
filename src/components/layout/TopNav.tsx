@@ -20,6 +20,8 @@ import { useMyActivity } from "@/hooks/useActivity";
 import { playNotificationChime } from "@/lib/notificationSound";
 import { useMyConnections } from "@/hooks/useConnections";
 import type { AdminNotification } from "@/services/admin/adminNotificationService";
+import { CreatorNotificationItems } from "@/components/engagement/CreatorNotificationItems";
+import { useCreatorNotifications, useMarkCreatorNotificationsRead } from "@/hooks/useCreatorEngagement";
 
 export function TopNav() {
   const navigate = useNavigate();
@@ -29,6 +31,8 @@ export function TopNav() {
   const { data: creatorProfile } = useCreatorProfile(hasRole("creator") ? user?.id : undefined);
   const { data: activity = [] } = useMyActivity(hasRole("creator") ? user?.id : undefined);
   const { data: connections = [] } = useMyConnections(hasRole("creator") ? user?.id : undefined);
+  const { data: creatorIdentityNotifications = [] } = useCreatorNotifications(hasRole("creator"));
+  const markCreatorNotificationsRead = useMarkCreatorNotificationsRead();
   const isAdmin = hasRole("admin") && pathname.startsWith("/admin");
   const [adminNotifications, setAdminNotifications] = useState<AdminNotification[]>([]);
   const [lastSeen, setLastSeen] = useState(() =>
@@ -39,8 +43,9 @@ export function TopNav() {
   const creatorUnread = [...activity, ...connections].filter(
     (item) => new Date(item.created_at).getTime() > lastSeen,
   ).length;
+  const identityUnread = creatorIdentityNotifications.filter((item) => !item.read_at).length;
   const adminUnread = adminNotifications.filter((item) => item.status === "unread").length;
-  const unread = isAdmin ? adminUnread : creatorUnread;
+  const unread = isAdmin ? adminUnread : creatorUnread + identityUnread;
   const latestActivity = useRef<string | null>(null);
   useEffect(() => {
     const latestItem = [...activity, ...connections].sort((a, b) =>
@@ -119,6 +124,7 @@ export function TopNav() {
               const now = Date.now();
               setLastSeen(now);
               window.localStorage.setItem("vybe:activity-seen", String(now));
+              if (hasRole("creator")) void markCreatorNotificationsRead();
             }
           }}
         >
@@ -172,6 +178,7 @@ export function TopNav() {
             ) : null}
             {!isAdmin && (
               <>
+                <CreatorNotificationItems items={creatorIdentityNotifications} />
                 {connections.slice(0, 3).map((connection) => (
                   <DropdownMenuItem key={connection.id} className="items-start py-3" asChild>
                     <Link to="/connections">
@@ -188,7 +195,7 @@ export function TopNav() {
                     </Link>
                   </DropdownMenuItem>
                 ))}
-                {!activity.length && !connections.length && (
+                {!activity.length && !connections.length && !creatorIdentityNotifications.length && (
                   <DropdownMenuItem disabled>No creator activity yet.</DropdownMenuItem>
                 )}
                 {activity.slice(0, 10).map((item) => (
@@ -226,7 +233,7 @@ export function TopNav() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                  Anonymous activity only. Refreshes every 30 seconds.
+                  Creator engagement and playlist activity. Refreshes every 30 seconds.
                 </DropdownMenuLabel>
               </>
             )}

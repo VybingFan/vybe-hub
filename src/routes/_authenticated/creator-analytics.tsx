@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCreatorEntitlements, hasCreatorFeature } from "@/features/membership/entitlements";
 import { useMembership } from "@/hooks/useMembership";
 import { supabase } from "@/integrations/supabase/client";
+import { CreatorEngagementPanel } from "@/components/engagement/CreatorEngagementPanel";
 
 export const Route = createFileRoute("/_authenticated/creator-analytics")({
   component: () => <RoleGuard allow={["creator", "admin"]}><CreatorInsightsPage /></RoleGuard>,
@@ -122,7 +123,7 @@ function CreatorInsightsPage() {
 
         <TabsContent value="playlists"><section><h2 className="text-2xl font-semibold">Playlist performance</h2><div className="mt-4 overflow-hidden rounded-2xl border">{playlist.playlists.map((row) => <div key={row.playlist_id} className="grid gap-2 border-b px-4 py-4 last:border-0 sm:grid-cols-[1fr_auto_auto_auto] sm:gap-5"><span className="font-medium">{row.title}</span><span className="text-muted-foreground">{row.opens} opens</span><span className="text-muted-foreground">{row.plays} starts</span><span className="text-muted-foreground">{row.unique_visitors} visitors</span></div>)}{!playlist.playlists.length && <p className="p-8 text-center text-muted-foreground">Share a playlist to begin collecting insights.</p>}</div></section></TabsContent>
 
-        <TabsContent value="engagement"><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{[["Followers", social.followers || 0, UserPlus], ["Likes", social.likes || 0, Heart], ["Saves", social.saves || 0, Repeat2], ["Comments", social.comments || 0, MessageCircle]].map(([label, value, Icon]) => { const MetricIcon = Icon as typeof BarChart3; return <Card key={label as string}><CardContent className="flex items-center gap-4 p-5"><MetricIcon className="h-6 w-6 text-primary" /><div><p className="text-3xl font-semibold">{value as number}</p><p className="text-sm text-muted-foreground">{label as string}</p></div></CardContent></Card>; })}</div></TabsContent>
+        <TabsContent value="engagement"><CreatorEngagementPanel days={queryDays} social={social} /></TabsContent>
       </Tabs>
 
       {!canExport ? <LockedFeatureCard title="Advanced insights and exports" description="Keep a longer reporting window and export creator performance for professional review." requiredPlan="creator_pro" usage={`${periodLabel} reporting is active on your current membership.`} compact /> : null}
