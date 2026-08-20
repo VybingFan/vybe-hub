@@ -107,9 +107,8 @@ function VideoStudio() {
           <div>
             <p className="font-semibold">Upload from your computer or phone gallery</p>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              The upload interface is ready now. It activates after Cloudflare Stream credentials
-              are added, providing secure encoding and mobile-quality playback without exposing
-              platform credentials.
+              Cloudflare Stream is connected. Native uploads are securely encoded for reliable
+              playback while VYBE keeps platform credentials protected server-side.
             </p>
           </div>
         </CardContent>
@@ -216,20 +215,45 @@ function VideoStudio() {
                 className="overflow-hidden rounded-2xl border border-border bg-card"
               >
                 <div className="aspect-video bg-black">
-                  <iframe
-                    src={videoEmbedUrl(video)}
-                    title={video.title}
-                    className="h-full w-full"
-                    loading="lazy"
-                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+                  {video.provider === "cloudflare_stream" && video.status === "processing" ? (
+                    <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-white">
+                      <Loader2 className="h-7 w-7 animate-spin text-cyan-300" />
+                      <div>
+                        <p className="font-semibold">Processing video...</p>
+                        <p className="mt-1 text-xs text-white/70">
+                          Cloudflare Stream is preparing this video for playback.
+                        </p>
+                      </div>
+                    </div>
+                  ) : video.provider === "cloudflare_stream" && video.status === "failed" ? (
+                    <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center text-white">
+                      <p className="font-semibold">Video processing failed</p>
+                      <p className="text-xs text-white/70">
+                        Try the upload again or choose another video file.
+                      </p>
+                    </div>
+                  ) : (
+                    <iframe
+                      src={videoEmbedUrl(video)}
+                      title={video.title}
+                      className="h-full w-full"
+                      loading="lazy"
+                      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  )}
                 </div>
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <Badge variant={video.status === "published" ? "default" : "outline"}>
-                        {video.status === "published" ? "Published" : "Draft"}
+                        {video.status === "published"
+                          ? "Published"
+                          : video.status === "processing"
+                            ? "Processing"
+                            : video.status === "failed"
+                              ? "Failed"
+                              : "Draft"}
                       </Badge>
                       <h3 className="mt-2 line-clamp-2 font-semibold">{video.title}</h3>
                     </div>
@@ -250,6 +274,7 @@ function VideoStudio() {
                     <Button
                       type="button"
                       variant="outline"
+                      disabled={video.status === "processing" || video.status === "failed"}
                       onClick={() =>
                         setPublished.mutate({
                           id: video.id,
@@ -258,7 +283,13 @@ function VideoStudio() {
                       }
                     >
                       <CheckCircle2 />
-                      {video.status === "published" ? "Move to draft" : "Publish"}
+                      {video.status === "published"
+                        ? "Move to draft"
+                        : video.status === "processing"
+                          ? "Processing"
+                          : video.status === "failed"
+                            ? "Upload failed"
+                            : "Publish"}
                     </Button>
                     {video.status === "published" ? (
                       <Button type="button" variant="outline" onClick={() => copyLink(video.id)}>
@@ -456,8 +487,8 @@ function NativeUploadCard({ creatorId }: { creatorId?: string }) {
         {uploading ? "Uploading video…" : "Upload from device"}
       </Button>
       <p className="mt-3 text-xs text-muted-foreground">
-        Before Stream is connected, this button safely explains which Cloudflare settings are
-        missing. No video leaves your device until a secure one-time upload link is created.
+        Videos upload directly to Cloudflare Stream using a secure one-time upload link, then
+        appear in your VYBE library as drafts after processing completes.
       </p>
     </form>
   );
