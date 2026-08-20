@@ -1,4 +1,4 @@
-﻿import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import type {
   Album,
   AlbumInput,
@@ -283,6 +283,20 @@ export const musicService = {
       await this.removeStorage(COVER_BUCKET, (existing.cover_url as string | null) ?? null);
       await this.removeStorage(PREVIEW_BUCKET, (existing.preview_audio_path as string | null) ?? null);
     }
+  },
+
+  async bulkSetTrackVisibility(
+    userId: string,
+    trackIds: string[],
+    visibility: "public" | "unlisted" | "private",
+  ): Promise<void> {
+    if (!trackIds.length) return;
+    const { error } = await supabase
+      .from("tracks")
+      .update({ visibility } as never)
+      .eq("creator_id", userId)
+      .in("id", trackIds);
+    if (error) throw error;
   },
 
   async listCreatorTracks(userId: string): Promise<Track[]> {

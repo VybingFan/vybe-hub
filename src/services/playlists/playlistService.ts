@@ -1,4 +1,4 @@
-﻿import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import { MAX_COVER_BYTES, type Track } from "@/features/music/schema";
 import type {
   CreatePlaylistInput,
@@ -337,9 +337,14 @@ export const playlistService = {
       throw itemsError;
     }
 
-    const tracks = (items ?? []).flatMap((item) =>
-      item.tracks ? [item.tracks as unknown as Track] : [],
-    );
+    const tracks = (items ?? [])
+      .flatMap((item) =>
+        item.tracks ? [item.tracks as unknown as Track] : [],
+      )
+      .filter(
+        (track) =>
+          track.visibility === "public" || track.visibility === "unlisted",
+      );
 
     const hydratedTracks = await Promise.all(tracks.map(hydrateTrack));
 

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { musicService, type UploadTrackParams } from "@/services/music/musicService";
-import type { AlbumInput, TrackInput } from "@/features/music/schema";
+import type { AlbumInput, TrackInput, TrackVisibility } from "@/features/music/schema";
 
 export const creatorTracksKey = (userId: string | undefined) => ["creator-tracks", userId] as const;
 export const creatorAlbumsKey = (userId: string | undefined) => ["creator-albums", userId] as const;
@@ -10,6 +10,28 @@ export function useCreatorTracks(userId: string | undefined) {
     queryKey: creatorTracksKey(userId),
     queryFn: () => musicService.listCreatorTracks(userId!),
     enabled: !!userId,
+  });
+}
+
+export function useBulkSetTrackVisibility(userId: string | undefined) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      trackIds,
+      visibility,
+    }: {
+      trackIds: string[];
+      visibility: Extract<TrackVisibility, "public" | "unlisted" | "private">;
+    }) => {
+      if (!userId) throw new Error("Not authenticated");
+      return musicService.bulkSetTrackVisibility(userId, trackIds, visibility);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: creatorTracksKey(userId) });
+      qc.invalidateQueries({ queryKey: ["public-creator"] });
+      qc.invalidateQueries({ queryKey: ["public-music"] });
+      qc.invalidateQueries({ queryKey: ["shared-playlist"] });
+    },
   });
 }
 

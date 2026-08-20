@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatDuration, type Track } from "@/features/music/schema";
+import { formatDuration, type Track, type TrackVisibility } from "@/features/music/schema";
 import {
   TRACK_PRODUCTION_STAGE_LABELS,
   TRACK_PRODUCTION_STAGES,
@@ -40,7 +40,10 @@ import {
   type TrackProductionStage,
   type TrackWorkspaceCategory,
 } from "@/features/music/workflow";
-import { useCreatorTracks } from "@/hooks/useMusic";
+import {
+  useBulkSetTrackVisibility,
+  useCreatorTracks,
+} from "@/hooks/useMusic";
 import {
   useBulkUpdateTrackWorkflow,
   useUpdateTrackWorkflow,
@@ -107,6 +110,7 @@ function MusicLibrary() {
   const tracks = data as WorkflowTrack[];
   const workflow = useUpdateTrackWorkflow(user?.id);
   const bulkWorkflow = useBulkUpdateTrackWorkflow(user?.id);
+  const bulkVisibilityMutation = useBulkSetTrackVisibility(user?.id);
 
   const [view, setView] = useState<LibraryView>("overview");
   const [query, setQuery] = useState("");
@@ -117,11 +121,13 @@ function MusicLibrary() {
     "",
   );
   const [bulkStage, setBulkStage] = useState<TrackProductionStage | "">("");
+  const [bulkVisibility, setBulkVisibility] = useState<TrackVisibility | "">("");
 
   useEffect(() => {
     setSelectedIds([]);
     setBulkCategory("");
     setBulkStage("");
+    setBulkVisibility("");
   }, [view, query, stage]);
 
   const counts = useMemo(() => {
@@ -220,17 +226,26 @@ function MusicLibrary() {
       return;
     }
 
-    if (!bulkCategory && !bulkStage) {
-      toast.error("Choose a category or production stage.");
+    if (!bulkCategory && !bulkStage && !bulkVisibility) {
+      toast.error("Choose a category, production stage, or visibility.");
       return;
     }
 
     try {
-      await bulkWorkflow.mutateAsync({
-        trackIds: selectedIds,
-        ...(bulkCategory ? { category: bulkCategory } : {}),
-        ...(bulkStage ? { stage: bulkStage } : {}),
-      });
+      if (bulkCategory || bulkStage) {
+        await bulkWorkflow.mutateAsync({
+          trackIds: selectedIds,
+          ...(bulkCategory ? { category: bulkCategory } : {}),
+          ...(bulkStage ? { stage: bulkStage } : {}),
+        });
+      }
+
+      if (bulkVisibility) {
+        await bulkVisibilityMutation.mutateAsync({
+          trackIds: selectedIds,
+          visibility: bulkVisibility,
+        });
+      }
 
       toast.success(
         `${selectedIds.length} song${selectedIds.length === 1 ? "" : "s"} updated.`,
@@ -238,6 +253,7 @@ function MusicLibrary() {
       setSelectedIds([]);
       setBulkCategory("");
       setBulkStage("");
+      setBulkVisibility("");
     } catch (cause) {
       toast.error(
         cause instanceof Error ? cause.message : "Bulk update failed.",
@@ -470,7 +486,7 @@ function MusicLibrary() {
                       {selectedIds.length === 1 ? "" : "s"}
                     </div>
 
-                    <div className="grid flex-1 gap-2 sm:grid-cols-2">
+                    <div className="grid flex-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
                       <Select
                         value={bulkCategory}
                         onValueChange={(value) =>
@@ -506,12 +522,28 @@ function MusicLibrary() {
                           ))}
                         </SelectContent>
                       </Select>
+
+                      <Select
+                        value={bulkVisibility}
+                        onValueChange={(value) =>
+                          setBulkVisibility(value as TrackVisibility)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Visibility" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="public">Public</SelectItem>
+                          <SelectItem value="unlisted">Shareable / Unlisted</SelectItem>
+                          <SelectItem value="private">Private</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div className="flex gap-2">
                       <Button
                         onClick={() => void applyBulkUpdate()}
-                        disabled={bulkWorkflow.isPending}
+                        disabled={bulkWorkflow.isPending || bulkVisibilityMutation.isPending}
                       >
                         {bulkWorkflow.isPending ? "Updating…" : "Apply"}
                       </Button>
