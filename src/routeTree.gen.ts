@@ -73,6 +73,7 @@ import { Route as AuthenticatedMusicRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMerchRouteImport } from './routes/_authenticated/merch'
 import { Route as AuthenticatedListenRouteImport } from './routes/_authenticated/listen'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedGuideRouteImport } from './routes/_authenticated/guide'
 import { Route as AuthenticatedFilmStudioRouteImport } from './routes/_authenticated/film-studio'
 import { Route as AuthenticatedFilmProjectMediaRouteImport } from './routes/_authenticated/film-project-media'
 import { Route as AuthenticatedFilmPlaylistsRouteImport } from './routes/_authenticated/film-playlists'
@@ -449,6 +450,11 @@ const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGuideRoute = AuthenticatedGuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFilmStudioRoute = AuthenticatedFilmStudioRouteImport.update({
   id: '/film-studio',
   path: '/film-studio',
@@ -783,6 +789,7 @@ export interface FileRoutesByFullPath {
   '/film-playlists': typeof AuthenticatedFilmPlaylistsRoute
   '/film-project-media': typeof AuthenticatedFilmProjectMediaRoute
   '/film-studio': typeof AuthenticatedFilmStudioRoute
+  '/guide': typeof AuthenticatedGuideRoute
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
   '/merch': typeof AuthenticatedMerchRoute
@@ -900,6 +907,7 @@ export interface FileRoutesByTo {
   '/film-playlists': typeof AuthenticatedFilmPlaylistsRoute
   '/film-project-media': typeof AuthenticatedFilmProjectMediaRoute
   '/film-studio': typeof AuthenticatedFilmStudioRoute
+  '/guide': typeof AuthenticatedGuideRoute
   '/home': typeof AuthenticatedHomeRoute
   '/listen': typeof AuthenticatedListenRoute
   '/merch': typeof AuthenticatedMerchRoute
@@ -1019,6 +1027,7 @@ export interface FileRoutesById {
   '/_authenticated/film-playlists': typeof AuthenticatedFilmPlaylistsRoute
   '/_authenticated/film-project-media': typeof AuthenticatedFilmProjectMediaRoute
   '/_authenticated/film-studio': typeof AuthenticatedFilmStudioRoute
+  '/_authenticated/guide': typeof AuthenticatedGuideRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/listen': typeof AuthenticatedListenRoute
   '/_authenticated/merch': typeof AuthenticatedMerchRoute
@@ -1138,6 +1147,7 @@ export interface FileRouteTypes {
     | '/film-playlists'
     | '/film-project-media'
     | '/film-studio'
+    | '/guide'
     | '/home'
     | '/listen'
     | '/merch'
@@ -1255,6 +1265,7 @@ export interface FileRouteTypes {
     | '/film-playlists'
     | '/film-project-media'
     | '/film-studio'
+    | '/guide'
     | '/home'
     | '/listen'
     | '/merch'
@@ -1373,6 +1384,7 @@ export interface FileRouteTypes {
     | '/_authenticated/film-playlists'
     | '/_authenticated/film-project-media'
     | '/_authenticated/film-studio'
+    | '/_authenticated/guide'
     | '/_authenticated/home'
     | '/_authenticated/listen'
     | '/_authenticated/merch'
@@ -1953,6 +1965,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/guide': {
+      id: '/_authenticated/guide'
+      path: '/guide'
+      fullPath: '/guide'
+      preLoaderRoute: typeof AuthenticatedGuideRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/film-studio': {
       id: '/_authenticated/film-studio'
       path: '/film-studio'
@@ -2341,6 +2360,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFilmPlaylistsRoute: typeof AuthenticatedFilmPlaylistsRoute
   AuthenticatedFilmProjectMediaRoute: typeof AuthenticatedFilmProjectMediaRoute
   AuthenticatedFilmStudioRoute: typeof AuthenticatedFilmStudioRoute
+  AuthenticatedGuideRoute: typeof AuthenticatedGuideRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedListenRoute: typeof AuthenticatedListenRoute
   AuthenticatedMerchRoute: typeof AuthenticatedMerchRoute
@@ -2406,6 +2426,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFilmPlaylistsRoute: AuthenticatedFilmPlaylistsRoute,
   AuthenticatedFilmProjectMediaRoute: AuthenticatedFilmProjectMediaRoute,
   AuthenticatedFilmStudioRoute: AuthenticatedFilmStudioRoute,
+  AuthenticatedGuideRoute: AuthenticatedGuideRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedListenRoute: AuthenticatedListenRoute,
   AuthenticatedMerchRoute: AuthenticatedMerchRoute,

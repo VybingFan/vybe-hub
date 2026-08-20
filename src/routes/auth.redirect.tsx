@@ -38,6 +38,7 @@ function RedirectPage() {
       navigate({ to: "/auth/onboarding", replace: true });
       return;
     }
+
     navigate({ to: defaultRoute, replace: true });
   }, [isAuthenticated, isLoading, userLoading, primaryRole, defaultRoute, navigate]);
 

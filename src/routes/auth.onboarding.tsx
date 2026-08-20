@@ -71,6 +71,13 @@ function OnboardingPage() {
     setSaving(true);
     try {
       await assignInitialRole(selected);
+      if (selected === "creator") {
+        window.localStorage.setItem(
+          "vybe:creator-onboarding-v2",
+          JSON.stringify({ status: "offered", step: 0 }),
+        );
+        window.localStorage.setItem("vybe:creator-onboarding-launch-v2", "1");
+      }
       toast.success("You're all set");
       navigate({ to: "/auth/redirect" });
     } catch (err) {

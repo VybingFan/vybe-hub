@@ -41,6 +41,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/common/Logo";
+import { VybeGuideLauncher } from "@/components/guide/VybeGuideLauncher";
 import { useUser } from "@/hooks/useUser";
 import { useMembership } from "@/hooks/useMembership";
 import { useQuery } from "@tanstack/react-query";
@@ -107,6 +108,7 @@ const memberMore: NavItem[] = [
     icon: Gamepad2,
     allow: ["supporter", "creator", "business", "admin"],
   },
+
   {
     title: "Communities",
     url: "/communities",
@@ -292,9 +294,12 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="px-3 py-4">
-        <Link to="/auth/redirect">
-          <Logo />
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link to="/auth/redirect" className="min-w-0 flex-1">
+            <Logo />
+          </Link>
+          {!isAdmin ? <VybeGuideLauncher /> : null}
+        </div>
       </SidebarHeader>
       <SidebarContent className="pb-5">
         {isAdmin ? (

@@ -31,6 +31,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SelfServiceDeletionCard } from "@/components/accountDeletion/SelfServiceDeletionCard";
 import { MembershipAdjustmentNotice } from "@/components/membership/MembershipAdjustmentNotice";
 import { ContentContinuityCard } from "@/components/membership/ContentContinuityCard";
+import { VybeGuideLibrary } from "@/components/guide/VybeGuideLibrary";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
@@ -177,6 +178,7 @@ function SettingsContent() {
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="appearance">Appearance</TabsTrigger>
+            <TabsTrigger value="guide">VYBE Guide</TabsTrigger>
             <TabsTrigger value="danger">Danger Zone</TabsTrigger>
           </TabsList>
         </div>
@@ -448,6 +450,14 @@ function SettingsContent() {
           </WorkspaceSection>
         </TabsContent>
 
+        <TabsContent value="guide">
+          <WorkspaceSection
+            title="VYBE Guide & Help"
+            description="Search what VYBE features mean, what they do, and where to find them."
+          >
+            <VybeGuideLibrary />
+          </WorkspaceSection>
+        </TabsContent>
         <TabsContent value="danger">
           <WorkspaceSection
             title="Account deletion"
