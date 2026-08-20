@@ -195,7 +195,7 @@ function VideoStudio() {
           </label>
           <Button disabled={create.isPending} className="w-full bg-gradient-brand text-white">
             {create.isPending ? <Loader2 className="animate-spin" /> : <Clapperboard />}
-            {create.isPending ? "Saving video…" : "Add to Video Library"}
+            {create.isPending ? "Saving video..." : "Add to Video Library"}
           </Button>
         </form>
 
@@ -446,9 +446,9 @@ function NativeUploadCard({ creatorId }: { creatorId?: string }) {
             <FileVideo2 className="h-7 w-7 text-cyan-400" />
           </span>
           <span className="min-w-0 text-sm">
-            <strong className="block truncate">{file?.name || "Choose video from device"}</strong>
+            <strong className="block truncate">{file ? `Video selected: ${file.name}` : "1. Select a video"}</strong>
             <span className="mt-1 block text-muted-foreground">
-              MP4, MOV, or WebM · Maximum 200MB
+              MP4, MOV, or WebM | Maximum 200MB
             </span>
           </span>
           <input
@@ -468,7 +468,7 @@ function NativeUploadCard({ creatorId }: { creatorId?: string }) {
       {uploading && (
         <div className="mt-4">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Uploading securely to Cloudflare Stream</span>
+            <span>Uploading video to VYBE</span>
             <span>{progress}%</span>
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
@@ -484,7 +484,7 @@ function NativeUploadCard({ creatorId }: { creatorId?: string }) {
         className="mt-5 w-full bg-gradient-brand text-white sm:w-auto"
       >
         {uploading ? <Loader2 className="animate-spin" /> : <Upload />}
-        {uploading ? "Uploading video…" : "Upload from device"}
+        {uploading ? "Uploading video..." : "2. Upload video to VYBE"}
       </Button>
       <p className="mt-3 text-xs text-muted-foreground">
         Videos upload directly to Cloudflare Stream using a secure one-time upload link, then
