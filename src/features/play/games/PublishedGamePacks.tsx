@@ -8,6 +8,7 @@ import {
   RotateCcw,
   Sparkles,
 } from "lucide-react";
+import { NonMusicPlayPreviews } from "@/features/play/games/NonMusicPlayPreviews";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -110,6 +111,7 @@ export function PublishedGamePacks() {
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
           Pick any active game below. New reviewed game packs appear here automatically.
         </p>
+        <NonMusicPlayPreviews />
         <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label="Filter VYBE games by creator focus">
           {FOCUS_FILTERS.map((focus) => (
             <button
