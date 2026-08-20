@@ -47,19 +47,31 @@ export function TopNav() {
   const adminUnread = adminNotifications.filter((item) => item.status === "unread").length;
   const unread = isAdmin ? adminUnread : creatorUnread + identityUnread;
   const latestActivity = useRef<string | null>(null);
+  const notificationSoundMountedAt = useRef(Date.now());
   useEffect(() => {
-    const latestItem = [...activity, ...connections].sort((a, b) =>
-      b.created_at.localeCompare(a.created_at),
-    )[0];
-    const latest = latestItem?.id;
+    const latestItem = [
+      ...activity.map((item) => ({ ...item, notificationKey: `activity:${item.id}` })),
+      ...connections.map((item) => ({ ...item, notificationKey: `connection:${item.id}` })),
+      ...creatorIdentityNotifications.map((item) => ({
+        ...item,
+        notificationKey: `identity:${item.id}`,
+      })),
+    ].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+    const latest = latestItem?.notificationKey;
     if (!latest) return;
-    if (latestActivity.current && latestActivity.current !== latest) {
+    const isNewSinceOpen =
+      new Date(latestItem.created_at).getTime() >= notificationSoundMountedAt.current;
+    if (
+      latestActivity.current &&
+      latestActivity.current !== latest &&
+      isNewSinceOpen
+    ) {
       const saved = window.localStorage.getItem("vybe:preview-preferences");
       const soundEnabled = saved ? JSON.parse(saved).sound === true : false;
       if (soundEnabled) playNotificationChime();
     }
     latestActivity.current = latest;
-  }, [activity, connections]);
+  }, [activity, connections, creatorIdentityNotifications]);
   useEffect(() => {
     if (!isAdmin) return;
     const load = () => {
