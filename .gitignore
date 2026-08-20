@@ -37,3 +37,6 @@ dist-ssr
 # Supabase local development
 .supabase/
 .vybe-backups/
+
+# Public Vite production build variables
+!.env.production
