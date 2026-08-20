@@ -17,6 +17,8 @@ import { PwaRegistration } from "@/components/pwa/PwaRegistration";
 import { PwaInstallProvider } from "@/components/pwa/PwaInstallProvider";
 import { BackOfficePwaIdentity } from "@/components/pwa/BackOfficePwaIdentity";
 import { BackOfficeNotificationMonitor } from "@/components/admin/BackOfficeNotificationMonitor";
+import { applyAppearanceChoice, isAppearanceChoice, readStoredAppearanceChoice, storeAppearanceChoice } from "@/features/appearance/appearance";
+import { supabase } from "@/integrations/supabase/client";
 
 const themeInitializationScript = `
   (function () {
@@ -26,6 +28,14 @@ const themeInitializationScript = `
       root.classList.remove("light", "dark");
       root.classList.add(theme);
       root.style.colorScheme = theme;
+      delete root.dataset.theme;
+
+      var extra = window.localStorage.getItem("vybe:appearance-extra");
+      if (extra === "midnight-blue" || extra === "warm-stage") {
+        root.dataset.appearance = extra;
+      } else {
+        delete root.dataset.appearance;
+      }
     } catch (error) {
       document.documentElement.classList.add("dark");
     }
@@ -192,10 +202,27 @@ function RootComponent() {
 
 function ThemePreference() {
   useEffect(() => {
-    const theme = window.localStorage.getItem("vybe:theme") || "dark";
-    document.documentElement.classList.toggle("light", theme === "light");
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    document.documentElement.style.colorScheme = theme;
+    let active = true;
+
+    applyAppearanceChoice(readStoredAppearanceChoice());
+
+    void supabase.auth.getSession().then(async ({ data }) => {
+      const userId = data.session?.user.id;
+      if (!userId) return;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("appearance_theme")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (!active || !isAppearanceChoice(profile?.appearance_theme)) return;
+      storeAppearanceChoice(profile.appearance_theme);
+      applyAppearanceChoice(profile.appearance_theme);
+    });
+
+    return () => {
+      active = false;
+    };
   }, []);
   return null;
 }

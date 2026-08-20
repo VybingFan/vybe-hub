@@ -6,8 +6,6 @@ import {
   Crown,
   ExternalLink,
   LockKeyhole,
-  Moon,
-  Sun,
   UserRound,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -32,6 +30,7 @@ import { SelfServiceDeletionCard } from "@/components/accountDeletion/SelfServic
 import { MembershipAdjustmentNotice } from "@/components/membership/MembershipAdjustmentNotice";
 import { ContentContinuityCard } from "@/components/membership/ContentContinuityCard";
 import { VybeGuideLibrary } from "@/components/guide/VybeGuideLibrary";
+import { APPEARANCE_OPTIONS, applyAppearanceChoice, isAppearanceChoice, readStoredAppearanceChoice, storeAppearanceChoice, type AppearanceChoice } from "@/features/appearance/appearance";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
@@ -59,7 +58,9 @@ function SettingsContent() {
   const { data: membership } = useMembership(
     primaryRole === "creator" || primaryRole === "admin",
   );
-  const [theme, setThemeState] = useState<"dark" | "light">("dark");
+  const [appearance, setAppearance] = useState<AppearanceChoice>("vybe-dark");
+  const [savedAppearance, setSavedAppearance] = useState<AppearanceChoice>("vybe-dark");
+  const [savingAppearance, setSavingAppearance] = useState(false);
   const [isOpeningBilling, setIsOpeningBilling] = useState(false);
   const [preferences, setPreferences] = useState<Record<string, boolean>>({
     email: true,
@@ -70,18 +71,47 @@ function SettingsContent() {
   });
 
   useEffect(() => {
-    setThemeState(
-      window.localStorage.getItem("vybe:theme") === "light" ? "light" : "dark",
-    );
+    const stored = readStoredAppearanceChoice();
+    setAppearance(stored);
+    setSavedAppearance(stored);
+    applyAppearanceChoice(stored);
+
     const saved = window.localStorage.getItem("vybe:preview-preferences");
     if (saved)
       setPreferences((current) => ({ ...current, ...JSON.parse(saved) }));
   }, []);
-  const setTheme = (next: "dark" | "light") => {
-    setThemeState(next);
-    window.localStorage.setItem("vybe:theme", next);
-    document.documentElement.classList.toggle("light", next === "light");
-    document.documentElement.classList.toggle("dark", next === "dark");
+
+  useEffect(() => {
+    if (!isAppearanceChoice(profile?.appearance_theme)) return;
+    setAppearance(profile.appearance_theme);
+    setSavedAppearance(profile.appearance_theme);
+    storeAppearanceChoice(profile.appearance_theme);
+    applyAppearanceChoice(profile.appearance_theme);
+  }, [profile?.appearance_theme]);
+
+  const previewAppearance = (next: AppearanceChoice) => {
+    setAppearance(next);
+    applyAppearanceChoice(next);
+  };
+
+  const saveAppearance = async () => {
+    setSavingAppearance(true);
+    try {
+      storeAppearanceChoice(appearance);
+      if (user?.id) {
+        await authService.updateAppearanceTheme(user.id, appearance);
+        await refresh();
+      }
+      setSavedAppearance(appearance);
+      toast.success("Appearance saved to your VYBE account");
+    } catch (error) {
+      applyAppearanceChoice(savedAppearance);
+      toast.error(
+        error instanceof Error ? error.message : "Could not save appearance",
+      );
+    } finally {
+      setSavingAppearance(false);
+    }
   };
   const saveAccount = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -427,29 +457,84 @@ function SettingsContent() {
         <TabsContent value="appearance">
           <WorkspaceSection
             title="Appearance"
-            description="Choose the interface theme stored on this device."
+            description="Choose the VYBE color experience you want to use across the app."
           >
-            <div className="grid gap-3 p-4 sm:grid-cols-2">
-              <Button
-                type="button"
-                variant={theme === "dark" ? "default" : "outline"}
-                onClick={() => setTheme("dark")}
-              >
-                <Moon className="mr-2 h-4 w-4" />
-                Dark
-              </Button>
-              <Button
-                type="button"
-                variant={theme === "light" ? "default" : "outline"}
-                onClick={() => setTheme("light")}
-              >
-                <Sun className="mr-2 h-4 w-4" />
-                Light
-              </Button>
+            <div className="space-y-5 p-4 sm:p-5">
+              <div className="grid gap-3 sm:grid-cols-2">
+                {APPEARANCE_OPTIONS.map((option) => {
+                  const selected = appearance === option.code;
+                  return (
+                    <button
+                      key={option.code}
+                      type="button"
+                      onClick={() => previewAppearance(option.code)}
+                      className={`overflow-hidden rounded-2xl border text-left transition ${
+                        selected
+                          ? "border-primary ring-2 ring-primary/20"
+                          : "border-border hover:border-primary/40"
+                      }`}
+                    >
+                      <div
+                        className="relative h-28 p-3"
+                        style={{ backgroundColor: option.preview.background }}
+                      >
+                        <div
+                          className="h-full rounded-xl border p-3"
+                          style={{
+                            backgroundColor: option.preview.surface,
+                            borderColor: option.preview.primary,
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="h-5 w-14 rounded-full"
+                              style={{ backgroundColor: option.preview.primary }}
+                            />
+                            <span
+                              className="h-2 w-16 rounded-full opacity-90"
+                              style={{ backgroundColor: option.preview.text }}
+                            />
+                          </div>
+                          <div
+                            className="mt-4 h-2 w-24 rounded-full opacity-50"
+                            style={{ backgroundColor: option.preview.text }}
+                          />
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <p className="font-semibold">{option.label}</p>
+                        <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                          {option.description}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-muted/20 p-4">
+                <div>
+                  <p className="font-medium">
+                    Current preview: {APPEARANCE_OPTIONS.find((item) => item.code === appearance)?.label}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {appearance === savedAppearance
+                      ? "This matches your saved appearance."
+                      : "Previewing an unsaved appearance."}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => void saveAppearance()}
+                  disabled={savingAppearance || appearance === savedAppearance}
+                  className="bg-gradient-brand text-white"
+                >
+                  {savingAppearance ? "Saving..." : "Save appearance"}
+                </Button>
+              </div>
             </div>
           </WorkspaceSection>
         </TabsContent>
-
         <TabsContent value="guide">
           <WorkspaceSection
             title="VYBE Guide & Help"

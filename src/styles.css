@@ -146,6 +146,80 @@
   --sidebar-ring: oklch(0.55 0.24 300);
 }
 
+/* V24.47D2R1 — extra appearance colors layered over native VYBE Light/Dark. */
+:root[data-appearance="midnight-blue"] {
+  --background: #07111f;
+  --foreground: #eff8ff;
+  --surface: #10233a;
+  --surface-elevated: #172e49;
+  --card: #10233a;
+  --card-foreground: #eff8ff;
+  --popover: #172e49;
+  --popover-foreground: #eff8ff;
+  --primary: #38bdf8;
+  --primary-foreground: #06111e;
+  --primary-glow: #8b5cf6;
+  --secondary: #8b5cf6;
+  --secondary-foreground: #ffffff;
+  --muted: #172e49;
+  --muted-foreground: #a9c2d8;
+  --accent: #8b5cf6;
+  --accent-foreground: #ffffff;
+  --border: #25415e;
+  --input: #25415e;
+  --ring: #38bdf8;
+  --sidebar: #081827;
+  --sidebar-foreground: #eff8ff;
+  --sidebar-primary: #38bdf8;
+  --sidebar-primary-foreground: #06111e;
+  --sidebar-accent: #172e49;
+  --sidebar-accent-foreground: #eff8ff;
+  --sidebar-border: #25415e;
+  --sidebar-ring: #38bdf8;
+  --gradient-brand: linear-gradient(135deg, #38bdf8, #8b5cf6);
+  --shadow-glow: 0 20px 60px -20px rgb(56 189 248 / .42);
+}
+
+:root[data-appearance="warm-stage"] {
+  --background: #17100d;
+  --foreground: #fff7ed;
+  --surface: #2a1c17;
+  --surface-elevated: #38251d;
+  --card: #2a1c17;
+  --card-foreground: #fff7ed;
+  --popover: #38251d;
+  --popover-foreground: #fff7ed;
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --primary-glow: #eab308;
+  --secondary: #eab308;
+  --secondary-foreground: #17100d;
+  --muted: #38251d;
+  --muted-foreground: #d9bbaa;
+  --accent: #eab308;
+  --accent-foreground: #17100d;
+  --border: #513327;
+  --input: #513327;
+  --ring: #f97316;
+  --sidebar: #1d130f;
+  --sidebar-foreground: #fff7ed;
+  --sidebar-primary: #f97316;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #38251d;
+  --sidebar-accent-foreground: #fff7ed;
+  --sidebar-border: #513327;
+  --sidebar-ring: #f97316;
+  --gradient-brand: linear-gradient(135deg, #f97316, #eab308);
+  --shadow-glow: 0 20px 60px -20px rgb(249 115 22 / .4);
+}
+
+.vybe-public-creator--custom-bg [class*="bg-background"] {
+  background-color: color-mix(in srgb, var(--background) 72%, transparent);
+  backdrop-filter: blur(10px);
+}
+.vybe-public-creator--custom-bg [class*="bg-card"] {
+  background-color: color-mix(in srgb, var(--card) 86%, transparent);
+}
 @utility bg-gradient-brand {
   background-image: var(--gradient-brand);
 }

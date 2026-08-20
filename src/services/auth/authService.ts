@@ -10,6 +10,7 @@ export interface Profile {
   email: string | null;
   avatar_url: string | null;
   bio: string | null;
+  appearance_theme: "system" | "vybe-dark" | "vybe-light" | "midnight-blue" | "warm-stage";
 }
 
 export const authService = {
@@ -67,10 +68,18 @@ export const authService = {
     if (error) throw error;
   },
 
+  async updateAppearanceTheme(userId: string, appearanceTheme: Profile["appearance_theme"]) {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ appearance_theme: appearanceTheme })
+      .eq("id", userId);
+    if (error) throw error;
+  },
+
   async fetchProfile(userId: string): Promise<Profile | null> {
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, display_name, email, avatar_url, bio")
+      .select("id, display_name, email, avatar_url, bio, appearance_theme")
       .eq("id", userId)
       .maybeSingle();
     if (error) throw error;

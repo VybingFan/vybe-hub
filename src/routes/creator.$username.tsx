@@ -27,6 +27,7 @@ import { FollowCreatorButton } from "@/components/engagement/FollowCreatorButton
 import { CreatorPlanBadge } from "@/components/membership/CreatorPlanBadge";
 import { PublicCreatorStories } from "@/components/stories/PublicCreatorStories";
 import { PublicCreatorUpdates } from "@/components/creator/PublicCreatorUpdates";
+import { getPublicCreatorThemeStyle } from "@/features/profile/profileThemes";
 
 export const Route = createFileRoute("/creator/$username")({
   component: CreatorPage,
@@ -70,13 +71,14 @@ export function PublicArtistHome({
   const compactProfile = planCode === "creator_free";
   const isOwner = user?.id === profile.user_id;
   const name = profile.artist_name || profile.display_name;
+  const themeStyle = getPublicCreatorThemeStyle(profile, planCode);
   const share = () =>
     navigator.share
       ? navigator.share({ title: `${name} on VYBE`, url: window.location.href })
       : navigator.clipboard.writeText(window.location.href);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background bg-cover bg-center bg-no-repeat ${themeStyle ? "vybe-public-creator--custom-bg" : ""}`} style={themeStyle}>
       <MarketingNav />
       <div className="border-b border-border/50 bg-background/85">
         <div className="mx-auto flex h-12 max-w-7xl items-center justify-between gap-3 px-6">

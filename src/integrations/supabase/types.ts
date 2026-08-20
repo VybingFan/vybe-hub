@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -2993,6 +2993,9 @@ export type Database = {
           bio: string
           cover_path: string | null
           cover_url: string | null
+          profile_background_path: string | null
+          profile_background_url: string | null
+          profile_theme: string
           created_at: string
           display_name: string
           facebook: string | null
@@ -3019,6 +3022,9 @@ export type Database = {
           bio?: string
           cover_path?: string | null
           cover_url?: string | null
+          profile_background_path?: string | null
+          profile_background_url?: string | null
+          profile_theme?: string
           created_at?: string
           display_name?: string
           facebook?: string | null
@@ -3045,6 +3051,9 @@ export type Database = {
           bio?: string
           cover_path?: string | null
           cover_url?: string | null
+          profile_background_path?: string | null
+          profile_background_url?: string | null
+          profile_theme?: string
           created_at?: string
           display_name?: string
           facebook?: string | null
@@ -4224,6 +4233,7 @@ export type Database = {
           created_at: string
           display_name: string
           email: string | null
+          appearance_theme: string
           id: string
           updated_at: string
         }
@@ -4233,6 +4243,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           email?: string | null
+          appearance_theme?: string
           id: string
           updated_at?: string
         }
@@ -4242,6 +4253,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           email?: string | null
+          appearance_theme?: string
           id?: string
           updated_at?: string
         }

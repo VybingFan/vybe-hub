@@ -12,26 +12,34 @@ function normalize(row: Row): CreatorProfile {
 
 async function hydrate(row: Row): Promise<CreatorProfile> {
   const profile = normalize(row);
-  const [avatar, cover] = await Promise.all([
+  const [avatar, cover, background] = await Promise.all([
     profile.avatar_path
       ? supabase.storage.from("avatars").createSignedUrl(profile.avatar_path, 60 * 60 * 6)
       : null,
     profile.cover_path
       ? supabase.storage.from("avatars").createSignedUrl(profile.cover_path, 60 * 60 * 6)
       : null,
+    profile.profile_background_path
+      ? supabase.storage.from("avatars").createSignedUrl(profile.profile_background_path, 60 * 60 * 6)
+      : null,
   ]);
   return {
     ...profile,
     avatar_url: avatar?.data?.signedUrl || profile.avatar_url,
     cover_url: cover?.data?.signedUrl || profile.cover_url,
+    profile_background_url: background?.data?.signedUrl || profile.profile_background_url,
   };
 }
 
 export const creatorProfileService = {
-  async uploadImage(userId: string, kind: "avatar" | "cover", file: File) {
+  async uploadImage(userId: string, kind: "avatar" | "cover" | "background", file: File) {
     if (kind === "cover") {
       const membership = await membershipService.getMine();
       if (!hasCreatorCapability(membership.plan_code, "profile.custom_cover")) throw new Error("Custom profile covers require Creator Plus or higher.");
+    }
+    if (kind === "background") {
+      const membership = await membershipService.getMine();
+      if (!hasCreatorCapability(membership.plan_code, "profile.custom_background")) throw new Error("Full-page profile backgrounds require Creator Pro or higher.");
     }
     if (file.size > 8 * 1024 * 1024) throw new Error("Image must be 8MB or smaller");
     if (!file.type.startsWith("image/")) throw new Error("Choose an image file");
@@ -58,12 +66,17 @@ export const creatorProfileService = {
   },
 
   async upsert(userId: string, input: CreatorProfileInput): Promise<CreatorProfile> {
+    const membership = await membershipService.getMine();
+    const canBackground = hasCreatorCapability(membership.plan_code, "profile.custom_background");
     const payload = {
       user_id: userId,
       ...input,
       genre: input.genres[0] ?? "",
       avatar_url: input.avatar_path ? null : input.avatar_url,
       cover_url: input.cover_path ? null : input.cover_url,
+      profile_theme: canBackground ? input.profile_theme : "vybe",
+      profile_background_path: canBackground ? input.profile_background_path : null,
+      profile_background_url: canBackground && !input.profile_background_path ? input.profile_background_url : null,
       personal_links: input.personal_links ?? [],
     };
     const { data, error } = await supabase

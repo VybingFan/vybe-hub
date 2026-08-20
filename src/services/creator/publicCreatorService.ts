@@ -48,6 +48,7 @@ export const publicCreatorService = {
       : "creator_free";
     const publicLinkLimit = planCode === "creator_studio" ? 100 : planCode === "creator_pro" || planCode === "founding_beta" ? 25 : planCode === "creator_plus" ? 5 : 1;
     const videoAllowed = planCode !== "creator_free";
+    const profileBackgroundAllowed = planCode === "creator_pro" || planCode === "creator_studio" || planCode === "founding_beta";
 
     const [
       { data: rows, error: tracksError },
@@ -182,6 +183,11 @@ export const publicCreatorService = {
           (await signedUrl("avatars", profile.cover_path)) ||
           profile.cover_url ||
           "",
+        profile_theme: profileBackgroundAllowed && profile.profile_theme === "custom" ? "custom" : "vybe",
+        profile_background_url: profileBackgroundAllowed ?
+          (await signedUrl("avatars", profile.profile_background_path)) ||
+          profile.profile_background_url ||
+          "" : "",
         genres: (profile.genres ?? []).slice(0, planCode === "creator_free" ? 1 : 5),
         ...visibleLinks,
         personal_links: visiblePersonalLinks,

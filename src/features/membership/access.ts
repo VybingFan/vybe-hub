@@ -3,6 +3,7 @@ import type { CreatorFocusCode } from "@/features/membership/creatorFocusAccess"
 
 export type CreatorCapability =
   | "profile.custom_cover"
+  | "profile.custom_background"
   | "profile.multiple_genres"
   | "music.workflow"
   | "video.library"
@@ -15,6 +16,7 @@ export type CreatorCapability =
 
 const CAPABILITY_PLANS: Record<CreatorCapability, readonly PublicCreatorPlanCode[]> = {
   "profile.custom_cover": ["creator_plus", "creator_pro", "creator_studio"],
+  "profile.custom_background": ["creator_pro", "creator_studio"],
   "profile.multiple_genres": ["creator_plus", "creator_pro", "creator_studio"],
   "music.workflow": ["creator_plus", "creator_pro", "creator_studio"],
   "video.library": ["creator_plus", "creator_pro", "creator_studio"],

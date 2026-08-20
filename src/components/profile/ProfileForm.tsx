@@ -22,6 +22,7 @@ import type { CreatorPlanCode } from "@/features/membership/catalog";
 import { getCreatorEntitlements } from "@/features/membership/entitlements";
 import { hasCreatorCapability } from "@/features/membership/access";
 import { LockedFeatureCard } from "@/components/membership/LockedFeatureCard";
+import { ProfileThemeEditor } from "@/components/profile/ProfileThemeEditor";
 
 interface Props {
   initial: CreatorProfile | null;
@@ -47,6 +48,9 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
         location: initial.location ?? "",
         avatar_url: initial.avatar_url ?? "",
         cover_url: initial.cover_url ?? "",
+        profile_theme: initial.profile_theme ?? "vybe",
+        profile_background_url: initial.profile_background_url ?? "",
+        profile_background_path: initial.profile_background_path ?? null,
         avatar_path: initial.avatar_path ?? null,
         cover_path: initial.cover_path ?? null,
         website: initial.website ?? "",
@@ -73,18 +77,26 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
     resolver: zodResolver(creatorProfileSchema),
     defaultValues: defaults,
   });
-  const [uploading, setUploading] = useState<"avatar" | "cover" | null>(null);
+  const [uploading, setUploading] = useState<"avatar" | "cover" | "background" | null>(null);
   const avatarPreview = watch("avatar_url");
   const coverPreview = watch("cover_url");
+  const backgroundPreview = watch("profile_background_url");
   const bio = watch("bio") ?? "";
-  const upload = async (kind: "avatar" | "cover", file?: File) => {
+  const upload = async (kind: "avatar" | "cover" | "background", file?: File) => {
     if (!file) return;
     setUploading(kind);
     try {
       const result = await creatorProfileService.uploadImage(userId, kind, file);
-      setValue(`${kind}_path`, result.path, { shouldDirty: true });
-      setValue(`${kind}_url`, result.url, { shouldDirty: true });
-      toast.success(`${kind === "avatar" ? "Profile photo" : "Cover photo"} uploaded`);
+      if (kind === "background") {
+        setValue("profile_background_path", result.path, { shouldDirty: true });
+        setValue("profile_background_url", result.url, { shouldDirty: true });
+        setValue("profile_theme", "custom", { shouldDirty: true });
+        toast.success("Full-page profile background uploaded");
+      } else {
+        setValue(`${kind}_path`, result.path, { shouldDirty: true });
+        setValue(`${kind}_url`, result.url, { shouldDirty: true });
+        toast.success(`${kind === "avatar" ? "Profile photo" : "Cover photo"} uploaded`);
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Upload failed");
     } finally {
@@ -177,6 +189,23 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
         </label>
       </ProfileCard>
 
+      <ProfileCard
+        title="Public page background"
+        description="Customize the full public page behind your creator content. Your cover image remains a separate header image."
+      >
+        <ProfileThemeEditor
+          planCode={planCode}
+          backgroundUrl={backgroundPreview}
+          uploading={uploading === "background"}
+          onUploadBackground={(file) => void upload("background", file)}
+          onRemoveBackground={() => {
+            setValue("profile_background_path", null, { shouldDirty: true });
+            setValue("profile_background_url", "", { shouldDirty: true });
+            setValue("profile_theme", "vybe", { shouldDirty: true });
+          }}
+        />
+      </ProfileCard>
+
       <ProfileCard title="Basics" description="Your public identity on VYBE.">
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="VYBE username (your unique link)" error={errors.username?.message}>
@@ -247,13 +276,18 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
         <SocialLinksForm control={control} register={register} errors={errors} />
       </ProfileCard>
 
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
-          Cancel
-        </Button>
-        <SubmitButton loading={submitting} className="w-auto px-8">
-          Save profile
-        </SubmitButton>
+      <div className="sticky bottom-4 z-40 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-background/95 p-3 shadow-2xl backdrop-blur-xl">
+        <p className="text-sm text-muted-foreground">
+          Save Profile applies your profile, cover, links, and public-page background changes.
+        </p>
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
+            Cancel
+          </Button>
+          <SubmitButton loading={submitting} className="w-auto px-8">
+            Save Profile
+          </SubmitButton>
+        </div>
       </div>
     </form>
   );
