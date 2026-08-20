@@ -215,19 +215,31 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
         </div>
       ) : null}
 
-      <main className="relative z-10 mx-auto max-w-6xl px-5 pb-16 pt-10 sm:px-6 md:pt-16">
-        <section className="relative mb-9 sm:mb-12">
-          <div className="h-32 overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-r from-fuchsia-950 via-violet-950 to-cyan-950 sm:h-60 sm:rounded-[2rem]">
+      <main className="relative z-10 mx-auto max-w-5xl px-3 pb-32 pt-5 sm:px-6 sm:pt-8">
+        <section className="relative mb-5 overflow-hidden rounded-[1.75rem] border border-white/15 bg-white/[.035] shadow-2xl">
+          <Button
+            type="button"
+            size="icon"
+            variant="outline"
+            onClick={sharePlaylist}
+            className="absolute right-3 top-3 z-20 h-10 w-10 rounded-full border-white/20 bg-black/55 text-white backdrop-blur-md hover:bg-black/75 hover:text-white"
+            aria-label={copied ? "Playlist link copied" : "Share this VYBE"}
+            title={copied ? "Link copied" : "Share this VYBE"}
+          >
+            {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+          </Button>
+
+          <div className="relative h-32 overflow-hidden bg-gradient-to-r from-fuchsia-950 via-violet-950 to-cyan-950 sm:h-44">
             <img
               src={data.artistBannerUrl || "/banners/default-creator-banner.png"}
               alt={`${data.artistName} banner`}
               className="h-full w-full object-cover"
             />
 
-            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-t from-[#070811] via-black/15 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#070811] via-black/25 to-transparent" />
           </div>
 
-          <div className="-mt-12 flex items-end gap-3 px-4 sm:-mt-20 sm:gap-4 sm:px-8">
+          <div className="relative -mt-10 flex items-end gap-3 px-4 pb-4 sm:-mt-12 sm:px-6">
             <img
               src={playlistArtwork}
               alt={
@@ -235,123 +247,76 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
                   ? `${data.title} playlist cover`
                   : `${data.title} default VYBE playlist cover`
               }
-              className="relative h-24 w-24 shrink-0 rounded-2xl border-4 border-[#070811] bg-violet-950 object-cover shadow-2xl sm:h-36 sm:w-36"
+              className="h-20 w-20 shrink-0 rounded-2xl border-4 border-[#070811] bg-violet-950 object-cover shadow-2xl sm:h-24 sm:w-24"
             />
 
-            <div className="relative min-w-0 pb-2">
-              <p className="truncate text-sm text-white/60">Playlist by</p>
-
+            <div className="min-w-0 flex-1 pb-1">
               <p className="truncate text-lg font-semibold sm:text-xl">{data.artistName}</p>
+              <p className="truncate text-xs text-white/55">Independent creator</p>
+              <h1 className="mt-1 truncate text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 to-cyan-300 sm:text-xl">{data.title}</h1>
             </div>
+
+            {data.artistUsername ? (
+              <Button asChild size="sm" variant="outline" className="mb-1 shrink-0 rounded-full border-fuchsia-300/35 bg-fuchsia-400/10 text-white hover:bg-fuchsia-400/20 hover:text-white">
+                <Link to="/artist/$username" params={{ username: data.artistUsername }} search={{ track: "" }}>
+                  <UserPlus className="mr-1.5 h-4 w-4" /> Follow
+                </Link>
+              </Button>
+            ) : null}
           </div>
         </section>
 
-        <section className="grid items-center gap-8 lg:grid-cols-[minmax(0,.9fr)_minmax(0,1.1fr)] lg:gap-14">
-          <div>
-            <div className="inline-flex max-w-full items-center gap-2 rounded-2xl border border-fuchsia-300/25 bg-fuchsia-400/10 px-3 py-2 text-[10px] font-semibold uppercase leading-4 tracking-[.12em] text-fuchsia-200 sm:rounded-full sm:py-1.5 sm:text-xs sm:tracking-[.18em]">
-              <Sparkles className="h-3.5 w-3.5" />A personal VYBE from {data.artistName}
+        <section>
+          <div className="relative">
+            <div className="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-fuchsia-500/20 via-violet-500/5 to-cyan-400/20 blur-2xl" />
+
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/15 bg-white/[.055] p-1 shadow-2xl backdrop-blur-xl sm:p-2">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-white/10 px-3 py-2 text-[10px] text-white/50 sm:px-4 sm:text-xs">
+                <span className="inline-flex items-center gap-1 font-semibold uppercase tracking-[.13em] text-fuchsia-200"><Sparkles className="h-3 w-3" />A personal VYBE</span>
+                <span>{data.tracks.length} tracks · {minutes} min</span>
+                <span className="inline-flex items-center gap-1"><Headphones className="h-3 w-3 text-cyan-300" />{accessLabel}</span>
+              </div>
+              <SharedPlaylistPlayer tracks={data.tracks} playlistSlug={slug} autoPlayOnOpen />
             </div>
+          </div>
 
-            <h1 className="mt-5 break-words text-3xl font-black tracking-[-.035em] sm:text-5xl md:text-7xl">
-              {data.title}
-            </h1>
-
-            <p className="mt-4 max-w-xl text-base leading-7 text-white/70 sm:mt-5 sm:text-lg sm:leading-8">
+          <div className="mt-2 px-2">
+            <p className="line-clamp-2 max-w-2xl text-xs leading-5 text-white/45 sm:text-sm">
               {data.description || `${data.artistName} chose these songs for this moment.`}
             </p>
-
-            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/55">
-              {data.occasion ? (
-                <span className="font-semibold text-amber-300">{data.occasion}</span>
-              ) : null}
-
-              <span>{data.tracks.length} tracks</span>
-              <span>{minutes} min</span>
-
-              <span className="inline-flex items-center gap-1.5">
-                <Headphones className="h-4 w-4 text-cyan-300" />
-                {accessLabel}
-              </span>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              {data.artistUsername ? (
-                <Button asChild className="rounded-full bg-white text-black hover:bg-white/90">
-                  <Link
-                    to="/artist/$username"
-                    params={{
-                      username: data.artistUsername,
-                    }}
-                    search={{ track: "" }}
-                  >
-                    <UserRound className="mr-2 h-4 w-4" />
-                    Meet {data.artistName}
-                  </Link>
-                </Button>
-              ) : null}
-
-              <Button
-                variant="outline"
-                onClick={sharePlaylist}
-                className="rounded-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-              >
-                {copied ? <Check className="mr-2 h-4 w-4" /> : <Share2 className="mr-2 h-4 w-4" />}
-
-                {copied ? "Link copied" : "Share this VYBE"}
-              </Button>
-
-              <PlaylistSaveButton playlistId={data.id} />
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="absolute -inset-5 rounded-[2.5rem] bg-gradient-to-br from-fuchsia-500/20 via-violet-500/5 to-cyan-400/20 blur-2xl" />
-
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-white/[.055] p-3 shadow-2xl backdrop-blur-xl">
-              <SharedPlaylistPlayer tracks={data.tracks} playlistSlug={slug} />
-            </div>
           </div>
         </section>
 
-        <section className="mt-16 grid gap-5 md:grid-cols-3">
-          <div className="rounded-3xl border border-pink-300/15 bg-gradient-to-br from-pink-400/10 to-transparent p-6">
-            <UserPlus className="h-6 w-6 text-pink-300" />
-
-            <h2 className="mt-4 text-xl font-semibold">Stay close to the artist</h2>
-
-            <p className="mt-2 text-sm leading-6 text-white/60">
-              Follow new music, stories, events, merch, and the moments behind every release.
-            </p>
+        <section className="mt-6 rounded-[1.75rem] border border-white/10 bg-white/[.025] p-4 sm:p-6">
+          <h2 className="text-center text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 to-cyan-300 sm:text-2xl">One link. Your whole VYBE.</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl border border-fuchsia-300/20 bg-fuchsia-400/[.07] p-4">
+              <Heart className="h-5 w-5 text-fuchsia-300" />
+              <h3 className="mt-2 font-semibold text-fuchsia-200">For Supporters</h3>
+              <p className="mt-1 text-sm leading-5 text-white/55">Follow, save, connect, and discover independent creators.</p>
+              <Button asChild size="sm" variant="outline" className="mt-3 w-full border-fuchsia-300/35 bg-transparent text-fuchsia-200 hover:bg-fuchsia-400/10 hover:text-white"><Link to="/auth/sign-up">Get your VYBE</Link></Button>
+              <div className="mt-2 flex justify-center"><PlaylistSaveButton playlistId={data.id} /></div>
+            </div>
+            <div className="rounded-2xl border border-cyan-300/20 bg-cyan-400/[.07] p-4">
+              <UserPlus className="h-5 w-5 text-cyan-300" />
+              <h3 className="mt-2 font-semibold text-cyan-200">For Creators</h3>
+              <p className="mt-1 text-sm leading-5 text-white/55">Share your work, grow community, and be discovered.</p>
+              <Button asChild size="sm" variant="outline" className="mt-3 w-full border-cyan-300/35 bg-transparent text-cyan-200 hover:bg-cyan-400/10 hover:text-white"><Link to="/for-artists">Create on VYBE</Link></Button>
+            </div>
           </div>
-
-          <div className="rounded-3xl border border-cyan-300/15 bg-gradient-to-br from-cyan-400/10 to-transparent p-6">
-            <Heart className="h-6 w-6 text-cyan-300" />
-
-            <h2 className="mt-4 text-xl font-semibold">Save what moves you</h2>
-
-            <p className="mt-2 text-sm leading-6 text-white/60">
-              Keep this playlist, build your own, and return without searching for the link.
-            </p>
-          </div>
-
-          <div className="rounded-3xl border border-amber-300/15 bg-gradient-to-br from-amber-400/10 to-transparent p-6">
-            <Sparkles className="h-6 w-6 text-amber-300" />
-
-            <h2 className="mt-4 text-xl font-semibold">Find your next VYBE</h2>
-
-            <p className="mt-2 text-sm leading-6 text-white/60">
-              Discover independent creators through people, stories, moods, and shared moments.
-            </p>
+          <div className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
+            <a href="#connect" className="text-fuchsia-300 hover:text-fuchsia-200"><UserRound className="mr-1.5 inline h-4 w-4" />Connect with {data.artistName}</a>
+            <Link to="/explore" search={{ q: "" }} className="text-cyan-300 hover:text-cyan-200">Discover creators <ArrowRight className="ml-1 inline h-4 w-4" /></Link>
           </div>
         </section>
 
-        <section className="mt-8 overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(120deg,rgba(168,85,247,.22),rgba(236,72,153,.15)_45%,rgba(34,211,238,.16))] p-7 md:flex md:items-center md:justify-between md:gap-10 md:p-10">
+        <section className="mt-5 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[linear-gradient(120deg,rgba(168,85,247,.18),rgba(236,72,153,.1)_45%,rgba(34,211,238,.12))] p-5 md:flex md:items-center md:justify-between md:gap-8">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[.2em] text-cyan-200">
               Don’t let the last song be the end
             </p>
 
-            <h2 className="mt-3 text-3xl font-bold tracking-tight">Keep the connection going.</h2>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight">Keep the connection going.</h2>
 
             <p className="mt-3 leading-7 text-white/65">
               Join VYBE to follow {data.artistName}, save this playlist, and hear what comes next.
@@ -359,7 +324,7 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
             </p>
           </div>
 
-          <div className="mt-6 flex shrink-0 flex-wrap gap-3 md:mt-0 md:flex-col">
+          <div className="mt-4 flex shrink-0 flex-wrap gap-2 md:mt-0 md:flex-col">
             {appLinks.deepLink ? (
               <Button asChild className="rounded-full bg-white text-black hover:bg-white/90">
                 <a href={appLinks.deepLink}>
@@ -397,14 +362,16 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
           </div>
         </section>
 
-        <ListenerConnectionForm slug={slug} artistName={data.artistName} />
+        <div id="connect" className="mt-5 scroll-mt-24">
+          <ListenerConnectionForm slug={slug} artistName={data.artistName} />
+        </div>
 
-        <section className="mt-8 rounded-[2rem] border border-white/10 bg-white/[.035] p-7 text-center">
+        <section className="mt-5 rounded-[1.75rem] border border-white/10 bg-white/[.035] p-5 text-center">
           <p className="text-sm font-semibold uppercase tracking-[.2em] text-fuchsia-200">
             Founding creator preview
           </p>
 
-          <h2 className="mt-3 text-2xl font-semibold">Help shape what playlists become.</h2>
+          <h2 className="mt-2 text-xl font-semibold">Help shape what playlists become.</h2>
 
           <p className="mx-auto mt-3 max-w-2xl text-white/55">
             VYBE is testing this experience with creators and listeners before paid creator plans

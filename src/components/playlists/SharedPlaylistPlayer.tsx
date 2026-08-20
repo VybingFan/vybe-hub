@@ -23,6 +23,7 @@ interface SharedPlaylistPlayerProps {
   playlistSlug?: string;
   initialTrackId?: string;
   queueLabel?: string;
+  autoPlayOnOpen?: boolean;
 }
 
 interface ActivePlaybackProgress {
@@ -59,6 +60,7 @@ export function SharedPlaylistPlayer({
   playlistSlug,
   initialTrackId,
   queueLabel = "Playlist queue",
+  autoPlayOnOpen = false,
 }: SharedPlaylistPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const recordedTracks = useRef(new Set<string>());
@@ -66,6 +68,7 @@ export function SharedPlaylistPlayer({
   const progressRef = useRef<ActivePlaybackProgress | null>(null);
   const listenedSinceFlushRef = useRef(0);
   const lastObservedTimeRef = useRef(0);
+  const attemptedInitialAutoplayRef = useRef(false);
 
   const initialIndex = initialTrackId ? tracks.findIndex((item) => item.id === initialTrackId) : -1;
 
@@ -80,6 +83,7 @@ export function SharedPlaylistPlayer({
   const [loadingAudio, setLoadingAudio] = useState(false);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [queueExpanded, setQueueExpanded] = useState(false);
 
   const track = tracks[current];
 
@@ -130,6 +134,11 @@ export function SharedPlaylistPlayer({
     setLoadingAudio(true);
     audio.load();
 
+    if (autoPlayOnOpen && !attemptedInitialAutoplayRef.current) {
+      attemptedInitialAutoplayRef.current = true;
+      shouldAutoplayRef.current = true;
+    }
+
     if (shouldAutoplayRef.current) {
       const playWhenReady = async () => {
         try {
@@ -138,7 +147,11 @@ export function SharedPlaylistPlayer({
           console.error("Playlist audio playback failed:", error);
 
           setPlaying(false);
-          setPlaybackError("The selected audio could not begin playing.");
+          // Mobile browsers may require one explicit tap before audio can start.
+          // Keep the primary play control ready instead of presenting an error.
+          if (!autoPlayOnOpen) {
+            setPlaybackError("The selected audio could not begin playing.");
+          }
         } finally {
           shouldAutoplayRef.current = false;
         }
@@ -146,7 +159,7 @@ export function SharedPlaylistPlayer({
 
       void playWhenReady();
     }
-  }, [current, track?.audio_url]);
+  }, [autoPlayOnOpen, current, track?.audio_url]);
 
   function flushProgress(completed = false) {
     const progress = progressRef.current;
@@ -290,21 +303,6 @@ export function SharedPlaylistPlayer({
     setElapsed(value);
   }
 
-  function changeVolume([value]: number[]) {
-    const nextVolume = Math.min(1, Math.max(0, value));
-
-    setVolume(nextVolume);
-
-    if (nextVolume > 0) {
-      setPreviousVolume(nextVolume);
-    }
-
-    if (audioRef.current) {
-      audioRef.current.volume = nextVolume;
-      audioRef.current.muted = nextVolume === 0;
-    }
-  }
-
   function toggleMute() {
     const audio = audioRef.current;
 
@@ -426,8 +424,8 @@ export function SharedPlaylistPlayer({
         }}
       />
 
-      <div className="grid grid-cols-[96px_minmax(0,1fr)] gap-4 p-4 sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-6 sm:p-6 md:grid-cols-[180px_minmax(0,1fr)] md:p-7">
-        <button type="button" onClick={() => setDetailOpen(true)} className={cn("group relative aspect-square w-full overflow-hidden rounded-2xl bg-gradient-brand text-left shadow-lg transition hover:scale-[1.015]", playing && "ring-2 ring-fuchsia-400/40")} aria-label={`Open details for ${track.title}`}>
+      <div className="grid grid-cols-[72px_minmax(0,1fr)] items-center gap-3 p-3 sm:grid-cols-[92px_minmax(0,1fr)_auto] sm:gap-5 sm:p-5">
+        <button type="button" onClick={() => setDetailOpen(true)} className={cn("group relative aspect-square w-full overflow-hidden rounded-xl bg-gradient-brand text-left shadow-lg transition hover:scale-[1.015]", playing && "ring-2 ring-fuchsia-400/40")} aria-label={`Open details for ${track.title}`}>
           {track.cover_url ? (
             <img
               src={track.cover_url}
@@ -435,23 +433,24 @@ export function SharedPlaylistPlayer({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-6xl font-bold text-white/90">
+            <div className="flex h-full items-center justify-center text-3xl font-bold text-white/90">
               V
             </div>
           )}
-          <span className="absolute bottom-2 right-2 rounded-full bg-black/65 p-2 text-white opacity-90 backdrop-blur transition group-hover:scale-105">
-            <Expand className="h-4 w-4" />
+          <span className="absolute bottom-1.5 right-1.5 rounded-full bg-black/65 p-1.5 text-white opacity-90 backdrop-blur transition group-hover:scale-105">
+            <Expand className="h-3.5 w-3.5" />
           </span>
         </button>
 
-        <div className="flex min-w-0 flex-col justify-center">
-          <p className="text-xs font-semibold uppercase tracking-[.2em] text-primary">
-            Now playing
+        <div className="min-w-0">
+          <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-fuchsia-300">Now playing</p>
+          <button type="button" onClick={() => setDetailOpen(true)} className="mt-1 block max-w-full truncate text-left text-base font-semibold transition hover:text-fuchsia-200 sm:text-lg" aria-label={`Open details for ${track.title}`}>{track.title}</button>
+          <p className="truncate text-xs text-muted-foreground sm:text-sm">
+            {track.primary_artist_name || "Independent artist"}
+            {track.featured_artist_names?.length ? ` feat. ${track.featured_artist_names.join(", ")}` : ""}
           </p>
 
-          <button type="button" onClick={() => setDetailOpen(true)} className="mt-2 line-clamp-2 text-left text-xl font-semibold transition hover:text-fuchsia-200 sm:text-2xl" aria-label={`Open details for ${track.title}`}>{track.title}</button>
-
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-muted-foreground">
+          <div className="mt-1.5 flex flex-wrap items-center gap-2 text-muted-foreground">
             {track.playback_mode === "preview" ? (
               <span className="rounded-full border px-2 py-0.5 text-xs">
                 Preview · {track.preview_duration_sec}s
@@ -470,23 +469,13 @@ export function SharedPlaylistPlayer({
             ) : null}
           </div>
 
-          <p className="mt-2 text-muted-foreground">
-            {track.primary_artist_name || "Independent artist"}
-
-            {track.featured_artist_names?.length
-              ? ` feat. ${track.featured_artist_names.join(", ")}`
-              : ""}
-
-            {track.genre ? ` · ${track.genre}` : ""}
-          </p>
-
           {playbackError ? (
-            <div className="mt-4 rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+            <div className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-2 text-xs text-destructive">
               {playbackError}
             </div>
           ) : null}
 
-          <div className="mt-7">
+          <div className="mt-3">
             <Slider
               min={0}
               max={Math.max(displayedDuration, 1)}
@@ -504,19 +493,9 @@ export function SharedPlaylistPlayer({
             </div>
           </div>
 
-          <div className="mt-4 flex items-center justify-center gap-2 sm:gap-3">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => setShuffle((value) => !value)}
-              className={cn(shuffle && "bg-cyan-400/10 text-cyan-300")}
-              aria-pressed={shuffle}
-              aria-label="Shuffle playlist"
-            >
-              <Shuffle className="h-4 w-4" />
-            </Button>
+        </div>
 
+        <div className="col-span-2 flex items-center justify-center gap-2 border-t border-white/10 pt-3 sm:col-span-1 sm:border-0 sm:pt-0">
             <Button
               type="button"
               variant="ghost"
@@ -531,7 +510,7 @@ export function SharedPlaylistPlayer({
             <Button
               type="button"
               size="icon"
-              className="h-12 w-12 rounded-full bg-gradient-brand text-white sm:h-14 sm:w-14"
+              className="h-12 w-12 rounded-full bg-gradient-brand text-white"
               onClick={() => void togglePlayback()}
               disabled={!canPlay || loadingAudio}
               aria-label={playing ? "Pause" : "Play"}
@@ -554,61 +533,35 @@ export function SharedPlaylistPlayer({
               <SkipForward />
             </Button>
 
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => setRepeat((value) => !value)}
-              className={cn(repeat && "bg-pink-400/10 text-pink-300")}
-              aria-pressed={repeat}
-              aria-label="Repeat current song"
-            >
-              <Repeat2 className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="mx-auto mt-3 hidden w-full max-w-52 items-center gap-3 sm:flex">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 shrink-0"
-              onClick={toggleMute}
-              aria-label={volume === 0 ? "Unmute" : "Mute"}
-            >
-              {volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-            </Button>
-
-            <Slider
-              min={0}
-              max={1}
-              step={0.05}
-              value={[volume]}
-              onValueChange={changeVolume}
-              disabled={!canPlay}
-              aria-label="Volume"
-            />
-          </div>
         </div>
       </div>
 
-      <div className="border-t border-border/70 p-2 sm:p-3 md:p-5">
-        <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-[.18em] text-muted-foreground sm:px-4">
-          {queueLabel}
-        </p>
+      <div className="border-t border-border/70 p-2 sm:p-3">
+        <div className="flex items-center justify-between px-2 pb-1 sm:px-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-muted-foreground">{queueLabel}</p>
+          <div className="hidden items-center gap-1 sm:flex">
+            <Button type="button" variant="ghost" size="icon" className={cn("h-7 w-7", shuffle && "text-cyan-300")} onClick={() => setShuffle((value) => !value)} aria-pressed={shuffle} aria-label="Shuffle playlist"><Shuffle className="h-3.5 w-3.5" /></Button>
+            <Button type="button" variant="ghost" size="icon" className={cn("h-7 w-7", repeat && "text-pink-300")} onClick={() => setRepeat((value) => !value)} aria-pressed={repeat} aria-label="Repeat current song"><Repeat2 className="h-3.5 w-3.5" /></Button>
+            <Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={toggleMute} aria-label={volume === 0 ? "Unmute" : "Mute"}>{volume === 0 ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}</Button>
+          </div>
+        </div>
 
-        {tracks.map((item, index) => (
+        {(queueExpanded ? tracks : tracks.slice(0, 3)).map((item, index) => (
           <button
             key={item.id}
             type="button"
             onClick={() => selectTrack(index)}
             className={cn(
-              "flex min-h-12 w-full items-center gap-3 rounded-xl px-2 py-3 text-left transition hover:bg-white/5 sm:gap-4 sm:px-4",
+              "flex min-h-12 w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition hover:bg-white/5 sm:px-3",
               index === current && "bg-primary/10",
             )}
           >
             <span className="w-6 text-center text-xs text-muted-foreground">
               {index === current && playing ? "▶" : index + 1}
+            </span>
+
+            <span className="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-gradient-brand">
+              {item.cover_url ? <img src={item.cover_url} alt="" className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center text-xs font-bold text-white">V</span>}
             </span>
 
             <span className="min-w-0 flex-1">
@@ -628,6 +581,28 @@ export function SharedPlaylistPlayer({
             </span>
           </button>
         ))}
+
+        {tracks.length > 3 ? (
+          <button type="button" onClick={() => setQueueExpanded((value) => !value)} className="mt-1 w-full rounded-xl py-2 text-xs font-medium text-fuchsia-300 transition hover:bg-white/5 hover:text-fuchsia-200">
+            {queueExpanded ? "Show fewer songs" : `View all ${tracks.length} songs`}
+          </button>
+        ) : null}
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-[80] border-t border-white/15 bg-[#090a12]/95 px-3 py-2 shadow-[0_-18px_45px_rgba(0,0,0,.45)] backdrop-blur-xl sm:px-5">
+        <div className="mx-auto flex max-w-6xl items-center gap-3">
+          <button type="button" onClick={() => setDetailOpen(true)} className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-gradient-brand" aria-label={`Open details for ${track.title}`}>
+            {track.cover_url ? <img src={track.cover_url} alt="" className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center font-bold text-white">V</span>}
+          </button>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold">{track.title}</p>
+            <p className="truncate text-xs text-white/50">{track.primary_artist_name || "VYBE artist"}</p>
+          </div>
+          <Button type="button" variant="ghost" size="icon" onClick={previousTrack} disabled={tracks.length < 2} aria-label="Previous song"><SkipBack className="h-4 w-4" /></Button>
+          <Button type="button" size="icon" className="h-11 w-11 rounded-full bg-gradient-brand text-white" onClick={() => void togglePlayback()} disabled={!canPlay || loadingAudio} aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause className="h-4 w-4 fill-current" /> : <Play className="ml-0.5 h-4 w-4 fill-current" />}</Button>
+          <Button type="button" variant="ghost" size="icon" onClick={nextTrack} disabled={tracks.length < 2} aria-label="Next song"><SkipForward className="h-4 w-4" /></Button>
+        </div>
+        <div className="mx-auto mt-1 max-w-6xl"><div className="h-0.5 overflow-hidden rounded-full bg-white/10"><div className="h-full bg-gradient-to-r from-fuchsia-500 to-cyan-400" style={{ width: `${Math.min(100, (elapsed / Math.max(displayedDuration, 1)) * 100)}%` }} /></div></div>
       </div>
 
       {detailOpen ? (
