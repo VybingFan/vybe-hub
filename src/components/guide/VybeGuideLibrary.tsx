@@ -26,7 +26,7 @@ export function VybeGuideLibrary() {
   function restartCreatorOnboarding() {
     window.localStorage.setItem(
       "vybe:creator-onboarding-v2",
-      JSON.stringify({ status: "active", step: 0 }),
+      JSON.stringify({ status: "active", step: 0, mode: "review" }),
     );
     window.localStorage.setItem("vybe:creator-onboarding-launch-v2", "1");
     window.location.reload();
@@ -60,7 +60,7 @@ export function VybeGuideLibrary() {
       {primaryRole === "creator" ? (
         <Button type="button" variant="outline" onClick={restartCreatorOnboarding}>
           <RotateCcw className="mr-2 h-4 w-4" />
-          Restart 5-minute creator setup
+          Review Creator Setup
         </Button>
       ) : null}
 

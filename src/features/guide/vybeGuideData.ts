@@ -92,8 +92,8 @@ export const CREATOR_ONBOARDING_STEPS: CreatorOnboardingStep[] = [
   {
     id: "ready",
     title: "You're ready to VYBE",
-    short: "Your basic creator setup is complete.",
-    instruction: "Your five-minute setup is complete. Use the VG quick tool whenever you need directions, and Settings > VYBE Guide for detailed explanations of every major VYBE tool.",
+    short: "Your essential creator setup is complete.",
+    instruction: "Your essential creator setup is complete. Use the VG quick tool whenever you need directions, and Settings > VYBE Guide for detailed explanations of every major VYBE tool.",
     route: "/dashboard",
     actionLabel: "Go to Creator Dashboard",
     minutes: 0,
