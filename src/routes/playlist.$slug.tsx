@@ -232,11 +232,17 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
           <div className="relative h-32 overflow-hidden bg-gradient-to-r from-fuchsia-950 via-violet-950 to-cyan-950 sm:h-44">
             <img
               src={data.artistBannerUrl || "/banners/default-creator-banner.png"}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full scale-110 object-cover opacity-45 blur-xl"
+            />
+            <img
+              src={data.artistBannerUrl || "/banners/default-creator-banner.png"}
               alt={`${data.artistName} banner`}
-              className="h-full w-full object-cover"
+              className="relative z-10 h-full w-full object-contain"
             />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-[#070811] via-black/25 to-transparent" />
+            <div className="absolute inset-0 z-20 bg-gradient-to-t from-[#070811] via-black/10 to-transparent" />
           </div>
 
           <div className="relative -mt-10 flex items-end gap-3 px-4 pb-4 sm:-mt-12 sm:px-6">
