@@ -177,7 +177,7 @@ export function SharedPlaylistPlayer({
 
   if (!track) {
     return (
-      <p className="rounded-2xl border border-border p-6 text-muted-foreground">
+      <p className="rounded-2xl border border-border p-6 text-white/55">
         This playlist does not have any songs yet.
       </p>
     );
@@ -329,7 +329,7 @@ export function SharedPlaylistPlayer({
   }
 
   return (
-    <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-card shadow-elevated">
+    <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#0a0c16] text-white shadow-elevated">
       <audio
         key={`${track.id}-${track.audio_url || "restricted"}`}
         ref={audioRef}
@@ -445,12 +445,12 @@ export function SharedPlaylistPlayer({
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-fuchsia-300">Now playing</p>
           <button type="button" onClick={() => setDetailOpen(true)} className="mt-1 block max-w-full truncate text-left text-base font-semibold transition hover:text-fuchsia-200 sm:text-lg" aria-label={`Open details for ${track.title}`}>{track.title}</button>
-          <p className="truncate text-xs text-muted-foreground sm:text-sm">
+          <p className="truncate text-xs text-white/55 sm:text-sm">
             {track.primary_artist_name || "Independent artist"}
             {track.featured_artist_names?.length ? ` feat. ${track.featured_artist_names.join(", ")}` : ""}
           </p>
 
-          <div className="mt-1.5 flex flex-wrap items-center gap-2 text-muted-foreground">
+          <div className="mt-1.5 flex flex-wrap items-center gap-2 text-white/55">
             {track.playback_mode === "preview" ? (
               <span className="rounded-full border px-2 py-0.5 text-xs">
                 Preview · {track.preview_duration_sec}s
@@ -486,7 +486,7 @@ export function SharedPlaylistPlayer({
               aria-label="Track progress"
             />
 
-            <div className="mt-2 flex justify-between text-xs text-muted-foreground">
+            <div className="mt-2 flex justify-between text-xs text-white/55">
               <span>{formatDuration(elapsed)}</span>
 
               <span>{formatDuration(displayedDuration)}</span>
@@ -536,9 +536,9 @@ export function SharedPlaylistPlayer({
         </div>
       </div>
 
-      <div className="border-t border-border/70 p-2 sm:p-3">
+      <div className="border-t border-white/10 p-2 sm:p-3">
         <div className="flex items-center justify-between px-2 pb-1 sm:px-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-muted-foreground">{queueLabel}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[.18em] text-white/55">{queueLabel}</p>
           <div className="hidden items-center gap-1 sm:flex">
             <Button type="button" variant="ghost" size="icon" className={cn("h-7 w-7", shuffle && "text-cyan-300")} onClick={() => setShuffle((value) => !value)} aria-pressed={shuffle} aria-label="Shuffle playlist"><Shuffle className="h-3.5 w-3.5" /></Button>
             <Button type="button" variant="ghost" size="icon" className={cn("h-7 w-7", repeat && "text-pink-300")} onClick={() => setRepeat((value) => !value)} aria-pressed={repeat} aria-label="Repeat current song"><Repeat2 className="h-3.5 w-3.5" /></Button>
@@ -556,7 +556,7 @@ export function SharedPlaylistPlayer({
               index === current && "bg-primary/10",
             )}
           >
-            <span className="w-6 text-center text-xs text-muted-foreground">
+            <span className="w-6 text-center text-xs text-white/55">
               {index === current && playing ? "▶" : index + 1}
             </span>
 
@@ -567,7 +567,7 @@ export function SharedPlaylistPlayer({
             <span className="min-w-0 flex-1">
               <span className="block truncate font-medium">{item.title}</span>
 
-              <span className="block truncate text-xs text-muted-foreground">
+              <span className="block truncate text-xs text-white/55">
                 {item.primary_artist_name || "VYBE artist"}
 
                 {item.featured_artist_names?.length
@@ -576,7 +576,7 @@ export function SharedPlaylistPlayer({
               </span>
             </span>
 
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-white/55">
               {formatDuration(item.duration_sec)}
             </span>
           </button>

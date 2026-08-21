@@ -245,28 +245,20 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
             <div className="absolute inset-0 z-20 bg-gradient-to-t from-[#070811] via-black/10 to-transparent" />
           </div>
 
-          <div className="relative -mt-10 flex items-end gap-3 px-4 pb-4 sm:-mt-12 sm:px-6">
+          <div className="relative flex items-center gap-3 border-t border-white/10 bg-[#090b15]/92 px-4 py-3 backdrop-blur-xl sm:gap-4 sm:px-6 sm:py-4">
             <img
               src={playlistArtwork}
-              alt={
-                data.cover_url
-                  ? `${data.title} playlist cover`
-                  : `${data.title} default VYBE playlist cover`
-              }
-              className="h-20 w-20 shrink-0 rounded-2xl border-4 border-[#070811] bg-violet-950 object-cover shadow-2xl sm:h-24 sm:w-24"
+              alt={data.cover_url ? `${data.title} playlist cover` : `${data.title} default VYBE playlist cover`}
+              className="h-16 w-16 shrink-0 rounded-xl border border-white/15 bg-violet-950 object-cover shadow-xl sm:h-20 sm:w-20"
             />
-
-            <div className="min-w-0 flex-1 pb-1">
-              <p className="truncate text-lg font-semibold sm:text-xl">{data.artistName}</p>
-              <p className="truncate text-xs text-white/55">Independent creator</p>
-              <h1 className="mt-1 truncate text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 to-cyan-300 sm:text-xl">{data.title}</h1>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-base font-semibold sm:text-lg">{data.artistName}</p>
+              <p className="text-xs text-white/50">Independent creator</p>
+              <h1 className="mt-1 line-clamp-2 text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-300 to-cyan-300 sm:text-lg">{data.title}</h1>
             </div>
-
             {data.artistUsername ? (
-              <Button asChild size="sm" variant="outline" className="mb-1 shrink-0 rounded-full border-fuchsia-300/35 bg-fuchsia-400/10 text-white hover:bg-fuchsia-400/20 hover:text-white">
-                <Link to="/artist/$username" params={{ username: data.artistUsername }} search={{ track: "" }}>
-                  <UserPlus className="mr-1.5 h-4 w-4" /> Follow
-                </Link>
+              <Button asChild size="sm" variant="outline" className="shrink-0 rounded-full border-fuchsia-300/35 bg-fuchsia-400/10 px-3 text-white hover:bg-fuchsia-400/20 hover:text-white">
+                <Link to="/artist/$username" params={{ username: data.artistUsername }} search={{ track: "" }}><UserPlus className="mr-1.5 h-4 w-4" />Follow</Link>
               </Button>
             ) : null}
           </div>
@@ -299,14 +291,16 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
             <div className="rounded-2xl border border-fuchsia-300/20 bg-fuchsia-400/[.07] p-4">
               <Heart className="h-5 w-5 text-fuchsia-300" />
               <h3 className="mt-2 font-semibold text-fuchsia-200">For Supporters</h3>
-              <p className="mt-1 text-sm leading-5 text-white/55">Follow, save, connect, and discover independent creators.</p>
+              <p className="mt-1 text-sm leading-5 text-white/55">Listen freely, then join when you are ready to:</p>
+              <ul className="mt-2 space-y-1 text-xs leading-5 text-white/60"><li>â€¢ Follow creators and receive updates</li><li>â€¢ Save playlists and return anytime</li><li>â€¢ Connect directly when creators allow it</li><li>â€¢ Discover music, films, stories, and more</li></ul>
               <Button asChild size="sm" variant="outline" className="mt-3 w-full border-fuchsia-300/35 bg-transparent text-fuchsia-200 hover:bg-fuchsia-400/10 hover:text-white"><Link to="/auth/sign-up">Get your VYBE</Link></Button>
               <div className="mt-2 flex justify-center"><PlaylistSaveButton playlistId={data.id} /></div>
             </div>
             <div className="rounded-2xl border border-cyan-300/20 bg-cyan-400/[.07] p-4">
               <UserPlus className="h-5 w-5 text-cyan-300" />
               <h3 className="mt-2 font-semibold text-cyan-200">For Creators</h3>
-              <p className="mt-1 text-sm leading-5 text-white/55">Share your work, grow community, and be discovered.</p>
+              <p className="mt-1 text-sm leading-5 text-white/55">Bring your work and audience together:</p>
+              <ul className="mt-2 space-y-1 text-xs leading-5 text-white/60"><li>â€¢ Share playable work through one link</li><li>â€¢ Build a recognizable creator presence</li><li>â€¢ Connect directly with supporters</li><li>â€¢ See listening and engagement insights</li></ul>
               <Button asChild size="sm" variant="outline" className="mt-3 w-full border-cyan-300/35 bg-transparent text-cyan-200 hover:bg-cyan-400/10 hover:text-white"><Link to="/for-artists">Create on VYBE</Link></Button>
             </div>
           </div>
@@ -316,21 +310,21 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
           </div>
         </section>
 
-        <section className="mt-5 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[linear-gradient(120deg,rgba(168,85,247,.18),rgba(236,72,153,.1)_45%,rgba(34,211,238,.12))] p-5 md:flex md:items-center md:justify-between md:gap-8">
+        <section className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(120deg,rgba(168,85,247,.14),rgba(34,211,238,.09))] p-4 md:flex md:items-center md:justify-between md:gap-6">
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[.2em] text-cyan-200">
+            <p className="text-xs font-semibold uppercase tracking-[.16em] text-cyan-200">
               Don’t let the last song be the end
             </p>
 
-            <h2 className="mt-2 text-2xl font-bold tracking-tight">Keep the connection going.</h2>
+            <h2 className="mt-1 text-lg font-bold tracking-tight">Keep the connection going.</h2>
 
-            <p className="mt-3 leading-7 text-white/65">
+            <p className="mt-1 text-sm leading-5 text-white/55">
               Join VYBE to follow {data.artistName}, save this playlist, and hear what comes next.
               Listening here will always stay simple.
             </p>
           </div>
 
-          <div className="mt-4 flex shrink-0 flex-wrap gap-2 md:mt-0 md:flex-col">
+          <div className="mt-3 flex shrink-0 flex-wrap gap-2 md:mt-0">
             {appLinks.deepLink ? (
               <Button asChild className="rounded-full bg-white text-black hover:bg-white/90">
                 <a href={appLinks.deepLink}>
