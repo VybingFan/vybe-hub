@@ -1,10 +1,11 @@
-﻿import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   FileAudio,
   FileText,
   ImagePlus,
+  LockKeyhole,
   Loader2,
   Save,
   Star,
@@ -61,6 +62,13 @@ import {
   type TrackWorkspaceCategory,
 } from "@/features/music/workflow";
 import { readAudioDuration } from "@/services/music/musicService";
+import { useMembership } from "@/hooks/useMembership";
+import {
+  effectivePublicPlan,
+  hasCreatorCapability,
+} from "@/features/membership/access";
+import { CREATOR_PLAN_CATALOG } from "@/features/membership/catalog";
+import { LockedFeatureLearnMoreDialog } from "@/components/membership/LockedFeatureLearnMoreDialog";
 
 export const Route = createFileRoute("/_authenticated/music_/$trackId")({
   component: () => (
@@ -90,6 +98,15 @@ function SongEditor() {
   const { trackId } = Route.useParams();
   const navigate = useNavigate();
   const { user } = useUser();
+  const { data: membership } = useMembership(Boolean(user?.id));
+  const canUseWorkflow = hasCreatorCapability(
+    membership?.plan_code,
+    "music.workflow",
+  );
+  const currentPlanCode = effectivePublicPlan(membership?.plan_code);
+  const currentPlanName =
+    CREATOR_PLAN_CATALOG.find((plan) => plan.code === currentPlanCode)?.name ??
+    "Creator Free";
   const { data: tracks = [], isLoading } = useCreatorTracks(user?.id);
   const track = tracks.find((item) => item.id === trackId);
   const update = useUpdateTrack(user?.id);
@@ -133,7 +150,7 @@ function SongEditor() {
     setReleaseDate(track.release_date || "");
     setStatus(track.status);
     setWorkspaceCategory(track.workspace_category ?? "work_in_progress");
-    setProductionStage(track.production_stage ?? "idea");
+    setProductionStage(track.production_stage || "idea");
     setVisibility(track.visibility ?? "public");
     setPlaybackMode(track.playback_mode ?? "full");
     setPreviewDuration(track.preview_duration_sec ?? 30);
@@ -168,8 +185,12 @@ function SongEditor() {
           description: description.trim(),
           release_date: releaseDate,
           status,
-          workspace_category: workspaceCategory,
-          production_stage: productionStage,
+          ...(canUseWorkflow
+            ? {
+                workspace_category: workspaceCategory,
+                production_stage: productionStage,
+              }
+            : {}),
           visibility,
           playback_mode: playbackMode,
           preview_duration_sec: previewDuration,
@@ -192,7 +213,7 @@ function SongEditor() {
       }
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Could not save the song",
+        error instanceof Error ? error.message : typeof error === "object" && error !== null && "message" in error ? String(error.message) : "Could not save the song. Check the required fields and try again.",
       );
     }
   };
@@ -281,11 +302,42 @@ function SongEditor() {
           Manage its audio, artwork, credits, publishing status, and profile
           placement.
         </p>
-        <Button asChild variant="outline" className="mt-3">
-          <Link to="/music/$trackId/lyrics" params={{ trackId }}>
-            <FileText className="mr-2 h-4 w-4" /> Add or refine lyrics
-          </Link>
-        </Button>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <Button asChild variant="outline">
+            <Link to="/music/$trackId/lyrics" params={{ trackId }}>
+              <FileText className="mr-2 h-4 w-4" /> Add or refine lyrics
+            </Link>
+          </Button>
+          <LockedFeatureLearnMoreDialog
+            triggerLabel="Learn about locked features"
+            title="Organize every song from idea to release"
+            description="Music categories and production stages give creators a working catalog—not just a list of uploaded files."
+            howItWorks={[
+              "Music category explains why a song is in your workspace, such as work in progress, upcoming, released, or archived.",
+              "Production stage records where the song is in the creative process, from an early idea through recording, mixing, mastering, and release readiness.",
+              "These organization choices do not change who can discover or hear the song. Visibility and playback remain separate controls.",
+            ]}
+            benefits={[
+              "Find the right song faster as your catalog grows.",
+              "See which songs need attention and what should happen next.",
+              "Plan releases without confusing unfinished, upcoming, and published work.",
+              "Prepare a cleaner catalog for collaborators, teams, opportunities, and future VYBE tools.",
+            ]}
+            requiredPlanLabel="Creator Plus or higher"
+          />
+        </div>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">
+              Your membership
+            </p>
+            <p className="mt-1 font-semibold">{currentPlanName}</p>
+          </div>
+          <p className="max-w-xl text-sm text-muted-foreground">
+            Included tools remain editable. Locked tools stay visible so you can
+            understand what another plan adds before deciding whether to upgrade.
+          </p>
+        </div>
       </header>
 
       <form
@@ -297,7 +349,7 @@ function SongEditor() {
           form="manage-song-form"
           type="submit"
           disabled={update.isPending || replaceAudio.isPending}
-          className="fixed bottom-20 right-4 z-40 bg-gradient-brand text-primary-foreground shadow-elevated md:bottom-6 md:right-8"
+          className="fixed bottom-20 right-4 z-40 bg-gradient-brand text-primary-foreground shadow-elevated md:hidden"
         >
           {update.isPending || replaceAudio.isPending ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -352,19 +404,65 @@ function SongEditor() {
         </aside>
 
         <div className="space-y-4">
-          <section className="rounded-2xl border border-border bg-card p-4 sm:p-5">
-            <h2 className="text-lg font-semibold">Workspace & production</h2>
+          <section
+            className={
+              canUseWorkflow
+                ? "rounded-2xl border border-border bg-card p-4 sm:p-5"
+                : "rounded-2xl border border-primary/25 bg-primary/[0.03] p-4 sm:p-5"
+            }
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold">Workspace & production</h2>
+              {!canUseWorkflow ? (
+                <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                  <LockKeyhole className="h-3.5 w-3.5" /> Creator Plus feature
+                </span>
+              ) : null}
+            </div>
             <p className="mt-2 text-sm text-muted-foreground">
               Set why this song is in your workspace and where it currently is
               in the creative process. These settings do not decide who can
               discover or hear the song.
             </p>
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {!canUseWorkflow ? (
+              <div className="mt-4 flex flex-col gap-3 rounded-xl border border-primary/20 bg-background/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Your song can still be saved. Creator Plus unlocks categories
+                  and production stages for organizing a growing music catalog.
+                </p>
+                <LockedFeatureLearnMoreDialog
+                  compact
+                  triggerLabel="Learn how this helps"
+                  title="Turn your uploads into an organized music catalog"
+                  description="Use music categories and production stages to understand what every song is for, where it stands, and what needs to happen next."
+                  howItWorks={[
+                    "Choose a music category to separate work in progress, upcoming music, released songs, and archived material.",
+                    "Choose a production stage to track the song from idea through recording, mixing, mastering, and release readiness.",
+                    "Keep visibility and playback separate so organizing a song never publishes it accidentally.",
+                  ]}
+                  benefits={[
+                    "Prioritize unfinished work.",
+                    "Prepare releases more confidently.",
+                    "Keep a growing catalog understandable.",
+                    "Make future collaboration and team workflows easier.",
+                  ]}
+                  requiredPlanLabel="Creator Plus or higher"
+                />
+              </div>
+            ) : null}
+
+            <div
+              className={`mt-4 grid gap-4 sm:grid-cols-2 ${
+                canUseWorkflow ? "" : "opacity-60"
+              }`}
+              aria-disabled={!canUseWorkflow}
+            >
               <div>
                 <Label>Music category</Label>
                 <Select
                   value={workspaceCategory}
+                  disabled={!canUseWorkflow}
                   onValueChange={(value) =>
                     setWorkspaceCategory(value as TrackWorkspaceCategory)
                   }
@@ -386,6 +484,7 @@ function SongEditor() {
                 <Label>Production stage</Label>
                 <Select
                   value={productionStage}
+                  disabled={!canUseWorkflow}
                   onValueChange={(value) =>
                     setProductionStage(value as TrackProductionStage)
                   }
@@ -714,7 +813,7 @@ function SongEditor() {
             <FileAudio className="h-7 w-7 text-primary" />
             <h2 className="mt-5 text-lg font-semibold">Replace audio file</h2>
             <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">
-              Upload a corrected or updated MP3 while keeping this songâ€™s
+              Upload a corrected or updated MP3 while keeping this song's
               identity, cover, credits, playlist positions, and public playlist
               links.
             </p>
@@ -791,9 +890,7 @@ function SongEditor() {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Delete â€œ{track.title}â€?
-                  </AlertDialogTitle>
+                  <AlertDialogTitle>Delete &quot;{track.title}&quot;?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This permanently removes the audio, cover art, and song from
                     every playlist containing it. Use Replace audio when
@@ -843,7 +940,7 @@ function SongEditor() {
               <Button
                 size="default"
                 disabled={update.isPending || replaceAudio.isPending}
-                className="bg-gradient-brand text-primary-foreground"
+                className="hidden bg-gradient-brand text-primary-foreground md:inline-flex"
               >
                 {update.isPending || replaceAudio.isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -861,4 +958,3 @@ function SongEditor() {
     </div>
   );
 }
-
