@@ -2,6 +2,13 @@ import { z } from "zod";
 import { personalLinkSchema } from "@/features/profile/schema";
 
 const optionalUrl = z.string().trim().max(300).url({ message: "Enter a valid URL" }).optional().or(z.literal(""));
+const optionalMediaUrl = z
+  .string()
+  .trim()
+  .max(4096, "Uploaded profile image URL is invalid")
+  .url({ message: "Uploaded profile image URL is invalid" })
+  .optional()
+  .or(z.literal(""));
 const optionalHandle = z.string().trim().max(120).optional().or(z.literal(""));
 
 export const supporterProfileSchema = z.object({
@@ -9,7 +16,7 @@ export const supporterProfileSchema = z.object({
   username: z.string().trim().min(3, "At least 3 characters").max(30).regex(/^[a-zA-Z0-9_]+$/, "Letters, numbers, and underscores only"),
   bio: z.string().trim().max(1000).optional().or(z.literal("")),
   location: z.string().trim().max(120).optional().or(z.literal("")),
-  avatar_url: optionalUrl,
+  avatar_url: optionalMediaUrl,
   avatar_path: z.string().nullable().optional(),
   favorite_genres: z.array(z.string().trim().min(1).max(40)).max(20),
   favorite_artists: z.array(z.string().trim().min(1).max(80)).max(20),

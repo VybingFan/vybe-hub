@@ -22,12 +22,12 @@ function SupporterProfilePage() {
 }
 
 function SupporterProfileWorkspace() {
-  const { user } = useUser();
+  const { user, isLoading: isUserLoading } = useUser();
   const { data: profile, isLoading, error, refetch } = useSupporterProfile(user?.id);
   const save = useSaveSupporterProfile(user?.id);
   const [editingRequested, setEditingRequested] = useState(false);
 
-  if (isLoading) return <div className="flex min-h-[40vh] items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  if (isUserLoading || !user || isLoading) return <div className="flex min-h-[40vh] items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
   if (error) return <ErrorState title="Couldn't load your supporter profile" message={(error as Error).message} onRetry={() => void refetch()} />;
 
   const isEditing = editingRequested || !profile;
@@ -39,7 +39,7 @@ function SupporterProfileWorkspace() {
   if (isEditing) {
     return <div className="mx-auto max-w-5xl space-y-6 pb-12">
       <WorkspacePageHeader eyebrow="Supporter profile" title={profile ? "Edit your supporter identity" : "Create your supporter identity"} description="Choose how you appear when you follow creators, join conversations, save experiences, and participate across VYBE." />
-      <SupporterProfileForm initial={profile ?? null} userId={user!.id} onSubmit={handleSave} onCancel={() => setEditingRequested(false)} submitting={save.isPending} />
+      <SupporterProfileForm initial={profile ?? null} userId={user.id} onSubmit={handleSave} onCancel={() => setEditingRequested(false)} submitting={save.isPending} />
     </div>;
   }
 
