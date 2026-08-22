@@ -33,10 +33,8 @@ async function hydrate(row: Row): Promise<CreatorProfile> {
 
 export const creatorProfileService = {
   async uploadImage(userId: string, kind: "avatar" | "cover" | "background", file: File) {
-    if (kind === "cover") {
-      const membership = await membershipService.getMine();
-      if (!hasCreatorCapability(membership.plan_code, "profile.custom_cover")) throw new Error("Custom profile covers require Creator Plus or higher.");
-    }
+    // Standard profile banners are available to every Creator plan.
+    // Full-page custom backgrounds remain protected separately below.
     if (kind === "background") {
       const membership = await membershipService.getMine();
       if (!hasCreatorCapability(membership.plan_code, "profile.custom_background")) throw new Error("Full-page profile backgrounds require Creator Pro or higher.");
@@ -66,8 +64,12 @@ export const creatorProfileService = {
   },
 
   async upsert(userId: string, input: CreatorProfileInput): Promise<CreatorProfile> {
-    const membership = await membershipService.getMine();
-    const canBackground = hasCreatorCapability(membership.plan_code, "profile.custom_background");
+    // A newly confirmed Creator may reach profile setup before the membership
+    // query has finished becoming available. Creator Free is the safe fallback:
+    // it never grants paid profile capabilities, but it must not block saving.
+    const membership = await membershipService.getMine().catch(() => null);
+    const planCode = membership?.plan_code ?? "creator_free";
+    const canBackground = hasCreatorCapability(planCode, "profile.custom_background");
     const payload = {
       user_id: userId,
       ...input,
@@ -84,7 +86,15 @@ export const creatorProfileService = {
       .upsert(payload, { onConflict: "user_id" })
       .select("*")
       .single();
-    if (error) throw error;
+    if (error) {
+      if (error.code === "23505") {
+        throw new Error("That VYBE username is already taken. Choose another username and save again.");
+      }
+      if (error.code === "42501") {
+        throw new Error("Your Creator profile permissions are still being prepared. Refresh once and save again.");
+      }
+      throw new Error(error.message || "Failed to save profile");
+    }
     return hydrate(data as unknown as Row);
   },
 };

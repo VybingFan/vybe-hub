@@ -35,7 +35,7 @@ interface Props {
 
 export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, planCode }: Props) {
   const entitlements = getCreatorEntitlements(planCode);
-  const customCover = hasCreatorCapability(planCode, "profile.custom_cover");
+  const customCover = true; // Standard banners are included with every Creator plan.
   const multipleGenres = hasCreatorCapability(planCode, "profile.multiple_genres");
   const defaults: CreatorProfileInput = initial
     ? {
@@ -143,7 +143,7 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
 
       <ProfileCard
         title="Profile and cover images"
-        description="Click either image to upload. Cover: 1600 × 400 px recommended. Profile: 800 × 800 px recommended. JPG, PNG, or WebP up to 8MB. Keep important details centered for mobile cropping."
+        description="Every Creator plan includes a profile photo and standard banner. Banner: 1600 by 400 px recommended. Profile: 800 by 800 px recommended. JPG, PNG, or WebP up to 8MB."
       >
         {customCover ? <label className="group relative block h-52 cursor-pointer overflow-hidden rounded-2xl border border-border bg-muted">
           <img
@@ -151,12 +151,12 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
             alt="Cover preview"
             className="h-full w-full object-cover"
           />
-          <span className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition group-hover:opacity-100">
+          <span className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-100 transition group-hover:bg-black/45">
             {uploading === "cover" ? (
               <Loader2 className="animate-spin text-white" />
             ) : (
               <span className="flex items-center gap-2 text-sm font-medium text-white">
-                <Camera className="h-5 w-5" /> Change cover
+                <Camera className="h-5 w-5" /> Upload standard banner
               </span>
             )}
           </span>
@@ -173,7 +173,7 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
             alt="Profile preview"
             className="h-full w-full object-cover"
           />
-          <span className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition group-hover:opacity-100">
+          <span className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-100 transition group-hover:bg-black/45">
             {uploading === "avatar" ? (
               <Loader2 className="animate-spin text-white" />
             ) : (
@@ -190,8 +190,8 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
       </ProfileCard>
 
       <ProfileCard
-        title="Public page background"
-        description="Customize the full public page behind your creator content. Your cover image remains a separate header image."
+        title="Optional full-page background"
+        description="This optional Creator Pro feature changes the page behind your content. It is not your standard banner and is not required to save your profile."
       >
         <ProfileThemeEditor
           planCode={planCode}

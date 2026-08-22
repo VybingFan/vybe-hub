@@ -15,7 +15,7 @@ export type CreatorCapability =
   | "creator_mode.browse";
 
 const CAPABILITY_PLANS: Record<CreatorCapability, readonly PublicCreatorPlanCode[]> = {
-  "profile.custom_cover": ["creator_plus", "creator_pro", "creator_studio"],
+  "profile.custom_cover": ["creator_free", "creator_plus", "creator_pro", "creator_studio"],
   "profile.custom_background": ["creator_pro", "creator_studio"],
   "profile.multiple_genres": ["creator_plus", "creator_pro", "creator_studio"],
   "music.workflow": ["creator_plus", "creator_pro", "creator_studio"],

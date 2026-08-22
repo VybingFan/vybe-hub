@@ -75,8 +75,6 @@ function CreatorProfileContent({
   const previewProfile = isFreeCreator
     ? {
         ...profile,
-        cover_url: null,
-        cover_path: null,
         genres: profile?.genres?.slice(0, 1) ?? [],
       }
     : profile;

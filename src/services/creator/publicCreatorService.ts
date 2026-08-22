@@ -179,7 +179,7 @@ export const publicCreatorService = {
           (await signedUrl("avatars", profile.avatar_path)) ||
           profile.avatar_url ||
           "",
-        cover_url: planCode === "creator_free" ? "" :
+        cover_url:
           (await signedUrl("avatars", profile.cover_path)) ||
           profile.cover_url ||
           "",
