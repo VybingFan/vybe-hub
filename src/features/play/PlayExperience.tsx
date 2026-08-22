@@ -77,6 +77,7 @@ const playDestinations = [
     href: "#game-library",
     status: "Available now",
     icon: Gamepad2,
+    image: "/images/play/games/beat-blitz-cover-v1.webp",
   },
   {
     title: "Explore Music",
@@ -84,6 +85,7 @@ const playDestinations = [
     href: "/explore",
     status: "Available now",
     icon: Map,
+    image: "/images/supporter-cards/discover.webp",
   },
   {
     title: "Discover",
@@ -91,6 +93,7 @@ const playDestinations = [
     href: "/explore",
     status: "Available now",
     icon: Compass,
+    image: "/images/supporter-cards/discover.webp",
   },
   {
     title: "Learn",
@@ -98,6 +101,7 @@ const playDestinations = [
     href: "#play-roadmap",
     status: "Coming soon",
     icon: BookOpen,
+    image: "/images/experience-cards/learn.webp",
   },
   {
     title: "Spotlight",
@@ -105,6 +109,7 @@ const playDestinations = [
     href: "#spotlight",
     status: "Available now",
     icon: Star,
+    image: "/images/demo/nova-vale/banner.webp",
   },
   {
     title: "Challenges",
@@ -112,6 +117,7 @@ const playDestinations = [
     href: "#spotlight",
     status: "Demo",
     icon: Trophy,
+    image: "/images/experience-cards/challenges.webp",
   },
 ] as const;
 
@@ -387,22 +393,21 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
             <a
               key={destination.title}
               href={destination.href}
-              className="group rounded-3xl border border-border/70 bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/40"
+              className="group overflow-hidden rounded-3xl border border-border/70 bg-card transition hover:-translate-y-0.5 hover:border-primary/40"
             >
-              <div className="flex items-start justify-between gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                  <destination.icon className="h-5 w-5" />
-                </span>
-                <Badge variant="outline" className="rounded-full text-[11px]">
-                  {destination.status}
-                </Badge>
+              <div className="relative aspect-video overflow-hidden border-b border-border/60">
+                <img src={destination.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-black/25" />
               </div>
-              <h3 className="mt-5 text-lg font-semibold">{destination.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{destination.detail}</p>
-              <span className="mt-4 flex items-center gap-2 text-sm font-medium text-primary">
-                {destination.status === "Coming soon" ? "See the roadmap" : "Open"}
-                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-              </span>
+              <div className="p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary"><destination.icon className="h-5 w-5" /></span>
+                  <Badge variant="outline" className="rounded-full text-[11px]">{destination.status}</Badge>
+                </div>
+                <h3 className="mt-5 text-lg font-semibold">{destination.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{destination.detail}</p>
+                <span className="mt-4 flex items-center gap-2 text-sm font-medium text-primary">{destination.status === "Coming soon" ? "See the roadmap" : "Open"}<ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span>
+              </div>
             </a>
           ))}
         </div>

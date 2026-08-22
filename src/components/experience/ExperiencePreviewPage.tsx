@@ -8,6 +8,7 @@ export interface ExperienceCard {
   title: string;
   description: string;
   icon: LucideIcon;
+  image?: string;
   status?: "Available now" | "Preview";
   to?: string;
 }
@@ -55,27 +56,25 @@ export function ExperiencePreviewPage({
         {cards.map((card) => (
           <article
             key={card.title}
-            className="group flex min-h-64 flex-col rounded-3xl border border-border/70 bg-card p-7 transition hover:-translate-y-1 hover:border-primary/35"
+            className="group flex min-h-64 flex-col overflow-hidden rounded-3xl border border-border/70 bg-card transition hover:-translate-y-1 hover:border-primary/35"
           >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <card.icon className="h-6 w-6" />
+            {card.image && (
+              <div className="relative aspect-video overflow-hidden border-b border-border/60">
+                <img src={card.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/85 via-transparent to-black/20" />
               </div>
-              <Badge variant={card.status === "Available now" ? "default" : "secondary"}>
-                {card.status ?? "Preview"}
-              </Badge>
-            </div>
-            <h2 className="mt-7 text-2xl font-semibold">{card.title}</h2>
-            <p className="mt-3 flex-1 leading-7 text-muted-foreground">{card.description}</p>
-            {card.to ? (
-              <Button asChild variant="ghost" className="mt-5 w-fit px-0 hover:bg-transparent">
-                <Link to={card.to}>
-                  Open now <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            ) : (
-              <p className="mt-5 text-sm font-medium text-primary">Coming to VYBE</p>
             )}
+            <div className="flex flex-1 flex-col p-7">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><card.icon className="h-6 w-6" /></div>
+                <Badge variant={card.status === "Available now" ? "default" : "secondary"}>{card.status ?? "Preview"}</Badge>
+              </div>
+              <h2 className="mt-6 text-2xl font-semibold">{card.title}</h2>
+              <p className="mt-3 flex-1 leading-7 text-muted-foreground">{card.description}</p>
+              {card.to ? (
+                <Button asChild variant="ghost" className="mt-5 w-fit px-0 hover:bg-transparent"><Link to={card.to}>Open now <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+              ) : <p className="mt-5 text-sm font-medium text-primary">Coming to VYBE</p>}
+            </div>
           </article>
         ))}
       </section>

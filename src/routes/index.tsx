@@ -43,6 +43,7 @@ const connectionCards = [
     body: "Follow sounds, scenes, and people—not an algorithmic mold.",
     to: "/explore",
     status: "Available now",
+    image: "/images/supporter-cards/discover.webp",
   },
   {
     icon: MessageCircle,
@@ -50,6 +51,7 @@ const connectionCards = [
     body: "Preview how creator-led conversations and communities can grow around the music.",
     to: "/experience/communities",
     status: "Experience preview",
+    image: "/images/supporter-cards/community.webp",
   },
   {
     icon: CalendarDays,
@@ -57,6 +59,7 @@ const connectionCards = [
     body: "Preview listening parties, local showcases, drops, and member events.",
     to: "/experience/events",
     status: "Experience preview",
+    image: "/images/supporter-cards/events.webp",
   },
 ];
 
@@ -68,6 +71,7 @@ const audiencePaths = [
     body: "Listen, watch, read, discover, follow, save, connect, and take part as VYBE's community grows.",
     to: "/auth/sign-up",
     cta: "Create a free supporter account",
+    image: "/images/landing-paths/supporters.webp",
   },
   {
     icon: WandSparkles,
@@ -76,6 +80,7 @@ const audiencePaths = [
     body: "Share your work, organize your creator presence, understand your audience, and build direct supporter relationships.",
     to: "/build-with-vybe",
     cta: "Explore creator paths",
+    image: "/images/landing-paths/creators.webp",
   },
   {
     icon: BriefcaseBusiness,
@@ -84,13 +89,14 @@ const audiencePaths = [
     body: "Explore partnerships, campaigns, venues, sponsorships, and responsible ways to work with VYBE and its creators.",
     to: "/for-businesses",
     cta: "Explore business opportunities",
+    image: "/images/landing-paths/business-partners.webp",
   },
 ];
 
 const creatorPaths = [
-  { icon: Music2, title: "Music Creators", body: "Songs, playlists, stories, merch, sharing, and audience insights.", to: "/for-artists", status: "Available now" },
-  { icon: Clapperboard, title: "Film & Video Creators", body: "Trailers, clips, project media, reviews, screenings, and visual storytelling.", to: "/for-film-video", status: "Foundation growing" },
-  { icon: BookOpenText, title: "Writers & Poets", body: "Poetry, lyrics, stories, readings, written releases, and creator discovery.", to: "/for-writers-poets", status: "Experience preview" },
+  { icon: Music2, title: "Music Creators", body: "Songs, playlists, stories, merch, sharing, and audience insights.", to: "/for-artists", status: "Available now", image: "/images/supporter-cards/discover.webp" },
+  { icon: Clapperboard, title: "Film & Video Creators", body: "Trailers, clips, project media, reviews, screenings, and visual storytelling.", to: "/for-film-video", status: "Foundation growing", image: "/images/experience-cards/short-films.webp" },
+  { icon: BookOpenText, title: "Writers & Poets", body: "Poetry, lyrics, stories, readings, written releases, and creator discovery.", to: "/for-writers-poets", status: "Experience preview", image: "/images/experience-cards/poetry.webp" },
 ];
 
 function Landing() {
@@ -190,12 +196,18 @@ function Landing() {
           </div>
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
             {audiencePaths.map((path) => (
-              <Link key={path.eyebrow} to={path.to} className="group rounded-3xl border border-border/70 bg-card p-7 transition hover:-translate-y-0.5 hover:border-primary/40">
-                <path.icon className="h-6 w-6 text-primary" />
-                <p className="mt-6 text-xs font-semibold uppercase tracking-[.18em] text-primary">{path.eyebrow}</p>
-                <h3 className="mt-3 text-2xl font-semibold">{path.title}</h3>
-                <p className="mt-3 leading-7 text-muted-foreground">{path.body}</p>
-                <p className="mt-6 flex items-center gap-2 text-sm font-medium text-primary">{path.cta}<ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></p>
+              <Link key={path.eyebrow} to={path.to} className="group flex overflow-hidden rounded-3xl border border-border/70 bg-card transition hover:-translate-y-0.5 hover:border-primary/40 lg:flex-col">
+                <div className="relative min-h-48 w-2/5 overflow-hidden border-r border-border/60 lg:aspect-video lg:min-h-0 lg:w-full lg:border-b lg:border-r-0">
+                  <img src={path.image} alt="" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/65 via-transparent to-black/15" />
+                </div>
+                <div className="flex flex-1 flex-col p-6 lg:p-7">
+                  <path.icon className="h-6 w-6 text-primary" />
+                  <p className="mt-5 text-xs font-semibold uppercase tracking-[.18em] text-primary">{path.eyebrow}</p>
+                  <h3 className="mt-3 text-2xl font-semibold">{path.title}</h3>
+                  <p className="mt-3 flex-1 leading-7 text-muted-foreground">{path.body}</p>
+                  <p className="mt-6 flex items-center gap-2 text-sm font-medium text-primary">{path.cta}<ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></p>
+                </div>
               </Link>
             ))}
           </div>
@@ -208,7 +220,7 @@ function Landing() {
               <p className="max-w-md text-muted-foreground">Music is VYBE's strongest working foundation today. Film, video, writing, poetry, and additional entertainment creator paths continue to grow from it.</p>
             </div>
             <div className="mt-10 grid gap-5 md:grid-cols-3">
-              {creatorPaths.map((path) => <Link key={path.title} to={path.to} className="group rounded-3xl border border-border/70 bg-background/70 p-7 transition hover:border-primary/40"><path.icon className="h-6 w-6 text-primary" /><h3 className="mt-5 text-xl font-semibold">{path.title}</h3><p className="mt-3 leading-7 text-muted-foreground">{path.body}</p><div className="mt-6 flex items-center justify-between text-xs font-medium text-primary"><span>{path.status}</span><ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></div></Link>)}
+              {creatorPaths.map((path) => <Link key={path.title} to={path.to} className="group overflow-hidden rounded-3xl border border-border/70 bg-background/70 transition hover:border-primary/40"><div className="relative aspect-video overflow-hidden border-b border-border/60"><img src={path.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" /><div className="absolute inset-0 bg-gradient-to-t from-background/75 via-transparent to-black/15" /></div><div className="p-7"><path.icon className="h-6 w-6 text-primary" /><h3 className="mt-5 text-xl font-semibold">{path.title}</h3><p className="mt-3 leading-7 text-muted-foreground">{path.body}</p><div className="mt-6 flex items-center justify-between text-xs font-medium text-primary"><span>{path.status}</span><ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></div></div></Link>)}
             </div>
           </div>
         </section>
@@ -276,17 +288,17 @@ function Landing() {
                   key={item.title}
                   to={item.to}
                   search={item.to === "/explore" ? { q: "" } : undefined}
-                  className="group rounded-3xl border border-border/70 bg-card/75 p-7 transition hover:-translate-y-0.5 hover:border-primary/40"
+                  className="group overflow-hidden rounded-3xl border border-border/70 bg-card/75 transition hover:-translate-y-0.5 hover:border-primary/40"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/12 text-primary">
-                    <item.icon className="h-5 w-5" />
+                  <div className="relative aspect-video overflow-hidden border-b border-border/60">
+                    <img src={item.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-black/15" />
                   </div>
-                  <p className="mt-7 text-xs text-muted-foreground">0{index + 1}</p>
-                  <h3 className="mt-2 text-xl font-semibold">{item.title}</h3>
-                  <p className="mt-3 leading-7 text-muted-foreground">{item.body}</p>
-                  <div className="mt-5 flex items-center justify-between text-xs font-medium text-primary">
-                    <span>{item.status}</span>
-                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  <div className="p-7">
+                    <div className="flex items-center justify-between"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/12 text-primary"><item.icon className="h-5 w-5" /></div><p className="text-xs text-muted-foreground">0{index + 1}</p></div>
+                    <h3 className="mt-6 text-xl font-semibold">{item.title}</h3>
+                    <p className="mt-3 leading-7 text-muted-foreground">{item.body}</p>
+                    <div className="mt-5 flex items-center justify-between text-xs font-medium text-primary"><span>{item.status}</span><ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></div>
                   </div>
                 </Link>
               ))}

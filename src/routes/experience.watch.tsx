@@ -14,22 +14,26 @@ function WatchPreview() {
       cards={[
         {
           title: "Short films",
+          image: "/images/experience-cards/short-films.webp",
           description:
             "Independent films presented with credits, creator context, and a path to the filmmaker.",
           icon: Film,
         },
         {
           title: "Trailers & scenes",
+          image: "/images/experience-cards/trailers-scenes.webp",
           description: "Shareable previews for upcoming films, screenings, series, and projects.",
           icon: Clapperboard,
         },
         {
           title: "Music videos",
+          image: "/images/experience-cards/music-videos.webp",
           description: "Pair a release with the visual world the artist created around it.",
           icon: PlaySquare,
         },
         {
           title: "Behind the scenes",
+          image: "/images/experience-cards/behind-scenes.webp",
           description:
             "Production diaries, director commentary, studio sessions, and works in progress.",
           icon: Video,

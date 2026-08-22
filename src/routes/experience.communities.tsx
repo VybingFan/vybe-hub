@@ -33,8 +33,10 @@ function CommunitiesDemo() {
     <div className="min-h-screen bg-background">
       <MarketingNav />
       <main>
-        <section className="border-b border-border/60 bg-gradient-hero">
-          <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+        <section className="relative overflow-hidden border-b border-border/60 bg-gradient-hero">
+          <img src="/images/supporter-cards/community.webp" alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/85 to-background/55" />
+          <div className="relative mx-auto max-w-6xl px-6 py-16 md:py-20">
             <Badge className="border-pink-700/30 bg-pink-100 text-pink-900 dark:border-pink-300/30 dark:bg-pink-300/10 dark:text-pink-200">
               <MessageCircle className="mr-2 h-3.5 w-3.5" />
               Functional community demonstration

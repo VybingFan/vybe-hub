@@ -59,7 +59,10 @@ function PublicExplorePage() {
     <div className="min-h-screen bg-background">
       <MarketingNav />
       <main className="mx-auto min-h-[70vh] max-w-7xl px-6 py-14">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-border/70 px-6 py-12 text-center shadow-elevated md:px-12 md:py-16">
+          <img src="/images/supporter-cards/discover.webp" alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/88 to-background/70" />
+          <div className="relative mx-auto max-w-3xl">
           <Badge className="rounded-full bg-primary/10 text-primary">Open VYBE discovery</Badge>
           <h1 className="mt-5 text-4xl font-semibold tracking-tight md:text-6xl">
             Find your sound, city, or creator.
@@ -91,6 +94,7 @@ function PublicExplorePage() {
                 {genre}
               </Button>
             ))}
+          </div>
           </div>
         </div>
 

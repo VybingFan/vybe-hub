@@ -23,34 +23,40 @@ function ReadPage() {
         cards={[
           {
             title: "Poetry",
+            image: "/images/experience-cards/poetry.webp",
             description:
               "Poems presented as creative works with the voice and identity of the poet.",
             icon: Feather,
           },
           {
             title: "Lyrics",
+            image: "/images/experience-cards/lyrics.webp",
             description:
               "Creator-authorized lyrics paired with songs, credits, and the story behind them.",
             icon: PenLine,
           },
           {
             title: "Creator stories",
+            image: "/images/supporter-cards/creator-stories.webp",
             description:
               "Personal essays, milestones, inspirations, and the experiences shaping the work.",
             icon: BookHeart,
           },
           {
             title: "Behind the work",
+            image: "/images/experience-cards/behind-the-work.webp",
             description: "Notes from the studio, set, writing desk, stage, and editing room.",
             icon: BookOpenText,
           },
           {
             title: "Interviews",
+            image: "/images/supporter-cards/community.webp",
             description: "Conversations that introduce members to creators in their own words.",
             icon: MessageSquareQuote,
           },
           {
             title: "Culture & learning",
+            image: "/images/experience-cards/learn.webp",
             description:
               "Editorial features exploring genres, movements, craft, and creative history.",
             icon: Newspaper,
