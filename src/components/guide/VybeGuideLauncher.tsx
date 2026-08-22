@@ -8,33 +8,12 @@ import { useUser } from "@/hooks/useUser";
 import { CREATOR_ONBOARDING_STEPS, VYBE_GUIDE_ITEMS } from "@/features/guide/vybeGuideData";
 import { useCreatorSetupIntelligence } from "@/features/guide/useCreatorSetupIntelligence";
 
-type CreatorOnboardingState = {
-  status: "offered" | "active" | "paused" | "completed";
-  step: number;
-  mode?: "setup" | "review";
-};
-
-const STORAGE_KEY = "vybe:creator-onboarding-v2";
-
-function readState(): CreatorOnboardingState {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as CreatorOnboardingState;
-      if (
-        (parsed.status === "offered" || parsed.status === "active" || parsed.status === "paused" || parsed.status === "completed") &&
-        Number.isInteger(parsed.step)
-      ) {
-        return parsed;
-      }
-    }
-  } catch {}
-  return { status: "completed", step: 0 };
-}
-
-function saveState(next: CreatorOnboardingState) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-}
+import {
+  consumeCreatorOnboardingLaunch,
+  readCreatorOnboardingState,
+  saveCreatorOnboardingState,
+  type CreatorOnboardingState,
+} from "@/features/guide/creatorOnboardingState";
 
 export function VybeGuideLauncher() {
   const navigate = useNavigate();
@@ -49,25 +28,24 @@ export function VybeGuideLauncher() {
   const setup = useCreatorSetupIntelligence(creator ? user?.id : undefined);
 
   useEffect(() => {
-    if (!creator) return;
-    const current = readState();
-    const firstRun = window.localStorage.getItem("vybe:creator-onboarding-launch-v2");
+    if (!creator || !user?.id) return;
+    const current = readCreatorOnboardingState(user.id);
+    const firstRun = consumeCreatorOnboardingLaunch(user.id);
     setOnboarding(current);
     if (firstRun) {
-      window.localStorage.removeItem("vybe:creator-onboarding-launch-v2");
-      const next = current.status === "completed" ? { status: "offered" as const, step: 0 } : current;
-      saveState(next);
+      const next = current.status === "completed" ? { status: "offered" as const, step: 0, mode: "setup" as const } : current;
+      saveCreatorOnboardingState(user.id, next);
       setOnboarding(next);
       setOpen(true);
     }
-  }, [creator]);
+  }, [creator, user?.id]);
 
   useEffect(() => {
     if (!creator || setup.isLoading || onboarding.mode === "review" || onboarding.status === "completed") return;
     const targetStep = setup.nextStepIndex;
     if (onboarding.step === targetStep) return;
     const next = { status: onboarding.status, step: targetStep };
-    saveState(next);
+    if (user?.id) saveCreatorOnboardingState(user.id, next);
     setOnboarding(next);
   }, [creator, setup.isLoading, setup.nextStepIndex, onboarding.mode, onboarding.status, onboarding.step]);
 
@@ -84,13 +62,14 @@ export function VybeGuideLauncher() {
   }, [primaryRole, query]);
 
   function updateOnboarding(next: CreatorOnboardingState) {
-    saveState(next);
+    if (user?.id) saveCreatorOnboardingState(user.id, next);
     setOnboarding(next);
   }
 
   function continueSetup() {
     if (!currentStep) return;
-    setCoachDismissed(false);
+    // Minimize the coach after navigation so the destination controls remain visible.
+    setCoachDismissed(true);
     setOpen(false);
     void navigate({ to: currentStep.route as any });
   }

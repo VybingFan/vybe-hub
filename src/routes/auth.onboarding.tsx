@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useUser } from "@/hooks/useUser";
 import { SELECTABLE_ROLES, type SelectableRole } from "@/features/auth/roles";
+import { requestCreatorOnboardingLaunch } from "@/features/guide/creatorOnboardingState";
 import { z } from "zod";
 
 const onboardingSearchSchema = z.object({
@@ -42,7 +43,7 @@ const ROLE_META: Record<SelectableRole, { title: string; body: string; icon: typ
 function OnboardingPage() {
   const { role } = Route.useSearch();
   const { assignInitialRole } = useAuth();
-  const { isLoading, isAuthenticated, primaryRole, defaultRoute } = {
+  const { isLoading, isAuthenticated, primaryRole, defaultRoute, user } = {
     ...useUser(),
     isAuthenticated: useAuth().isAuthenticated,
   };
@@ -71,13 +72,7 @@ function OnboardingPage() {
     setSaving(true);
     try {
       await assignInitialRole(selected);
-      if (selected === "creator") {
-        window.localStorage.setItem(
-          "vybe:creator-onboarding-v2",
-          JSON.stringify({ status: "offered", step: 0 }),
-        );
-        window.localStorage.setItem("vybe:creator-onboarding-launch-v2", "1");
-      }
+      if (selected === "creator") requestCreatorOnboardingLaunch(user?.id);
       toast.success("You're all set");
       navigate({ to: "/auth/redirect" });
     } catch (err) {

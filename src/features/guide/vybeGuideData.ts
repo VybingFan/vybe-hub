@@ -42,8 +42,8 @@ export const CREATOR_ONBOARDING_STEPS: CreatorOnboardingStep[] = [
   {
     id: "profile",
     title: "Build your creator profile",
-    short: "Photo, creator name, bio, genres, links, and public profile basics.",
-    instruction: "What to do: Open Public Profile & Discovery and complete the essentials people need to recognize you. Add your creator name, photo, bio, genres, and important links. You can polish the rest later.",
+    short: "Profile photo, standard banner, creator name, bio, genres, links, and public profile basics.",
+    instruction: "What to do: Open Public Profile & Discovery and complete the essentials people need to recognize you. Add your creator name, profile photo, standard banner, bio, genres, and important links. You can polish the rest later.",
     route: "/profile",
     actionLabel: "Build My Profile",
     minutes: 1,

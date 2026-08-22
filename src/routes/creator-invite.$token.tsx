@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useUser } from "@/hooks/useUser";
 import { invitationService, type InvitePreview } from "@/services/invitations/invitationService";
+import { requestCreatorOnboardingLaunch } from "@/features/guide/creatorOnboardingState";
 
 export const Route = createFileRoute("/creator-invite/$token")({ component: CreatorInvitePage });
 
@@ -21,7 +22,7 @@ const PLAN_NAMES = {
 function CreatorInvitePage() {
   const { token } = Route.useParams();
   const { isAuthenticated, isLoading } = useAuth();
-  const { refresh } = useUser();
+  const { refresh, primaryRole } = useUser();
   const navigate = useNavigate();
   const [preview, setPreview] = useState<InvitePreview | null>(null);
   const [checking, setChecking] = useState(true);
@@ -43,6 +44,7 @@ function CreatorInvitePage() {
     try {
       await invitationService.redeem(token);
       window.localStorage.removeItem("vybe:pending-creator-invite");
+      if (!primaryRole) requestCreatorOnboardingLaunch();
       await refresh();
       toast.success("Creator Studio access activated");
       navigate({ to: "/dashboard", replace: true });

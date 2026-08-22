@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { LEGAL_POLICY_VERSION } from "@/constants/legal";
 import { useAuth } from "@/hooks/useAuth";
 import { signUpSchema } from "@/features/auth/roles";
+import { requestCreatorOnboardingLaunch } from "@/features/guide/creatorOnboardingState";
 
 export const Route = createFileRoute("/creator/sign-up")({
   component: CreatorSignUpPage,
@@ -51,6 +52,8 @@ function CreatorSignUpPage() {
         parsed.data.displayName,
         LEGAL_POLICY_VERSION,
       );
+
+      requestCreatorOnboardingLaunch();
 
       const pendingInvite = window.localStorage.getItem("vybe:pending-creator-invite");
       if (pendingInvite) {
