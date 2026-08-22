@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,15 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { ProfileCard } from "@/components/profile/ProfileCard";
-import { SocialLinksForm } from "@/components/socialLinks/SocialLinksForm";
 import { TagInput } from "@/components/supporter/TagInput";
 import { supporterProfileService } from "@/services/supporter/supporterProfileService";
 import {
   supporterProfileSchema, emptySupporterProfile, SUPPORTER_SOCIAL_FIELDS,
   type SupporterProfile, type SupporterProfileInput,
 } from "@/features/supporter/schema";
-import type { CreatorProfileInput } from "@/features/profile/schema";
-import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
 
 interface Props {
   initial: SupporterProfile | null;
@@ -33,6 +30,7 @@ export function SupporterProfileForm({ initial, userId, onSubmit, onCancel, subm
     useForm<SupporterProfileInput>({ resolver: zodResolver(supporterProfileSchema), defaultValues: defaults });
 
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const { fields: personalLinks, append: appendLink, remove: removeLink } = useFieldArray({ control, name: "personal_links" });
   const avatarPreview = watch("avatar_url");
   const bio = watch("bio") ?? "";
 
@@ -136,11 +134,17 @@ export function SupporterProfileForm({ initial, userId, onSubmit, onCancel, subm
             </Field>
           ))}
         </div>
-        <SocialLinksForm
-          control={control as unknown as Control<CreatorProfileInput>}
-          register={register as unknown as UseFormRegister<CreatorProfileInput>}
-          errors={errors as unknown as FieldErrors<CreatorProfileInput>}
-        />
+        <div className="mt-6 space-y-3">
+          <div className="flex items-center justify-between gap-4">
+            <div><Label>Personal links</Label><p className="text-xs text-muted-foreground">Add up to 10 optional links.</p></div>
+            <Button type="button" variant="outline" size="sm" onClick={() => appendLink({ label: "", url: "" })} disabled={personalLinks.length >= 10}><Plus className="mr-1 h-4 w-4" />Add link</Button>
+          </div>
+          {personalLinks.map((field, index) => <div key={field.id} className="grid gap-2 md:grid-cols-[1fr_2fr_auto]">
+            <Input placeholder="Label" {...register(`personal_links.${index}.label`)} />
+            <Input placeholder="https://…" {...register(`personal_links.${index}.url`)} />
+            <Button type="button" variant="ghost" size="icon" onClick={() => removeLink(index)} aria-label={`Remove link ${index + 1}`}><Trash2 className="h-4 w-4" /></Button>
+          </div>)}
+        </div>
       </ProfileCard>
 
       <div className="flex justify-end gap-2">

@@ -1,5 +1,5 @@
 export const APP_NAME = "VYBE";
-export const APP_TAGLINE = "Where music becomes community.";
+export const APP_TAGLINE = "Where creators and supporters connect.";
 export const COMPANY = "Aision Labs";
 
 export const NAV_LINKS = [
@@ -8,7 +8,8 @@ export const NAV_LINKS = [
 ] as const;
 
 export const EXPERIENCE_LINKS = [
-  { label: "Listen", to: "/experience/listen" },
+  { label: "Start Discovering", to: "/experience/discover" },
+  { label: "Music & Audio", to: "/discover/music" },
   { label: "Watch", to: "/experience/watch" },
   { label: "Read", to: "/experience/read" },
   { label: "Play", to: "/experience/play" },

@@ -2,7 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { CSSProperties } from "react";
 import {
   ArrowRight,
+  BookOpenText,
+  BriefcaseBusiness,
   CalendarDays,
+  Clapperboard,
   Headphones,
   Heart,
   MessageCircle,
@@ -11,6 +14,7 @@ import {
   ShoppingBag,
   Sparkles,
   Users,
+  WandSparkles,
 } from "lucide-react";
 import { MarketingNav } from "@/components/layout/MarketingNav";
 import { Footer } from "@/components/layout/Footer";
@@ -56,6 +60,39 @@ const connectionCards = [
   },
 ];
 
+const audiencePaths = [
+  {
+    icon: Heart,
+    eyebrow: "For Supporters",
+    title: "Find creators worth returning to.",
+    body: "Listen, watch, read, discover, follow, save, connect, and take part as VYBE's community grows.",
+    to: "/auth/sign-up",
+    cta: "Create a free supporter account",
+  },
+  {
+    icon: WandSparkles,
+    eyebrow: "For Creators",
+    title: "Give your work one professional home.",
+    body: "Share your work, organize your creator presence, understand your audience, and build direct supporter relationships.",
+    to: "/build-with-vybe",
+    cta: "Explore creator paths",
+  },
+  {
+    icon: BriefcaseBusiness,
+    eyebrow: "For Businesses & Partners",
+    title: "Create opportunities around the work.",
+    body: "Explore partnerships, campaigns, venues, sponsorships, and responsible ways to work with VYBE and its creators.",
+    to: "/for-businesses",
+    cta: "Explore business opportunities",
+  },
+];
+
+const creatorPaths = [
+  { icon: Music2, title: "Music Creators", body: "Songs, playlists, stories, merch, sharing, and audience insights.", to: "/for-artists", status: "Available now" },
+  { icon: Clapperboard, title: "Film & Video Creators", body: "Trailers, clips, project media, reviews, screenings, and visual storytelling.", to: "/for-film-video", status: "Foundation growing" },
+  { icon: BookOpenText, title: "Writers & Poets", body: "Poetry, lyrics, stories, readings, written releases, and creator discovery.", to: "/for-writers-poets", status: "Experience preview" },
+];
+
 function Landing() {
   return (
     <div className="min-h-screen bg-background">
@@ -68,14 +105,15 @@ function Landing() {
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-12 sm:px-6 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:py-28">
             <div>
               <Badge className="mb-6 rounded-full border border-primary/25 bg-primary/10 text-primary">
-                <Sparkles className="mr-2 h-3.5 w-3.5" /> Built around creators and fans
+                <Sparkles className="mr-2 h-3.5 w-3.5" /> A creator-first entertainment community
               </Badge>
               <h1 className="max-w-3xl text-4xl font-bold leading-[1.04] tracking-tight sm:text-5xl md:text-7xl">
-                Where music becomes <span className="text-gradient-brand">community.</span>
+                Where creators and supporters <span className="text-gradient-brand">connect.</span>
               </h1>
               <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-                Discover independent music, get closer to the stories behind it, and build lasting
-                connections with artists and fellow supporters.
+                Discover independent music, film, video, writing, stories, and the people behind
+                them. VYBE gives creators a professional home and supporters a meaningful way to
+                find, follow, and connect.
               </p>
               <div className="mt-9 flex flex-wrap gap-3">
                 <Button
@@ -93,14 +131,14 @@ function Landing() {
                   variant="outline"
                   className="rounded-full bg-background/40 backdrop-blur"
                 >
-                  <Link to="/explore" search={{ q: "" }}>
+                  <Link to="/experience/discover">
                     <Play className="mr-2 h-4 w-4" /> Start discovering
                   </Link>
                 </Button>
               </div>
               <div className="mt-10 flex flex-wrap gap-7 text-sm text-muted-foreground">
                 <span className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-primary" /> People, not profiles
+                  <Users className="h-4 w-4 text-primary" /> People behind the work
                 </span>
                 <span className="flex items-center gap-2">
                   <Heart className="h-4 w-4 text-genre-pop" /> Support that feels personal
@@ -115,22 +153,62 @@ function Landing() {
                 className="h-[470px] w-full rounded-[2rem] object-cover shadow-elevated"
               />
               <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-t from-background/90 via-transparent to-transparent" />
-              <Link
-                to="/demo/creator"
-                hash="music"
-                className="group absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 rounded-2xl border border-border bg-card/95 p-5 shadow-elevated backdrop-blur-xl transition hover:border-primary/60"
-                aria-label="Play music from the VYBE demo creator"
-              >
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.2em] text-genre-country">
-                    Your music world
-                  </p>
-                  <h2 className="mt-1 text-xl font-semibold">Discover. Connect. Belong.</h2>
+              <div className="absolute inset-x-5 bottom-5 rounded-2xl border border-border bg-card/95 p-5 shadow-elevated backdrop-blur-xl">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-[0.2em] text-genre-country">
+                      Guided creator example
+                    </p>
+                    <h2 className="mt-1 text-xl font-semibold">Discover. Connect. Belong.</h2>
+                  </div>
+                  <Link
+                    to="/demo/creator"
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-foreground text-background shadow-md transition hover:scale-105"
+                    aria-label="Open the guided VYBE creator example"
+                  >
+                    <Play className="ml-0.5 h-5 w-5 fill-current" />
+                  </Link>
                 </div>
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-foreground text-background shadow-md transition group-hover:scale-105">
-                  <Play className="ml-0.5 h-5 w-5 fill-current" />
+                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border/70 pt-4 text-sm">
+                  <Link to="/demo/creator" className="font-medium text-primary hover:underline">
+                    See VYBE in action
+                  </Link>
+                  <Link to="/explore" search={{ q: "" }} className="text-muted-foreground hover:text-foreground hover:underline">
+                    Or explore real creators
+                  </Link>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-6 py-20">
+          <div className="max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">One VYBE. Different reasons to belong.</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">Know where you fit from the first visit.</h2>
+            <p className="mt-5 text-lg leading-8 text-muted-foreground">Supporters discover and participate. Creators build and grow. Businesses and partners help create responsible opportunities.</p>
+          </div>
+          <div className="mt-10 grid gap-5 lg:grid-cols-3">
+            {audiencePaths.map((path) => (
+              <Link key={path.eyebrow} to={path.to} className="group rounded-3xl border border-border/70 bg-card p-7 transition hover:-translate-y-0.5 hover:border-primary/40">
+                <path.icon className="h-6 w-6 text-primary" />
+                <p className="mt-6 text-xs font-semibold uppercase tracking-[.18em] text-primary">{path.eyebrow}</p>
+                <h3 className="mt-3 text-2xl font-semibold">{path.title}</h3>
+                <p className="mt-3 leading-7 text-muted-foreground">{path.body}</p>
+                <p className="mt-6 flex items-center gap-2 text-sm font-medium text-primary">{path.cta}<ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></p>
               </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-y border-border/60 bg-card/35">
+          <div className="mx-auto max-w-7xl px-6 py-20">
+            <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+              <div><p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Built beyond one kind of creator</p><h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">Entertainment lives in more than one format.</h2></div>
+              <p className="max-w-md text-muted-foreground">Music is VYBE's strongest working foundation today. Film, video, writing, poetry, and additional entertainment creator paths continue to grow from it.</p>
+            </div>
+            <div className="mt-10 grid gap-5 md:grid-cols-3">
+              {creatorPaths.map((path) => <Link key={path.title} to={path.to} className="group rounded-3xl border border-border/70 bg-background/70 p-7 transition hover:border-primary/40"><path.icon className="h-6 w-6 text-primary" /><h3 className="mt-5 text-xl font-semibold">{path.title}</h3><p className="mt-3 leading-7 text-muted-foreground">{path.body}</p><div className="mt-6 flex items-center justify-between text-xs font-medium text-primary"><span>{path.status}</span><ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></div></Link>)}
             </div>
           </div>
         </section>
@@ -139,10 +217,10 @@ function Landing() {
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-                Explore your way
+                Music discovery starts here
               </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
-                Every genre brings a different VYBE.
+                Every sound brings a different VYBE.
               </h2>
             </div>
             <p className="max-w-md text-muted-foreground">
@@ -277,15 +355,15 @@ function Landing() {
             <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
               <div>
                 <p className="text-sm font-medium text-primary-foreground/75">
-                  For artists and the people who believe in them
+                  For creators and the people who believe in them
                 </p>
                 <h2 className="mt-2 max-w-2xl text-3xl font-bold text-primary-foreground md:text-4xl">
-                  One home for your music, your story, and your community.
+                  One home for your work, your story, and your community.
                 </h2>
               </div>
               <Button asChild size="lg" variant="secondary" className="shrink-0 rounded-full">
-                <Link to="/creator">
-                  <Music2 className="mr-2 h-4 w-4" /> Create your VYBE
+                <Link to="/build-with-vybe">
+                  <WandSparkles className="mr-2 h-4 w-4" /> Build your VYBE
                 </Link>
               </Button>
             </div>

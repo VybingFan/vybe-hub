@@ -23,6 +23,10 @@ export interface DiscoveryTrack {
   genre: string;
   description: string;
   cover_url: string | null;
+  audio_url: string;
+  playback_mode: string;
+  duration_sec: number;
+  created_at: string;
   creator: DiscoveryCreator | null;
 }
 
@@ -32,19 +36,46 @@ export interface DiscoveryArtistCredit {
   uploaderCount: number;
 }
 
+function storageObjectPath(bucket: string, value: string | null) {
+  if (!value) return null;
+  if (!/^https?:\/\//i.test(value)) return value.split("?")[0].replace(/^\/+/, "");
+  try {
+    const url = new URL(value);
+    const markers = [
+      `/storage/v1/object/sign/${bucket}/`,
+      `/storage/v1/object/public/${bucket}/`,
+      `/storage/v1/object/authenticated/${bucket}/`,
+    ];
+    const marker = markers.find((candidate) => url.pathname.includes(candidate));
+    if (!marker) return null;
+    return decodeURIComponent(url.pathname.slice(url.pathname.indexOf(marker) + marker.length));
+  } catch {
+    return null;
+  }
+}
+
 async function signedCover(path: string | null) {
-  if (!path) return null;
+  const objectPath = storageObjectPath("music-covers", path);
+  if (!objectPath) return null;
   const { data } = await supabase.storage
     .from("music-covers")
-    .createSignedUrl(path, 60 * 60);
+    .createSignedUrl(objectPath, 60 * 60);
   return data?.signedUrl ?? null;
 }
 
+async function signedAudio(bucket: "music-audio" | "music-previews", path: string | null) {
+  const objectPath = storageObjectPath(bucket, path);
+  if (!objectPath) return "";
+  const { data } = await supabase.storage.from(bucket).createSignedUrl(objectPath, 60 * 3);
+  return data?.signedUrl ?? "";
+}
+
 async function signedAvatar(path: string | null, fallback: string | null) {
-  if (!path) return fallback;
+  const objectPath = storageObjectPath("avatars", path);
+  if (!objectPath) return fallback;
   const { data } = await supabase.storage
     .from("avatars")
-    .createSignedUrl(path, 60 * 60);
+    .createSignedUrl(objectPath, 60 * 60);
   return data?.signedUrl ?? fallback;
 }
 
@@ -67,10 +98,11 @@ export const publicDiscoveryService = {
     let tracksQuery = supabase
       .from("tracks")
       .select(
-        "id,creator_id,title,primary_artist_name,featured_artist_names,genre,description,cover_url",
+        "id,creator_id,title,primary_artist_name,featured_artist_names,genre,description,cover_url,audio_url,playback_mode,preview_audio_path,duration_sec,created_at",
       )
       .eq("status", "published")
       .eq("visibility", "public")
+      .order("created_at", { ascending: false })
       .limit(40);
 
     if (query) {
@@ -151,11 +183,20 @@ export const publicDiscoveryService = {
       })),
     );
     const tracks = await Promise.all(
-      (trackRows ?? []).map(async (track) => ({
-        ...track,
-        cover_url: await signedCover(track.cover_url),
-        creator: creatorMap.get(track.creator_id) ?? null,
-      })),
+      (trackRows ?? []).map(async (track) => {
+        const playableAudio =
+          track.playback_mode === "preview"
+            ? await signedAudio("music-previews", track.preview_audio_path)
+            : track.playback_mode === "none" || track.playback_mode === "approved_listeners"
+              ? ""
+              : await signedAudio("music-audio", track.audio_url);
+        return {
+          ...track,
+          audio_url: playableAudio,
+          cover_url: await signedCover(track.cover_url),
+          creator: creatorMap.get(track.creator_id) ?? null,
+        };
+      }),
     );
 
     const visibleTracks = tracks.filter((track) => track.creator?.username);

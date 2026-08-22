@@ -65,6 +65,53 @@ function DemoCreatorPage() {
     <div className="min-h-screen bg-background">
       <MarketingNav />
       <main>
+        <section className="border-b border-primary/20 bg-primary/5">
+          <div className="mx-auto max-w-7xl px-5 py-7 sm:px-6">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-3xl">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge className="border-primary/30 bg-primary/15 text-primary">
+                    <Sparkles className="mr-1 h-3 w-3" /> Guided VYBE example
+                  </Badge>
+                  <Badge variant="outline">Fictional creator—not a real artist</Badge>
+                </div>
+                <h1 className="mt-4 text-2xl font-semibold sm:text-3xl">
+                  See how one creator page can become a complete supporter destination.
+                </h1>
+                <p className="mt-3 leading-7 text-muted-foreground">
+                  Nova Vale is a fictional example built to show how identity, playable music,
+                  playlists, stories, video, merch, events, and audience access can work together
+                  on VYBE. Nothing on this page represents a real artist or a live offer.
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <Button asChild variant="outline">
+                  <Link to="/explore" search={{ q: "" }}>
+                    Explore real creators
+                  </Link>
+                </Button>
+                <Button asChild className="bg-gradient-brand text-white">
+                  <a href="#tour">Start guided example</a>
+                </Button>
+              </div>
+            </div>
+            <div className="mt-6 grid gap-3 border-t border-border/70 pt-5 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                ["1", "Creator identity", "See how the banner, profile, bio, and lead work introduce the creator."],
+                ["2", "Work in one place", "Listen, watch, read, and browse without losing the creator's world."],
+                ["3", "Supporter access", "Understand public, member, follower, and future subscriber experiences."],
+                ["4", "Reasons to return", "See how playlists, stories, events, community, and merch deepen connection."],
+              ].map(([number, title, description]) => (
+                <div key={number} className="rounded-2xl border border-border/70 bg-background/60 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[.16em] text-primary">Learn {number}</p>
+                  <p className="mt-2 font-semibold">{title}</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="relative">
           <div className="h-64 overflow-hidden sm:h-80 md:h-[28rem]">
             <img
@@ -116,13 +163,13 @@ function DemoCreatorPage() {
           </div>
         </section>
 
-        <section className="border-y border-primary/20 bg-primary/5">
+        <section id="tour" className="scroll-mt-24 border-y border-primary/20 bg-primary/5">
           <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="font-semibold">You are viewing a guided example.</p>
+              <p className="font-semibold">Start here: see the public visitor experience.</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Nova Vale is a fictional creator built to demonstrate where VYBE links lead and how
-                public, member, follower, and future subscriber content could appear.
+                Follow the page from Nova's identity into music, playlists, stories, video, merch,
+                and community. Labels explain what is public now and what demonstrates future access.
               </p>
             </div>
             <Badge variant="outline" className="w-fit shrink-0">

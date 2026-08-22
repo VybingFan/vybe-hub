@@ -17,7 +17,7 @@ function ListenPreview() {
           description: "Browse independent artists and published music available across VYBE.",
           icon: Headphones,
           status: "Available now",
-          to: "/explore",
+          to: "/discover/music",
         },
         {
           title: "Creator playlists",

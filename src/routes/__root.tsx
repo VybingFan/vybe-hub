@@ -113,26 +113,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "VYBE Creator" },
-      { title: "VYBE — Where music becomes community" },
+      { title: "VYBE — Where creators and supporters connect" },
       {
         name: "description",
         content:
-          "Discover independent music, meet the people behind it, and build lasting community on VYBE.",
+          "Discover independent entertainment, connect with creators, and build lasting community on VYBE.",
       },
       { name: "author", content: "Aision Labs" },
-      { property: "og:title", content: "VYBE — Where music becomes community" },
+      { property: "og:title", content: "VYBE — Where creators and supporters connect" },
       {
         property: "og:description",
         content:
-          "Discover music, share stories, and connect with independent artists and fellow supporters.",
+          "Discover music, film, video, writing, stories, and the independent creators behind them.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "VYBE — Where music becomes community" },
+      { name: "twitter:title", content: "VYBE — Where creators and supporters connect" },
       {
         name: "twitter:description",
         content:
-          "Discover music, share stories, and connect with independent artists and fellow supporters.",
+          "Discover independent entertainment and connect directly with creators and supporters.",
       },
       {
         property: "og:image",

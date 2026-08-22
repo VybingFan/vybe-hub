@@ -36,7 +36,9 @@ import { Route as ExperienceReadRouteImport } from './routes/experience.read'
 import { Route as ExperiencePlayRouteImport } from './routes/experience.play'
 import { Route as ExperienceListenRouteImport } from './routes/experience.listen'
 import { Route as ExperienceEventsRouteImport } from './routes/experience.events'
+import { Route as ExperienceDiscoverRouteImport } from './routes/experience.discover'
 import { Route as ExperienceCommunitiesRouteImport } from './routes/experience.communities'
+import { Route as DiscoverMusicRouteImport } from './routes/discover.music'
 import { Route as DemoCreatorRouteImport } from './routes/demo.creator'
 import { Route as CreatorSignUpRouteImport } from './routes/creator.sign-up'
 import { Route as CreatorSignInRouteImport } from './routes/creator.sign-in'
@@ -261,9 +263,19 @@ const ExperienceEventsRoute = ExperienceEventsRouteImport.update({
   path: '/experience/events',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExperienceDiscoverRoute = ExperienceDiscoverRouteImport.update({
+  id: '/experience/discover',
+  path: '/experience/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExperienceCommunitiesRoute = ExperienceCommunitiesRouteImport.update({
   id: '/experience/communities',
   path: '/experience/communities',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscoverMusicRoute = DiscoverMusicRouteImport.update({
+  id: '/discover/music',
+  path: '/discover/music',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoCreatorRoute = DemoCreatorRouteImport.update({
@@ -826,7 +838,9 @@ export interface FileRoutesByFullPath {
   '/creator/sign-in': typeof CreatorSignInRoute
   '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
+  '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
+  '/experience/discover': typeof ExperienceDiscoverRoute
   '/experience/events': typeof ExperienceEventsRoute
   '/experience/listen': typeof ExperienceListenRoute
   '/experience/play': typeof ExperiencePlayRoute
@@ -944,7 +958,9 @@ export interface FileRoutesByTo {
   '/creator/sign-in': typeof CreatorSignInRoute
   '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
+  '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
+  '/experience/discover': typeof ExperienceDiscoverRoute
   '/experience/events': typeof ExperienceEventsRoute
   '/experience/listen': typeof ExperienceListenRoute
   '/experience/play': typeof ExperiencePlayRoute
@@ -1064,7 +1080,9 @@ export interface FileRoutesById {
   '/creator/sign-in': typeof CreatorSignInRoute
   '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
+  '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
+  '/experience/discover': typeof ExperienceDiscoverRoute
   '/experience/events': typeof ExperienceEventsRoute
   '/experience/listen': typeof ExperienceListenRoute
   '/experience/play': typeof ExperiencePlayRoute
@@ -1184,7 +1202,9 @@ export interface FileRouteTypes {
     | '/creator/sign-in'
     | '/creator/sign-up'
     | '/demo/creator'
+    | '/discover/music'
     | '/experience/communities'
+    | '/experience/discover'
     | '/experience/events'
     | '/experience/listen'
     | '/experience/play'
@@ -1302,7 +1322,9 @@ export interface FileRouteTypes {
     | '/creator/sign-in'
     | '/creator/sign-up'
     | '/demo/creator'
+    | '/discover/music'
     | '/experience/communities'
+    | '/experience/discover'
     | '/experience/events'
     | '/experience/listen'
     | '/experience/play'
@@ -1421,7 +1443,9 @@ export interface FileRouteTypes {
     | '/creator/sign-in'
     | '/creator/sign-up'
     | '/demo/creator'
+    | '/discover/music'
     | '/experience/communities'
+    | '/experience/discover'
     | '/experience/events'
     | '/experience/listen'
     | '/experience/play'
@@ -1497,7 +1521,9 @@ export interface RootRouteChildren {
   CreatorSignInRoute: typeof CreatorSignInRoute
   CreatorSignUpRoute: typeof CreatorSignUpRoute
   DemoCreatorRoute: typeof DemoCreatorRoute
+  DiscoverMusicRoute: typeof DiscoverMusicRoute
   ExperienceCommunitiesRoute: typeof ExperienceCommunitiesRoute
+  ExperienceDiscoverRoute: typeof ExperienceDiscoverRoute
   ExperienceEventsRoute: typeof ExperienceEventsRoute
   ExperienceListenRoute: typeof ExperienceListenRoute
   ExperiencePlayRoute: typeof ExperiencePlayRoute
@@ -1706,11 +1732,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExperienceEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/experience/discover': {
+      id: '/experience/discover'
+      path: '/experience/discover'
+      fullPath: '/experience/discover'
+      preLoaderRoute: typeof ExperienceDiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/experience/communities': {
       id: '/experience/communities'
       path: '/experience/communities'
       fullPath: '/experience/communities'
       preLoaderRoute: typeof ExperienceCommunitiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover/music': {
+      id: '/discover/music'
+      path: '/discover/music'
+      fullPath: '/discover/music'
+      preLoaderRoute: typeof DiscoverMusicRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/creator': {
@@ -2531,7 +2571,9 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorSignInRoute: CreatorSignInRoute,
   CreatorSignUpRoute: CreatorSignUpRoute,
   DemoCreatorRoute: DemoCreatorRoute,
+  DiscoverMusicRoute: DiscoverMusicRoute,
   ExperienceCommunitiesRoute: ExperienceCommunitiesRoute,
+  ExperienceDiscoverRoute: ExperienceDiscoverRoute,
   ExperienceEventsRoute: ExperienceEventsRoute,
   ExperienceListenRoute: ExperienceListenRoute,
   ExperiencePlayRoute: ExperiencePlayRoute,

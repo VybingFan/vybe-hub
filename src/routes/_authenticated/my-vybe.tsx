@@ -136,7 +136,7 @@ function SupporterIdentityCard({ profile }: {
             ) : null}
           </div>
           <Button asChild variant={hasIdentity ? "outline" : "default"}>
-            <Link to="/profile"><Pencil className="mr-2 h-4 w-4" />{hasIdentity ? "Edit profile" : "Create profile"}</Link>
+            <Link to="/supporter-profile"><Pencil className="mr-2 h-4 w-4" />{hasIdentity ? "Edit profile" : "Create profile"}</Link>
           </Button>
         </div>
       </CardContent>
