@@ -126,7 +126,7 @@ function CreatorInsightsPage() {
         <TabsContent value="engagement"><CreatorEngagementPanel days={queryDays} social={social} /></TabsContent>
       </Tabs>
 
-      {!canExport ? <LockedFeatureCard title="Advanced insights and exports" description="Keep a longer reporting window and export creator performance for professional review." requiredPlan="creator_pro" usage={`${periodLabel} reporting is active on your current membership.`} compact /> : null}
+      {!canExport ? <LockedFeatureCard title="Advanced insights and exports" description="Keep a longer reporting window and export creator performance for professional review." requiredPlan="creator_pro" educationKey="analytics_export" usage={`${periodLabel} reporting is active on your current membership.`} compact /> : null}
     </div>
   );
 }

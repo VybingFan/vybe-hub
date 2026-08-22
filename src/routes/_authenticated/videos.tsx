@@ -46,7 +46,7 @@ const MAX_DIRECT_UPLOAD_BYTES = 200 * 1024 * 1024;
 export const Route = createFileRoute("/_authenticated/videos")({
   component: () => (
     <RoleGuard allow={["creator", "admin"]}>
-      <CreatorCapabilityGuard capability="video.library" requiredPlan="creator_plus" title="Video Library requires Creator Plus" description="Creator Free keeps its established music and profile benefits. Video publishing begins with Creator Plus.">
+      <CreatorCapabilityGuard capability="video.library" requiredPlan="creator_plus" educationKey="video_library" title="Video Library requires Creator Plus" description="Creator Free keeps its established music and profile benefits. Video publishing begins with Creator Plus.">
         <VideoStudio />
       </CreatorCapabilityGuard>
     </RoleGuard>

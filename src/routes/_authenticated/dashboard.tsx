@@ -254,6 +254,7 @@ function DashboardContent() {
             title="Protected playlist sharing"
             description="Add password-protected playlists with controlled expiration for private previews."
             requiredPlan="creator_plus"
+            educationKey="playlist_password"
             usage="Creator Free includes public links and up to two active unlisted playlists."
             compact
           />
@@ -261,6 +262,7 @@ function DashboardContent() {
             title="Full Creator Website and EPK"
             description="Build a multi-section public creator home and unlock the complete professional EPK."
             requiredPlan="creator_pro"
+            educationKey="epk_full"
             compact
           />
         </section>
@@ -271,6 +273,7 @@ function DashboardContent() {
             title="Full Creator Website and professional EPK"
             description="Move beyond the Creator Showcase with full public sections, EPK export, and professional sharing controls."
             requiredPlan="creator_pro"
+            educationKey="epk_full"
             usage="Your Creator Showcase, Top 5, EPK Lite, and protected-sharing allowance remain active."
             compact
           />

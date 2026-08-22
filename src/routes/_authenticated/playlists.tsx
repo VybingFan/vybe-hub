@@ -63,6 +63,7 @@ import { Badge } from "@/components/ui/badge";
 import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
 import { useMembership } from "@/hooks/useMembership";
 import { getCreatorEntitlements, hasCreatorFeature } from "@/features/membership/entitlements";
+import { LockedFeatureCard } from "@/components/membership/LockedFeatureCard";
 import {
   TRACK_PRODUCTION_STAGE_LABELS,
   TRACK_WORKSPACE_CATEGORY_LABELS,
@@ -415,11 +416,13 @@ function PlaylistStudio() {
         </div>
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
           {creatorEntitlements.limits.activePasswordPlaylists
-            ? `${creatorEntitlements.limits.activePasswordPlaylists} active password links Â· maximum ${creatorEntitlements.limits.passwordExpiryDays}-day expiration`
+            ? `${creatorEntitlements.limits.activePasswordPlaylists} active password links · maximum ${creatorEntitlements.limits.passwordExpiryDays}-day expiration`
             : "Password links require Creator Plus. Public and unlisted sharing remain available."}
-          {canUseApprovedListeners ? " Â· Approved listeners and sign-in controls included" : " Â· Approved listeners require Creator Pro"}
+          {canUseApprovedListeners ? " · Approved listeners and sign-in controls included" : " · Approved listeners require Creator Pro"}
         </p>
       </div>
+      {!canUsePasswords ? <LockedFeatureCard title="Password-protected playlist links" description="Keep the option visible while learning how controlled preview links can support pitches, releases, and private reviews." requiredPlan="creator_plus" educationKey="playlist_password" compact /> : null}
+      {!canUseApprovedListeners ? <LockedFeatureCard title="Approved-listener playlist access" description="Learn when recipient-level access is more appropriate than a public, unlisted, or password-protected link." requiredPlan="creator_pro" educationKey="playlist_approved_listeners" compact /> : null}
 
       {createdSlug && (
         <div className="flex flex-col gap-4 rounded-2xl border border-primary/30 bg-primary/10 p-5 sm:flex-row sm:items-center sm:justify-between">

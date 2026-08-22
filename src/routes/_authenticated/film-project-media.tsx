@@ -17,7 +17,7 @@ import { useUser } from "@/hooks/useUser";
 import { creatorFocusService } from "@/services/membership/creatorFocusService";
 import { filmProjectMediaService,type CompletionState,type FilmMediaRole } from "@/services/film/filmProjectMediaService";
 
-export const Route=createFileRoute("/_authenticated/film-project-media")({component:()=> <RoleGuard allow={["creator","admin"]}><CreatorCapabilityGuard capability="film.project_media_review" requiredPlan="creator_plus" title="Project Media & Review requires Creator Plus" description="Private project-review planning is not included with Creator Free."><FilmProjectMediaPage/></CreatorCapabilityGuard></RoleGuard>});
+export const Route=createFileRoute("/_authenticated/film-project-media")({component:()=> <RoleGuard allow={["creator","admin"]}><CreatorCapabilityGuard capability="film.project_media_review" requiredPlan="creator_plus" educationKey="film_review" title="Project Media & Review requires Creator Plus" description="Private project-review planning is not included with Creator Free."><FilmProjectMediaPage/></CreatorCapabilityGuard></RoleGuard>});
 const ROLES:FilmMediaRole[]=["trailer","clip","scene","rough_cut","teaser","behind_the_scenes","other"];
 function FilmProjectMediaPage(){
  const {user}=useUser();const creatorId=user?.id;const client=useQueryClient();

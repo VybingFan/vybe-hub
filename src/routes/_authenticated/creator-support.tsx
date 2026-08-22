@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/creator-support")({
-  component: () => <RoleGuard allow={["creator", "admin"]}><CreatorCapabilityGuard capability="support.priority" requiredPlan="creator_plus" title="Priority support requires Creator Plus" description="Creator Free retains standard support access. Priority creator support begins with Creator Plus."><CreatorSupportPage /></CreatorCapabilityGuard></RoleGuard>,
+  component: () => <RoleGuard allow={["creator", "admin"]}><CreatorCapabilityGuard capability="support.priority" requiredPlan="creator_plus" educationKey="priority_support" title="Priority support requires Creator Plus" description="Creator Free retains standard support access. Priority creator support begins with Creator Plus."><CreatorSupportPage /></CreatorCapabilityGuard></RoleGuard>,
 });
 
 function CreatorSupportPage() {

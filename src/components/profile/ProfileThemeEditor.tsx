@@ -25,6 +25,7 @@ export function ProfileThemeEditor({
         title="Full-page creator backgrounds begin with Creator Pro"
         description="Creator Pro, Founding Creator, and Creator Studio can replace the standard public-page background with their own full-page image. This is separate from VYBE interface Appearance settings."
         requiredPlan="creator_pro"
+        educationKey="profile_background"
       />
     );
   }

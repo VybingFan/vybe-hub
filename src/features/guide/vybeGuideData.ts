@@ -1,5 +1,5 @@
 import {
-  BarChart3, BellRing, BookOpenText, Eye, FileCheck2, Film, Heart,
+  BarChart3, BellRing, BookOpenText, Eye, FileCheck2, Film, Heart, LockKeyhole,
   ListMusic, Music2, Share2, ShieldCheck, Upload, UserRound, Video,
 } from "lucide-react";
 
@@ -112,6 +112,17 @@ export const VYBE_GUIDE_ITEMS: VybeGuideItem[] = [
     roles: ["creator", "supporter", "business", "admin"],
     keywords: ["help", "guide", "vg", "quick help", "where"],
     icon: BookOpenText,
+  },
+  {
+    id: "membership-tools",
+    title: "Your plan, included tools & locked features",
+    summary: "Understand what is active now and what additional creator tools are designed to do.",
+    what: "Locked tools remain visible so you can understand VYBE's creator workflow before deciding whether another plan is useful. Select Learn how this helps for a practical explanation of the feature, how it works, and its growth value. A lock means the tool is not included in the current membership; it does not mean VYBE is broken. Creator Free keeps its included tools active, and each higher plan expands specific limits or professional workflows.",
+    where: "Look for lock icons and Learn how this helps throughout Creator Studio. Compare complete limits and plan availability under Creator Settings > Membership.",
+    route: "/creator-memberships",
+    roles: ["creator", "admin"],
+    keywords: ["membership", "plan", "locked", "upgrade", "included", "limits", "free", "plus", "pro", "studio"],
+    icon: LockKeyhole,
   },
   {
     id: "profile",

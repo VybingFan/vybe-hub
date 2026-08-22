@@ -21,6 +21,7 @@ import {
   LayoutDashboard,
   LibraryBig,
   ListMusic,
+  LockKeyhole,
   Music2,
   Settings,
   ShieldCheck,
@@ -266,10 +267,12 @@ export function AppSidebar() {
   const visible = (items: NavItem[]) =>
     items.filter((item) => {
       if (!hasAnyRole(item.allow)) return false;
-      if (item.capability && !hasCreatorCapability(membership.data?.plan_code, item.capability)) return false;
       if (item.focus && !hasActiveCreatorFocus(item.focus, focusAccess.data?.access)) return false;
       return true;
     });
+  const isLocked = (item: NavItem) => Boolean(
+    item.capability && !hasCreatorCapability(membership.data?.plan_code, item.capability),
+  );
 
   useEffect(() => {
     if (!isAdmin) {
@@ -526,6 +529,7 @@ export function AppSidebar() {
                 label="Creator Studio"
                 items={visible(creatorStudio)}
                 isActive={isActive}
+                isLocked={isLocked}
               />
             ) : null}
             {visible(creatorAudience).length ? (
@@ -533,6 +537,7 @@ export function AppSidebar() {
                 label="Audience"
                 items={visible(creatorAudience)}
                 isActive={isActive}
+                isLocked={isLocked}
               />
             ) : null}
             {visible(creatorGrowth).length ? (
@@ -540,6 +545,7 @@ export function AppSidebar() {
                 label="Profile & Growth"
                 items={visible(creatorGrowth)}
                 isActive={isActive}
+                isLocked={isLocked}
               />
             ) : null}            {hasAnyRole(["creator"]) && hasCreatorCapability(membership.data?.plan_code, "creator_mode.browse") ? (
               <NavGroup
@@ -608,11 +614,13 @@ function NavGroup({
   items,
   isActive,
   adminPermissions,
+  isLocked,
 }: {
   label: string;
   items: NavItem[];
   isActive: (url: string) => boolean;
   adminPermissions?: string[];
+  isLocked?: (item: NavItem) => boolean;
 }) {
   const visibleItems = items.filter(
     (item) =>
@@ -637,6 +645,7 @@ function NavGroup({
                 <Link to={item.url} className="flex items-center gap-2">
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
+                  {isLocked?.(item) ? <LockKeyhole className="ml-auto h-3.5 w-3.5 text-muted-foreground" aria-label="Locked by membership" /> : null}
                   {item.badge ? (
                     <span className="ml-auto rounded-full bg-destructive px-2 py-0.5 text-xs font-semibold text-destructive-foreground">
                       {item.badge > 99 ? "99+" : item.badge}
