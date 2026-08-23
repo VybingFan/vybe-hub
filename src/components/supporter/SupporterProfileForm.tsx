@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm, Controller, useFieldArray, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera, Loader2, Plus, Trash2 } from "lucide-react";
+import { Camera, CheckCircle2, Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +12,7 @@ import { ProfileCard } from "@/components/profile/ProfileCard";
 import { TagInput } from "@/components/supporter/TagInput";
 import { supporterProfileService } from "@/services/supporter/supporterProfileService";
 import {
-  supporterProfileSchema, emptySupporterProfile, SUPPORTER_SOCIAL_FIELDS,
+  supporterProfileSchema, normalizeSupporterProfileInput, SUPPORTER_SOCIAL_FIELDS,
   type SupporterProfile, type SupporterProfileInput,
 } from "@/features/supporter/schema";
 
@@ -25,19 +25,12 @@ interface Props {
 }
 
 export function SupporterProfileForm({ initial, userId, onSubmit, onCancel, submitting }: Props) {
-  const defaults: SupporterProfileInput = initial
-    ? {
-        ...emptySupporterProfile,
-        ...initial,
-        favorite_genres: Array.isArray(initial.favorite_genres) ? initial.favorite_genres : [],
-        favorite_artists: Array.isArray(initial.favorite_artists) ? initial.favorite_artists : [],
-        personal_links: Array.isArray(initial.personal_links) ? initial.personal_links : [],
-      }
-    : { ...emptySupporterProfile };
-  const { register, control, watch, setValue, handleSubmit, formState: { errors } } =
+  const defaults = normalizeSupporterProfileInput(initial);
+  const { register, control, watch, setValue, handleSubmit, formState: { errors, isSubmitting } } =
     useForm<SupporterProfileInput>({ resolver: zodResolver(supporterProfileSchema), defaultValues: defaults });
 
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [photoNotice, setPhotoNotice] = useState<string | null>(null);
   const { fields: personalLinks, append: appendLink, remove: removeLink } = useFieldArray({ control, name: "personal_links" });
   const avatarPreview = watch("avatar_url");
   const bio = watch("bio") ?? "";
@@ -45,10 +38,12 @@ export function SupporterProfileForm({ initial, userId, onSubmit, onCancel, subm
   const uploadAvatar = async (file?: File) => {
     if (!file) return;
     setUploadingAvatar(true);
+    setPhotoNotice(null);
     try {
       const result = await supporterProfileService.uploadAvatar(userId, file);
       setValue("avatar_path", result.path, { shouldDirty: true, shouldValidate: true });
       setValue("avatar_url", result.url, { shouldDirty: true, shouldValidate: true });
+      setPhotoNotice("New photo ready. Select Save changes to apply it to your profile.");
       toast.success("Profile photo uploaded");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Upload failed");
@@ -79,33 +74,42 @@ export function SupporterProfileForm({ initial, userId, onSubmit, onCancel, subm
 
   return (
     <form onSubmit={submit} className="space-y-6">
+      <div className="sticky top-20 z-20 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/25 bg-background/95 p-3 shadow-elevated backdrop-blur">
+        <div>
+          <p className="font-semibold">Editing your supporter profile</p>
+          <p className="text-xs text-muted-foreground">Make your changes, then select Save changes.</p>
+        </div>
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" onClick={onCancel} disabled={submitting || isSubmitting || uploadingAvatar}>Cancel</Button>
+          <SubmitButton loading={submitting || isSubmitting} disabled={uploadingAvatar} className="w-auto px-6">Save changes</SubmitButton>
+        </div>
+      </div>
       <ProfileCard
         title="Your supporter identity"
         description="This is how you show up across VYBE when you follow, comment, save, and join communities."
       >
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-          <label className="group relative block h-28 w-28 shrink-0 cursor-pointer overflow-hidden rounded-3xl border-4 border-card bg-muted shadow-elevated">
+          <div className="relative block h-32 w-32 shrink-0 overflow-hidden rounded-3xl border-4 border-card bg-muted shadow-elevated">
             <img
               src={avatarPreview || "/avatars/default-avatar.png"}
               alt="Supporter profile preview"
               className="h-full w-full object-cover"
             />
-            <span className="absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition group-hover:opacity-100">
+            <span className="pointer-events-none absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full bg-black/65 shadow-md">
               {uploadingAvatar ? <Loader2 className="h-6 w-6 animate-spin text-white" /> : <Camera className="h-6 w-6 text-white" />}
             </span>
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-              disabled={uploadingAvatar}
-              onChange={(event) => void uploadAvatar(event.target.files?.[0])}
-            />
-          </label>
+          </div>
           <div className="min-w-0 flex-1">
             <p className="font-medium">Profile picture</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Click the image to upload a JPG, PNG, or WebP up to 8MB.
+              JPG, PNG, or WebP up to 8MB.
             </p>
+            <label htmlFor="supporter-avatar-upload" className="mt-3 inline-flex h-10 cursor-pointer items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow transition hover:bg-primary/90">
+              {uploadingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
+              {uploadingAvatar ? "Uploading photo…" : avatarPreview ? "Change photo" : "Upload photo"}
+            </label>
+            <input id="supporter-avatar-upload" type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" disabled={uploadingAvatar} onChange={(event) => void uploadAvatar(event.target.files?.[0])} />
+            {photoNotice && <p className="mt-3 flex items-start gap-2 text-sm font-medium text-emerald-500"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />{photoNotice}</p>}
           </div>
         </div>
 
@@ -170,10 +174,6 @@ export function SupporterProfileForm({ initial, userId, onSubmit, onCancel, subm
         </div>
       </ProfileCard>
 
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onCancel} disabled={submitting || uploadingAvatar}>Cancel</Button>
-        <SubmitButton loading={submitting} disabled={uploadingAvatar} className="w-auto px-8">Save profile</SubmitButton>
-      </div>
     </form>
   );
 }

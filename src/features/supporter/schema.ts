@@ -34,6 +34,41 @@ export const emptySupporterProfile: SupporterProfileInput = {
   favorite_genres: [], favorite_artists: [], website: "", instagram: "", x: "", tiktok: "", personal_links: [],
 };
 
+const text = (value: unknown) => typeof value === "string" ? value : "";
+
+/** Convert nullable or older database rows into values the supporter form can always render and save. */
+export function normalizeSupporterProfileInput(value: unknown): SupporterProfileInput {
+  const source = value && typeof value === "object" ? value as Record<string, unknown> : {};
+  const tags = (key: string) => Array.isArray(source[key])
+    ? source[key].filter((item): item is string => typeof item === "string").map((item) => item.trim()).filter(Boolean)
+    : [];
+  const personalLinks = Array.isArray(source.personal_links)
+    ? source.personal_links.flatMap((item) => {
+        if (!item || typeof item !== "object") return [];
+        const link = item as Record<string, unknown>;
+        const label = text(link.label).trim();
+        const url = text(link.url).trim();
+        return label && url ? [{ label, url }] : [];
+      })
+    : [];
+
+  return {
+    display_name: text(source.display_name),
+    username: text(source.username),
+    bio: text(source.bio),
+    location: text(source.location),
+    avatar_url: text(source.avatar_url),
+    avatar_path: typeof source.avatar_path === "string" ? source.avatar_path : null,
+    favorite_genres: tags("favorite_genres"),
+    favorite_artists: tags("favorite_artists"),
+    website: text(source.website),
+    instagram: text(source.instagram),
+    x: text(source.x),
+    tiktok: text(source.tiktok),
+    personal_links: personalLinks,
+  };
+}
+
 export interface SupporterProfile extends SupporterProfileInput {
   user_id: string;
   created_at: string;

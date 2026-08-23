@@ -1,6 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { SupporterProfile, SupporterProfileInput } from "@/features/supporter/schema";
-import type { PersonalLink } from "@/features/profile/schema";
+import {
+  normalizeSupporterProfileInput,
+  supporterProfileSchema,
+  type SupporterProfile,
+  type SupporterProfileInput,
+} from "@/features/supporter/schema";
 
 const database = supabase as any;
 const SIGNED_URL_TTL = 60 * 60 * 6;
@@ -12,11 +16,10 @@ type Row = Omit<SupporterProfile, "personal_links" | "favorite_genres" | "favori
 };
 
 function normalize(row: Row): SupporterProfile {
+  const safe = normalizeSupporterProfileInput(row);
   return {
     ...row,
-    personal_links: Array.isArray(row.personal_links) ? row.personal_links as PersonalLink[] : [],
-    favorite_genres: Array.isArray(row.favorite_genres) ? row.favorite_genres as string[] : [],
-    favorite_artists: Array.isArray(row.favorite_artists) ? row.favorite_artists as string[] : [],
+    ...safe,
   };
 }
 
@@ -47,7 +50,8 @@ export const supporterProfileService = {
   },
 
   async upsert(userId: string, input: SupporterProfileInput): Promise<SupporterProfile> {
-    const payload = { user_id: userId, ...input, avatar_url: input.avatar_path ? null : input.avatar_url, personal_links: input.personal_links ?? [] };
+    const safe = supporterProfileSchema.parse(input);
+    const payload = { user_id: userId, ...safe, avatar_url: safe.avatar_path ? null : safe.avatar_url, personal_links: safe.personal_links ?? [] };
     const { data, error } = await database.from("supporter_profiles").upsert(payload, { onConflict: "user_id" }).select("*").single();
     if (error) throw error;
     return hydrate(data as Row);

@@ -50,7 +50,6 @@ function SupporterProfileWorkspace() {
     <Card className="overflow-hidden border-primary/20"><CardContent className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center">
       <Avatar className="h-24 w-24 rounded-3xl border shadow-elevated"><AvatarImage src={profile.avatar_url || undefined} alt={`${name} supporter profile`} /><AvatarFallback className="rounded-3xl bg-gradient-brand text-xl text-white">{name.slice(0, 2).toUpperCase()}</AvatarFallback></Avatar>
       <div className="min-w-0 flex-1"><p className="text-xs font-semibold uppercase tracking-[.2em] text-primary">Your supporter identity</p><h1 className="mt-1 text-3xl font-semibold">{name}</h1><p className="mt-1 text-sm font-medium text-primary">@{profile.username}</p>{profile.location ? <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground"><MapPin className="h-4 w-4" />{profile.location}</p> : null}</div>
-      <Button variant="outline" onClick={() => setEditingRequested(true)}><Pencil className="mr-2 h-4 w-4" />Change profile</Button>
     </CardContent></Card>
 
     <SupporterProfileView profile={profile} />

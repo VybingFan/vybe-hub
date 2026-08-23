@@ -9,8 +9,8 @@ interface Props {
 
 export function SupporterProfileView({ profile }: Props) {
   const bio = profile?.bio?.trim();
-  const genres = profile?.favorite_genres ?? [];
-  const artists = profile?.favorite_artists ?? [];
+  const genres = Array.isArray(profile?.favorite_genres) ? profile.favorite_genres : [];
+  const artists = Array.isArray(profile?.favorite_artists) ? profile.favorite_artists : [];
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
