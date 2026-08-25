@@ -7,7 +7,7 @@ export function PublicExperiencePage(props: ComponentProps<typeof ExperiencePrev
   return (
     <div className="min-h-screen bg-background">
       <MarketingNav />
-      <main className="px-6 py-12 md:py-16">
+      <main className="px-5 py-8 sm:px-6 sm:py-12 md:py-16">
         <ExperiencePreviewPage {...props} />
       </main>
       <Footer />

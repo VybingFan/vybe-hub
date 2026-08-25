@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
-import { CheckCircle2, Clapperboard, Footprints, Mic2, Sparkles, XCircle } from "lucide-react";
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { ArrowRight, CheckCircle2, Clapperboard, Footprints, Mic2, Sparkles, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type PreviewKey = "film" | "dance" | "podcasting";
+export type PreviewKey = "film" | "dance" | "podcasting";
 
 interface PreviewQuestion {
   prompt: string;
@@ -22,7 +23,7 @@ interface PreviewDefinition {
   questions: PreviewQuestion[];
 }
 
-const PREVIEWS: PreviewDefinition[] = [
+export const NON_MUSIC_PREVIEWS: PreviewDefinition[] = [
   {
     key: "film",
     focus: "Film / Video",
@@ -129,42 +130,85 @@ const PREVIEWS: PreviewDefinition[] = [
   },
 ];
 
+export function getNonMusicPreview(key: string) {
+  return NON_MUSIC_PREVIEWS.find((item) => item.key === key) ?? null;
+}
+
 export function NonMusicPlayPreviews() {
-  const [active, setActive] = useState<PreviewKey | null>(null);
+  return (
+    <section className="mb-8 sm:mb-12">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-fuchsia-400">Creator Focus Games</p>
+          <h3 className="mt-1 text-xl font-semibold sm:text-3xl">More ways to play</h3>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Try a Film / Video, Dance, or Podcasting three-question game.
+          </p>
+        </div>
+        <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-xs font-semibold text-violet-300">
+          <Sparkles className="h-3.5 w-3.5" />
+          Quick games
+        </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:grid-cols-3 sm:gap-4">
+        {NON_MUSIC_PREVIEWS.map((item) => {
+          const Icon = item.Icon;
+          return (
+            <Link
+              key={item.key}
+              to="/play/preview/$previewKey"
+              params={{ previewKey: item.key }}
+              className="group min-w-0 overflow-hidden rounded-2xl border border-border bg-card text-left transition hover:-translate-y-1 hover:border-violet-400/50 hover:shadow-xl sm:rounded-[1.75rem]"
+            >
+              <div className="relative aspect-[16/9] overflow-hidden bg-muted sm:aspect-[16/10]">
+                <img
+                  src={item.artwork}
+                  alt=""
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                />
+                <div className={`absolute inset-0 bg-gradient-to-t ${item.accent}`} />
+                <div className="absolute left-2 top-2 rounded-full border border-white/20 bg-black/55 p-1.5 text-white backdrop-blur sm:left-4 sm:top-4 sm:p-2">
+                  <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                </div>
+              </div>
+              <div className="p-3 sm:p-5">
+                <p className="truncate text-[10px] font-bold uppercase tracking-[.14em] text-cyan-400 sm:text-[11px] sm:tracking-[.18em]">
+                  {item.focus}
+                </p>
+                <h4 className="mt-1.5 text-sm font-semibold sm:mt-2 sm:text-lg">{item.title}</h4>
+                <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground sm:mt-2 sm:text-sm sm:leading-6">
+                  {item.description}
+                </p>
+                <p className="mt-2.5 flex items-center gap-1 text-[10px] font-bold uppercase tracking-[.14em] text-fuchsia-400 sm:mt-4 sm:text-xs sm:tracking-[.16em]">
+                  Play <ArrowRight className="h-3.5 w-3.5" />
+                </p>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+export function NonMusicPreviewPlayer({ previewKey }: { previewKey: string }) {
+  const selected = getNonMusicPreview(previewKey);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answer, setAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
 
-  const selected = useMemo(
-    () => PREVIEWS.find((item) => item.key === active) ?? null,
-    [active],
-  );
-
-  const question = selected?.questions[questionIndex] ?? null;
-
-  function openPreview(key: PreviewKey) {
-    setActive(key);
-    setQuestionIndex(0);
-    setAnswer(null);
-    setScore(0);
-    setFinished(false);
-    window.requestAnimationFrame(() => {
-      document.getElementById("creator-focus-preview-player")?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    });
-  }
+  if (!selected) return null;
+  const question = selected.questions[questionIndex];
 
   function chooseAnswer(choice: string) {
-    if (!question || answer) return;
+    if (answer) return;
     setAnswer(choice);
     if (choice === question.answer) setScore((current) => current + 1);
   }
 
   function nextQuestion() {
-    if (!selected) return;
     if (questionIndex >= selected.questions.length - 1) {
       setFinished(true);
       setAnswer(null);
@@ -181,180 +225,94 @@ export function NonMusicPlayPreviews() {
     setFinished(false);
   }
 
-  function closePreview() {
-    setActive(null);
-    setQuestionIndex(0);
-    setAnswer(null);
-    setScore(0);
-    setFinished(false);
-  }
-
   return (
-    <section className="mb-12">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-semibold text-fuchsia-400">Creator Focus Preview</p>
-          <h3 className="mt-1 text-2xl font-semibold sm:text-3xl">
-            More ways to play are entering the VYBE
-          </h3>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Music is only one part of Play. Try a quick three-question preview from Film / Video,
-            Dance, or Podcasting.
-          </p>
-        </div>
-        <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-xs font-semibold text-violet-300">
-          <Sparkles className="h-3.5 w-3.5" />
-          Friends and family preview
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
-        {PREVIEWS.map((item) => {
-          const Icon = item.Icon;
-          const isActive = active === item.key;
-          return (
-            <button
-              key={item.key}
-              type="button"
-              onClick={() => openPreview(item.key)}
-              className={`group overflow-hidden rounded-[1.75rem] border text-left transition hover:-translate-y-1 hover:shadow-xl ${
-                isActive
-                  ? "border-fuchsia-400/60 bg-fuchsia-400/10 shadow-fuchsia-500/10"
-                  : "border-border bg-card hover:border-violet-400/50"
-              }`}
-            >
-              <div className="relative aspect-[16/10] overflow-hidden bg-muted">
-                <img
-                  src={item.artwork}
-                  alt=""
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                />
-                <div className={`absolute inset-0 bg-gradient-to-t ${item.accent}`} />
-                <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-black/55 p-2 text-white backdrop-blur">
-                  <Icon className="h-4 w-4" />
-                </div>
-              </div>
-              <div className="p-5">
-                <p className="text-[11px] font-bold uppercase tracking-[.18em] text-cyan-400">
-                  {item.focus}
-                </p>
-                <h4 className="mt-2 text-lg font-semibold">{item.title}</h4>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
-                <p className="mt-4 text-xs font-bold uppercase tracking-[.16em] text-fuchsia-400">
-                  Try preview
-                </p>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {selected ? (
-        <div
-          id="creator-focus-preview-player"
-          className={`mt-6 overflow-hidden rounded-[2rem] border border-violet-400/30 bg-gradient-to-br ${selected.accent} p-[1px]`}
-        >
-          <div className="rounded-[calc(2rem-1px)] bg-background/95 p-5 backdrop-blur sm:p-7">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[.18em] text-cyan-400">
-                  {selected.focus} quick preview
-                </p>
-                <h4 className="mt-2 text-2xl font-semibold">{selected.title}</h4>
-              </div>
-              <Button type="button" variant="outline" size="sm" onClick={closePreview}>
-                Close preview
-              </Button>
-            </div>
-
-            {finished ? (
-              <div className="py-8 text-center">
-                <CheckCircle2 className="mx-auto h-12 w-12 text-lime-400" />
-                <p className="mt-4 text-3xl font-semibold">
-                  {score} of {selected.questions.length}
-                </p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Preview complete. Try it again or explore another creator focus.
-                </p>
-                <div className="mt-5 flex flex-wrap justify-center gap-2">
-                  <Button onClick={restartPreview}>Play again</Button>
-                  <Button variant="outline" onClick={closePreview}>Choose another preview</Button>
-                </div>
-              </div>
-            ) : question ? (
-              <>
-                <div className="mt-6 flex items-center justify-between gap-4 text-xs text-muted-foreground">
-                  <span>
-                    Question {questionIndex + 1} of {selected.questions.length}
-                  </span>
-                  <span>Score {score}</span>
-                </div>
-
-                <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-400 to-cyan-400 transition-all duration-500"
-                    style={{ width: `${((questionIndex + 1) / selected.questions.length) * 100}%` }}
-                  />
-                </div>
-
-                <p className="mt-6 text-lg font-semibold leading-7">{question.prompt}</p>
-
-                <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                  {question.choices.map((choice) => {
-                    const correct = answer && choice === question.answer;
-                    const chosenWrong = answer === choice && choice !== question.answer;
-                    return (
-                      <button
-                        key={choice}
-                        type="button"
-                        disabled={Boolean(answer)}
-                        onClick={() => chooseAnswer(choice)}
-                        className={`rounded-2xl border p-4 text-left text-sm font-medium transition ${
-                          correct
-                            ? "border-lime-400 bg-lime-400/10"
-                            : chosenWrong
-                              ? "border-destructive bg-destructive/10"
-                              : "border-border bg-card/70 hover:border-fuchsia-400/50"
-                        }`}
-                      >
-                        {choice}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {answer ? (
-                  <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-4">
-                    <p className="flex items-center gap-2 font-semibold">
-                      {answer === question.answer ? (
-                        <CheckCircle2 className="h-4 w-4 text-lime-400" />
-                      ) : (
-                        <XCircle className="h-4 w-4 text-destructive" />
-                      )}
-                      {answer === question.answer ? "Correct" : `Answer: ${question.answer}`}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {question.explanation}
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Button size="sm" onClick={nextQuestion}>
-                        {questionIndex === selected.questions.length - 1
-                          ? "See score"
-                          : "Next question"}
-                      </Button>
-                      {answer !== question.answer ? (
-                        <Button size="sm" variant="outline" onClick={() => setAnswer(null)}>
-                          Try this question again
-                        </Button>
-                      ) : null}
-                    </div>
-                  </div>
-                ) : null}
-              </>
-            ) : null}
+    <article className={`overflow-hidden rounded-2xl border border-violet-400/30 bg-gradient-to-br ${selected.accent} p-[1px] sm:rounded-[2rem]`}>
+      <div className="rounded-[calc(1rem-1px)] bg-background/95 backdrop-blur sm:rounded-[calc(2rem-1px)]">
+        <div className="relative aspect-[16/6] overflow-hidden rounded-t-[calc(1rem-1px)] bg-muted sm:aspect-[16/7] sm:rounded-t-[calc(2rem-1px)]">
+          <img src={selected.artwork} alt="" className="h-full w-full object-cover" />
+          <div className={`absolute inset-0 bg-gradient-to-t ${selected.accent}`} />
+          <div className="absolute inset-x-4 bottom-3">
+            <p className="text-[10px] font-bold uppercase tracking-[.16em] text-cyan-300">{selected.focus}</p>
+            <h1 className="mt-1 text-xl font-semibold text-white sm:text-3xl">{selected.title}</h1>
           </div>
         </div>
-      ) : null}
-    </section>
+
+        <div className="p-4 sm:p-7">
+          {finished ? (
+            <div className="py-6 text-center sm:py-8">
+              <CheckCircle2 className="mx-auto h-10 w-10 text-lime-400 sm:h-12 sm:w-12" />
+              <p className="mt-3 text-2xl font-semibold sm:mt-4 sm:text-3xl">
+                {score} of {selected.questions.length}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">Game complete.</p>
+              <Button onClick={restartPreview} className="mt-4 rounded-full">Play again</Button>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between gap-4 text-xs text-muted-foreground">
+                <span>Question {questionIndex + 1} of {selected.questions.length}</span>
+                <span>Score {score}</span>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-violet-500 via-fuchsia-400 to-cyan-400 transition-all duration-500"
+                  style={{ width: `${((questionIndex + 1) / selected.questions.length) * 100}%` }}
+                />
+              </div>
+
+              <p className="mt-5 text-lg font-semibold leading-7">{question.prompt}</p>
+
+              <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                {question.choices.map((choice) => {
+                  const correct = answer && choice === question.answer;
+                  const chosenWrong = answer === choice && choice !== question.answer;
+                  return (
+                    <button
+                      key={choice}
+                      type="button"
+                      disabled={Boolean(answer)}
+                      onClick={() => chooseAnswer(choice)}
+                      className={`rounded-xl border p-3 text-left text-sm font-medium transition sm:rounded-2xl sm:p-4 ${
+                        correct
+                          ? "border-lime-400 bg-lime-400/10"
+                          : chosenWrong
+                            ? "border-destructive bg-destructive/10"
+                            : "border-border bg-card/70 hover:border-fuchsia-400/50"
+                      }`}
+                    >
+                      {choice}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {answer ? (
+                <div className="mt-4 rounded-xl border border-cyan-400/20 bg-cyan-400/5 p-3 sm:rounded-2xl sm:p-4">
+                  <p className="flex items-center gap-2 font-semibold">
+                    {answer === question.answer ? (
+                      <CheckCircle2 className="h-4 w-4 text-lime-400" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-destructive" />
+                    )}
+                    {answer === question.answer ? "Correct" : `Answer: ${question.answer}`}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{question.explanation}</p>
+                  <div className="mt-3 flex flex-col gap-2 sm:mt-4 sm:flex-row">
+                    <Button size="sm" onClick={nextQuestion} className="w-full sm:w-auto">
+                      {questionIndex === selected.questions.length - 1 ? "See score" : "Next question"}
+                    </Button>
+                    {answer !== question.answer ? (
+                      <Button size="sm" variant="outline" onClick={() => setAnswer(null)} className="w-full sm:w-auto">
+                        Try again
+                      </Button>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+            </>
+          )}
+        </div>
+      </div>
+    </article>
   );
 }

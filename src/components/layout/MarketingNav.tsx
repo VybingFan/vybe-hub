@@ -94,7 +94,7 @@ export function MarketingNav() {
               title="Discover"
               items={NAV_LINKS.map((item) => ({ label: item.label, to: item.to }))}
             />
-            <MobileSection title="Explore VYBE" items={EXPERIENCE_LINKS} />
+            <MobileSection title="Explore VYBE" items={EXPERIENCE_LINKS.filter((item) => item.to !== "/discover/music")} />
             <MobileSection title="Community" items={COMMUNITY_LINKS} />
             <MobileSection title="More" items={[...MORE_LINKS, { label: "Build With VYBE", to: "/build-with-vybe" }]} />
             <div className="border-t border-border/50 pt-4">

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   CheckCircle2,
@@ -62,7 +63,6 @@ function stylePromptLabel(pack: ReleasedPlayGamePack) {
 
 export function PublishedGamePacks() {
   const [packs, setPacks] = useState<ReleasedPlayGamePack[]>([]);
-  const [selectedPackId, setSelectedPackId] = useState<string | null>(null);
   const [selectedFocus, setSelectedFocus] = useState<FocusFilter>("all");
 
   useEffect(() => {
@@ -73,7 +73,6 @@ export function PublishedGamePacks() {
         if (active) {
           const playable = next.filter((pack) => pack.items.length);
           setPacks(playable);
-          setSelectedPackId(playable.find((pack) => pack.game_type !== "beat_blitz")?.id ?? null);
         }
       })
       .catch(() => undefined);
@@ -91,17 +90,6 @@ export function PublishedGamePacks() {
     }
     return pack.creator_focus === selectedFocus;
   });
-  const selectedPack = packs.find((pack) => pack.id === selectedPackId) ?? null;
-
-  function choosePack(pack: ReleasedPlayGamePack) {
-    setSelectedPackId(pack.id);
-    window.requestAnimationFrame(() => {
-      document.getElementById("selected-game")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    });
-  }
 
   return (
     <section id="game-library" className="scroll-mt-24 border-t border-border/60 bg-surface/40">
@@ -120,7 +108,6 @@ export function PublishedGamePacks() {
               aria-pressed={selectedFocus === focus.key}
               onClick={() => {
                 setSelectedFocus(focus.key);
-                setSelectedPackId(null);
               }}
               className={`rounded-full border px-3 py-2 text-sm transition ${
                 selectedFocus === focus.key
@@ -146,18 +133,12 @@ export function PublishedGamePacks() {
               pack.game_type === "vybe_match"
                 ? pack.items.reduce((total, item) => total + (item.payload.matches?.length ?? 0), 0)
                 : pack.items.length;
-            const selected = selectedPackId === pack.id;
             return (
-              <button
+              <Link
                 key={pack.id}
-                type="button"
-                onClick={() => choosePack(pack)}
-                aria-pressed={selected}
-                className={`group overflow-hidden rounded-3xl border p-5 text-left transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/10 ${
-                  selected
-                    ? "border-primary bg-primary/10"
-                    : "border-border bg-card hover:border-primary/50"
-                }`}
+                to="/play/$packId"
+                params={{ packId: pack.id }}
+                className="group overflow-hidden rounded-3xl border border-border bg-card p-5 text-left transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10"
               >
                 <div className="-mx-5 -mt-5 mb-5 aspect-video overflow-hidden rounded-t-[1.45rem] bg-muted">
                   <img
@@ -179,21 +160,16 @@ export function PublishedGamePacks() {
                 <p className="mt-4 text-xs font-medium uppercase tracking-wider text-primary">
                   Play now
                 </p>
-              </button>
+              </Link>
             );
           })}
         </div>
-        {selectedPack ? (
-          <div id="selected-game" className="scroll-mt-24 mt-8 max-w-3xl">
-            <PackPlayer key={selectedPack.id} pack={selectedPack} />
-          </div>
-        ) : null}
       </div>
     </section>
   );
 }
 
-function PackPlayer({ pack }: { pack: ReleasedPlayGamePack }) {
+export function ReleasedGamePackPlayer({ pack }: { pack: ReleasedPlayGamePack }) {
   if (pack.game_type === "vybe_match") return <MatchPlayer pack={pack} />;
   return <ChoicePlayer pack={pack} />;
 }

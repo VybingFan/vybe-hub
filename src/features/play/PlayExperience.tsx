@@ -297,21 +297,21 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
   return (
     <main>
       <section className="border-b border-border/60 bg-gradient-hero">
-        <div className="mx-auto max-w-6xl px-6 py-16 text-center md:py-24">
+        <div className="mx-auto max-w-6xl px-5 py-9 text-center sm:px-6 sm:py-16 md:py-24">
           <Badge className="border-lime-700/40 bg-lime-100 text-lime-900 dark:border-lime-300/30 dark:bg-lime-300/10 dark:text-lime-200">
             <Sparkles className="mr-2 h-3.5 w-3.5" />
             Play on VYBE · Available now
           </Badge>
-          <h1 className="mx-auto mt-5 max-w-4xl text-4xl font-bold tracking-tight md:text-6xl">
+          <h1 className="mx-auto mt-4 max-w-4xl text-3xl font-bold tracking-tight sm:mt-5 sm:text-4xl md:text-6xl">
             Discovery becomes something you do.
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted-foreground sm:mt-5 sm:text-lg sm:leading-8">
             {isMember
               ? "Play progress is saved on this device and synchronized after reconnection. Offline results remain casual and unverified."
               : "Try VYBE activities without an account. Casual progress stays on this device, including while you are offline."}
           </p>
-          <div className="mt-6 flex justify-center">
-            <div className="flex items-center gap-2 rounded-full border border-border bg-background/80 px-4 py-2 text-sm">
+          <div className="mt-4 flex justify-center sm:mt-6">
+            <div className="flex max-w-full items-center gap-1.5 rounded-full border border-border bg-background/80 px-3 py-1.5 text-xs sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
               {online ? (
                 <Wifi className="h-4 w-4 text-lime-600 dark:text-lime-300" />
               ) : (
@@ -331,29 +331,39 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-14">
+      <section className="mx-auto max-w-6xl px-5 pb-2 pt-5 sm:hidden">
+        <div className="mb-3">
+          <p className="text-sm font-medium text-primary">Play now</p>
+          <h2 className="mt-1 text-2xl font-semibold">Choose a game to play</h2>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            Start with an available game. More game types will appear here as they are ready.
+          </p>
+        </div>
+        <PublishedGamePacks />
+      </section>
+
+      <section className="mx-auto max-w-6xl px-5 py-7 sm:px-6 sm:py-14">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-medium text-primary">Play Home</p>
-            <h2 className="mt-1 text-3xl font-semibold">What sounds fun today?</h2>
+            <p className="text-sm font-medium text-primary">Game options</p>
+            <h2 className="mt-1 text-xl font-semibold sm:text-3xl">Pick how you want to play</h2>
           </div>
-          <p className="max-w-lg text-sm text-muted-foreground">
-            Live activities open now. Preview destinations are labeled clearly while VYBE grows.
+          <p className="max-w-lg text-xs leading-5 text-muted-foreground sm:text-sm">
+            Filter available games or use a quick Play option. Preview areas stay clearly labeled.
           </p>
         </div>
 
-        <div className="mt-8 rounded-[2rem] border border-border/70 bg-card p-6 sm:p-8">
+        <div className="mt-5 rounded-2xl border border-border/70 bg-card p-4 sm:mt-8 sm:rounded-[2rem] sm:p-8">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-sm font-medium text-primary">Choose your game VYBE</p>
-              <h2 className="mt-1 text-2xl font-semibold">Play by genre—or mix it up</h2>
+              <p className="text-xs font-medium uppercase tracking-wider text-primary sm:text-sm sm:normal-case sm:tracking-normal">Game filter</p>
+              <h2 className="mt-1 text-xl font-semibold sm:text-2xl">Play by genre—or mix it up</h2>
             </div>
-            <p className="max-w-lg text-sm leading-6 text-muted-foreground">
-              Mixed VYBE is open for the pilot. Individual genres activate only after their
-              Knowledge Engine content is reviewed and deep enough to avoid repetition.
+            <p className="max-w-lg text-xs leading-5 text-muted-foreground sm:text-sm sm:leading-6">
+              Mixed VYBE is available now. Other filters unlock as their game content is ready.
             </p>
           </div>
-          <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label="Play genre">
+          <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-6 sm:gap-2" role="group" aria-label="Play genre">
             {PLAY_GENRES.map((genre) => {
               const available = AVAILABLE_PLAY_GENRES.includes(genre);
               const active = playGenre === genre;
@@ -365,7 +375,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
                   disabled={!available}
                   aria-pressed={active}
                   title={available ? `Play ${genre}` : `${genre} content is being prepared`}
-                  className={`rounded-full border px-4 py-2 text-sm transition ${
+                  className={`rounded-full border px-3 py-1.5 text-xs transition sm:px-4 sm:py-2 sm:text-sm ${
                     active
                       ? "border-primary bg-primary text-primary-foreground"
                       : available
@@ -379,7 +389,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
               );
             })}
           </div>
-          <div className="mt-4 text-sm text-muted-foreground" aria-live="polite">
+          <div className="mt-3 text-xs text-muted-foreground sm:mt-4 sm:text-sm" aria-live="polite">
             <p>
               Today’s game selection:{" "}
               <span className="font-semibold text-foreground">{playGenre}</span>
@@ -388,52 +398,51 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
           </div>
         </div>
 
-        <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-5 hidden gap-3 sm:grid sm:grid-cols-2 sm:mt-7 sm:gap-4 lg:grid-cols-3">
           {playDestinations.map((destination) => (
             <a
               key={destination.title}
               href={destination.href}
-              className="group overflow-hidden rounded-3xl border border-border/70 bg-card transition hover:-translate-y-0.5 hover:border-primary/40"
+              className="group min-w-0 overflow-hidden rounded-2xl border border-border/70 bg-card transition hover:-translate-y-0.5 hover:border-primary/40 sm:rounded-3xl"
             >
-              <div className="relative aspect-video overflow-hidden border-b border-border/60">
+              <div className="relative aspect-[16/8] overflow-hidden border-b border-border/60 sm:aspect-video">
                 <img src={destination.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-black/25" />
               </div>
-              <div className="p-5">
+              <div className="p-3 sm:p-5">
                 <div className="flex items-start justify-between gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary"><destination.icon className="h-5 w-5" /></span>
-                  <Badge variant="outline" className="rounded-full text-[11px]">{destination.status}</Badge>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary sm:h-11 sm:w-11 sm:rounded-2xl"><destination.icon className="h-4 w-4 sm:h-5 sm:w-5" /></span>
+                  <Badge variant="outline" className="max-w-[5.75rem] truncate rounded-full px-1.5 text-[9px] sm:max-w-none sm:px-2.5 sm:text-[11px]">{destination.status}</Badge>
                 </div>
-                <h3 className="mt-5 text-lg font-semibold">{destination.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{destination.detail}</p>
-                <span className="mt-4 flex items-center gap-2 text-sm font-medium text-primary">{destination.status === "Coming soon" ? "See the roadmap" : "Open"}<ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span>
+                <h3 className="mt-3 text-sm font-semibold sm:mt-5 sm:text-lg">{destination.title}</h3>
+                <p className="mt-1.5 text-xs leading-5 text-muted-foreground sm:mt-2 sm:text-sm sm:leading-6">{destination.detail}</p>
+                <span className="mt-2.5 flex items-center gap-1 text-xs font-medium text-primary sm:mt-4 sm:gap-2 sm:text-sm">{destination.status === "Coming soon" ? "See the roadmap" : "Open"}<ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span>
               </div>
             </a>
           ))}
         </div>
 
-        <div className="mt-6 overflow-hidden rounded-[2rem] border border-primary/30 bg-gradient-brand p-6 text-white sm:p-8">
-          <div className="grid gap-6 lg:grid-cols-[1fr_.9fr] lg:items-center">
+        <div className="mt-4 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-brand p-3.5 text-white sm:mt-6 sm:rounded-[2rem] sm:p-8">
+          <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1fr_.9fr] lg:items-center">
             <div>
               <p className="flex items-center gap-2 text-sm font-semibold text-white/80">
-                <Sparkles className="h-4 w-4" /> Signature Play action
+                <Sparkles className="h-4 w-4" /> Quick pick
               </p>
-              <h2 className="mt-2 text-3xl font-semibold">Surprise Me</h2>
-              <p className="mt-3 max-w-xl leading-7 text-white/80">
-                Reveal one eligible public VYBE activity or destination. Locked and unfinished
-                subscriber content is never included.
+              <h2 className="mt-1 text-xl font-semibold sm:mt-2 sm:text-3xl">Surprise Me</h2>
+              <p className="mt-1.5 max-w-xl text-xs leading-5 text-white/80 sm:mt-3 sm:text-base sm:leading-7">
+                Not sure what to choose? Let VYBE pick an available activity for you.
               </p>
               <Button
                 type="button"
                 variant="secondary"
-                className="mt-5 rounded-full"
+                className="mt-3 w-full rounded-full sm:mt-5 sm:w-auto"
                 onClick={revealSurprise}
               >
                 <Sparkles className="mr-2 h-4 w-4" />
                 {surprise ? "Surprise me again" : "Reveal my surprise"}
               </Button>
             </div>
-            <div className="rounded-3xl border border-white/20 bg-black/20 p-6" aria-live="polite">
+            <div className="rounded-2xl border border-white/20 bg-black/20 p-4 sm:rounded-3xl sm:p-6" aria-live="polite">
               {surprise ? (
                 <>
                   <p className="text-sm text-white/70">Your surprise</p>
@@ -459,34 +468,35 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
         </div>
       </section>
 
-      <PublishedGamePacks />
+      <div className="hidden sm:block">
+        <PublishedGamePacks />
+      </div>
 
       <section className="border-y border-border/60 bg-surface/40">
-        <div className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mx-auto max-w-6xl px-5 py-9 sm:px-6 sm:py-16">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-sm font-medium text-primary">Daily VYBE</p>
-              <h2 className="mt-1 text-3xl font-semibold">A fresh reason to return</h2>
+              <p className="text-xs font-medium uppercase tracking-wider text-primary sm:text-sm sm:normal-case sm:tracking-normal">More to play</p>
+              <h2 className="mt-1 text-xl font-semibold sm:text-3xl">Daily VYBE</h2>
             </div>
-            <p className="max-w-lg text-sm leading-6 text-muted-foreground">
-              Quick activities use approved VYBE knowledge and creator-authorized material. Saved
-              streaks and history come in a later account phase.
+            <p className="max-w-lg text-xs leading-5 text-muted-foreground sm:text-sm sm:leading-6">
+              Quick activities and rotating reasons to come back and play.
             </p>
           </div>
-          <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:mt-7 sm:gap-4 lg:grid-cols-4">
             {DAILY_PLAY_ITEMS.map((item) => (
               <a
                 key={item.id}
                 href={item.href}
-                className="rounded-3xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/40"
+                className="min-w-0 rounded-2xl border border-border bg-card p-3 transition hover:-translate-y-0.5 hover:border-primary/40 sm:rounded-3xl sm:p-5"
               >
                 <div className="flex items-center justify-between gap-3">
                   <CalendarDays className="h-5 w-5 text-primary" />
                   <Badge variant="outline">{item.cadence}</Badge>
                 </div>
-                <h3 className="mt-5 font-semibold">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p>
-                <p className="mt-4 text-xs font-medium uppercase tracking-wider text-primary">
+                <h3 className="mt-3 text-sm font-semibold sm:mt-5 sm:text-base">{item.title}</h3>
+                <p className="mt-1.5 text-xs leading-5 text-muted-foreground sm:mt-2 sm:text-sm sm:leading-6">{item.detail}</p>
+                <p className="mt-2.5 text-[10px] font-medium uppercase tracking-wider text-primary sm:mt-4 sm:text-xs">
                   {item.status}
                 </p>
               </a>
@@ -495,13 +505,13 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr]">
+      <section className="mx-auto max-w-6xl px-5 py-9 sm:px-6 sm:py-16">
+        <div className="grid gap-5 sm:gap-8 lg:grid-cols-[1.15fr_.85fr]">
           <article
             id="trivia"
-            className="scroll-mt-24 overflow-hidden rounded-[2rem] border border-lime-300/25 bg-card shadow-xl shadow-lime-300/5"
+            className="scroll-mt-24 overflow-hidden rounded-2xl border border-lime-300/25 bg-card shadow-xl shadow-lime-300/5 sm:rounded-[2rem]"
           >
-            <div className="relative aspect-[16/7] overflow-hidden bg-muted">
+            <div className="relative aspect-[16/5] overflow-hidden bg-muted sm:aspect-[16/7]">
               <img
                 src="/images/play/games/beat-blitz-cover-v1.webp"
                 alt=""
@@ -509,13 +519,13 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
             </div>
-            <div className="p-6 sm:p-8">
+            <div className="p-4 sm:p-8">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[.18em] text-lime-300">
                     Available now
                   </p>
-                  <h2 className="mt-2 text-2xl font-semibold">VYBE Music Trivia</h2>
+                  <h2 className="mt-1 text-xl font-semibold sm:mt-2 sm:text-2xl">VYBE Music Trivia</h2>
                   <p className="mt-1 text-sm text-muted-foreground">{playGenre} pilot round</p>
                 </div>
                 <Badge variant="outline">
@@ -593,7 +603,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
 
           <article
             id="build-your-vybe"
-            className="scroll-mt-24 rounded-[2rem] border border-primary/25 bg-card p-6 sm:p-8"
+            className="scroll-mt-24 rounded-2xl border border-primary/25 bg-card p-4 sm:rounded-[2rem] sm:p-8"
           >
             <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">
               Available now
@@ -638,12 +648,12 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
       </section>
 
       <section id="daily-poll" className="scroll-mt-24 border-y border-border/60 bg-surface/40">
-        <div className="mx-auto grid max-w-6xl gap-8 px-6 py-16 md:grid-cols-[.8fr_1.2fr]">
+        <div className="mx-auto grid max-w-6xl gap-5 px-5 py-9 sm:gap-8 sm:px-6 sm:py-16 md:grid-cols-[.8fr_1.2fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[.18em] text-cyan-300">
               Daily VYBE Poll
             </p>
-            <h2 className="mt-2 text-3xl font-semibold">Studio version or live version?</h2>
+            <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">Studio version or live version?</h2>
             <p className="mt-3 leading-7 text-muted-foreground">
               Vote once in this demonstration. Offline choices are saved on this device and
               synchronized for signed-in members after reconnection.
@@ -656,7 +666,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
                 type="button"
                 onClick={() => setPoll(choice)}
                 disabled={poll !== null}
-                className={`rounded-3xl border p-6 text-left transition ${
+                className={`rounded-2xl border p-4 text-left transition sm:rounded-3xl sm:p-6 ${
                   poll === choice
                     ? "border-cyan-300 bg-cyan-300/10"
                     : "border-border bg-card hover:border-cyan-300/50"
@@ -683,11 +693,11 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
         </div>
       </section>
 
-      <section id="spotlight" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-16">
-        <div className="rounded-[2rem] border border-primary/25 bg-card p-8 md:flex md:items-center md:justify-between md:gap-8">
+      <section id="spotlight" className="mx-auto max-w-6xl scroll-mt-24 px-5 py-9 sm:px-6 sm:py-16">
+        <div className="rounded-2xl border border-primary/25 bg-card p-4 sm:rounded-[2rem] sm:p-8 md:flex md:items-center md:justify-between md:gap-8">
           <div>
             <p className="text-sm font-semibold text-primary">Creator Spotlight Challenge</p>
-            <h2 className="mt-2 text-3xl font-semibold">Meet Nova Vale, then explore the clues</h2>
+            <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">Meet Nova Vale, then explore the clues</h2>
             <p className="mt-3 max-w-2xl text-muted-foreground">
               The guided demo profile shows how future challenges can connect music, stories, merch,
               video, access levels, and creator discovery.
@@ -696,7 +706,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
           <Button
             asChild
             size="lg"
-            className="mt-6 shrink-0 rounded-full bg-gradient-brand md:mt-0"
+            className="mt-4 w-full shrink-0 rounded-full bg-gradient-brand sm:mt-6 sm:w-auto md:mt-0"
           >
             <Link to="/demo/creator">
               Open creator spotlight
@@ -710,7 +720,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
         </p>
         <div
           id="play-roadmap"
-          className="mt-8 scroll-mt-24 rounded-3xl border border-dashed border-border p-6 text-center"
+          className="mt-5 scroll-mt-24 rounded-2xl border border-dashed border-border p-4 text-center sm:mt-8 sm:rounded-3xl sm:p-6"
         >
           <p className="text-sm font-medium text-primary">What comes next</p>
           <h2 className="mt-2 text-2xl font-semibold">Learn, challenges, and member progress</h2>

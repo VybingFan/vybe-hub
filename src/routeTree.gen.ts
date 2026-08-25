@@ -30,6 +30,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VideoVideoIdRouteImport } from './routes/video.$videoId'
 import { Route as PlaylistSlugRouteImport } from './routes/playlist.$slug'
+import { Route as PlayPackIdRouteImport } from './routes/play.$packId'
 import { Route as OperationsSignInRouteImport } from './routes/operations.sign-in'
 import { Route as ExperienceWatchRouteImport } from './routes/experience.watch'
 import { Route as ExperienceReadRouteImport } from './routes/experience.read'
@@ -97,6 +98,7 @@ import { Route as AuthenticatedCommerceRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedBusinessRouteImport } from './routes/_authenticated/business'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
+import { Route as PlayPreviewPreviewKeyRouteImport } from './routes/play.preview.$previewKey'
 import { Route as DemoStorySlugRouteImport } from './routes/demo.story.$slug'
 import { Route as DemoPoemSlugRouteImport } from './routes/demo.poem.$slug'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api.stripe.webhook'
@@ -234,6 +236,11 @@ const VideoVideoIdRoute = VideoVideoIdRouteImport.update({
 const PlaylistSlugRoute = PlaylistSlugRouteImport.update({
   id: '/playlist/$slug',
   path: '/playlist/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlayPackIdRoute = PlayPackIdRouteImport.update({
+  id: '/play/$packId',
+  path: '/play/$packId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OperationsSignInRoute = OperationsSignInRouteImport.update({
@@ -585,6 +592,11 @@ const AuthenticatedActivityRoute = AuthenticatedActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const PlayPreviewPreviewKeyRoute = PlayPreviewPreviewKeyRouteImport.update({
+  id: '/play/preview/$previewKey',
+  path: '/play/preview/$previewKey',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoStorySlugRoute = DemoStorySlugRouteImport.update({
   id: '/demo/story/$slug',
   path: '/demo/story/$slug',
@@ -867,6 +879,7 @@ export interface FileRoutesByFullPath {
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
   '/operations/sign-in': typeof OperationsSignInRoute
+  '/play/$packId': typeof PlayPackIdRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
@@ -899,6 +912,7 @@ export interface FileRoutesByFullPath {
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
+  '/play/preview/$previewKey': typeof PlayPreviewPreviewKeyRoute
   '/admin/campaigns/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/music/$trackId/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
@@ -990,6 +1004,7 @@ export interface FileRoutesByTo {
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
   '/operations/sign-in': typeof OperationsSignInRoute
+  '/play/$packId': typeof PlayPackIdRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
@@ -1022,6 +1037,7 @@ export interface FileRoutesByTo {
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
+  '/play/preview/$previewKey': typeof PlayPreviewPreviewKeyRoute
   '/admin/campaigns/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/music/$trackId/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
@@ -1115,6 +1131,7 @@ export interface FileRoutesById {
   '/experience/read': typeof ExperienceReadRoute
   '/experience/watch': typeof ExperienceWatchRoute
   '/operations/sign-in': typeof OperationsSignInRoute
+  '/play/$packId': typeof PlayPackIdRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
   '/_authenticated/admin_/accounts': typeof AuthenticatedAdminAccountsRoute
@@ -1147,6 +1164,7 @@ export interface FileRoutesById {
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
+  '/play/preview/$previewKey': typeof PlayPreviewPreviewKeyRoute
   '/_authenticated/admin_/campaigns_/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/_authenticated/music_/$trackId_/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
   '/artist/$username_/playlist/$slug': typeof ArtistUsernamePlaylistSlugRoute
@@ -1240,6 +1258,7 @@ export interface FileRouteTypes {
     | '/experience/read'
     | '/experience/watch'
     | '/operations/sign-in'
+    | '/play/$packId'
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/admin/accounts'
@@ -1272,6 +1291,7 @@ export interface FileRouteTypes {
     | '/api/stripe/webhook'
     | '/demo/poem/$slug'
     | '/demo/story/$slug'
+    | '/play/preview/$previewKey'
     | '/admin/campaigns/$campaignId'
     | '/music/$trackId/lyrics'
     | '/artist/$username/playlist/$slug'
@@ -1363,6 +1383,7 @@ export interface FileRouteTypes {
     | '/experience/read'
     | '/experience/watch'
     | '/operations/sign-in'
+    | '/play/$packId'
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/admin/accounts'
@@ -1395,6 +1416,7 @@ export interface FileRouteTypes {
     | '/api/stripe/webhook'
     | '/demo/poem/$slug'
     | '/demo/story/$slug'
+    | '/play/preview/$previewKey'
     | '/admin/campaigns/$campaignId'
     | '/music/$trackId/lyrics'
     | '/artist/$username/playlist/$slug'
@@ -1487,6 +1509,7 @@ export interface FileRouteTypes {
     | '/experience/read'
     | '/experience/watch'
     | '/operations/sign-in'
+    | '/play/$packId'
     | '/playlist/$slug'
     | '/video/$videoId'
     | '/_authenticated/admin_/accounts'
@@ -1519,6 +1542,7 @@ export interface FileRouteTypes {
     | '/api/stripe/webhook'
     | '/demo/poem/$slug'
     | '/demo/story/$slug'
+    | '/play/preview/$previewKey'
     | '/_authenticated/admin_/campaigns_/$campaignId'
     | '/_authenticated/music_/$trackId_/lyrics'
     | '/artist/$username_/playlist/$slug'
@@ -1568,6 +1592,7 @@ export interface RootRouteChildren {
   ExperienceReadRoute: typeof ExperienceReadRoute
   ExperienceWatchRoute: typeof ExperienceWatchRoute
   OperationsSignInRoute: typeof OperationsSignInRoute
+  PlayPackIdRoute: typeof PlayPackIdRoute
   PlaylistSlugRoute: typeof PlaylistSlugRoute
   VideoVideoIdRoute: typeof VideoVideoIdRoute
   ApiStripeCheckoutRoute: typeof ApiStripeCheckoutRoute
@@ -1577,6 +1602,7 @@ export interface RootRouteChildren {
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
   DemoPoemSlugRoute: typeof DemoPoemSlugRoute
   DemoStorySlugRoute: typeof DemoStorySlugRoute
+  PlayPreviewPreviewKeyRoute: typeof PlayPreviewPreviewKeyRoute
   ArtistUsernamePlaylistSlugRoute: typeof ArtistUsernamePlaylistSlugRoute
 }
 
@@ -1727,6 +1753,13 @@ declare module '@tanstack/react-router' {
       path: '/playlist/$slug'
       fullPath: '/playlist/$slug'
       preLoaderRoute: typeof PlaylistSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/play/$packId': {
+      id: '/play/$packId'
+      path: '/play/$packId'
+      fullPath: '/play/$packId'
+      preLoaderRoute: typeof PlayPackIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/operations/sign-in': {
@@ -2198,6 +2231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedActivityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/play/preview/$previewKey': {
+      id: '/play/preview/$previewKey'
+      path: '/play/preview/$previewKey'
+      fullPath: '/play/preview/$previewKey'
+      preLoaderRoute: typeof PlayPreviewPreviewKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/story/$slug': {
       id: '/demo/story/$slug'
       path: '/demo/story/$slug'
@@ -2643,6 +2683,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExperienceReadRoute: ExperienceReadRoute,
   ExperienceWatchRoute: ExperienceWatchRoute,
   OperationsSignInRoute: OperationsSignInRoute,
+  PlayPackIdRoute: PlayPackIdRoute,
   PlaylistSlugRoute: PlaylistSlugRoute,
   VideoVideoIdRoute: VideoVideoIdRoute,
   ApiStripeCheckoutRoute: ApiStripeCheckoutRoute,
@@ -2652,6 +2693,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
   DemoPoemSlugRoute: DemoPoemSlugRoute,
   DemoStorySlugRoute: DemoStorySlugRoute,
+  PlayPreviewPreviewKeyRoute: PlayPreviewPreviewKeyRoute,
   ArtistUsernamePlaylistSlugRoute: ArtistUsernamePlaylistSlugRoute,
 }
 export const routeTree = rootRouteImport
