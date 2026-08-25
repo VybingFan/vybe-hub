@@ -4,7 +4,7 @@ export const COMPANY = "Aision Labs";
 
 export const NAV_LINKS = [
   { label: "Discover", to: "/explore" },
-  { label: "Merch", to: "/#merch" },
+  { label: "Merch", to: "/shop" },
 ] as const;
 
 export const EXPERIENCE_LINKS = [

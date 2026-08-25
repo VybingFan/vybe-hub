@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrustRouteImport } from './routes/trust'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as ForWritersPoetsRouteImport } from './routes/for-writers-poets'
@@ -142,6 +143,11 @@ const TrustRoute = TrustRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -810,6 +816,7 @@ export interface FileRoutesByFullPath {
   '/for-writers-poets': typeof ForWritersPoetsRoute
   '/help': typeof HelpRoute
   '/privacy': typeof PrivacyRoute
+  '/shop': typeof ShopRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
   '/activity': typeof AuthenticatedActivityRoute
@@ -935,6 +942,7 @@ export interface FileRoutesByTo {
   '/for-writers-poets': typeof ForWritersPoetsRoute
   '/help': typeof HelpRoute
   '/privacy': typeof PrivacyRoute
+  '/shop': typeof ShopRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
   '/activity': typeof AuthenticatedActivityRoute
@@ -1062,6 +1070,7 @@ export interface FileRoutesById {
   '/for-writers-poets': typeof ForWritersPoetsRoute
   '/help': typeof HelpRoute
   '/privacy': typeof PrivacyRoute
+  '/shop': typeof ShopRoute
   '/terms': typeof TermsRoute
   '/trust': typeof TrustRoute
   '/_authenticated/activity': typeof AuthenticatedActivityRoute
@@ -1189,6 +1198,7 @@ export interface FileRouteTypes {
     | '/for-writers-poets'
     | '/help'
     | '/privacy'
+    | '/shop'
     | '/terms'
     | '/trust'
     | '/activity'
@@ -1314,6 +1324,7 @@ export interface FileRouteTypes {
     | '/for-writers-poets'
     | '/help'
     | '/privacy'
+    | '/shop'
     | '/terms'
     | '/trust'
     | '/activity'
@@ -1440,6 +1451,7 @@ export interface FileRouteTypes {
     | '/for-writers-poets'
     | '/help'
     | '/privacy'
+    | '/shop'
     | '/terms'
     | '/trust'
     | '/_authenticated/activity'
@@ -1567,6 +1579,7 @@ export interface RootRouteChildren {
   ForWritersPoetsRoute: typeof ForWritersPoetsRoute
   HelpRoute: typeof HelpRoute
   PrivacyRoute: typeof PrivacyRoute
+  ShopRoute: typeof ShopRoute
   TermsRoute: typeof TermsRoute
   TrustRoute: typeof TrustRoute
   AdminInviteTokenRoute: typeof AdminInviteTokenRoute
@@ -1620,6 +1633,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -2658,6 +2678,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForWritersPoetsRoute: ForWritersPoetsRoute,
   HelpRoute: HelpRoute,
   PrivacyRoute: PrivacyRoute,
+  ShopRoute: ShopRoute,
   TermsRoute: TermsRoute,
   TrustRoute: TrustRoute,
   AdminInviteTokenRoute: AdminInviteTokenRoute,

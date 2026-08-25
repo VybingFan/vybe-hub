@@ -356,8 +356,8 @@ function Landing() {
               drops, and unexpected pieces that carry an artist's story into your world.
             </p>
             <Button asChild size="lg" className="mt-7 rounded-full bg-gradient-brand">
-              <Link to="/explore" search={{ q: "" }}>
-                <ShoppingBag className="mr-2 h-4 w-4" /> Discover creator pages
+              <Link to="/shop">
+                <ShoppingBag className="mr-2 h-4 w-4" /> Shop creator merch
               </Link>
             </Button>
           </div>
