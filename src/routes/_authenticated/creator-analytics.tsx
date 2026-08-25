@@ -87,7 +87,7 @@ function CreatorInsightsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6 min-[900px]:space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Creator Studio</p>
@@ -99,29 +99,29 @@ function CreatorInsightsPage() {
           : <span className="inline-flex items-center gap-2 text-sm text-muted-foreground"><LockKeyhole className="h-4 w-4" /> Export requires Creator Pro</span>}
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
+      <Tabs defaultValue="overview" className="space-y-6 min-[900px]:space-y-4">
         <div className="overflow-x-auto pb-1"><TabsList className="w-max min-w-full justify-start">
           <TabsTrigger value="overview">Overview</TabsTrigger><TabsTrigger value="music">Music</TabsTrigger>
           <TabsTrigger value="playlists">Playlists</TabsTrigger><TabsTrigger value="engagement">Engagement</TabsTrigger>
         </TabsList></div>
 
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {overviewMetrics.map(([label, value, Icon]) => <Card key={label}><CardContent className="flex items-center gap-4 p-5"><Icon className="h-6 w-6 text-primary" /><div><p className="text-3xl font-semibold">{value}</p><p className="text-sm text-muted-foreground">{label}</p></div></CardContent></Card>)}
+        <TabsContent value="overview" className="space-y-6 min-[900px]:space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 min-[900px]:gap-3">
+            {overviewMetrics.map(([label, value, Icon]) => <Card key={label}><CardContent className="flex items-center gap-4 p-5 min-[900px]:gap-3 min-[900px]:p-4"><Icon className="h-6 w-6 text-primary min-[900px]:h-5 min-[900px]:w-5" /><div><p className="text-3xl font-semibold min-[900px]:text-2xl">{value}</p><p className="text-sm text-muted-foreground">{label}</p></div></CardContent></Card>)}
           </div>
-          <Card><CardContent className="p-6"><h2 className="text-xl font-semibold">Listening depth</h2><p className="mt-1 text-sm text-muted-foreground">How many playback sessions accumulated each share of a song.</p><div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">{[["25%", retention.reached_25], ["50%", retention.reached_50], ["75%", retention.reached_75], ["90%", retention.reached_90]].map(([label, value]) => <div key={label} className="rounded-xl border p-4"><p className="text-2xl font-semibold">{value}</p><p className="text-xs text-muted-foreground">Listened {label}</p></div>)}</div></CardContent></Card>
+          <Card><CardContent className="p-6 min-[900px]:p-4"><h2 className="text-xl font-semibold">Listening depth</h2><p className="mt-1 text-sm text-muted-foreground">How many playback sessions accumulated each share of a song.</p><div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4 min-[900px]:mt-3">{[["25%", retention.reached_25], ["50%", retention.reached_50], ["75%", retention.reached_75], ["90%", retention.reached_90]].map(([label, value]) => <div key={label} className="rounded-xl border p-4 min-[900px]:p-3"><p className="text-2xl font-semibold">{value}</p><p className="text-xs text-muted-foreground">Listened {label}</p></div>)}</div></CardContent></Card>
         </TabsContent>
 
         <TabsContent value="music">
           <section><h2 className="text-2xl font-semibold">Song performance</h2><p className="mt-2 text-sm text-muted-foreground">A qualified play is at least 30 seconds, or half of content shorter than 30 seconds.</p>
-            <div className="mt-4 overflow-x-auto rounded-2xl border"><table className="w-full min-w-[850px] text-sm"><thead className="bg-muted/40 text-left text-muted-foreground"><tr><th className="p-4">Song</th><th>Qualified</th><th>Listeners</th><th>Listening time</th><th>Average</th><th>Completed</th><th>Repeat</th></tr></thead><tbody>
-              {retention.tracks.map((row) => <tr key={row.track_id} className="border-t"><td className="p-4 font-medium">{row.title}</td><td>{row.qualified_plays}</td><td>{row.unique_listeners}</td><td>{formatListeningTime(row.listening_seconds)}</td><td>{formatListeningTime(row.average_listening_seconds)}</td><td>{row.completion_rate}%</td><td>{row.repeat_listeners}</td></tr>)}
-              {!retention.tracks.length && <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">Play shared music to begin collecting song retention insights.</td></tr>}
+            <div className="mt-4 overflow-x-auto rounded-2xl border"><table className="w-full min-w-[850px] text-sm"><thead className="bg-muted/40 text-left text-muted-foreground"><tr><th className="p-4 min-[900px]:p-3">Song</th><th>Qualified</th><th>Listeners</th><th>Listening time</th><th>Average</th><th>Completed</th><th>Repeat</th></tr></thead><tbody>
+              {retention.tracks.map((row) => <tr key={row.track_id} className="border-t"><td className="p-4 font-medium min-[900px]:p-3">{row.title}</td><td>{row.qualified_plays}</td><td>{row.unique_listeners}</td><td>{formatListeningTime(row.listening_seconds)}</td><td>{formatListeningTime(row.average_listening_seconds)}</td><td>{row.completion_rate}%</td><td>{row.repeat_listeners}</td></tr>)}
+              {!retention.tracks.length && <tr><td colSpan={7} className="p-8 text-center text-muted-foreground min-[900px]:p-6">Play shared music to begin collecting song retention insights.</td></tr>}
             </tbody></table></div>
           </section>
         </TabsContent>
 
-        <TabsContent value="playlists"><section><h2 className="text-2xl font-semibold">Playlist performance</h2><div className="mt-4 overflow-hidden rounded-2xl border">{playlist.playlists.map((row) => <div key={row.playlist_id} className="grid gap-2 border-b px-4 py-4 last:border-0 sm:grid-cols-[1fr_auto_auto_auto] sm:gap-5"><span className="font-medium">{row.title}</span><span className="text-muted-foreground">{row.opens} opens</span><span className="text-muted-foreground">{row.plays} starts</span><span className="text-muted-foreground">{row.unique_visitors} visitors</span></div>)}{!playlist.playlists.length && <p className="p-8 text-center text-muted-foreground">Share a playlist to begin collecting insights.</p>}</div></section></TabsContent>
+        <TabsContent value="playlists"><section><h2 className="text-2xl font-semibold">Playlist performance</h2><div className="mt-4 overflow-hidden rounded-2xl border">{playlist.playlists.map((row) => <div key={row.playlist_id} className="grid gap-2 border-b px-4 py-4 last:border-0 sm:grid-cols-[1fr_auto_auto_auto] sm:gap-5 min-[900px]:py-3"><span className="font-medium">{row.title}</span><span className="text-muted-foreground">{row.opens} opens</span><span className="text-muted-foreground">{row.plays} starts</span><span className="text-muted-foreground">{row.unique_visitors} visitors</span></div>)}{!playlist.playlists.length && <p className="p-8 text-center text-muted-foreground min-[900px]:p-6">Share a playlist to begin collecting insights.</p>}</div></section></TabsContent>
 
         <TabsContent value="engagement"><CreatorEngagementPanel days={queryDays} social={social} /></TabsContent>
       </Tabs>
