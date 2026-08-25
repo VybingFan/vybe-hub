@@ -343,7 +343,7 @@ function SongEditor() {
       <form
         id="manage-song-form"
         onSubmit={save}
-        className="grid gap-5 lg:grid-cols-[15rem_minmax(0,1fr)]"
+        className="grid gap-4 min-[900px]:grid-cols-[12.5rem_minmax(0,1fr)] min-[1280px]:grid-cols-[13rem_minmax(0,1fr)]"
       >
         <Button
           form="manage-song-form"
@@ -358,15 +358,15 @@ function SongEditor() {
           )}
           {replacementAudio ? "Save and replace audio" : "Save song"}
         </Button>
-        <aside className="space-y-5">
+        <aside className="space-y-5 min-[900px]:space-y-3">
           <div className="overflow-hidden rounded-2xl border border-border bg-card">
             <img
               src={track.cover_url || "/banners/default-creator-banner.png"}
               alt=""
               className="aspect-square w-full object-cover"
             />
-            <div className="space-y-3 p-5">
-              <Label className="flex cursor-pointer items-center justify-center rounded-xl border border-border px-4 py-3 text-sm font-medium hover:border-primary/60">
+            <div className="space-y-2.5 p-5 min-[900px]:p-3.5">
+              <Label className="flex cursor-pointer items-center justify-center rounded-xl border border-border px-4 py-3 text-sm font-medium hover:border-primary/60 min-[900px]:px-3 min-[900px]:py-2.5 min-[900px]:text-sm">
                 {replaceCover.isPending ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
@@ -389,7 +389,7 @@ function SongEditor() {
               </p>
             </div>
           </div>
-          <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="rounded-2xl border border-border bg-card p-5 min-[900px]:p-3.5">
             <p className="text-sm font-medium">Current audio</p>
             <audio
               controls
@@ -403,12 +403,12 @@ function SongEditor() {
           </div>
         </aside>
 
-        <div className="space-y-4">
+        <div className="space-y-4 min-[900px]:space-y-3">
           <section
             className={
               canUseWorkflow
-                ? "rounded-2xl border border-border bg-card p-4 sm:p-5"
-                : "rounded-2xl border border-primary/25 bg-primary/[0.03] p-4 sm:p-5"
+                ? "rounded-2xl border border-border bg-card p-4 sm:p-5 min-[900px]:p-4"
+                : "rounded-2xl border border-primary/25 bg-primary/[0.03] p-4 sm:p-5 min-[900px]:p-4"
             }
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -419,10 +419,8 @@ function SongEditor() {
                 </span>
               ) : null}
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Set why this song is in your workspace and where it currently is
-              in the creative process. These settings do not decide who can
-              discover or hear the song.
+            <p className="mt-1 text-sm leading-5 text-muted-foreground">
+              Organize where this song is in your workflow. Visibility and playback remain separate.
             </p>
 
             {!canUseWorkflow ? (
@@ -453,7 +451,7 @@ function SongEditor() {
             ) : null}
 
             <div
-              className={`mt-4 grid gap-4 sm:grid-cols-2 ${
+              className={`mt-3 grid gap-3 sm:grid-cols-2 ${
                 canUseWorkflow ? "" : "opacity-60"
               }`}
               aria-disabled={!canUseWorkflow}
@@ -503,15 +501,14 @@ function SongEditor() {
               </div>
             </div>
           </section>
-          <section className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+          <section className="rounded-2xl border border-border bg-card p-4 sm:p-5 min-[900px]:p-4">
             <h2 className="text-lg font-semibold">
               Visibility & listening access
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Control discovery, playback, previews, and downloads for this
-              song.
+            <p className="mt-1 text-sm leading-5 text-muted-foreground">
+              Control discovery, playback, previews, and downloads.
             </p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
                 <Label>Visibility</Label>
                 <Select
@@ -601,7 +598,7 @@ function SongEditor() {
                   </div>
                 </>
               ) : null}
-              <label className="flex items-center gap-3 rounded-xl border p-4 text-sm">
+              <label className="flex items-center gap-3 rounded-xl border p-3 text-sm">
                 <input
                   type="checkbox"
                   checked={allowDownload}
@@ -611,12 +608,14 @@ function SongEditor() {
               </label>
             </div>
           </section>
+        </div>
 
+        <div className="space-y-3 min-[900px]:col-span-2 min-[900px]:space-y-2.5">
           <section
             className={
               replacementAudio
-                ? "rounded-2xl border-2 border-amber-400 bg-amber-500/5 p-6 shadow-[0_0_0_4px_rgba(251,191,36,0.08)] md:p-8"
-                : "rounded-2xl border border-border bg-card p-4 sm:p-5"
+                ? "rounded-2xl border-2 border-amber-400 bg-amber-500/5 p-6 shadow-[0_0_0_4px_rgba(251,191,36,0.08)] md:p-6 min-[900px]:p-5"
+                : "rounded-2xl border border-border bg-card p-4 sm:p-5 min-[900px]:p-4"
             }
           >
             <h2 className="text-lg font-semibold">Song details</h2>
@@ -632,7 +631,7 @@ function SongEditor() {
                 </p>
               </div>
             ) : null}
-            <div className="mt-4 grid gap-4">
+            <div className="mt-3 grid gap-3">
               <div>
                 <Label htmlFor="song-title">Song title</Label>
                 <Input
@@ -643,7 +642,7 @@ function SongEditor() {
                   onChange={(event) => setTitle(event.target.value)}
                 />
               </div>
-              <div className="grid gap-5 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="primary-artist">Primary artist</Label>
                   <Input
@@ -664,7 +663,7 @@ function SongEditor() {
                   />
                 </div>
               </div>
-              <div className="grid gap-5 sm:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-3">
                 <div>
                   <Label htmlFor="song-genre">Genre</Label>
                   <Input
@@ -705,7 +704,7 @@ function SongEditor() {
                 <Label htmlFor="song-description">Description</Label>
                 <Textarea
                   id="song-description"
-                  className="mt-2 min-h-28"
+                  className="mt-2 min-h-20 min-[900px]:min-h-16"
                   value={description}
                   maxLength={1000}
                   onChange={(event) => setDescription(event.target.value)}
@@ -714,14 +713,12 @@ function SongEditor() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+          <section className="rounded-2xl border border-border bg-card p-4 sm:p-5 min-[900px]:p-4">
             <h2 className="text-lg font-semibold">Discovery information</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              These optional details help listeners find the song when they
-              remember a mood, location, movie, show, video, or scene instead of
-              the title.
+            <p className="mt-1 text-sm leading-5 text-muted-foreground">
+              Optional details that help listeners rediscover a song by mood, location, project, or scene.
             </p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 min-[1100px]:grid-cols-4">
               <div>
                 <Label htmlFor="song-moods">Mood tags</Label>
                 <Input
@@ -789,13 +786,13 @@ function SongEditor() {
                   }
                 />
               </div>
-              <div className="sm:col-span-2">
+              <div className="sm:col-span-2 min-[1100px]:col-span-4">
                 <Label htmlFor="placement-details">
                   Scene, episode, or placement details
                 </Label>
                 <Textarea
                   id="placement-details"
-                  className="mt-2 min-h-24"
+                  className="mt-2 min-h-20 min-[900px]:min-h-16"
                   value={discovery.placement_details}
                   placeholder="Episode, scene, timestamp, or anything a listener may remember"
                   onChange={(event) =>
@@ -809,21 +806,21 @@ function SongEditor() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-primary/25 bg-primary/5 p-4 sm:p-5">
-            <FileAudio className="h-7 w-7 text-primary" />
-            <h2 className="mt-5 text-lg font-semibold">Replace audio file</h2>
-            <p className="mt-3 max-w-2xl leading-7 text-muted-foreground">
-              Upload a corrected or updated MP3 while keeping this song's
-              identity, cover, credits, playlist positions, and public playlist
-              links.
-            </p>
-            <div className="mt-5 rounded-2xl border border-border/70 bg-background/60 p-4 text-sm text-muted-foreground">
-              Replacing the audio updates this song everywhere it appears on
-              VYBE. The previous file is removed only after the replacement
-              succeeds.
+          <section className="rounded-2xl border border-primary/25 bg-primary/5 p-4 min-[900px]:p-4">
+            <div className="flex items-start gap-3">
+              <FileAudio className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <h2 className="text-lg font-semibold">Replace audio file</h2>
+                <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                  Upload a corrected MP3 while keeping this song's identity, artwork, credits, playlists, and links.
+                </p>
+              </div>
             </div>
+            <p className="mt-3 rounded-xl border border-border/70 bg-background/60 px-3 py-2 text-xs leading-5 text-muted-foreground">
+              The new file updates this song everywhere after replacement succeeds.
+            </p>
             {replacementAudio ? (
-              <div className="mt-5 rounded-2xl border border-amber-400/60 bg-amber-400/10 p-4">
+              <div className="mt-3 rounded-xl border border-amber-400/60 bg-amber-400/10 p-3">
                 <p className="font-semibold">{replacementAudio.file.name}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Replacement duration:{" "}
@@ -857,7 +854,7 @@ function SongEditor() {
                 </Button>
               </div>
             ) : null}
-            <Label className="mt-5 inline-flex cursor-pointer items-center rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground">
+            <Label className="mt-3 inline-flex cursor-pointer items-center rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground">
               {replaceAudio.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
@@ -877,7 +874,7 @@ function SongEditor() {
             </Label>
           </section>
 
-          <div className="flex flex-col-reverse justify-between gap-3 rounded-2xl border border-border/80 bg-background/95 p-3 sm:flex-row sm:items-center">
+          <div className="flex flex-col-reverse justify-between gap-3 rounded-2xl border border-border/80 bg-background/95 p-3 sm:flex-row sm:items-center min-[900px]:sticky min-[900px]:bottom-3 min-[900px]:z-30 min-[900px]:shadow-xl min-[900px]:backdrop-blur">
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
