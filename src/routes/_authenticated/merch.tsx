@@ -62,7 +62,7 @@ function MerchStudio() {
     }
   };
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
+    <div className="mx-auto max-w-6xl space-y-8 min-[900px]:space-y-5">
       <header>
         <p className="text-sm font-semibold uppercase tracking-[.2em] text-genre-country">
           Creator commerce
@@ -73,9 +73,9 @@ function MerchStudio() {
           experiences, apparel, and more.
         </p>
       </header>
-      <div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
-        <form onSubmit={submit} className="space-y-4 rounded-3xl border border-border bg-card p-6">
-          <h2 className="text-xl font-semibold">Add an item</h2>
+      <div className="space-y-8 min-[900px]:space-y-5">
+        <form onSubmit={submit} className="space-y-4 rounded-3xl border border-border bg-card p-6 min-[900px]:grid min-[900px]:grid-cols-2 min-[900px]:gap-3 min-[900px]:space-y-0 min-[900px]:p-4">
+          <h2 className="text-xl font-semibold min-[900px]:col-span-2">Add an item</h2>
           <div>
             <Label>Item name</Label>
             <Input name="title" required className="mt-2" />
@@ -95,7 +95,7 @@ function MerchStudio() {
               </SelectContent>
             </Select>
           </div>
-          <div>
+          <div className="min-[900px]:col-span-2">
             <Label>Description</Label>
             <Textarea name="description" required className="mt-2" placeholder="Materials, sizes, colors, edition details, or the story behind this item" />
           </div>
@@ -112,26 +112,26 @@ function MerchStudio() {
               </Select>
             </div>
           </div>
-          <div>
+          <div className="min-[900px]:col-span-2">
             <Label>Product image</Label>
-            <label className="mt-2 flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-border p-4 transition hover:border-primary/60">
-              {imagePreview ? <img src={imagePreview} alt="Product preview" className="h-24 w-24 rounded-xl object-cover" /> : <span className="flex h-24 w-24 items-center justify-center rounded-xl bg-muted"><ImagePlus className="h-8 w-8 text-muted-foreground" /></span>}
+            <label className="mt-2 flex cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-border p-4 transition hover:border-primary/60 min-[900px]:p-3">
+              {imagePreview ? <img src={imagePreview} alt="Product preview" className="h-24 w-24 rounded-xl object-cover min-[900px]:h-16 min-[900px]:w-16" /> : <span className="flex h-24 w-24 items-center justify-center rounded-xl bg-muted min-[900px]:h-16 min-[900px]:w-16"><ImagePlus className="h-8 w-8 text-muted-foreground" /></span>}
               <span className="text-sm"><strong>{image ? image.name : "Choose product image"}</strong><br /><span className="text-muted-foreground">Recommended: 1200 × 1200 px square<br />JPG, PNG, or WebP • Maximum 2MB<br />Keep important artwork and text centered.</span></span>
               <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { const file = event.target.files?.[0] ?? null; setImage(file); setImagePreview(file ? URL.createObjectURL(file) : null); }} />
             </label>
           </div>
-          <div>
+          <div className="min-[900px]:col-span-2">
             <Label>External purchase or details URL (optional)</Label>
             <Input name="purchase_url" type="url" className="mt-2" placeholder="Leave blank for coming soon" />
           </div>
-          <Button disabled={create.isPending} className="w-full bg-gradient-brand text-white">
+          <Button disabled={create.isPending} className="w-full bg-gradient-brand text-white min-[900px]:col-span-2 min-[900px]:ml-auto min-[900px]:w-auto">
             {create.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShoppingBag className="mr-2 h-4 w-4" />}
             {create.isPending ? "Uploading and saving…" : "Add showcase item"}
           </Button>
         </form>
-        <section>
+        <section className="min-w-0">
           <h2 className="text-2xl font-semibold">Your collection</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 min-[900px]:mt-4 min-[1280px]:grid-cols-3">
             {products.map((product) => (
               <article
                 key={product.id}
@@ -148,7 +148,7 @@ function MerchStudio() {
                     <ShoppingBag className="h-12 w-12 text-muted-foreground" />
                   </div>
                 )}
-                <div className="p-4">
+                <div className="p-4 min-[900px]:p-3">
                   <p className="text-xs text-genre-country">{product.category}</p>
                   <h3 className="mt-1 font-semibold">{product.title}</h3>
                   <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
@@ -168,7 +168,7 @@ function MerchStudio() {
               </article>
             ))}
             {!products.length && (
-              <p className="rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground sm:col-span-2">
+              <p className="rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground sm:col-span-2 min-[900px]:p-6 min-[1280px]:col-span-3">
                 Add the first item in your artist collection.
               </p>
             )}
