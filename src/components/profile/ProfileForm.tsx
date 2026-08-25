@@ -125,8 +125,8 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
   );
 
   return (
-    <form onSubmit={submit} className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+    <form onSubmit={submit} className="space-y-6 min-[900px]:grid min-[900px]:grid-cols-[20rem_minmax(0,1fr)] min-[900px]:items-start min-[900px]:gap-4 min-[900px]:space-y-0">
+      <div className="flex items-center justify-between gap-4 min-[900px]:col-span-2">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">
             Creator profile
@@ -141,11 +141,12 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
         </Button>
       </div>
 
+      <div className="min-[900px]:col-start-1 min-[900px]:row-start-2">
       <ProfileCard
         title="Profile and cover images"
         description="Every Creator plan includes a profile photo and standard banner. Banner: 1600 by 400 px recommended. Profile: 800 by 800 px recommended. JPG, PNG, or WebP up to 8MB."
       >
-        {customCover ? <label className="group relative block h-52 cursor-pointer overflow-hidden rounded-2xl border border-border bg-muted">
+        {customCover ? <label className="group relative block h-52 cursor-pointer overflow-hidden rounded-2xl border border-border bg-muted min-[900px]:h-36">
           <img
             src={coverPreview || "/banners/default-creator-banner.png"}
             alt="Cover preview"
@@ -167,7 +168,7 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
             onChange={(event) => upload("cover", event.target.files?.[0])}
           />
         </label> : <LockedFeatureCard compact title="Custom cover begins with Creator Plus" description="Creator Free uses the standard VYBE profile header." requiredPlan="creator_plus" />}
-        <label className="group relative -mt-14 ml-6 block h-28 w-28 cursor-pointer overflow-hidden rounded-3xl border-4 border-card bg-muted shadow-elevated">
+        <label className="group relative -mt-14 ml-6 block h-28 w-28 cursor-pointer overflow-hidden rounded-3xl border-4 border-card bg-muted shadow-elevated min-[900px]:-mt-10 min-[900px]:ml-4 min-[900px]:h-24 min-[900px]:w-24">
           <img
             src={avatarPreview || "/avatars/default-avatar.png"}
             alt="Profile preview"
@@ -188,7 +189,9 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
           />
         </label>
       </ProfileCard>
+      </div>
 
+      <div className="min-[900px]:col-start-1">
       <ProfileCard
         title="Optional full-page background"
         description="This optional Creator Pro feature changes the page behind your content. It is not your standard banner and is not required to save your profile."
@@ -205,9 +208,11 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
           }}
         />
       </ProfileCard>
+      </div>
 
+      <div className="min-[900px]:col-start-2 min-[900px]:row-start-2">
       <ProfileCard title="Basics" description="Your public identity on VYBE.">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 min-[900px]:gap-3">
           <Field label="VYBE username (your unique link)" error={errors.username?.message}>
             <div>
               <Input placeholder="jordanbanks" {...register("username")} />
@@ -259,6 +264,7 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
         <Field label="Bio" error={errors.bio?.message}>
           <Textarea
             rows={5}
+            className="min-[900px]:min-h-24"
             maxLength={1000}
             placeholder="Tell supporters your story…"
             {...register("bio")}
@@ -268,15 +274,18 @@ export function ProfileForm({ initial, onSubmit, onCancel, submitting, userId, p
           </p>
         </Field>
       </ProfileCard>
+      </div>
 
+      <div className="min-[900px]:col-span-2 [&_.space-y-4]:min-[900px]:space-y-3 [&_.gap-4]:min-[900px]:gap-3">
       <ProfileCard
         title="Links & socials"
         description={`Website, social platforms, and custom links. Your membership displays up to ${entitlements.limits.publicLinks} public link${entitlements.limits.publicLinks === 1 ? "" : "s"}.`}
       >
         <SocialLinksForm control={control} register={register} errors={errors} />
       </ProfileCard>
+      </div>
 
-      <div className="sticky bottom-4 z-40 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-background/95 p-3 shadow-2xl backdrop-blur-xl">
+      <div className="sticky bottom-4 z-40 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-background/95 p-3 shadow-2xl backdrop-blur-xl min-[900px]:col-span-2 min-[900px]:py-2.5">
         <p className="text-sm text-muted-foreground">
           Save Profile applies your profile, cover, links, and public-page background changes.
         </p>

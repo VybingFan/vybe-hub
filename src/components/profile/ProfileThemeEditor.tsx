@@ -31,25 +31,23 @@ export function ProfileThemeEditor({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-[900px]:space-y-3">
       <div>
         <p className="font-semibold">Full-page creator background</p>
-        <p className="mt-1 text-sm leading-6 text-muted-foreground">
-          Upload an image that replaces the standard background behind your public creator page.
-          Your cover image stays separate. VYBE adds a dark readability layer so music, buttons,
-          text, and cards remain clear.
+        <p className="mt-1 text-sm leading-5 text-muted-foreground">
+          Replace the background behind your public creator page. Your cover stays separate, and VYBE keeps a readability layer over the image.
         </p>
       </div>
 
       {backgroundUrl ? (
         <div
-          className="h-52 rounded-2xl border border-border bg-cover bg-center"
+          className="h-52 rounded-2xl border border-border bg-cover bg-center min-[900px]:h-36"
           style={{
             backgroundImage: `linear-gradient(rgba(5,6,14,.3), rgba(5,6,14,.68)), url("${backgroundUrl}")`,
           }}
         />
       ) : (
-        <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 px-6 text-center text-sm text-muted-foreground">
+        <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 px-6 text-center text-sm text-muted-foreground min-[900px]:h-28">
           Your public page is currently using the standard VYBE background.
         </div>
       )}
