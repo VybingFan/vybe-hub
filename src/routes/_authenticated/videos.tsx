@@ -60,6 +60,39 @@ function VideoStudio() {
   const setPublished = useSetVideoPublished(user?.id);
   const remove = useDeleteVideo(user?.id);
   const [videoType, setVideoType] = useState<VideoType>("music_video");
+  const [repairingPlayback, setRepairingPlayback] = useState(false);
+
+  const repairPlayback = async () => {
+    setRepairingPlayback(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) throw new Error("Sign in again before repairing playback.");
+
+      const response = await fetch("/api/video-upload-url", {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const result = (await response.json()) as {
+        repaired?: number;
+        total?: number;
+        failures?: Array<{ message?: string }>;
+        error?: string;
+      };
+      if (!response.ok && response.status !== 207) {
+        throw new Error(result.error || "Could not repair Cloudflare playback access.");
+      }
+      if (result.failures?.length) {
+        toast.warning(`Repaired ${result.repaired || 0} of ${result.total || 0} uploaded videos.`);
+      } else {
+        toast.success(`Playback access repaired for ${result.repaired || 0} uploaded videos.`);
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not repair Cloudflare playback access.");
+    } finally {
+      setRepairingPlayback(false);
+    }
+  };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -200,13 +233,25 @@ function VideoStudio() {
         </form>
 
         <section className="min-w-0">
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-2xl font-semibold">Your videos</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {videos.length} {videos.length === 1 ? "video" : "videos"}
               </p>
             </div>
+            {videos.some((video) => video.provider === "cloudflare_stream") ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={repairingPlayback}
+                onClick={() => void repairPlayback()}
+              >
+                {repairingPlayback ? <Loader2 className="animate-spin" /> : <CheckCircle2 />}
+                {repairingPlayback ? "Repairing playback..." : "Repair uploaded video playback"}
+              </Button>
+            ) : null}
           </div>
           <div className="mt-5 grid gap-5 sm:grid-cols-2 min-[900px]:mt-4 min-[900px]:gap-4 min-[1280px]:grid-cols-3">
             {videos.map((video) => (
