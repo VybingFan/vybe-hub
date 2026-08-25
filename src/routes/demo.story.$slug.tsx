@@ -9,34 +9,34 @@ export const Route = createFileRoute("/demo/story/$slug")({ component: DemoStory
 
 const stories = {
   "after-the-signal": {
-    category: "Behind the song",
-    title: "The story behind “After the Signal”",
-    dek: "How a late-night voice note, a missed train, and one imperfect breath became Nova Vale’s lead single.",
+    category: "Origin story",
+    title: "The notebooks she opened again",
+    dek: "How motherhood, responsibility, and an unexpected introduction to AI music tools led one writer back to her songs.",
     readTime: "5 minute demo read",
     sections: [
       {
-        heading: "The first signal",
-        body: "The idea began as a quiet rhythm tapped against a train window. Nova recorded it on her phone beside a single line: “I heard you after the noise was gone.” The recording was rough, but its sense of distance became the emotional center of the song.",
+        heading: "Before Nova had a name",
+        body: "She was born in New Orleans, where blues, jazz, gospel, family stories, and the rhythm of ordinary conversation formed her earliest creative language. She moved to New York with her parents as a child, then was sent to Florida in her early teens during a period of growing pains. Across every move, she sang to herself and filled notebooks with poems, verses, and unfinished songs.",
       },
       {
-        heading: "Leaving room for the human part",
-        body: "During the final vocal session, a cleaner take was available. Nova kept an earlier performance because the breath before the last phrase made the lyric feel lived-in. The demo illustrates how a creator can share decisions that listeners would never discover from an audio file alone.",
+        heading: "The Northeast, motherhood, and the quiet years",
+        body: "She returned north and spent several years in New Jersey. Children, work, responsibility, and the needs of other people slowly moved music out of her daily life. She became the person others depended on. The notebooks closed—not because the desire disappeared, but because there was always something more urgent to do.",
       },
       {
-        heading: "What to listen for",
-        body: "The arrangement slowly removes layers instead of adding them. By the final section, the rhythm has nearly disappeared, leaving the vocal and a distant pulse to carry the ending.",
+        heading: "Texas and the door opening again",
+        body: "A later move to Texas gave her enough distance to reconsider the parts of herself she had postponed. When her children introduced her to AI music tools, experimenting without expectation brought back the pleasure of shaping words, choosing sounds, and finishing ideas. Nova Vale became an alter ego—a transparent AI-assisted persona through which the real writer could finally hear her own stories returned as songs.",
       },
     ],
   },
   "five-sounds": {
     category: "Influences",
-    title: "Five sounds that shaped Nova Vale",
-    dek: "A fictional listening map connecting analog warmth, city rhythm, choral space, electronic detail, and silence.",
+    title: "What blues, jazz, and country taught Nova",
+    dek: "A listening map connecting emotional truth, vocal freedom, concrete detail, family memory, and the courage to begin again.",
     readTime: "4 minute demo read",
     sections: [
       {
         heading: "Influence is more than genre",
-        body: "Nova describes influence as a collection of textures rather than a list of artists: the hum of late trains, stacked community voices, worn drum machines, room tone, and the pause before a chorus.",
+        body: "Nova describes influence as lessons rather than celebrity names: blues tells the truth, jazz leaves room to breathe, country makes the truth visible, gospel remembers where strength came from, and silence gives the listener space to recognize their own life.",
       },
       {
         heading: "A discovery path",
@@ -46,17 +46,17 @@ const stories = {
   },
   "voice-memo": {
     category: "Creative process",
-    title: "From voice memo to finished record",
-    dek: "A step-by-step look at how Nova’s smallest recorded idea became a complete studio arrangement.",
+    title: "From poem to AI-assisted country song",
+    dek: "A transparent look at the human writing, tool-assisted experimentation, revision, rejection, and final decisions behind a Nova Vale release.",
     readTime: "6 minute demo read",
     sections: [
       {
-        heading: "Capture before judgment",
-        body: "Nova’s demo workflow starts with speed. Melodies, phrases, and environmental sounds are captured before they are organized. The goal is to preserve feeling before technical choices take over.",
+        heading: "Begin with the human memory",
+        body: "Nova's process starts with something lived: a sentence from an old notebook, a family memory, an image, a regret, or a question she could not answer years ago. The emotional point is written down before any AI tool is opened.",
       },
       {
-        heading: "Build the emotional structure",
-        body: "Instead of beginning with verse and chorus labels, Nova marks where the listener should feel closer, unsettled, released, or surprised. Instruments are then chosen to serve that emotional outline.",
+        heading: "Direct, listen, reject, and revise",
+        body: "AI-assisted tools can offer arrangements and vocal interpretations, but Nova's creator decides what sounds honest. Versions that feel generic, imitate the wrong influence, flatten the lyric, or misrepresent the story are rejected. Useful results are revised and organized around the intended emotional arc.",
       },
       {
         heading: "Finish with context",
@@ -66,13 +66,13 @@ const stories = {
   },
   "session-musicians": {
     category: "Credits",
-    title: "Meet the musicians behind the session",
-    dek: "A demonstration of richer credits that recognize the people whose choices shaped the recording.",
+    title: "Who made Nova: human direction and AI assistance",
+    dek: "A model disclosure showing how writing, direction, tools, editing, selection, artwork, and publishing responsibility should be credited.",
     readTime: "3 minute demo read",
     sections: [
       {
-        heading: "The people in the room",
-        body: "This fictional session brings together Nova on vocals and keys, Eli Mercer on bass, Simone Hart on percussion, and producer-engineer Cam Reyes. Each role could link to a profile, catalog, or collaboration history.",
+        heading: "Credit the real contributions",
+        body: "A Nova release should identify the human writer or creative director, any co-writers, musicians, producers, engineers, artwork contributors, and the material AI tools used in the process. A fictional persona should never be used to erase the people responsible for the work.",
       },
       {
         heading: "Why credits matter",
@@ -110,7 +110,7 @@ function DemoStoryPage() {
               <p className="mt-5 max-w-3xl text-xl leading-8 text-muted-foreground">{story.dek}</p>
               <div className="mt-7 flex items-center gap-3">
                 <img
-                  src="/images/demo/nova-vale/avatar.webp"
+                  src="/images/demo/nova-vale/profile-v2.webp"
                   alt="Nova Vale"
                   className="h-11 w-11 rounded-xl object-cover"
                 />
