@@ -297,7 +297,7 @@ function MusicLibrary() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6 min-[900px]:space-y-5">
       <Section
         title="Music library"
         description="Organize music by purpose and production stage instead of scrolling through one long catalog."
@@ -312,8 +312,8 @@ function MusicLibrary() {
         }
       >
         {view === "overview" ? (
-          <div className="space-y-5">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="space-y-5 min-[900px]:space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 min-[900px]:gap-2.5">
               <CategoryCard
                 label="All music"
                 count={tracks.length}
@@ -351,7 +351,7 @@ function MusicLibrary() {
                 )}
               </div>
 
-              <div className="mt-4 space-y-2">
+              <div className="mt-4 space-y-2 min-[900px]:mt-3">
                 {!recent.length ? (
                   <EmptyState
                     title="No music yet"
@@ -389,7 +389,7 @@ function MusicLibrary() {
             </div>
           </div>
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-5 min-[900px]:space-y-4">
             <Button
               variant="ghost"
               className="-ml-3"
@@ -459,7 +459,7 @@ function MusicLibrary() {
             </div>
 
             {!!filtered.length && (
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-muted/30 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-muted/30 p-3 min-[900px]:py-2.5">
                 <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
                   <input
                     type="checkbox"
@@ -478,7 +478,7 @@ function MusicLibrary() {
 
             {!!selectedIds.length && (
               <Card className="border-primary/30">
-                <CardContent className="p-4">
+                <CardContent className="p-4 min-[900px]:p-3">
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
                     <div className="flex items-center gap-2 font-medium">
                       <CheckSquare2 className="h-4 w-4 text-primary" />
@@ -625,7 +625,7 @@ function CategoryCard({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-xl border border-border bg-card p-3 text-left transition hover:border-primary/50"
+      className="rounded-xl border border-border bg-card p-3 text-left transition hover:border-primary/50 min-[900px]:p-2.5"
     >
       <div className="flex items-center gap-2">
         <Icon className="h-4 w-4 shrink-0 text-primary" />
@@ -664,7 +664,7 @@ function TrackRow({
 
   return (
     <Card className={selected ? "border-primary/50 bg-primary/5" : undefined}>
-      <CardContent className="p-2.5 sm:p-3">
+      <CardContent className="p-2.5 sm:p-3 min-[900px]:p-2.5">
         <div className="flex items-center gap-3">
           {selectable && (
             <input
@@ -679,7 +679,7 @@ function TrackRow({
           <img
             src={track.cover_url || "/banners/default-creator-banner.png"}
             alt=""
-            className="h-11 w-11 shrink-0 rounded-lg object-cover"
+            className="h-11 w-11 shrink-0 rounded-lg object-cover min-[900px]:h-10 min-[900px]:w-10"
           />
 
           <button
@@ -688,11 +688,11 @@ function TrackRow({
             className="min-w-0 flex-1 text-left"
           >
             <p className="truncate font-semibold">{track.title}</p>
-            <p className="mt-1 truncate text-xs text-muted-foreground">
+            <p className="mt-1 truncate text-xs text-muted-foreground min-[900px]:mt-0.5">
               {track.primary_artist_name || "Independent artist"} ·{" "}
               {formatDuration(track.duration_sec)}
             </p>
-            <span className="mt-1.5 flex flex-wrap gap-1">
+            <span className="mt-1.5 flex flex-wrap gap-1 min-[900px]:mt-1">
               <Badge
                 variant={visibility === "public" ? "default" : "outline"}
                 className="h-5 px-1.5 text-[10px] font-medium"
