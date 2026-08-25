@@ -58,13 +58,13 @@ function PublicExplorePage() {
   return (
     <div className="min-h-screen bg-background">
       <MarketingNav />
-      <main className="mx-auto min-h-[70vh] max-w-7xl px-6 py-14">
-        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-border/70 px-6 py-12 text-center shadow-elevated md:px-12 md:py-16">
+      <main className="mx-auto min-h-[70vh] max-w-7xl px-5 py-10 sm:px-6 sm:py-14">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[1.5rem] border border-border/70 px-4 py-8 text-center shadow-elevated sm:rounded-[2rem] sm:px-6 sm:py-12 md:px-12 md:py-16">
           <img src="/images/supporter-cards/discover.webp" alt="" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/88 to-background/70" />
           <div className="relative mx-auto max-w-3xl">
           <Badge className="rounded-full bg-primary/10 text-primary">Open VYBE discovery</Badge>
-          <h1 className="mt-5 text-4xl font-semibold tracking-tight md:text-6xl">
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:mt-5 sm:text-4xl md:text-6xl">
             Find your sound, city, or creator.
           </h1>
           <p className="mt-4 text-muted-foreground">
@@ -72,15 +72,15 @@ function PublicExplorePage() {
               ? "You are signed in. Discover creators and music, then follow, heart, save, or participate across VYBE."
               : "Browse published VYBE music freely. Create a free Supporter account when you want to follow, save, or participate."}
           </p>
-          <form onSubmit={submit} className="relative mx-auto mt-8 max-w-2xl">
-            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <form onSubmit={submit} className="relative mx-auto mt-6 flex max-w-2xl flex-col gap-3 sm:mt-8 sm:block">
+            <Search className="pointer-events-none absolute left-4 top-7 h-5 w-5 -translate-y-1/2 text-muted-foreground sm:top-1/2" />
             <Input
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder="Search artist, song, city, or genre"
-              className="h-14 rounded-full pl-12 pr-28 text-base"
+              className="h-14 rounded-full pl-12 pr-4 text-base sm:pr-28"
             />
-            <Button className="absolute right-1.5 top-1.5 h-11 rounded-full px-6">Search</Button>
+            <Button className="h-11 w-full rounded-full px-6 sm:absolute sm:right-1.5 sm:top-1.5 sm:w-auto">Search</Button>
           </form>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             {genreChoices.map((genre) => (
@@ -105,16 +105,16 @@ function PublicExplorePage() {
         )}
         {error && <p className="py-16 text-center text-destructive">{error}</p>}
         {!loading && !error && (
-          <div className="mt-16 space-y-14">
+          <div className="mt-10 space-y-10 sm:mt-16 sm:space-y-14">
             <section>
-              <div className="flex items-end justify-between">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-sm font-medium text-primary">Creators</p>
                   <h2 className="mt-1 text-2xl font-semibold">
                     {q ? `Creator accounts connected to “${q}”` : "Explore VYBE creator accounts"}
                   </h2>
                 </div>
-                <span className="text-sm text-muted-foreground">{creators.length} found</span>
+                <span className="shrink-0 text-sm text-muted-foreground">{creators.length} found</span>
               </div>
               {creators.length ? (
                 <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -123,16 +123,16 @@ function PublicExplorePage() {
                       key={creator.user_id}
                       to="/artist/$username"
                       params={{ username: creator.username }}
-                      className="group rounded-2xl border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/40"
+                      className="group min-w-0 rounded-2xl border bg-card p-4 transition hover:-translate-y-0.5 hover:border-primary/40 sm:p-5"
                     >
-                      <div className="flex items-center gap-4">
-                        <Avatar className="h-14 w-14">
+                      <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                        <Avatar className="h-14 w-14 shrink-0">
                           <AvatarImage src={creator.avatar_url ?? undefined} />
                           <AvatarFallback>
                             <UserRound className="h-5 w-5" />
                           </AvatarFallback>
                         </Avatar>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <h3 className="truncate font-semibold">
                             {creator.artist_name || creator.display_name}
                           </h3>
@@ -146,27 +146,27 @@ function PublicExplorePage() {
                             </p>
                           )}
                         </div>
-                        <ArrowRight className="ml-auto h-4 w-4 text-muted-foreground transition group-hover:translate-x-1" />
+                        <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground transition group-hover:translate-x-1" />
                       </div>
                     </Link>
                   ))}
                 </div>
               ) : (
-                <p className="mt-6 rounded-2xl border border-dashed p-8 text-center text-muted-foreground">
+                <p className="mt-6 rounded-2xl border border-dashed p-5 text-center text-muted-foreground sm:p-8">
                   No creator accounts are connected to this search yet.
                 </p>
               )}
             </section>
 
             <section>
-              <div className="flex items-end justify-between">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-sm font-medium text-primary">Artist credits</p>
                   <h2 className="mt-1 text-2xl font-semibold">
                     {q ? `Artists matching “${q}”` : "Credited performing artists"}
                   </h2>
                 </div>
-                <span className="text-sm text-muted-foreground">{artists.length} found</span>
+                <span className="shrink-0 text-sm text-muted-foreground">{artists.length} found</span>
               </div>
               {artists.length ? (
                 <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -175,14 +175,14 @@ function PublicExplorePage() {
                       key={artist.name.toLowerCase()}
                       type="button"
                       onClick={() => navigate({ to: "/explore", search: { q: artist.name } })}
-                      className="rounded-2xl border bg-card p-5 text-left transition hover:border-primary/40"
+                      className="min-w-0 rounded-2xl border bg-card p-4 text-left transition hover:border-primary/40 sm:p-5"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                           <Music2 className="h-5 w-5" />
                         </div>
-                        <div>
-                          <h3 className="font-semibold">{artist.name}</h3>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="truncate font-semibold">{artist.name}</h3>
                           <p className="text-xs text-muted-foreground">
                             {artist.songCount} {artist.songCount === 1 ? "song" : "songs"} ·{" "}
                             {artist.uploaderCount}{" "}
@@ -194,21 +194,21 @@ function PublicExplorePage() {
                   ))}
                 </div>
               ) : (
-                <p className="mt-6 rounded-2xl border border-dashed p-8 text-center text-muted-foreground">
+                <p className="mt-6 rounded-2xl border border-dashed p-5 text-center text-muted-foreground sm:p-8">
                   No performing-artist credits match this search yet.
                 </p>
               )}
             </section>
 
             <section>
-              <div className="flex items-end justify-between">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-sm font-medium text-primary">Published music</p>
                   <h2 className="mt-1 text-2xl font-semibold">
                     {q ? `Songs matching “${q}”` : "Music to explore"}
                   </h2>
                 </div>
-                <span className="text-sm text-muted-foreground">{tracks.length} found</span>
+                <span className="shrink-0 text-sm text-muted-foreground">{tracks.length} found</span>
               </div>
               {tracks.length ? (
                 <div className="mt-6 grid gap-3 md:grid-cols-2">
@@ -219,7 +219,7 @@ function PublicExplorePage() {
                       params={{ username: track.creator!.username }}
                       search={{ track: track.id }}
                       hash="music"
-                      className="flex items-center gap-4 rounded-2xl border bg-card p-4 transition hover:border-primary/40"
+                      className="flex min-w-0 items-center gap-3 rounded-2xl border bg-card p-3 transition hover:border-primary/40 sm:gap-4 sm:p-4"
                     >
                       <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
                         {track.cover_url ? (
@@ -232,7 +232,7 @@ function PublicExplorePage() {
                           <Music2 className="h-5 w-5 text-muted-foreground" />
                         )}
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <h3 className="truncate font-semibold">{track.title}</h3>
                         <p className="truncate text-sm text-muted-foreground">
                           {track.primary_artist_name ||
@@ -247,34 +247,34 @@ function PublicExplorePage() {
                           Uploaded by {track.creator?.artist_name || track.creator?.display_name}
                         </p>
                       </div>
-                      <ArrowRight className="ml-auto h-4 w-4 text-muted-foreground" />
+                      <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" />
                     </Link>
                   ))}
                 </div>
               ) : (
-                <p className="mt-6 rounded-2xl border border-dashed p-8 text-center text-muted-foreground">
+                <p className="mt-6 rounded-2xl border border-dashed p-5 text-center text-muted-foreground sm:p-8">
                   No published songs match this search yet.
                 </p>
               )}
             </section>
 
-            <section className="rounded-[2rem] border bg-card p-8 text-center">
+            <section className="rounded-[1.5rem] border bg-card p-5 text-center sm:rounded-[2rem] sm:p-8">
               {user ? (
                 <>
                   <h2 className="text-2xl font-semibold">Keep what moves you close.</h2>
                   <p className="mt-2 text-muted-foreground">You are signed in. Return to hearted songs, saved lists, followed creators, and communities in My VYBE.</p>
-                  <div className="mt-5 flex flex-wrap justify-center gap-3">
-                    <Button asChild className="rounded-full"><Link to="/my-vybe">Open My VYBE <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
-                    <Button asChild variant="outline" className="rounded-full"><Link to="/home">Member Home</Link></Button>
+                  <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+                    <Button asChild className="w-full rounded-full sm:w-auto"><Link to="/my-vybe">Open My VYBE <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+                    <Button asChild variant="outline" className="w-full rounded-full sm:w-auto"><Link to="/home">Member Home</Link></Button>
                   </div>
                 </>
               ) : (
                 <>
                   <h2 className="text-2xl font-semibold">Want to save what you find?</h2>
                   <p className="mt-2 text-muted-foreground">Sign in as a supporter or create a free account to follow, heart, save, and participate.</p>
-                  <div className="mt-5 flex flex-wrap justify-center gap-3">
-                    <Button asChild variant="outline" className="rounded-full"><Link to="/auth/sign-in">Supporter Sign In</Link></Button>
-                    <Button asChild className="rounded-full"><Link to="/auth/sign-up">Create Free Account <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+                  <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+                    <Button asChild variant="outline" className="w-full rounded-full sm:w-auto"><Link to="/auth/sign-in">Supporter Sign In</Link></Button>
+                    <Button asChild className="w-full rounded-full sm:w-auto"><Link to="/auth/sign-up">Create Free Account <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
                   </div>
                 </>
               )}
