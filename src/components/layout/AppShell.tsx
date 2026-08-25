@@ -4,6 +4,7 @@ import { AppSidebar } from "./AppSidebar";
 import { MobilePrimaryNav } from "./MobilePrimaryNav";
 import { TopNav } from "./TopNav";
 import { CreatorPwaInstallPrompt } from "@/components/pwa/CreatorPwaInstallPrompt";
+import { CreatorAcademyCoach } from "@/components/academy/CreatorAcademyCoach";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -17,6 +18,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {children}
           </main>
           <MobilePrimaryNav />
+          <CreatorAcademyCoach />
         </SidebarInset>
       </div>
     </SidebarProvider>

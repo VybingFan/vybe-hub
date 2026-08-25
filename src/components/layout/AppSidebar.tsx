@@ -16,6 +16,7 @@ import {
   FolderKanban,
   Gamepad2,
   Gift,
+  GraduationCap,
   Heart,
   Home,
   LayoutDashboard,
@@ -200,6 +201,12 @@ const creatorAudience: NavItem[] = [
 ];
 
 const creatorGrowth: NavItem[] = [
+  {
+    title: "Creator Academy",
+    url: "/creator-academy/nova",
+    icon: GraduationCap,
+    allow: ["creator", "admin"],
+  },
   {
     title: "Public Profile & Discovery",
     url: "/profile",
