@@ -6,6 +6,8 @@ import {
 } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { SavedMusicLists } from "@/components/engagement/SavedMusicLists";
+import { SupporterCreatorUpdates } from "@/components/engagement/SupporterCreatorUpdates";
+import { SupporterFollowingCreators } from "@/components/engagement/SupporterFollowingCreators";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
@@ -28,6 +30,10 @@ function MyVybePage() {
         />
 
         <SupporterIdentityCard profile={supporterProfile} />
+
+        <SupporterFollowingCreators />
+
+        <SupporterCreatorUpdates />
 
         <section className="grid gap-3 sm:gap-4 lg:grid-cols-[1.4fr_.8fr]">
           <Card className="overflow-hidden border-primary/20 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,.18),transparent_46%)]">

@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { CalendarDays, ExternalLink, ImagePlus, Loader2, Megaphone, Trash2 } from "lucide-react";
+import { CalendarDays, Clock, ExternalLink, ImagePlus, Loader2, Megaphone, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,13 @@ export const Route = createFileRoute("/_authenticated/creator-updates")({
   component: () => <RoleGuard allow={["creator", "admin"]}><CreatorUpdatesPage /></RoleGuard>,
 });
 
+function combineLocalDateTime(dateValue: FormDataEntryValue | null, timeValue: FormDataEntryValue | null) {
+  const date = String(dateValue || "").trim();
+  const time = String(timeValue || "").trim();
+  if (!date) return "";
+  return `${date}T${time || "00:00"}`;
+}
+
 function CreatorUpdatesPage() {
   const { user } = useUser();
   const creatorId = user?.id;
@@ -32,14 +39,30 @@ function CreatorUpdatesPage() {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
+    const startsAt = combineLocalDateTime(data.get("start_date"), data.get("start_time"));
+    const endsAt = combineLocalDateTime(data.get("end_date"), data.get("end_time"));
+
+    if (!startsAt && String(data.get("start_time") || "").trim()) {
+      toast.error("Choose a start date before adding a start time.");
+      return;
+    }
+    if (!endsAt && String(data.get("end_time") || "").trim()) {
+      toast.error("Choose an end date before adding an end time.");
+      return;
+    }
+    if (startsAt && endsAt && new Date(endsAt).getTime() < new Date(startsAt).getTime()) {
+      toast.error("The end date and time must be after the start.");
+      return;
+    }
+
     try {
       await create.mutateAsync({
         input: {
           kind,
           title: String(data.get("title") || ""),
           description: String(data.get("description") || ""),
-          startsAt: String(data.get("starts_at") || ""),
-          endsAt: String(data.get("ends_at") || ""),
+          startsAt,
+          endsAt,
           locationName: String(data.get("location_name") || ""),
           locationAddress: String(data.get("location_address") || ""),
           destinationUrl: String(data.get("destination_url") || ""),
@@ -65,7 +88,7 @@ function CreatorUpdatesPage() {
         <p className="mt-3 max-w-3xl text-muted-foreground">Keep supporters current with shows, appearances, releases, promotions, announcements, and links to tickets, registration, videos, interviews, or anywhere else they should go.</p>
       </header>
 
-      <div className="grid gap-8 lg:grid-cols-[.85fr_1.15fr]">
+      <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
         <form onSubmit={submit} className="space-y-5 rounded-3xl border border-border bg-card p-5 sm:p-6">
           <div>
             <h2 className="text-xl font-semibold">Post something new</h2>
@@ -90,14 +113,46 @@ function CreatorUpdatesPage() {
             <Textarea id="update-description" name="description" maxLength={3000} className="mt-2 min-h-28" placeholder="Tell supporters what is happening and why they may want to check it out." />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div><Label htmlFor="starts-at">Starts</Label><Input id="starts-at" name="starts_at" type="datetime-local" className="mt-2" /></div>
-            <div><Label htmlFor="ends-at">Ends</Label><Input id="ends-at" name="ends_at" type="datetime-local" className="mt-2" /></div>
-          </div>
+          <div className="grid gap-4 xl:grid-cols-2">
+            <div className="rounded-2xl border border-border/70 p-4">
+              <div className="flex items-center gap-2">
+                <CalendarDays className="h-4 w-4 text-cyan-400" />
+                <Label htmlFor="start-date">Starts</Label>
+              </div>
+              <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_.8fr] xl:grid-cols-1 2xl:grid-cols-[1fr_.8fr]">
+                <div>
+                  <Label htmlFor="start-date" className="text-xs text-muted-foreground">Date</Label>
+                  <Input id="start-date" name="start_date" type="date" className="mt-1.5 cursor-pointer" />
+                </div>
+                <div>
+                  <Label htmlFor="start-time" className="flex items-center gap-1 text-xs text-muted-foreground"><Clock className="h-3.5 w-3.5" />Time</Label>
+                  <Input id="start-time" name="start_time" type="time" className="mt-1.5 cursor-pointer" />
+                </div>
+              </div>
+            </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div><Label htmlFor="location-name">Location / Venue</Label><Input id="location-name" name="location_name" maxLength={200} className="mt-2" placeholder="Venue name or Online" /></div>
-            <div><Label htmlFor="location-address">Address / Area</Label><Input id="location-address" name="location_address" maxLength={300} className="mt-2" placeholder="Philadelphia, PA or full address" /></div>
+            <div className="rounded-2xl border border-border/70 p-4">
+              <div className="flex items-center gap-2">
+                <CalendarDays className="h-4 w-4 text-cyan-400" />
+                <Label htmlFor="end-date">Ends <span className="font-normal text-muted-foreground">(optional)</span></Label>
+              </div>
+              <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_.8fr] xl:grid-cols-1 2xl:grid-cols-[1fr_.8fr]">
+                <div>
+                  <Label htmlFor="end-date" className="text-xs text-muted-foreground">Date</Label>
+                  <Input id="end-date" name="end_date" type="date" className="mt-1.5 cursor-pointer" />
+                </div>
+                <div>
+                  <Label htmlFor="end-time" className="flex items-center gap-1 text-xs text-muted-foreground"><Clock className="h-3.5 w-3.5" />Time</Label>
+                  <Input id="end-time" name="end_time" type="time" className="mt-1.5 cursor-pointer" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <p className="-mt-2 text-xs leading-5 text-muted-foreground">Choose the date from the calendar and add a time when the event has one. End date and time are optional.</p>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="min-w-0"><Label htmlFor="location-name">Location / Venue</Label><Input id="location-name" name="location_name" maxLength={200} className="mt-2 w-full" placeholder="Venue name or Online" /></div>
+            <div className="min-w-0"><Label htmlFor="location-address">Address / Area</Label><Input id="location-address" name="location_address" maxLength={300} className="mt-2 w-full" placeholder="Philadelphia, PA or full address" /></div>
           </div>
 
           <div>

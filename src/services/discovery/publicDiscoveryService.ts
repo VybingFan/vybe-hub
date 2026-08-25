@@ -107,7 +107,7 @@ export const publicDiscoveryService = {
 
     if (query) {
       creatorsQuery = creatorsQuery.or(
-        `artist_name.ilike.${term},display_name.ilike.${term},genre.ilike.${term},location.ilike.${term},bio.ilike.${term}`,
+        `username.ilike.${term},artist_name.ilike.${term},display_name.ilike.${term},genre.ilike.${term},location.ilike.${term},bio.ilike.${term}`,
       );
       tracksQuery = tracksQuery.or(
         `title.ilike.${term},artist_credit_search.ilike.${term},genre.ilike.${term},description.ilike.${term}`,
