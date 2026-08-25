@@ -42,7 +42,7 @@ export function MarketingNav() {
 
         <nav className="hidden items-center gap-6 md:flex" aria-label="Primary navigation">
           <PublicLink link={NAV_LINKS[0]} pathname={pathname} />
-          <NavDropdown label="Explore" items={EXPERIENCE_LINKS} />
+          <NavDropdown label="Explore" items={EXPERIENCE_LINKS.filter((item) => item.to !== "/discover/music")} />
           <NavDropdown label="Community" items={COMMUNITY_LINKS} />
           <PublicLink link={NAV_LINKS[1]} pathname={pathname} />
           <NavDropdown label="More" items={[...MORE_LINKS, { label: "Build With VYBE", to: "/build-with-vybe" }]} />
