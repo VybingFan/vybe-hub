@@ -39,6 +39,7 @@ import { Route as ExperienceEventsRouteImport } from './routes/experience.events
 import { Route as ExperienceDiscoverRouteImport } from './routes/experience.discover'
 import { Route as ExperienceCommunitiesRouteImport } from './routes/experience.communities'
 import { Route as DiscoverMusicRouteImport } from './routes/discover.music'
+import { Route as DemoEpkRouteImport } from './routes/demo.epk'
 import { Route as DemoCreatorRouteImport } from './routes/demo.creator'
 import { Route as CreatorSignUpRouteImport } from './routes/creator.sign-up'
 import { Route as CreatorSignInRouteImport } from './routes/creator.sign-in'
@@ -97,6 +98,7 @@ import { Route as AuthenticatedBusinessRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
 import { Route as DemoStorySlugRouteImport } from './routes/demo.story.$slug'
+import { Route as DemoPoemSlugRouteImport } from './routes/demo.poem.$slug'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api.stripe.webhook'
 import { Route as ApiStripePortalRouteImport } from './routes/api.stripe.portal'
 import { Route as ApiStripeFocusCheckoutRouteImport } from './routes/api.stripe.focus-checkout'
@@ -105,6 +107,7 @@ import { Route as ApiStripeCheckoutRouteImport } from './routes/api.stripe.check
 import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_authenticated/playlists_.$playlistId'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
 import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authenticated/music_.$trackId'
+import { Route as AuthenticatedCreatorAcademyNovaRouteImport } from './routes/_authenticated/creator-academy.nova'
 import { Route as AuthenticatedAdminWorkQueueRouteImport } from './routes/_authenticated/admin_.work-queue'
 import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin_.team'
 import { Route as AuthenticatedAdminSystemHealthRouteImport } from './routes/_authenticated/admin_.system-health'
@@ -276,6 +279,11 @@ const ExperienceCommunitiesRoute = ExperienceCommunitiesRouteImport.update({
 const DiscoverMusicRoute = DiscoverMusicRouteImport.update({
   id: '/discover/music',
   path: '/discover/music',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoEpkRoute = DemoEpkRouteImport.update({
+  id: '/demo/epk',
+  path: '/demo/epk',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoCreatorRoute = DemoCreatorRouteImport.update({
@@ -582,6 +590,11 @@ const DemoStorySlugRoute = DemoStorySlugRouteImport.update({
   path: '/demo/story/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoPoemSlugRoute = DemoPoemSlugRouteImport.update({
+  id: '/demo/poem/$slug',
+  path: '/demo/poem/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
   id: '/api/stripe/webhook',
   path: '/api/stripe/webhook',
@@ -623,6 +636,12 @@ const AuthenticatedMusicTrackIdRoute =
   AuthenticatedMusicTrackIdRouteImport.update({
     id: '/music_/$trackId',
     path: '/music/$trackId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCreatorAcademyNovaRoute =
+  AuthenticatedCreatorAcademyNovaRouteImport.update({
+    id: '/creator-academy/nova',
+    path: '/creator-academy/nova',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAdminWorkQueueRoute =
@@ -838,6 +857,7 @@ export interface FileRoutesByFullPath {
   '/creator/sign-in': typeof CreatorSignInRoute
   '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
+  '/demo/epk': typeof DemoEpkRoute
   '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/discover': typeof ExperienceDiscoverRoute
@@ -868,6 +888,7 @@ export interface FileRoutesByFullPath {
   '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
+  '/creator-academy/nova': typeof AuthenticatedCreatorAcademyNovaRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -876,6 +897,7 @@ export interface FileRoutesByFullPath {
   '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
   '/admin/campaigns/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/music/$trackId/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
@@ -958,6 +980,7 @@ export interface FileRoutesByTo {
   '/creator/sign-in': typeof CreatorSignInRoute
   '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
+  '/demo/epk': typeof DemoEpkRoute
   '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/discover': typeof ExperienceDiscoverRoute
@@ -988,6 +1011,7 @@ export interface FileRoutesByTo {
   '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
+  '/creator-academy/nova': typeof AuthenticatedCreatorAcademyNovaRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -996,6 +1020,7 @@ export interface FileRoutesByTo {
   '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
   '/admin/campaigns/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/music/$trackId/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
@@ -1080,6 +1105,7 @@ export interface FileRoutesById {
   '/creator/sign-in': typeof CreatorSignInRoute
   '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
+  '/demo/epk': typeof DemoEpkRoute
   '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/discover': typeof ExperienceDiscoverRoute
@@ -1110,6 +1136,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/_authenticated/admin_/team': typeof AuthenticatedAdminTeamRoute
   '/_authenticated/admin_/work-queue': typeof AuthenticatedAdminWorkQueueRoute
+  '/_authenticated/creator-academy/nova': typeof AuthenticatedCreatorAcademyNovaRoute
   '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
   '/_authenticated/playlists_/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -1118,6 +1145,7 @@ export interface FileRoutesById {
   '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
+  '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
   '/_authenticated/admin_/campaigns_/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
   '/_authenticated/music_/$trackId_/lyrics': typeof AuthenticatedMusicTrackIdLyricsRoute
@@ -1202,6 +1230,7 @@ export interface FileRouteTypes {
     | '/creator/sign-in'
     | '/creator/sign-up'
     | '/demo/creator'
+    | '/demo/epk'
     | '/discover/music'
     | '/experience/communities'
     | '/experience/discover'
@@ -1232,6 +1261,7 @@ export interface FileRouteTypes {
     | '/admin/system-health'
     | '/admin/team'
     | '/admin/work-queue'
+    | '/creator-academy/nova'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -1240,6 +1270,7 @@ export interface FileRouteTypes {
     | '/api/stripe/focus-checkout'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
+    | '/demo/poem/$slug'
     | '/demo/story/$slug'
     | '/admin/campaigns/$campaignId'
     | '/music/$trackId/lyrics'
@@ -1322,6 +1353,7 @@ export interface FileRouteTypes {
     | '/creator/sign-in'
     | '/creator/sign-up'
     | '/demo/creator'
+    | '/demo/epk'
     | '/discover/music'
     | '/experience/communities'
     | '/experience/discover'
@@ -1352,6 +1384,7 @@ export interface FileRouteTypes {
     | '/admin/system-health'
     | '/admin/team'
     | '/admin/work-queue'
+    | '/creator-academy/nova'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -1360,6 +1393,7 @@ export interface FileRouteTypes {
     | '/api/stripe/focus-checkout'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
+    | '/demo/poem/$slug'
     | '/demo/story/$slug'
     | '/admin/campaigns/$campaignId'
     | '/music/$trackId/lyrics'
@@ -1443,6 +1477,7 @@ export interface FileRouteTypes {
     | '/creator/sign-in'
     | '/creator/sign-up'
     | '/demo/creator'
+    | '/demo/epk'
     | '/discover/music'
     | '/experience/communities'
     | '/experience/discover'
@@ -1473,6 +1508,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/system-health'
     | '/_authenticated/admin_/team'
     | '/_authenticated/admin_/work-queue'
+    | '/_authenticated/creator-academy/nova'
     | '/_authenticated/music_/$trackId'
     | '/_authenticated/music_/upload'
     | '/_authenticated/playlists_/$playlistId'
@@ -1481,6 +1517,7 @@ export interface FileRouteTypes {
     | '/api/stripe/focus-checkout'
     | '/api/stripe/portal'
     | '/api/stripe/webhook'
+    | '/demo/poem/$slug'
     | '/demo/story/$slug'
     | '/_authenticated/admin_/campaigns_/$campaignId'
     | '/_authenticated/music_/$trackId_/lyrics'
@@ -1521,6 +1558,7 @@ export interface RootRouteChildren {
   CreatorSignInRoute: typeof CreatorSignInRoute
   CreatorSignUpRoute: typeof CreatorSignUpRoute
   DemoCreatorRoute: typeof DemoCreatorRoute
+  DemoEpkRoute: typeof DemoEpkRoute
   DiscoverMusicRoute: typeof DiscoverMusicRoute
   ExperienceCommunitiesRoute: typeof ExperienceCommunitiesRoute
   ExperienceDiscoverRoute: typeof ExperienceDiscoverRoute
@@ -1537,6 +1575,7 @@ export interface RootRouteChildren {
   ApiStripeFocusCheckoutRoute: typeof ApiStripeFocusCheckoutRoute
   ApiStripePortalRoute: typeof ApiStripePortalRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
+  DemoPoemSlugRoute: typeof DemoPoemSlugRoute
   DemoStorySlugRoute: typeof DemoStorySlugRoute
   ArtistUsernamePlaylistSlugRoute: typeof ArtistUsernamePlaylistSlugRoute
 }
@@ -1751,6 +1790,13 @@ declare module '@tanstack/react-router' {
       path: '/discover/music'
       fullPath: '/discover/music'
       preLoaderRoute: typeof DiscoverMusicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/epk': {
+      id: '/demo/epk'
+      path: '/demo/epk'
+      fullPath: '/demo/epk'
+      preLoaderRoute: typeof DemoEpkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/creator': {
@@ -2159,6 +2205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/poem/$slug': {
+      id: '/demo/poem/$slug'
+      path: '/demo/poem/$slug'
+      fullPath: '/demo/poem/$slug'
+      preLoaderRoute: typeof DemoPoemSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/stripe/webhook': {
       id: '/api/stripe/webhook'
       path: '/api/stripe/webhook'
@@ -2213,6 +2266,13 @@ declare module '@tanstack/react-router' {
       path: '/music/$trackId'
       fullPath: '/music/$trackId'
       preLoaderRoute: typeof AuthenticatedMusicTrackIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/creator-academy/nova': {
+      id: '/_authenticated/creator-academy/nova'
+      path: '/creator-academy/nova'
+      fullPath: '/creator-academy/nova'
+      preLoaderRoute: typeof AuthenticatedCreatorAcademyNovaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin_/work-queue': {
@@ -2437,6 +2497,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminSystemHealthRoute: typeof AuthenticatedAdminSystemHealthRoute
   AuthenticatedAdminTeamRoute: typeof AuthenticatedAdminTeamRoute
   AuthenticatedAdminWorkQueueRoute: typeof AuthenticatedAdminWorkQueueRoute
+  AuthenticatedCreatorAcademyNovaRoute: typeof AuthenticatedCreatorAcademyNovaRoute
   AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
   AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -2505,6 +2566,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminSystemHealthRoute: AuthenticatedAdminSystemHealthRoute,
   AuthenticatedAdminTeamRoute: AuthenticatedAdminTeamRoute,
   AuthenticatedAdminWorkQueueRoute: AuthenticatedAdminWorkQueueRoute,
+  AuthenticatedCreatorAcademyNovaRoute: AuthenticatedCreatorAcademyNovaRoute,
   AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
   AuthenticatedPlaylistsPlaylistIdRoute: AuthenticatedPlaylistsPlaylistIdRoute,
@@ -2571,6 +2633,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorSignInRoute: CreatorSignInRoute,
   CreatorSignUpRoute: CreatorSignUpRoute,
   DemoCreatorRoute: DemoCreatorRoute,
+  DemoEpkRoute: DemoEpkRoute,
   DiscoverMusicRoute: DiscoverMusicRoute,
   ExperienceCommunitiesRoute: ExperienceCommunitiesRoute,
   ExperienceDiscoverRoute: ExperienceDiscoverRoute,
@@ -2587,6 +2650,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiStripeFocusCheckoutRoute: ApiStripeFocusCheckoutRoute,
   ApiStripePortalRoute: ApiStripePortalRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
+  DemoPoemSlugRoute: DemoPoemSlugRoute,
   DemoStorySlugRoute: DemoStorySlugRoute,
   ArtistUsernamePlaylistSlugRoute: ArtistUsernamePlaylistSlugRoute,
 }

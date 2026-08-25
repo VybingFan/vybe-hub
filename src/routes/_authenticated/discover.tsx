@@ -49,6 +49,16 @@ function DiscoverPage() {
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><ActionCard title="Tune interests" text="Choose the genres and experiences that should shape your discovery." to="/supporter-interests" image="/images/supporter-cards/discover.webp" icon={<SlidersHorizontal className="h-5 w-5" />} /><ActionCard title="Read creator stories" text="Go behind the music through stories, interviews, and creative journeys." to="/read" image="/images/supporter-cards/creator-stories.webp" icon={<ArrowRight className="h-5 w-5" />} /><ActionCard title="Find your people" text="Join conversations about creators, releases, scenes, and shared interests." to="/communities" image="/images/supporter-cards/community.webp" icon={<UsersRound className="h-5 w-5" />} /><ActionCard title="Return to My VYBE" text="Open your hearted songs, lists, followed creators, and saved experiences." to="/my-vybe" image="/images/supporter-cards/my-vybe.webp" icon={<Music2 className="h-5 w-5" />} /></section>
 
+      <Link to="/demo/creator" className="group grid overflow-hidden rounded-3xl border border-fuchsia-400/25 bg-gradient-to-r from-fuchsia-500/10 via-card to-cyan-400/10 transition hover:border-fuchsia-400/50 md:grid-cols-[220px_1fr]">
+        <img src="/images/demo/nova-vale/epk/theater-portrait.webp" alt="Nova Vale guided demo creator" className="h-48 w-full object-cover md:h-full" />
+        <span className="flex flex-col justify-center p-6 md:p-8">
+          <span className="text-xs font-semibold uppercase tracking-[.18em] text-fuchsia-300">Guided creator demonstration</span>
+          <span className="mt-2 text-2xl font-semibold">Meet Nova Vale and practice the supporter experience</span>
+          <span className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">Switch between public visitor, free member, and follower views. Practice listening, hearting, commenting, following, and saving without changing your real account.</span>
+          <span className="mt-5 inline-flex items-center text-sm font-medium text-primary">Open Nova's guided page <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" /></span>
+        </span>
+      </Link>
+
       {loading ? <div className="flex min-h-56 items-center justify-center"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div> : null}
       {error ? <p className="rounded-2xl border border-destructive/30 bg-destructive/10 p-5 text-sm text-destructive">{error}</p> : null}
       {!loading && !error ? <div className="space-y-10">
