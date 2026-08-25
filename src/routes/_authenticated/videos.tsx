@@ -89,7 +89,7 @@ function VideoStudio() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8">
+    <div className="mx-auto max-w-7xl space-y-8 min-[900px]:space-y-5">
       <header>
         <p className="text-sm font-semibold uppercase tracking-[.2em] text-rose-400">
           Creator Studio
@@ -102,11 +102,11 @@ function VideoStudio() {
       </header>
 
       <Card className="border-cyan-400/25 bg-cyan-400/5">
-        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start">
+        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start min-[900px]:gap-3 min-[900px]:p-4">
           <CloudUpload className="h-6 w-6 shrink-0 text-cyan-400" />
           <div>
             <p className="font-semibold">Upload from your computer or phone gallery</p>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            <p className="mt-1 text-sm leading-6 text-muted-foreground min-[900px]:leading-5">
               Cloudflare Stream is connected. Native uploads are securely encoded for reliable
               playback while VYBE keeps platform credentials protected server-side.
             </p>
@@ -117,10 +117,10 @@ function VideoStudio() {
       <NativeUploadCard creatorId={user?.id} />
       <NativeVideoProcessingMonitor creatorId={user?.id} videos={videos} />
 
-      <div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr]">
+      <div className="space-y-8 min-[900px]:space-y-5">
         <form
           onSubmit={submit}
-          className="space-y-5 rounded-3xl border border-border bg-card p-5 sm:p-6"
+          className="space-y-5 rounded-3xl border border-border bg-card p-5 sm:p-6 min-[900px]:space-y-4 min-[900px]:p-4 min-[900px]:mx-0"
         >
           <div>
             <h2 className="text-xl font-semibold">Add a hosted video</h2>
@@ -164,7 +164,7 @@ function VideoStudio() {
               id="video-description"
               name="description"
               maxLength={5000}
-              className="mt-2 min-h-28"
+              className="mt-2 min-h-28 min-[900px]:min-h-20"
               placeholder="Tell viewers about the video, production, cast, or release."
             />
           </div>
@@ -199,7 +199,7 @@ function VideoStudio() {
           </Button>
         </form>
 
-        <section>
+        <section className="min-w-0">
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 className="text-2xl font-semibold">Your videos</h2>
@@ -208,7 +208,7 @@ function VideoStudio() {
               </p>
             </div>
           </div>
-          <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <div className="mt-5 grid gap-5 sm:grid-cols-2 min-[900px]:mt-4 min-[900px]:gap-4 min-[1280px]:grid-cols-3">
             {videos.map((video) => (
               <article
                 key={video.id}
@@ -243,7 +243,7 @@ function VideoStudio() {
                     />
                   )}
                 </div>
-                <div className="p-4">
+                <div className="p-4 min-[900px]:p-3 min-[1280px]:p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <Badge variant={video.status === "published" ? "default" : "outline"}>
@@ -270,7 +270,7 @@ function VideoStudio() {
                   <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
                     {video.description || "No description added."}
                   </p>
-                  <div className="mt-4 grid gap-2 min-[420px]:grid-cols-2 sm:grid-cols-1 xl:grid-cols-2">
+                  <div className="mt-4 grid gap-2 min-[420px]:grid-cols-2 sm:grid-cols-1 xl:grid-cols-2 min-[900px]:mt-3">
                     <Button
                       type="button"
                       variant="outline"
@@ -321,7 +321,7 @@ function VideoStudio() {
               </article>
             ))}
             {!isLoading && !videos.length && (
-              <div className="rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground sm:col-span-2">
+              <div className="rounded-2xl border border-dashed border-border p-8 text-center text-muted-foreground sm:col-span-2 min-[900px]:p-6 min-[1280px]:col-span-3">
                 Your first video will appear here.
               </div>
             )}
@@ -401,7 +401,7 @@ function NativeUploadCard({ creatorId }: { creatorId?: string }) {
   };
 
   return (
-    <form onSubmit={submit} className="rounded-3xl border border-cyan-400/25 bg-card p-5 sm:p-6">
+    <form onSubmit={submit} className="rounded-3xl border border-cyan-400/25 bg-card p-5 sm:p-6 min-[900px]:p-4">
       <div className="flex items-start gap-3">
         <Upload className="mt-1 h-6 w-6 shrink-0 text-cyan-400" />
         <div>
@@ -412,7 +412,7 @@ function NativeUploadCard({ creatorId }: { creatorId?: string }) {
           </p>
         </div>
       </div>
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className="mt-5 grid gap-4 md:grid-cols-2 min-[900px]:mt-4 min-[900px]:gap-3">
         <div>
           <Label htmlFor="native-title">Video title</Label>
           <Input id="native-title" name="native_title" required maxLength={160} className="mt-2" />
@@ -441,8 +441,8 @@ function NativeUploadCard({ creatorId }: { creatorId?: string }) {
             className="mt-2"
           />
         </div>
-        <label className="flex min-h-28 cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-border p-4 transition hover:border-cyan-400 md:col-span-2">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10">
+        <label className="flex min-h-28 cursor-pointer items-center gap-4 rounded-2xl border border-dashed border-border p-4 transition hover:border-cyan-400 md:col-span-2 min-[900px]:min-h-20 min-[900px]:p-3">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 min-[900px]:h-11 min-[900px]:w-11">
             <FileVideo2 className="h-7 w-7 text-cyan-400" />
           </span>
           <span className="min-w-0 text-sm">
@@ -481,12 +481,12 @@ function NativeUploadCard({ creatorId }: { creatorId?: string }) {
       )}
       <Button
         disabled={uploading || createNative.isPending}
-        className="mt-5 w-full bg-gradient-brand text-white sm:w-auto"
+        className="mt-5 w-full bg-gradient-brand text-white sm:w-auto min-[900px]:mt-4"
       >
         {uploading ? <Loader2 className="animate-spin" /> : <Upload />}
         {uploading ? "Uploading video..." : "2. Upload video to VYBE"}
       </Button>
-      <p className="mt-3 text-xs text-muted-foreground">
+      <p className="mt-3 text-xs text-muted-foreground min-[900px]:mt-2">
         Videos upload directly to Cloudflare Stream using a secure one-time upload link, then
         appear in your VYBE library as drafts after processing completes.
       </p>
