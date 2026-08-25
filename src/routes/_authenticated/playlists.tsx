@@ -425,7 +425,7 @@ function PlaylistStudio() {
       {!canUseApprovedListeners ? <LockedFeatureCard title="Approved-listener playlist access" description="Learn when recipient-level access is more appropriate than a public, unlisted, or password-protected link." requiredPlan="creator_pro" educationKey="playlist_approved_listeners" compact /> : null}
 
       {createdSlug && (
-        <div className="flex flex-col gap-4 rounded-2xl border border-primary/30 bg-primary/10 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 rounded-2xl border border-primary/30 bg-primary/10 p-5 sm:flex-row sm:items-center sm:justify-between min-[900px]:p-4">
           <div>
             <p className="flex items-center gap-2 font-semibold">
               <Check className="h-5 w-5 text-primary" /> Ready to send
@@ -443,12 +443,12 @@ function PlaylistStudio() {
         {showCreate ? (
           <form
             onSubmit={submit}
-            className="rounded-2xl border border-primary/20 bg-card p-4 pb-20 shadow-lg shadow-primary/5 md:p-5"
+            className="rounded-2xl border border-primary/20 bg-card p-4 pb-20 shadow-lg shadow-primary/5 min-[900px]:p-4"
           >
             <h2 className="flex items-center gap-2 text-lg font-semibold">
               <Plus className="text-primary" /> Create a playlist
             </h2>
-            <div className="mt-4 grid gap-4">
+            <div className="mt-3 grid gap-3 min-[900px]:grid-cols-2">
               <div>
                 <Label htmlFor="title">Playlist title</Label>
                 <Input
@@ -500,7 +500,7 @@ function PlaylistStudio() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="rounded-2xl border border-border bg-muted/20 p-4">
+              <div className="rounded-2xl border border-border bg-muted/20 p-4 min-[900px]:col-span-2 min-[900px]:p-3">
                 <Label>Who can open this playlist?</Label>
 
                 <Select
@@ -536,12 +536,10 @@ function PlaylistStudio() {
                 </Select>
 
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  Every published song in your library appears below. Private and
-                  shareable songs stay hidden from your public song catalog. VYBE
-                  asks you to confirm before placing one in a public playlist.
+                  Published songs appear below. Private or shareable songs stay hidden from your public catalog, and VYBE confirms before adding one to a public playlist.
                 </p>
 
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="create-playlist-expiration">
                       Link expiration (optional)
@@ -558,7 +556,7 @@ function PlaylistStudio() {
                     />
                   </div>
 
-                  <label className="flex items-center gap-3 rounded-xl border border-border p-4 text-sm">
+                  <label className="flex items-center gap-3 rounded-xl border border-border p-4 text-sm min-[900px]:p-3">
                     <input
                       type="checkbox"
                       checked={
@@ -575,7 +573,7 @@ function PlaylistStudio() {
                 </div>
 
                 {createAccessMode === "approved_listeners" ? (
-                  <p className="mt-3 rounded-xl border border-primary/25 bg-primary/5 p-3 text-xs leading-5 text-muted-foreground">
+                  <p className="mt-2 rounded-xl border border-primary/25 bg-primary/5 p-3 text-xs leading-5 text-muted-foreground">
                     Create the playlist first, then use Manage playlist to add
                     the exact listener email addresses.
                   </p>
@@ -636,7 +634,7 @@ function PlaylistStudio() {
                   }}
                 />
               </div>
-              <div>
+              <div className="min-[900px]:col-span-2">
                 <Label>Choose songs in play order</Label>
                 <div className="relative mt-2">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -675,7 +673,7 @@ function PlaylistStudio() {
                     )}
                   </div>
                 </div>
-                <div className="mt-2 max-h-80 space-y-2 overflow-auto rounded-2xl border border-border p-2">
+                <div className="mt-2 max-h-80 space-y-2 overflow-auto rounded-2xl border border-border p-2 min-[900px]:max-h-72">
                   {isLoading ? (
                     <Loader2 className="m-6 animate-spin" />
                   ) : visibleTracks.length ? (
@@ -685,7 +683,7 @@ function PlaylistStudio() {
                       return (
                         <div
                           key={track.id}
-                          className="flex items-center gap-3 rounded-xl p-3 hover:bg-white/5"
+                          className="flex items-center gap-3 rounded-xl p-3 hover:bg-white/5 min-[900px]:py-2.5"
                         >
                           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
                             {checked ? selected.indexOf(track.id) + 1 : "-"}
@@ -777,20 +775,24 @@ function PlaylistStudio() {
                   )}
                 </div>
               </div>
-              <Button
-                disabled={
-                  create.isPending || replaceCover.isPending || !selected.length
-                }
-                size="lg"
-                className="fixed bottom-20 right-4 z-40 bg-gradient-brand text-white shadow-elevated md:bottom-6 md:right-8"
-              >
-                {create.isPending || replaceCover.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <ListMusic className="mr-2 h-4 w-4" />
-                )}{" "}
-                Publish and get link
-              </Button>
+              <div className="min-[900px]:col-span-2 min-[900px]:sticky min-[900px]:bottom-3 min-[900px]:z-30">
+                <div className="flex items-center justify-end rounded-2xl border border-primary/20 bg-background/95 p-3 shadow-xl backdrop-blur">
+                  <Button
+                    disabled={
+                      create.isPending || replaceCover.isPending || !selected.length
+                    }
+                    size="lg"
+                    className="bg-gradient-brand text-white shadow-elevated"
+                  >
+                    {create.isPending || replaceCover.isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <ListMusic className="mr-2 h-4 w-4" />
+                    )}{" "}
+                    Publish and get link
+                  </Button>
+                </div>
+              </div>
             </div>
           </form>
         ) : null}
@@ -913,7 +915,7 @@ function PlaylistStudio() {
                               : "Unlisted"}
                     </Badge>
                   </div>
-                  <div className="min-w-0 flex-1 p-3 sm:p-4">
+                  <div className="min-w-0 flex-1 p-3 sm:p-4 min-[900px]:p-3">
                     <p className="truncate font-semibold">{playlist.title}</p>
                     <div className="mt-1 flex min-w-0 items-center gap-1.5">
                       <p className="truncate text-[11px] font-medium text-primary">
