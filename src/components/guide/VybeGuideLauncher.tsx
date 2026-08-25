@@ -7,10 +7,14 @@ import { Input } from "@/components/ui/input";
 import { useUser } from "@/hooks/useUser";
 import { CREATOR_ONBOARDING_STEPS, VYBE_GUIDE_ITEMS } from "@/features/guide/vybeGuideData";
 import { useCreatorSetupIntelligence } from "@/features/guide/useCreatorSetupIntelligence";
+import { CREATOR_ACADEMY_COACH_KEY } from "@/components/academy/CreatorAcademyCoach";
 
 import {
   consumeCreatorOnboardingLaunch,
+  CREATOR_ONBOARDING_COACH_EVENT,
+  readCreatorOnboardingCoachActive,
   readCreatorOnboardingState,
+  saveCreatorOnboardingCoachActive,
   saveCreatorOnboardingState,
   type CreatorOnboardingState,
 } from "@/features/guide/creatorOnboardingState";
@@ -21,7 +25,7 @@ export function VybeGuideLauncher() {
   const [open, setOpen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [query, setQuery] = useState("");
-  const [coachDismissed, setCoachDismissed] = useState(false);
+  const [coachDismissed, setCoachDismissed] = useState(true);
   const [onboarding, setOnboarding] = useState<CreatorOnboardingState>({ status: "completed", step: 0 });
 
   const creator = primaryRole === "creator";
@@ -33,11 +37,40 @@ export function VybeGuideLauncher() {
     const firstRun = consumeCreatorOnboardingLaunch(user.id);
     setOnboarding(current);
     if (firstRun) {
+      saveCreatorOnboardingCoachActive(user.id, false);
+      setCoachDismissed(true);
       const next = current.status === "completed" ? { status: "offered" as const, step: 0, mode: "setup" as const } : current;
       saveCreatorOnboardingState(user.id, next);
       setOnboarding(next);
       setOpen(true);
     }
+  }, [creator, user?.id]);
+
+  useEffect(() => {
+    if (!creator || !user?.id) {
+      setCoachDismissed(true);
+      return;
+    }
+
+    const syncCoachState = () => {
+      const academyActive = Boolean(window.localStorage.getItem(CREATOR_ACADEMY_COACH_KEY));
+      if (academyActive) {
+        saveCreatorOnboardingCoachActive(user.id, false);
+        setCoachDismissed(true);
+        return;
+      }
+      setCoachDismissed(!readCreatorOnboardingCoachActive(user.id));
+    };
+
+    syncCoachState();
+    window.addEventListener("storage", syncCoachState);
+    window.addEventListener("vybe:creator-academy-coach", syncCoachState);
+    window.addEventListener(CREATOR_ONBOARDING_COACH_EVENT, syncCoachState);
+    return () => {
+      window.removeEventListener("storage", syncCoachState);
+      window.removeEventListener("vybe:creator-academy-coach", syncCoachState);
+      window.removeEventListener(CREATOR_ONBOARDING_COACH_EVENT, syncCoachState);
+    };
   }, [creator, user?.id]);
 
   useEffect(() => {
@@ -61,6 +94,19 @@ export function VybeGuideLauncher() {
       .slice(0, 6);
   }, [primaryRole, query]);
 
+  function setCoachActive(active: boolean) {
+    if (user?.id) saveCreatorOnboardingCoachActive(user.id, active);
+    setCoachDismissed(!active);
+  }
+
+  function activateCoach() {
+    if (window.localStorage.getItem(CREATOR_ACADEMY_COACH_KEY)) {
+      window.localStorage.removeItem(CREATOR_ACADEMY_COACH_KEY);
+      window.dispatchEvent(new CustomEvent("vybe:creator-academy-coach"));
+    }
+    setCoachActive(true);
+  }
+
   function updateOnboarding(next: CreatorOnboardingState) {
     if (user?.id) saveCreatorOnboardingState(user.id, next);
     setOnboarding(next);
@@ -69,7 +115,7 @@ export function VybeGuideLauncher() {
   function continueSetup() {
     if (!currentStep) return;
     // Minimize the coach after navigation so the destination controls remain visible.
-    setCoachDismissed(true);
+    activateCoach();
     setOpen(false);
     void navigate({ to: currentStep.route as any });
   }
@@ -77,13 +123,14 @@ export function VybeGuideLauncher() {
   function markStepComplete() {
     if (reviewSetup) {
       if (onboarding.step >= CREATOR_ONBOARDING_STEPS.length - 1) {
+        setCoachActive(false);
         updateOnboarding({ status: "completed", step: CREATOR_ONBOARDING_STEPS.length - 1, mode: "setup" });
         setOpen(false);
         return;
       }
       const nextStep = onboarding.step + 1;
       updateOnboarding({ status: "active", step: nextStep, mode: "review" });
-      setCoachDismissed(false);
+      activateCoach();
       setOpen(false);
       void navigate({ to: CREATOR_ONBOARDING_STEPS[nextStep].route as any });
       return;
@@ -91,26 +138,28 @@ export function VybeGuideLauncher() {
     const next = { status: setup.isReady ? "completed" as const : "active" as const, step: setup.nextStepIndex };
     updateOnboarding(next);
     if (!setup.isReady) void navigate({ to: CREATOR_ONBOARDING_STEPS[setup.nextStepIndex].route as any });
-    else setOpen(false);
+    else { setCoachActive(false); setOpen(false); }
   }
   function pauseSetup() {
+    setCoachActive(false);
     updateOnboarding({ ...onboarding, status: "paused" });
     setOpen(false);
   }
 
   function resumeSetup() {
+    activateCoach();
     updateOnboarding({ ...onboarding, status: "active" });
     setShowHelp(false);
   }
 
-  function startSetup() { updateOnboarding({ status: "active", step: 0, mode: "setup" }); setShowHelp(false); }
+  function startSetup() { activateCoach(); updateOnboarding({ status: "active", step: 0, mode: "setup" }); setShowHelp(false); }
 
-  function maybeLater() { updateOnboarding({ status: "paused", step: 0, mode: "setup" }); setOpen(false); }
+  function maybeLater() { setCoachActive(false); updateOnboarding({ status: "paused", step: 0, mode: "setup" }); setOpen(false); }
 
-  function skipSetup() { updateOnboarding({ status: "completed", step: CREATOR_ONBOARDING_STEPS.length - 1, mode: "setup" }); setOpen(false); }
+  function skipSetup() { setCoachActive(false); updateOnboarding({ status: "completed", step: CREATOR_ONBOARDING_STEPS.length - 1, mode: "setup" }); setOpen(false); }
 
   function restartSetup() {
-    setCoachDismissed(false);
+    activateCoach();
     updateOnboarding({ status: "active", step: 0, mode: "review" });
     setShowHelp(false);
     setOpen(true);
@@ -152,7 +201,7 @@ export function VybeGuideLauncher() {
               </button>
               <button
                 type="button"
-                onClick={() => setCoachDismissed(true)}
+                onClick={() => setCoachActive(false)}
                 className="rounded-full p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
                 aria-label="Close creator setup coach"
                 title="Close"

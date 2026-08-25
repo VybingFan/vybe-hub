@@ -15,6 +15,23 @@ function launchKey(userId: string) {
   return `${LEGACY_LAUNCH_KEY}:${userId}`;
 }
 
+const COACH_ACTIVE_KEY = "vybe:creator-onboarding-coach-active-v1";
+export const CREATOR_ONBOARDING_COACH_EVENT = "vybe:creator-onboarding-coach";
+
+function coachActiveKey(userId: string) {
+  return `${COACH_ACTIVE_KEY}:${userId}`;
+}
+
+export function readCreatorOnboardingCoachActive(userId: string): boolean {
+  return window.localStorage.getItem(coachActiveKey(userId)) === "1";
+}
+
+export function saveCreatorOnboardingCoachActive(userId: string, active: boolean) {
+  if (active) window.localStorage.setItem(coachActiveKey(userId), "1");
+  else window.localStorage.removeItem(coachActiveKey(userId));
+  window.dispatchEvent(new CustomEvent(CREATOR_ONBOARDING_COACH_EVENT));
+}
+
 function parseState(raw: string | null): CreatorOnboardingState | null {
   if (!raw) return null;
   try {

@@ -45,7 +45,11 @@ export function CreatorAcademyCoach() {
   }, []);
 
   if (!lesson) return null;
-  const close = () => { localStorage.removeItem(CREATOR_ACADEMY_COACH_KEY); setLesson(null); };
+  const close = () => {
+    localStorage.removeItem(CREATOR_ACADEMY_COACH_KEY);
+    window.dispatchEvent(new CustomEvent("vybe:creator-academy-coach"));
+    setLesson(null);
+  };
 
   return (
     <aside className={`fixed bottom-20 z-50 w-[min(430px,calc(100vw-24px))] ${side === "right" ? "right-3 md:right-6" : "left-3 md:left-[280px]"}`} aria-label="Creator Academy lesson coach">
