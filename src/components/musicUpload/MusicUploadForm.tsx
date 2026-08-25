@@ -153,7 +153,7 @@ export function MusicUploadForm({
   };
 
   return (
-    <form id="upload-track-form" onSubmit={submit} className="space-y-4 pb-20">
+    <form id="upload-track-form" onSubmit={submit} className="space-y-4 pb-20 min-[900px]:grid min-[900px]:grid-cols-2 min-[900px]:items-start min-[900px]:gap-4 min-[900px]:space-y-0">
       <ProfileCard
         title="Start with the essentials"
         description="Only the audio file, song title, and primary artist are required. Add everything else now or return later."
@@ -184,7 +184,7 @@ export function MusicUploadForm({
       </ProfileCard>
       {advancedWorkflow ? <ProfileCard
         title="Place this song in your workspace"
-        description="Choose why you are managing this song and where it is in the creative process. You can change either setting later from the Music Library."
+        description="Choose where this song belongs in your workflow and how far along it is. You can change either setting later."
       >
         <div className="grid gap-4 md:grid-cols-2">
           <Field label="Where should this song be organized?">
@@ -228,10 +228,8 @@ export function MusicUploadForm({
           </Field>
         </div>
 
-        <p className="mt-3 text-xs leading-5 text-muted-foreground">
-          Category, production stage, and listening access are separate. For
-          example, a song may be "Looking for collaborators," currently
-          "Recording," and shared only with approved listeners.
+        <p className="mt-2 text-xs leading-5 text-muted-foreground min-[900px]:leading-4">
+          Category, production stage, and listening access are separate settings.
         </p>
       </ProfileCard> : null}
 
@@ -366,11 +364,12 @@ export function MusicUploadForm({
         </div>
       </ProfileCard>
 
-      <ProfileCard
-        title="Optional information"
-        description="Choose only the sections you want to complete. Blank sections can be added from your Music Library later."
-      >
-        <div className="grid gap-3 sm:grid-cols-2">
+      <div className="min-[900px]:col-span-2">
+        <ProfileCard
+          title="Optional information"
+          description="Choose only the sections you want to complete. Blank sections can be added from your Music Library later."
+        >
+        <div className="grid gap-3 sm:grid-cols-2 min-[1100px]:grid-cols-3">
           {[
             ["credits", "Credits and collaborators"],
             ["discovery", "Genre and discovery"],
@@ -408,7 +407,7 @@ export function MusicUploadForm({
           </Field>
         )}
         {optional.discovery && (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2 min-[1100px]:grid-cols-3">
             <Field label="Genre">
               <Input
                 value={values.genre}
@@ -468,7 +467,8 @@ export function MusicUploadForm({
                 placeholder="Title of the production"
               />
             </Field>
-            <Field label="Scene, episode, or placement details">
+            <div className="md:col-span-2 min-[1100px]:col-span-3">
+              <Field label="Scene, episode, or placement details">
               <Textarea
                 rows={3}
                 value={values.discovery_metadata.placement_details}
@@ -480,7 +480,8 @@ export function MusicUploadForm({
                 }
                 placeholder="Episode, scene, timestamp, or anything a listener may remember"
               />
-            </Field>
+              </Field>
+            </div>
           </div>
         )}
         {optional.release && (
@@ -537,12 +538,13 @@ export function MusicUploadForm({
             </Select>
           </Field>
         )}
-      </ProfileCard>
+        </ProfileCard>
+      </div>
 
       <div className="fixed bottom-20 right-4 z-40 md:bottom-6 md:right-8">
         <SubmitButton
           loading={submitting}
-          className="w-auto bg-gradient-brand px-6 text-primary-foreground shadow-elevated"
+          className="w-auto bg-gradient-brand px-6 text-primary-foreground shadow-elevated min-[900px]:px-5"
         >
           <Upload className="mr-2 h-4 w-4" /> Upload track
         </SubmitButton>
@@ -584,7 +586,7 @@ function FilePicker({
   preview?: string | null;
 }) {
   return (
-    <label className="flex cursor-pointer flex-col gap-2 rounded-md border border-dashed border-border/70 p-4 transition hover:border-primary/60">
+    <label className="flex cursor-pointer flex-col gap-2 rounded-md border border-dashed border-border/70 p-4 transition hover:border-primary/60 min-[900px]:p-3">
       <div className="flex items-center gap-2 text-sm font-medium">
         {icon}
         {label}
@@ -593,7 +595,7 @@ function FilePicker({
         <img
           src={preview}
           alt=""
-          className="h-24 w-24 rounded-md object-cover"
+          className="h-24 w-24 rounded-md object-cover min-[900px]:h-20 min-[900px]:w-20"
         />
       )}
       <p className="text-xs text-muted-foreground">{file ? file.name : hint}</p>
