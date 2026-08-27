@@ -33,6 +33,8 @@ export type BackOfficeSummary = {
 export type AdminCreatorRecord = {
   user_id: string;
   display_name: string;
+  creator_name?: string | null;
+  focus_codes?: string[];
   email: string | null;
   joined_at: string;
   roles: string[];
@@ -101,7 +103,58 @@ export const adminService = {
       result_limit: 100,
     });
     if (error) throw error;
-    return (data ?? []) as AdminCreatorRecord[];
+
+    const base = (data ?? []) as AdminCreatorRecord[];
+    const creatorIds = base
+      .filter((row) => row.roles.includes("creator"))
+      .map((row) => row.user_id);
+
+    if (!creatorIds.length) return base;
+
+    const [
+      { data: profiles, error: profileError },
+      { data: focusRows, error: focusError },
+    ] = await Promise.all([
+      supabase
+        .from("creator_profiles")
+        .select("user_id,artist_name,display_name")
+        .in("user_id", creatorIds),
+      supabase
+        .from("creator_focus_access")
+        .select("creator_id,focus_code,status,ends_at")
+        .in("creator_id", creatorIds),
+    ]);
+
+    if (profileError) throw profileError;
+    if (focusError) throw focusError;
+
+    const creatorNames = new Map(
+      (profiles ?? []).map((profile) => [
+        profile.user_id,
+        profile.artist_name || profile.display_name || null,
+      ]),
+    );
+
+    const focuses = new Map<string, string[]>();
+    const now = Date.now();
+
+    (focusRows ?? []).forEach((row) => {
+      const active =
+        row.status === "active" &&
+        (!row.ends_at || new Date(row.ends_at).getTime() > now);
+
+      if (!active) return;
+
+      const existing = focuses.get(row.creator_id) ?? [];
+      if (!existing.includes(row.focus_code)) existing.push(row.focus_code);
+      focuses.set(row.creator_id, existing);
+    });
+
+    return base.map((row) => ({
+      ...row,
+      creator_name: creatorNames.get(row.user_id) ?? null,
+      focus_codes: focuses.get(row.user_id) ?? [],
+    }));
   },
 
   async listMemberships(): Promise<AdminMembershipRecord[]> {

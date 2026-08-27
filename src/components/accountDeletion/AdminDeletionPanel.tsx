@@ -29,6 +29,7 @@ import {
 interface AdminDeletionPanelProps {
   userId: string;
   email: string | null;
+  compact?: boolean;
 }
 
 function formatLabel(value: string) {
@@ -41,6 +42,7 @@ function formatLabel(value: string) {
 export function AdminDeletionPanel({
   userId,
   email,
+  compact = false,
 }: AdminDeletionPanelProps) {
   const [preview, setPreview] = useState<DeletionPreview | null>(null);
   const [confirmation, setConfirmation] = useState("");
@@ -139,17 +141,32 @@ export function AdminDeletionPanel({
       <Button
         type="button"
         variant="outline"
-        size="sm"
+        size={compact ? "icon" : "sm"}
+        className={compact ? "h-6 w-6 rounded-md" : undefined}
         disabled={loadingPreview}
         onClick={loadPreview}
+        aria-label={compact ? "Deletion preview" : undefined}
+        title={compact ? "Deletion preview" : undefined}
       >
         {loadingPreview ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <Loader2
+            className={
+              compact
+                ? "h-3 w-3 animate-spin"
+                : "mr-2 h-4 w-4 animate-spin"
+            }
+          />
         ) : (
-          <ShieldAlert className="mr-2 h-4 w-4" />
+          <ShieldAlert
+            className={compact ? "h-3 w-3" : "mr-2 h-4 w-4"}
+          />
         )}
 
-        {loadingPreview ? "Loading preview..." : "Deletion preview"}
+        {!compact
+          ? loadingPreview
+            ? "Loading preview..."
+            : "Deletion preview"
+          : null}
       </Button>
 
       <Dialog
