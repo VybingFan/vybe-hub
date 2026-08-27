@@ -22,6 +22,7 @@ import { useMyConnections } from "@/hooks/useConnections";
 import type { AdminNotification } from "@/services/admin/adminNotificationService";
 import { CreatorNotificationItems } from "@/components/engagement/CreatorNotificationItems";
 import { useCreatorNotifications, useMarkCreatorNotificationsRead } from "@/hooks/useCreatorEngagement";
+import { useMarkSupporterCreatorNotificationsRead, useSupporterBellNotifications } from "@/hooks/useSupporterNotifications";
 
 export function TopNav() {
   const navigate = useNavigate();
@@ -33,6 +34,8 @@ export function TopNav() {
   const { data: connections = [] } = useMyConnections(hasRole("creator") ? user?.id : undefined);
   const { data: creatorIdentityNotifications = [] } = useCreatorNotifications(hasRole("creator"));
   const markCreatorNotificationsRead = useMarkCreatorNotificationsRead();
+  const { data: supporterNotifications = [] } = useSupporterBellNotifications(hasRole("supporter"));
+  const markSupporterNotificationsRead = useMarkSupporterCreatorNotificationsRead();
   const isAdmin = hasRole("admin") && pathname.startsWith("/admin");
   const [adminNotifications, setAdminNotifications] = useState<AdminNotification[]>([]);
   const [lastSeen, setLastSeen] = useState(() =>
@@ -44,8 +47,9 @@ export function TopNav() {
     (item) => new Date(item.created_at).getTime() > lastSeen,
   ).length;
   const identityUnread = creatorIdentityNotifications.filter((item) => !item.read_at).length;
+  const supporterUnread = supporterNotifications.filter((item) => !item.read_at).length;
   const adminUnread = adminNotifications.filter((item) => item.status === "unread").length;
-  const unread = isAdmin ? adminUnread : creatorUnread + identityUnread;
+  const unread = isAdmin ? adminUnread : creatorUnread + identityUnread + supporterUnread;
   const latestActivity = useRef<string | null>(null);
   const notificationSoundMountedAt = useRef(Date.now());
   useEffect(() => {
@@ -55,6 +59,10 @@ export function TopNav() {
       ...creatorIdentityNotifications.map((item) => ({
         ...item,
         notificationKey: `identity:${item.id}`,
+      })),
+      ...supporterNotifications.map((item) => ({
+        ...item,
+        notificationKey: `supporter:${item.id}`,
       })),
     ].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
     const latest = latestItem?.notificationKey;
@@ -71,7 +79,7 @@ export function TopNav() {
       if (soundEnabled) playNotificationChime();
     }
     latestActivity.current = latest;
-  }, [activity, connections, creatorIdentityNotifications]);
+  }, [activity, connections, creatorIdentityNotifications, supporterNotifications]);
   useEffect(() => {
     if (!isAdmin) return;
     const load = () => {
@@ -137,6 +145,7 @@ export function TopNav() {
               setLastSeen(now);
               window.localStorage.setItem("vybe:activity-seen", String(now));
               if (hasRole("creator")) void markCreatorNotificationsRead();
+              if (hasRole("supporter")) void markSupporterNotificationsRead();
             }
           }}
         >
@@ -157,7 +166,7 @@ export function TopNav() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[calc(100vw-2rem)] max-w-80">
             <DropdownMenuLabel>
-              {isAdmin ? "Back Office alerts" : "Creator activity"}
+              {isAdmin ? "Back Office alerts" : "Notifications"}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             {isAdmin &&
@@ -190,6 +199,26 @@ export function TopNav() {
             ) : null}
             {!isAdmin && (
               <>
+                {supporterNotifications.slice(0, 8).map((item) => {
+                  const title = typeof item.payload?.title === "string" ? item.payload.title : "New creator update";
+                  const kind = typeof item.payload?.kind === "string" ? item.payload.kind.replace(/_/g, " ") : "creator update";
+                  const href = `/creator-update/${item.entity_id || item.id}`;
+                  return (
+                    <DropdownMenuItem key={`supporter:${item.id}`} className="items-start py-3" asChild>
+                      <a href={href}>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="truncate text-sm font-medium">{item.creator_display_name}</p>
+                            {!item.read_at ? <span className="h-2 w-2 shrink-0 rounded-full bg-primary" aria-label="Unread" /> : null}
+                          </div>
+                          <p className="mt-0.5 text-xs font-medium text-primary">New {kind}</p>
+                          <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{title}</p>
+                          <p className="mt-1 text-[11px] text-muted-foreground">{new Date(item.created_at).toLocaleString()}</p>
+                        </div>
+                      </a>
+                    </DropdownMenuItem>
+                  );
+                })}
                 <CreatorNotificationItems items={creatorIdentityNotifications} />
                 {connections.slice(0, 3).map((connection) => (
                   <DropdownMenuItem key={connection.id} className="items-start py-3" asChild>
@@ -207,8 +236,8 @@ export function TopNav() {
                     </Link>
                   </DropdownMenuItem>
                 ))}
-                {!activity.length && !connections.length && !creatorIdentityNotifications.length && (
-                  <DropdownMenuItem disabled>No creator activity yet.</DropdownMenuItem>
+                {!activity.length && !connections.length && !creatorIdentityNotifications.length && !supporterNotifications.length && (
+                  <DropdownMenuItem disabled>No notifications yet.</DropdownMenuItem>
                 )}
                 {activity.slice(0, 10).map((item) => (
                   <DropdownMenuItem key={item.id} className="items-start py-3">
@@ -237,6 +266,11 @@ export function TopNav() {
               </DropdownMenuItem>
             ) : (
               <>
+                {hasRole("supporter") ? (
+                  <DropdownMenuItem asChild>
+                    <Link to="/my-vybe">Open My VYBE</Link>
+                  </DropdownMenuItem>
+                ) : null}
                 <DropdownMenuItem asChild>
                   <Link to="/activity">View all activity and totals</Link>
                 </DropdownMenuItem>
@@ -245,7 +279,7 @@ export function TopNav() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                  Creator engagement and playlist activity. Refreshes every 30 seconds.
+                  Notifications and creator activity. Refreshes every 30 seconds.
                 </DropdownMenuLabel>
               </>
             )}

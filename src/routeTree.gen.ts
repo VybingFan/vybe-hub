@@ -110,6 +110,7 @@ import { Route as ApiStripeCheckoutRouteImport } from './routes/api.stripe.check
 import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_authenticated/playlists_.$playlistId'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
 import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authenticated/music_.$trackId'
+import { Route as AuthenticatedCreatorUpdateUpdateIdRouteImport } from './routes/_authenticated/creator-update.$updateId'
 import { Route as AuthenticatedCreatorAcademyNovaRouteImport } from './routes/_authenticated/creator-academy.nova'
 import { Route as AuthenticatedAdminWorkQueueRouteImport } from './routes/_authenticated/admin_.work-queue'
 import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin_.team'
@@ -656,6 +657,12 @@ const AuthenticatedMusicTrackIdRoute =
     path: '/music/$trackId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCreatorUpdateUpdateIdRoute =
+  AuthenticatedCreatorUpdateUpdateIdRouteImport.update({
+    id: '/creator-update/$updateId',
+    path: '/creator-update/$updateId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCreatorAcademyNovaRoute =
   AuthenticatedCreatorAcademyNovaRouteImport.update({
     id: '/creator-academy/nova',
@@ -909,6 +916,7 @@ export interface FileRoutesByFullPath {
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/creator-academy/nova': typeof AuthenticatedCreatorAcademyNovaRoute
+  '/creator-update/$updateId': typeof AuthenticatedCreatorUpdateUpdateIdRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -1035,6 +1043,7 @@ export interface FileRoutesByTo {
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/creator-academy/nova': typeof AuthenticatedCreatorAcademyNovaRoute
+  '/creator-update/$updateId': typeof AuthenticatedCreatorUpdateUpdateIdRoute
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -1163,6 +1172,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/team': typeof AuthenticatedAdminTeamRoute
   '/_authenticated/admin_/work-queue': typeof AuthenticatedAdminWorkQueueRoute
   '/_authenticated/creator-academy/nova': typeof AuthenticatedCreatorAcademyNovaRoute
+  '/_authenticated/creator-update/$updateId': typeof AuthenticatedCreatorUpdateUpdateIdRoute
   '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
   '/_authenticated/playlists_/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -1291,6 +1301,7 @@ export interface FileRouteTypes {
     | '/admin/team'
     | '/admin/work-queue'
     | '/creator-academy/nova'
+    | '/creator-update/$updateId'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -1417,6 +1428,7 @@ export interface FileRouteTypes {
     | '/admin/team'
     | '/admin/work-queue'
     | '/creator-academy/nova'
+    | '/creator-update/$updateId'
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
@@ -1544,6 +1556,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/team'
     | '/_authenticated/admin_/work-queue'
     | '/_authenticated/creator-academy/nova'
+    | '/_authenticated/creator-update/$updateId'
     | '/_authenticated/music_/$trackId'
     | '/_authenticated/music_/upload'
     | '/_authenticated/playlists_/$playlistId'
@@ -2328,6 +2341,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMusicTrackIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/creator-update/$updateId': {
+      id: '/_authenticated/creator-update/$updateId'
+      path: '/creator-update/$updateId'
+      fullPath: '/creator-update/$updateId'
+      preLoaderRoute: typeof AuthenticatedCreatorUpdateUpdateIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/creator-academy/nova': {
       id: '/_authenticated/creator-academy/nova'
       path: '/creator-academy/nova'
@@ -2558,6 +2578,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminTeamRoute: typeof AuthenticatedAdminTeamRoute
   AuthenticatedAdminWorkQueueRoute: typeof AuthenticatedAdminWorkQueueRoute
   AuthenticatedCreatorAcademyNovaRoute: typeof AuthenticatedCreatorAcademyNovaRoute
+  AuthenticatedCreatorUpdateUpdateIdRoute: typeof AuthenticatedCreatorUpdateUpdateIdRoute
   AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
   AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
@@ -2627,6 +2648,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminTeamRoute: AuthenticatedAdminTeamRoute,
   AuthenticatedAdminWorkQueueRoute: AuthenticatedAdminWorkQueueRoute,
   AuthenticatedCreatorAcademyNovaRoute: AuthenticatedCreatorAcademyNovaRoute,
+  AuthenticatedCreatorUpdateUpdateIdRoute:
+    AuthenticatedCreatorUpdateUpdateIdRoute,
   AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
   AuthenticatedPlaylistsPlaylistIdRoute: AuthenticatedPlaylistsPlaylistIdRoute,

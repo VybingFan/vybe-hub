@@ -80,16 +80,13 @@ export function SupporterCreatorUpdates() {
           {items.slice(0, 12).map((item) => {
             const title = typeof item.payload?.title === "string" ? item.payload.title : "New creator update";
             const description = typeof item.payload?.description === "string" ? item.payload.description : "";
-            const destination = typeof item.payload?.destination_url === "string" ? item.payload.destination_url : "";
             const startsAt = typeof item.payload?.starts_at === "string" ? item.payload.starts_at : "";
-            const creatorPath = item.creator_username ? `/creator/${item.creator_username}` : "";
-            const href = destination || creatorPath || "#";
+            const href = `/creator-update/${item.entity_id || item.id}`;
             return (
               <a
                 key={item.id}
                 href={href}
-                target={destination && /^https?:\/\//i.test(destination) ? "_blank" : undefined}
-                rel={destination && /^https?:\/\//i.test(destination) ? "noreferrer" : undefined}
+
                 className="group flex min-w-0 items-start gap-3 rounded-xl border bg-card p-3 transition hover:border-primary/40 sm:rounded-2xl sm:p-4"
               >
                 <Avatar className="h-10 w-10 shrink-0 sm:h-12 sm:w-12">
@@ -99,7 +96,7 @@ export function SupporterCreatorUpdates() {
                 <div className="min-w-0 flex-1">
                   <div className="flex min-w-0 items-center gap-2">
                     <p className="truncate text-sm font-semibold">{item.creator_display_name}</p>
-                    {!item.read_at ? <span className="h-2 w-2 shrink-0 rounded-full bg-primary" aria-label="Unread" /> : null}
+
                   </div>
                   <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[.12em] text-primary sm:text-xs">
                     New {kindLabel(item.payload?.kind)}

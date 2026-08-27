@@ -36,6 +36,11 @@ export const supporterNotificationService = {
     if (error) throw error;
     return Promise.all(((data || []) as SupporterCreatorNotification[]).map(signAvatar));
   },
+  async listNotifications(limit = 50): Promise<SupporterCreatorNotification[]> {
+    const { data, error } = await (supabase.rpc as any)("get_my_supporter_notifications", { p_limit: limit });
+    if (error) throw error;
+    return Promise.all(((data || []) as SupporterCreatorNotification[]).map(signAvatar));
+  },
   async listFollowing(): Promise<FollowedCreator[]> {
     const { data, error } = await (supabase.rpc as any)("get_my_followed_creators_v24_62a2");
     if (error) throw error;

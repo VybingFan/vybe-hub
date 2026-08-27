@@ -36,6 +36,38 @@ export const creatorUpdateService = {
     if (error) throw error;
     return (data ?? []).map(hydrate);
   },
+  async getPublishedDetail(id: string) {
+    const { data: updateRow, error: updateError } = await (supabase.from("creator_updates") as any)
+      .select("*")
+      .eq("id", id)
+      .eq("status", "published")
+      .maybeSingle();
+    if (updateError) throw updateError;
+    if (!updateRow) return null;
+
+    const update = hydrate(updateRow);
+    const { data: profile, error: profileError } = await (supabase.from("creator_profiles") as any)
+      .select("user_id, username, display_name, avatar_path, avatar_url")
+      .eq("user_id", update.creator_id)
+      .maybeSingle();
+    if (profileError) throw profileError;
+
+    let creatorAvatarUrl = profile?.avatar_url || null;
+    if (profile?.avatar_path) {
+      const { data } = await supabase.storage.from("avatars").createSignedUrl(profile.avatar_path, 60 * 60 * 6);
+      creatorAvatarUrl = data?.signedUrl || creatorAvatarUrl;
+    }
+
+    return {
+      update,
+      creator: {
+        user_id: update.creator_id,
+        username: profile?.username || null,
+        display_name: profile?.display_name || "VYBE Creator",
+        avatar_url: creatorAvatarUrl,
+      },
+    };
+  },
   async create(creatorId: string, input: CreatorUpdateInput, image?: File | null) {
     let imagePath: string | null = null;
     if (image) imagePath = await uploadImage(creatorId, image);

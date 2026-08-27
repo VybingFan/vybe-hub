@@ -11,6 +11,16 @@ export function useSupporterCreatorNotifications(enabled = true) {
   });
 }
 
+export function useSupporterBellNotifications(enabled = true) {
+  return useQuery({
+    queryKey: ["supporter-notification-bell"],
+    queryFn: () => supporterNotificationService.listNotifications(),
+    enabled,
+    refetchInterval: 30_000,
+    retry: 1,
+  });
+}
+
 export function useFollowedCreators(enabled = true) {
   return useQuery({
     queryKey: ["supporter-followed-creators"],
@@ -26,5 +36,6 @@ export function useMarkSupporterCreatorNotificationsRead() {
   return async () => {
     await supporterNotificationService.markRead();
     await queryClient.invalidateQueries({ queryKey: ["supporter-creator-feed"] });
+    await queryClient.invalidateQueries({ queryKey: ["supporter-notification-bell"] });
   };
 }
