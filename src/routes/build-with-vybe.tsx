@@ -43,12 +43,12 @@ function BuildWithVybe() {
               </h1>
               <p className="mt-7 max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">
                 VYBE is built around creators, powered by community, and strengthened by businesses and partners
-                who create meaningful opportunities. Choose the professional path that fits how you want to build.
+                who create meaningful opportunities. Creators can compare Free, Plus, and Pro before creating an account.
               </p>
             </div>
             <div className="mt-10 flex flex-wrap gap-3">
               <Button asChild size="lg" className="bg-gradient-brand text-primary-foreground shadow-glow">
-                <Link to="/creator/sign-up">Start as a Creator <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link to="/creator-memberships">Compare Creator Memberships <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <Link to="/for-businesses">Explore Business & Partnerships</Link>
@@ -75,7 +75,7 @@ function BuildWithVybe() {
                   {creatorPoints.map((point) => <Point key={point}>{point}</Point>)}
                 </div>
                 <div className="mt-9 flex flex-wrap gap-3">
-                  <Button asChild><Link to="/creator/sign-up">Create Creator Account</Link></Button>
+                  <Button asChild><Link to="/creator-memberships">Compare Memberships</Link></Button>
                   <Button asChild variant="outline"><Link to="/creator/sign-in">Creator Sign In</Link></Button>
                   <Button asChild variant="ghost"><Link to="/for-artists">Explore Creator Tools <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
                 </div>
@@ -147,7 +147,7 @@ function BuildWithVybe() {
               Your professional VYBE starts here.
             </h2>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg"><Link to="/creator/sign-up">Start Creator Free</Link></Button>
+              <Button asChild size="lg"><Link to="/creator-memberships">View Creator Memberships</Link></Button>
               <Button asChild size="lg" variant="outline"><Link to="/for-businesses">Work With VYBE</Link></Button>
             </div>
           </div>

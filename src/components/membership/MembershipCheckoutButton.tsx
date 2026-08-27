@@ -24,9 +24,18 @@ export function MembershipCheckoutButton({
   if (planCode === "creator_free") {
     return (
       <Button asChild className="mt-7 bg-gradient-brand text-white">
-        <Link to={user ? "/dashboard" : "/auth/sign-up"}>
-          {user ? "Open Creator Studio" : "Start free"} <ArrowRight className="ml-2 h-4 w-4" />
-        </Link>
+        {user ? (
+          <Link to="/dashboard">
+            Open Creator Studio <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        ) : (
+          <Link
+            to="/creator/sign-up"
+            search={{ plan: "creator_free", interval }}
+          >
+            Start free <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        )}
       </Button>
     );
   }
@@ -34,7 +43,10 @@ export function MembershipCheckoutButton({
   if (!isLoading && !user) {
     return (
       <Button asChild className="mt-7 bg-gradient-brand text-white">
-        <Link to="/auth/sign-up">
+        <Link
+          to="/creator/sign-up"
+          search={{ plan: planCode, interval }}
+        >
           Join to choose {planName} <ArrowRight className="ml-2 h-4 w-4" />
         </Link>
       </Button>

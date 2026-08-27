@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 const checkoutInput = z.object({
-  planCode: z.enum(["creator_plus"]),
+  planCode: z.enum(["creator_plus", "creator_pro"]),
   interval: z.enum(["monthly", "annual"]),
 });
 

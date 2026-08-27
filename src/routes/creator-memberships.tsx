@@ -11,6 +11,7 @@ import {
   CREATOR_PLAN_CATALOG,
   FOUNDING_CREATOR_NOTE,
   PIONEER_NOTE,
+  type PublicCreatorPlanCode,
 } from "@/features/membership/catalog";
 
 export const Route = createFileRoute("/creator-memberships")({
@@ -19,6 +20,8 @@ export const Route = createFileRoute("/creator-memberships")({
 
 function CreatorMembershipsPage() {
   const [billing, setBilling] = useState<"monthly" | "annual">("annual");
+  const [selectedPlanCode, setSelectedPlanCode] =
+    useState<PublicCreatorPlanCode>("creator_plus");
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,9 +36,9 @@ function CreatorMembershipsPage() {
               Start free. Build the creator home your work deserves.
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
-              Every VYBE creator begins with a working public page, music library, and shareable
-              playlists. Paid memberships will add capacity, video, AI, analytics, and professional
-              tools as each feature becomes ready.
+              Compare the creator memberships before you create your account. Start free, grow with
+              Plus, or build professionally with Pro. Creator Studio remains visible for creators
+              planning ahead, but is not open for purchase yet.
             </p>
             <div className="mt-8 inline-flex max-w-full flex-wrap justify-center rounded-2xl border border-border bg-background p-1 sm:rounded-full">
               <Button
@@ -54,7 +57,7 @@ function CreatorMembershipsPage() {
                 className="rounded-full"
                 onClick={() => setBilling("annual")}
               >
-                Annual · save 2 months
+                Annual - save 2 months
               </Button>
             </div>
           </div>
@@ -64,13 +67,30 @@ function CreatorMembershipsPage() {
           <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
             {CREATOR_PLAN_CATALOG.map((plan) => {
               const price = billing === "annual" ? plan.annualPrice : plan.monthlyPrice;
+              const isSelected = selectedPlanCode === plan.code;
+              const isAvailable = plan.launchState === "available";
+
               return (
                 <Card
                   key={plan.code}
+                  role={isAvailable ? "button" : undefined}
+                  tabIndex={isAvailable ? 0 : undefined}
+                  aria-pressed={isAvailable ? isSelected : undefined}
+                  onClick={() => {
+                    if (isAvailable) setSelectedPlanCode(plan.code);
+                  }}
+                  onKeyDown={(event) => {
+                    if (isAvailable && (event.key === "Enter" || event.key === " ")) {
+                      event.preventDefault();
+                      setSelectedPlanCode(plan.code);
+                    }
+                  }}
                   className={
-                    plan.code === "creator_plus"
-                      ? "relative overflow-hidden border-primary shadow-glow"
-                      : "relative overflow-hidden"
+                    isSelected && isAvailable
+                      ? "relative overflow-hidden border-primary shadow-glow transition"
+                      : isAvailable
+                        ? "relative overflow-hidden transition hover:border-primary/50"
+                        : "relative overflow-hidden opacity-75"
                   }
                 >
                   {plan.badge ? (
@@ -107,7 +127,7 @@ function CreatorMembershipsPage() {
                         value={
                           plan.limits.videoMinutes
                             ? `${plan.limits.videoMinutes} min`
-                            : "Preview planned"
+                            : "Not included"
                         }
                       />
                       <Limit label="AI assists" value={`${plan.limits.aiActions}/mo`} />
@@ -122,11 +142,17 @@ function CreatorMembershipsPage() {
                       ))}
                     </ul>
 
-                    <MembershipCheckoutButton
-                      planCode={plan.code}
-                      planName={plan.name}
-                      interval={billing}
-                    />
+                    {isAvailable ? (
+                      <MembershipCheckoutButton
+                        planCode={plan.code}
+                        planName={plan.name}
+                        interval={billing}
+                      />
+                    ) : (
+                      <Button disabled variant="outline" className="mt-7">
+                        Coming later
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               );
@@ -155,10 +181,10 @@ function CreatorMembershipsPage() {
             <Sparkles className="h-8 w-8 text-primary" />
             <h2 className="mt-5 text-3xl font-semibold">Honest launch status</h2>
             <p className="mt-4 max-w-3xl leading-7 text-muted-foreground">
-              Music profiles, libraries, editors, playlists, share links, and merchandise showcases
-              work today. Membership billing is entering controlled Stripe verification. Creator AI,
-              native video hosting, advanced analytics, commerce, custom domains, and team
-              workspaces remain labeled Coming Soon until each is connected and verified.
+              Creator Free, Plus, and Pro are the launch membership path. Plus and Pro checkout
+              remains protected by VYBE&apos;s Stripe launch switch and configured Stripe prices, so a
+              paid plan cannot be sold until billing is deliberately enabled in the deployment
+              environment. Creator Studio and unfinished platform features remain clearly labeled.
             </p>
           </div>
         </section>
