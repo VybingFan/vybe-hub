@@ -341,34 +341,15 @@ function SettingsContent() {
                   </div>
                   <details className="rounded-xl border border-border/70">
                     <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
-                      Coming-soon allowances and downgrade information
+                      Coming Soon
                     </summary>
                     <div className="grid gap-2 border-t border-border/60 p-4 text-sm text-muted-foreground sm:grid-cols-2">
                       <p>
                         AI assistance: {membership.future_allowances.ai_actions}{" "}
-                        actions/month · Coming Soon
+                        actions/month when available · Coming Soon
                       </p>
                       <p>
-                        Video storage:{" "}
-                        {membership.future_allowances.video_storage_minutes}{" "}
-                        minutes · Coming Soon
-                      </p>
-                      <p>
-                        Written posts:{" "}
-                        {membership.future_allowances.written_posts} · Coming
-                        Soon
-                      </p>
-                      <p>
-                        Team members:{" "}
-                        {membership.future_allowances.team_members} ·{" "}
-                        {membership.future_allowances.team_members > 1
-                          ? "Coming Soon"
-                          : "Single owner"}
-                      </p>
-                      <p className="sm:col-span-2">
-                        Paid-to-Free downgrades include a{" "}
-                        {membership.downgrade.adjustment_period_days}-day
-                        adjustment period with no automatic deletion.
+                        Team workspaces: Coming Soon · future membership upgrade feature
                       </p>
                     </div>
                   </details>

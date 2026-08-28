@@ -117,11 +117,11 @@ export const VYBE_GUIDE_ITEMS: VybeGuideItem[] = [
     id: "membership-tools",
     title: "Your plan, included tools & locked features",
     summary: "Understand what is active now and what additional creator tools are designed to do.",
-    what: "Locked tools remain visible so you can understand VYBE's creator workflow before deciding whether another plan is useful. Select Learn how this helps for a practical explanation of the feature, how it works, and its growth value. A lock means the tool is not included in the current membership; it does not mean VYBE is broken. Creator Free keeps its included tools active, and each higher plan expands specific limits or professional workflows.",
+    what: "Locked tools remain visible so you can understand VYBE's creator workflow before deciding whether another plan is useful. Select Learn how this helps for a practical explanation of the feature, how it works, and its growth value. A lock means the tool is not included in the current membership; it does not mean VYBE is broken. Creator Free keeps its included tools active, and each higher plan expands specific limits or professional workflows. If a paid creator moves to Creator Free, VYBE provides a 30-day adjustment period instead of immediately deleting creator work, giving the creator time to decide what remains published within Free limits.",
     where: "Look for lock icons and Learn how this helps throughout Creator Studio. Compare complete limits and plan availability under Creator Settings > Membership.",
     route: "/creator-memberships",
     roles: ["creator", "admin"],
-    keywords: ["membership", "plan", "locked", "upgrade", "included", "limits", "free", "plus", "pro", "studio"],
+    keywords: ["membership", "plan", "locked", "upgrade", "included", "limits", "free", "plus", "pro", "studio", "downgrade", "30-day adjustment"],
     icon: LockKeyhole,
   },
   {
