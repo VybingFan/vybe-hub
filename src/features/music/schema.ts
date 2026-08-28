@@ -1,4 +1,4 @@
-﻿import { z } from "zod";
+import { z } from "zod";
 import { MUSIC_RIGHTS_VALUES } from "@/constants/legal";
 import {
   TRACK_PRODUCTION_STAGES,
@@ -121,6 +121,9 @@ export interface Track extends TrackInput {
   profile_feature_rank?: number | null;
   subgenres?: string[];
   activity_tags?: string[];
+  playback_available?: boolean;
+  audio_storage_path?: string | null;
+  preview_storage_path?: string | null;
 }
 
 export interface Album extends AlbumInput {

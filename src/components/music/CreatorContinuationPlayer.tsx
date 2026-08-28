@@ -38,6 +38,7 @@ export function CreatorContinuationPlayer({
   creatorName,
   featuredCollectionLabel = "Artist’s Top 5",
   onSelect,
+  resolvePlaybackUrl,
   docked = false,
   planCode,
 }: {
@@ -48,6 +49,7 @@ export function CreatorContinuationPlayer({
   creatorName: string;
   featuredCollectionLabel?: string;
   onSelect: (id: string) => void;
+  resolvePlaybackUrl?: (track: Track) => Promise<string>;
   docked?: boolean;
   planCode?: CreatorPlanCode | null;
 }) {
@@ -67,6 +69,9 @@ export function CreatorContinuationPlayer({
   const [repeat, setRepeat] = useState(false);
   const [choice, setChoice] = useState<"top-five" | "library" | null>(null);
   const [nowPlayingOpen, setNowPlayingOpen] = useState(false);
+  const [resolvedAudioUrl, setResolvedAudioUrl] = useState("");
+  const [resolvingAudio, setResolvingAudio] = useState(false);
+  const resolvedTrackId = useRef<string | null>(null);
   const nowPlayingLevel = getNowPlayingExperienceLevel(planCode);
   const canExpandNowPlaying = nowPlayingLevel !== "standard";
 
@@ -77,10 +82,35 @@ export function CreatorContinuationPlayer({
     }
     shouldAutoplay.current = true;
   }, [selectedId]);
+  useEffect(() => {
+    if (!track) return;
+    if (resolvedTrackId.current !== track.id) {
+      resolvedTrackId.current = null;
+      setResolvedAudioUrl(track.audio_url || "");
+    }
+    if (!shouldAutoplay.current || track.audio_url) return;
+    if (!resolvePlaybackUrl || !(track.playback_available ?? Boolean(track.audio_url))) {
+      shouldAutoplay.current = false;
+      return;
+    }
+    let cancelled = false;
+    setResolvingAudio(true);
+    void resolvePlaybackUrl(track)
+      .then((url) => {
+        if (cancelled) return;
+        resolvedTrackId.current = track.id;
+        setResolvedAudioUrl(url);
+      })
+      .finally(() => {
+        if (!cancelled) setResolvingAudio(false);
+      });
+    return () => { cancelled = true; };
+  }, [track?.id, track?.audio_url, track?.playback_available, resolvePlaybackUrl]);
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || !track?.audio_url) return;
+    const sourceUrl = track?.audio_url || resolvedAudioUrl;
+    if (!audio || !sourceUrl) return;
     setElapsed(0);
     setDuration(track.duration_sec || 0);
     audio.load();
@@ -88,7 +118,7 @@ export function CreatorContinuationPlayer({
       shouldAutoplay.current = false;
       void audio.play().catch(() => setPlaying(false));
     }
-  }, [track?.id, track?.audio_url]);
+  }, [track?.id, track?.audio_url, resolvedAudioUrl]);
 
   if (!track) return null;
 
@@ -100,6 +130,29 @@ export function CreatorContinuationPlayer({
   const source = topTrackIds.has(track.id)
     ? featuredCollectionLabel
     : "More from this creator";
+  const startCurrent = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (!audio.paused) {
+      audio.pause();
+      return;
+    }
+    if (track.audio_url || resolvedAudioUrl) {
+      void audio.play().catch(() => setPlaying(false));
+      return;
+    }
+    if (!resolvePlaybackUrl || !(track.playback_available ?? Boolean(track.audio_url))) return;
+    setResolvingAudio(true);
+    try {
+      const url = await resolvePlaybackUrl(track);
+      if (!url) return;
+      resolvedTrackId.current = track.id;
+      shouldAutoplay.current = true;
+      setResolvedAudioUrl(url);
+    } finally {
+      setResolvingAudio(false);
+    }
+  };
 
   const choose = (nextTrack: Track | undefined) => {
     if (!nextTrack) return;
@@ -157,7 +210,7 @@ export function CreatorContinuationPlayer({
       >
         <audio
           ref={audioRef}
-          src={track.audio_url}
+          src={track.audio_url || resolvedAudioUrl || undefined}
           preload="metadata"
           controlsList="nodownload noremoteplayback"
           onPlay={() => setPlaying(true)}
@@ -237,11 +290,8 @@ export function CreatorContinuationPlayer({
                   type="button"
                   size="icon"
                   className={cn("rounded-full bg-gradient-brand text-white", docked ? "h-10 w-10 sm:h-11 sm:w-11" : "h-12 w-12")}
-                  onClick={() =>
-                    audioRef.current?.paused
-                      ? void audioRef.current.play()
-                      : audioRef.current?.pause()
-                  }
+                  onClick={() => void startCurrent()}
+                    disabled={resolvingAudio}
                   aria-label={playing ? "Pause" : "Play"}
                 >
                   {playing ? (
@@ -342,11 +392,7 @@ export function CreatorContinuationPlayer({
         canPrevious={index > 0}
         canNext={Boolean(next)}
         onClose={() => setNowPlayingOpen(false)}
-        onTogglePlayback={() =>
-          audioRef.current?.paused
-            ? void audioRef.current.play()
-            : audioRef.current?.pause()
-        }
+        onTogglePlayback={() => void startCurrent()}
         onPrevious={() => choose(queue[index - 1])}
         onNext={() => choose(next)}
         onToggleRepeat={() => setRepeat((value) => !value)}

@@ -24,7 +24,10 @@ export interface DiscoveryTrack {
   description: string;
   cover_url: string | null;
   audio_url: string;
+  audio_storage_path: string | null;
+  preview_audio_path: string | null;
   playback_mode: string;
+  playback_available: boolean;
   duration_sec: number;
   created_at: string;
   creator: DiscoveryCreator | null;
@@ -34,6 +37,11 @@ export interface DiscoveryArtistCredit {
   name: string;
   songCount: number;
   uploaderCount: number;
+}
+
+export interface DiscoverySearchOptions {
+  creatorLimit?: number;
+  trackLimit?: number;
 }
 
 function storageObjectPath(bucket: string, value: string | null) {
@@ -79,14 +87,34 @@ async function signedAvatar(path: string | null, fallback: string | null) {
   return data?.signedUrl ?? fallback;
 }
 
+function publicPlaybackAvailable(track: {
+  playback_mode: string;
+  audio_url: string | null;
+  preview_audio_path: string | null;
+}) {
+  if (track.playback_mode === "preview") return Boolean(track.preview_audio_path);
+  if (track.playback_mode === "none" || track.playback_mode === "approved_listeners") return false;
+  return Boolean(track.audio_url);
+}
+
 export const publicDiscoveryService = {
-  async search(rawQuery: string) {
+  async playbackUrl(track: DiscoveryTrack): Promise<string> {
+    if (!track.playback_available) return "";
+
+    return track.playback_mode === "preview"
+      ? signedAudio("music-previews", track.preview_audio_path)
+      : signedAudio("music-audio", track.audio_storage_path);
+  },
+
+  async search(rawQuery: string, options: DiscoverySearchOptions = {}) {
     const query = rawQuery
       .trim()
       .replace(/[(),.%*]/g, " ")
       .replace(/\s+/g, " ")
       .slice(0, 80);
     const term = `%${query}%`;
+    const creatorLimit = Math.max(1, Math.min(options.creatorLimit ?? 30, 30));
+    const trackLimit = Math.max(1, Math.min(options.trackLimit ?? 40, 40));
 
     let creatorsQuery = supabase
       .from("creator_profiles")
@@ -94,7 +122,7 @@ export const publicDiscoveryService = {
         "user_id,username,artist_name,display_name,genre,genres,location,bio,avatar_url,avatar_path",
       )
       .not("username", "is", null)
-      .limit(30);
+      .limit(creatorLimit);
     let tracksQuery = supabase
       .from("tracks")
       .select(
@@ -103,7 +131,7 @@ export const publicDiscoveryService = {
       .eq("status", "published")
       .eq("visibility", "public")
       .order("created_at", { ascending: false })
-      .limit(40);
+      .limit(trackLimit);
 
     if (query) {
       creatorsQuery = creatorsQuery.or(
@@ -183,20 +211,15 @@ export const publicDiscoveryService = {
       })),
     );
     const tracks = await Promise.all(
-      (trackRows ?? []).map(async (track) => {
-        const playableAudio =
-          track.playback_mode === "preview"
-            ? await signedAudio("music-previews", track.preview_audio_path)
-            : track.playback_mode === "none" || track.playback_mode === "approved_listeners"
-              ? ""
-              : await signedAudio("music-audio", track.audio_url);
-        return {
-          ...track,
-          audio_url: playableAudio,
-          cover_url: await signedCover(track.cover_url),
-          creator: creatorMap.get(track.creator_id) ?? null,
-        };
-      }),
+      (trackRows ?? []).map(async (track) => ({
+        ...track,
+        audio_url: "",
+        audio_storage_path: track.audio_url,
+        preview_audio_path: track.preview_audio_path,
+        playback_available: publicPlaybackAvailable(track),
+        cover_url: await signedCover(track.cover_url),
+        creator: creatorMap.get(track.creator_id) ?? null,
+      })),
     );
 
     const visibleTracks = tracks.filter((track) => track.creator?.username);

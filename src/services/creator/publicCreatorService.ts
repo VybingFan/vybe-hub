@@ -34,6 +34,14 @@ async function signedUrl(bucket: string, path: string | null, ttl = 60 * 5) {
 }
 
 export const publicCreatorService = {
+  async playbackUrl(track: Track): Promise<string> {
+    if (!(track.playback_available ?? Boolean(track.audio_url))) return "";
+    if (track.audio_url) return track.audio_url;
+    const bucket = track.playback_mode === "preview" ? "music-previews" : "music-audio";
+    const path = track.playback_mode === "preview" ? track.preview_storage_path : track.audio_storage_path;
+    return (await signedUrl(bucket, path ?? null, 60 * 3)) ?? "";
+  },
+
   async fetch(username: string): Promise<PublicCreatorPage | null> {
     const { data: profile, error } = await supabase
       .from("creator_profiles")
@@ -100,18 +108,15 @@ export const publicCreatorService = {
         )
         .map(async (track) => ({
           ...track,
-          audio_url:
+          audio_url: "",
+          audio_storage_path: track.audio_url,
+          preview_storage_path: track.preview_audio_path ?? null,
+          playback_available:
             track.playback_mode === "preview"
-              ? ((await signedUrl(
-                  "music-previews",
-                  track.preview_audio_path,
-                  60 * 3,
-                )) ?? "")
-              : track.playback_mode === "none" ||
-                  track.playback_mode === "approved_listeners"
-                ? ""
-                : ((await signedUrl("music-audio", track.audio_url, 60 * 3)) ??
-                  ""),
+              ? Boolean(track.preview_audio_path)
+              : track.playback_mode === "none" || track.playback_mode === "approved_listeners"
+                ? false
+                : Boolean(track.audio_url),
           cover_url: await signedUrl("music-covers", track.cover_url),
         })),
     )) as unknown as Track[];

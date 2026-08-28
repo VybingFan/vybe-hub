@@ -19,7 +19,7 @@ import {
   type CreatorContinuationSort,
 } from "@/features/music/playbackContinuation";
 import { CreatorContinuationPlayer } from "@/components/music/CreatorContinuationPlayer";
-import type { PublicCreatorPlaylist } from "@/services/creator/publicCreatorService";
+import { publicCreatorService, type PublicCreatorPlaylist } from "@/services/creator/publicCreatorService";
 
 type Filter =
   | { kind: "all" }
@@ -142,7 +142,7 @@ export function PublicCreatorMusicExperience({
               {track.playback_mode === "preview" ? (
                 <Badge variant="outline">Preview</Badge>
               ) : null}
-              {!track.audio_url ? (
+              {!(track.playback_available ?? Boolean(track.audio_url)) ? (
                 <LockKeyhole className="h-4 w-4 text-muted-foreground" />
               ) : (
                 <Play className="h-4 w-4" />
@@ -162,6 +162,7 @@ export function PublicCreatorMusicExperience({
           creatorName={creatorName}
           featuredCollectionLabel={featuredCollectionLabel}
           onSelect={setSelectedId}
+          resolvePlaybackUrl={publicCreatorService.playbackUrl}
           planCode={planCode}
           docked
         />

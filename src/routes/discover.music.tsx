@@ -34,8 +34,10 @@ function genreGroup(value: string | null | undefined) {
 function MusicDiscoveryPage() {
   const [tracks, setTracks] = useState<DiscoveryTrack[]>([]);
   const [selected, setSelected] = useState(0);
+  const [audioUrl, setAudioUrl] = useState("");
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingAudio, setLoadingAudio] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -68,34 +70,90 @@ function MusicDiscoveryPage() {
   }, [visibleTracks]);
 
   const current = tracks[selected];
-  const choose = async (track: DiscoveryTrack) => {
-    const index = tracks.findIndex((item) => item.id === track.id);
-    if (index < 0) return;
-    setSelected(index); setPlaying(false); setPlaybackError(null);
-    if (!track.audio_url) {
-      setPlaybackError("This creator has not enabled public playback for the selected song.");
-      return;
+
+  const signSelectedTrack = async (track: DiscoveryTrack) => {
+    if (!track.playback_available) return "";
+    setLoadingAudio(true);
+    try {
+      return await publicDiscoveryService.playbackUrl(track);
+    } finally {
+      setLoadingAudio(false);
     }
+  };
+
+  const playSignedUrl = (url: string) => {
+    setAudioUrl(url);
     window.setTimeout(() => {
-      void audioRef.current?.play().catch((reason) => {
+      const player = audioRef.current;
+      if (!player) {
+        setPlaybackError("The audio player is unavailable. Refresh the page and try again.");
+        return;
+      }
+      player.load();
+      void player.play().catch((reason) => {
         console.error("VYBE music discovery playback failed", reason);
         setPlaying(false);
         setPlaybackError("The selected audio could not be loaded. Try another song or refresh the page.");
       });
     }, 0);
   };
-  const toggle = async () => {
-    if (!current?.audio_url) { setPlaybackError("This creator has not enabled public playback for the selected song."); return; }
-    if (!audioRef.current) { setPlaybackError("The audio player is unavailable. Refresh the page and try again."); return; }
-    try {
-      setPlaybackError(null);
-      if (audioRef.current.paused) { await audioRef.current.play(); setPlaying(true); } else { audioRef.current.pause(); setPlaying(false); }
-    } catch (reason) {
-      console.error("VYBE music discovery playback failed", reason);
-      setPlaying(false);
-      setPlaybackError("The selected audio could not be loaded. Try another song or refresh the page.");
+
+  const choose = async (track: DiscoveryTrack) => {
+    const index = tracks.findIndex((item) => item.id === track.id);
+    if (index < 0) return;
+    setSelected(index);
+    setPlaying(false);
+    setPlaybackError(null);
+    setAudioUrl("");
+
+    if (!track.playback_available) {
+      setPlaybackError("This creator has not enabled public playback for the selected song.");
+      return;
     }
+
+    const url = await signSelectedTrack(track);
+    if (!url) {
+      setPlaybackError("The selected audio could not be authorized. Try again.");
+      return;
+    }
+
+    playSignedUrl(url);
   };
+
+  const toggle = async () => {
+    if (!current?.playback_available) {
+      setPlaybackError("This creator has not enabled public playback for the selected song.");
+      return;
+    }
+
+    if (audioUrl && audioRef.current) {
+      try {
+        setPlaybackError(null);
+        if (audioRef.current.paused) {
+          await audioRef.current.play();
+          setPlaying(true);
+        } else {
+          audioRef.current.pause();
+          setPlaying(false);
+        }
+      } catch (reason) {
+        console.error("VYBE music discovery playback failed", reason);
+        setPlaying(false);
+        setPlaybackError("The selected audio could not be loaded. Try another song or refresh the page.");
+      }
+      return;
+    }
+
+    const url = await signSelectedTrack(current);
+    if (!url) {
+      setPlaybackError("The selected audio could not be authorized. Try again.");
+      return;
+    }
+
+    setPlaybackError(null);
+    playSignedUrl(url);
+  };
+
   const move = (direction: number) => {
     if (!tracks.length) return;
     const next = (selected + direction + tracks.length) % tracks.length;
@@ -116,7 +174,7 @@ function MusicDiscoveryPage() {
       {!loading && !error && !visibleTracks.length ? <div className="mx-auto max-w-3xl px-5 py-12 text-center sm:px-6 sm:py-20"><Music2 className="mx-auto h-10 w-10 text-muted-foreground" /><h2 className="mt-4 text-2xl font-semibold">No published music matches yet.</h2><p className="mt-2 text-muted-foreground">Try another search or explore the available creator directory.</p><Button asChild className="mt-6"><Link to="/explore" search={{ q: "" }}>Explore creators</Link></Button></div> : null}
 
       {!loading && !error && visibleTracks.length ? <div className="mx-auto max-w-7xl space-y-7 px-5 py-10 sm:space-y-10 sm:px-6 sm:py-14">{categories.map((category) => <section key={category.title}><div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-4"><div><p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">Music category</p><h2 className="mt-1 text-xl font-semibold sm:text-2xl md:text-3xl">{category.title}</h2></div><span className="text-xs text-muted-foreground sm:text-sm">{category.tracks.length} {category.tracks.length === 1 ? "track" : "tracks"}</span></div>
-        <div className="mt-4 grid grid-cols-2 items-stretch gap-3 sm:mt-5 sm:gap-4 lg:grid-cols-4">{category.tracks.map((track) => <article key={`${category.title}-${track.id}`} className="flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card sm:rounded-3xl"><button type="button" onClick={() => void choose(track)} className="group relative block aspect-square w-full overflow-hidden bg-muted text-left" aria-label={`Play ${track.title}`}>{track.cover_url ? <img src={track.cover_url} alt={`${track.title} cover`} className="h-full w-full object-cover transition group-hover:scale-105" /> : <div className="flex h-full items-center justify-center"><Music2 className="h-12 w-12 text-muted-foreground" /></div>}<span className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" /><span className="absolute bottom-2.5 right-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-lg sm:bottom-4 sm:right-4 sm:h-12 sm:w-12">{current?.id === track.id && playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="ml-0.5 h-5 w-5 fill-current" />}</span>{!track.audio_url ? <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-1 text-[10px] text-white sm:left-4 sm:top-4 sm:px-3 sm:text-xs">Listening restricted</span> : null}</button>
+        <div className="mt-4 grid grid-cols-2 items-stretch gap-3 sm:mt-5 sm:gap-4 lg:grid-cols-4">{category.tracks.map((track) => <article key={`${category.title}-${track.id}`} className="flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card sm:rounded-3xl"><button type="button" onClick={() => void choose(track)} className="group relative block aspect-square w-full overflow-hidden bg-muted text-left" aria-label={`Play ${track.title}`}>{track.cover_url ? <img src={track.cover_url} alt={`${track.title} cover`} className="h-full w-full object-cover transition group-hover:scale-105" /> : <div className="flex h-full items-center justify-center"><Music2 className="h-12 w-12 text-muted-foreground" /></div>}<span className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" /><span className="absolute bottom-2.5 right-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-lg sm:bottom-4 sm:right-4 sm:h-12 sm:w-12">{current?.id === track.id && playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="ml-0.5 h-5 w-5 fill-current" />}</span>{!track.playback_available ? <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-1 text-[10px] text-white sm:left-4 sm:top-4 sm:px-3 sm:text-xs">Listening restricted</span> : null}</button>
           <div className="min-w-0 p-3 sm:p-5"><h3 className="truncate text-sm font-semibold sm:text-lg">{track.title}</h3><p className="mt-0.5 truncate text-xs text-muted-foreground sm:mt-1 sm:text-sm">{track.primary_artist_name || track.creator?.artist_name}</p><div className="mt-2.5 flex min-w-0 items-center justify-between gap-2 sm:mt-4 sm:gap-3"><Badge variant="outline" className="max-w-[7rem] truncate px-2 py-0.5 text-[10px] sm:max-w-none sm:px-2.5 sm:text-xs">{track.genre || "Independent"}</Badge>{track.creator ? <Link to="/artist/$username" params={{ username: track.creator.username }} className="flex shrink-0 items-center gap-0.5 text-xs font-medium text-primary sm:gap-1 sm:text-sm">Creator <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" /></Link> : null}</div></div>
         </article>)}</div></section>)}</div> : null}
     </main>
@@ -124,9 +182,9 @@ function MusicDiscoveryPage() {
     {current ? <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 p-3 shadow-[0_-10px_35px_rgba(0,0,0,.25)] backdrop-blur-xl"><div className="mx-auto flex max-w-7xl items-center gap-3 sm:gap-5">
       <Avatar className="h-12 w-12 shrink-0 rounded-xl sm:h-14 sm:w-14"><AvatarImage src={current.cover_url || current.creator?.avatar_url || undefined} /><AvatarFallback className="rounded-xl"><UserRound className="h-5 w-5" /></AvatarFallback></Avatar>
       <div className="min-w-0 flex-1"><p className="truncate font-semibold">{current.title}</p><p className="truncate text-sm text-muted-foreground">{current.primary_artist_name || current.creator?.artist_name}</p>{playbackError ? <p className="truncate text-xs text-destructive" role="alert">{playbackError}</p> : null}</div>
-      <div className="flex items-center gap-1 sm:gap-2"><Button size="icon" variant="ghost" onClick={() => move(-1)} aria-label="Previous track"><SkipBack className="h-5 w-5 fill-current" /></Button><Button size="icon" className="h-11 w-11 rounded-full bg-gradient-brand sm:h-12 sm:w-12" onClick={() => void toggle()} disabled={!current.audio_url} aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="ml-0.5 h-5 w-5 fill-current" />}</Button><Button size="icon" variant="ghost" onClick={() => move(1)} aria-label="Next track"><SkipForward className="h-5 w-5 fill-current" /></Button></div>
+      <div className="flex items-center gap-1 sm:gap-2"><Button size="icon" variant="ghost" onClick={() => move(-1)} aria-label="Previous track"><SkipBack className="h-5 w-5 fill-current" /></Button><Button size="icon" className="h-11 w-11 rounded-full bg-gradient-brand sm:h-12 sm:w-12" onClick={() => void toggle()} disabled={!current.playback_available || loadingAudio} aria-label={playing ? "Pause" : "Play"}>{loadingAudio ? <Loader2 className="h-5 w-5 animate-spin" /> : playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="ml-0.5 h-5 w-5 fill-current" />}</Button><Button size="icon" variant="ghost" onClick={() => move(1)} aria-label="Next track"><SkipForward className="h-5 w-5 fill-current" /></Button></div>
       <Button asChild variant="outline" className="hidden sm:flex">{current.creator ? <Link to="/artist/$username" params={{ username: current.creator.username }}><ListMusic className="mr-2 h-4 w-4" />Open creator</Link> : <Link to="/explore" search={{ q: "" }}>Explore</Link>}</Button>
-      <audio key={`${current.id}-${current.audio_url || "restricted"}`} ref={audioRef} src={current.audio_url || undefined} onPlay={() => { setPlaying(true); setPlaybackError(null); }} onPause={() => setPlaying(false)} onEnded={() => move(1)} onError={() => { setPlaying(false); setPlaybackError("The selected audio source could not be loaded."); }} preload="metadata" />
+      <audio key={`${current.id}-${audioUrl || "idle"}`} ref={audioRef} src={audioUrl || undefined} onPlay={() => { setPlaying(true); setPlaybackError(null); }} onPause={() => setPlaying(false)} onEnded={() => move(1)} onError={() => { setPlaying(false); setPlaybackError("The selected audio source could not be loaded."); }} preload="metadata" />
     </div></div> : null}
     <Footer />
   </div>;
