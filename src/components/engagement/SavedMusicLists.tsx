@@ -52,7 +52,7 @@ export function SavedMusicLists() {
                         <p className="truncate text-sm font-medium">{item.tracks?.title ?? "Saved song"}</p>
                         <p className="truncate text-xs text-muted-foreground">{item.tracks?.primary_artist_name ?? "VYBE creator"}</p>
                       </div>
-                      {item.tracks?.audio_url ? (
+                      {(item.tracks?.playback_available ?? Boolean(item.tracks?.audio_url)) ? (
                         <Button type="button" variant="ghost" size="sm" onClick={() => { setActiveListId(list.id); setSelectedTrackId(item.track_id); }}>
                           <Play className="mr-2 h-4 w-4" /> Play
                         </Button>
@@ -69,6 +69,7 @@ export function SavedMusicLists() {
                       tracks={(list.supporter_music_list_items ?? []).map((item) => item.tracks).filter((track): track is NonNullable<typeof track> => Boolean(track))}
                       initialTrackId={selectedTrackId ?? undefined}
                       queueLabel={`Up next in ${list.name}`}
+                      resolvePlaybackUrl={(track) => savedMusicService.playbackUrl(track.id)}
                     />
                   </div>
                 ) : null}

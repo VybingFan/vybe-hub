@@ -17,14 +17,19 @@ async function signedUrl(bucket: string, path: string | null | undefined): Promi
 }
 
 async function hydrateSavedTrack(row: Track): Promise<Track> {
+  const playbackAvailable =
+    row.playback_mode === "preview"
+      ? Boolean(row.preview_audio_path)
+      : row.playback_mode === "none"
+        ? false
+        : Boolean(row.audio_url);
+
   return {
     ...row,
-    audio_url:
-      row.playback_mode === "preview"
-        ? (await signedUrl(PREVIEW_BUCKET, row.preview_audio_path ?? null)) ?? ""
-        : row.playback_mode === "none"
-          ? ""
-          : (await signedUrl(AUDIO_BUCKET, row.audio_url)) ?? "",
+    audio_storage_path: row.audio_url || null,
+    preview_storage_path: row.preview_audio_path ?? null,
+    playback_available: playbackAvailable,
+    audio_url: "",
     cover_url: await signedUrl(COVER_BUCKET, row.cover_url),
   };
 }
@@ -49,6 +54,47 @@ function supporterIdentity() {
 }
 
 export const savedMusicService = {
+  async playbackUrl(trackId: string): Promise<string> {
+    const identity = supporterIdentity();
+
+    const { data: lists, error: listsError } = await database
+      .from("supporter_music_lists")
+      .select("id")
+      .eq("owner_identity_id", identity.id);
+    if (listsError) throw listsError;
+
+    const listIds = (lists ?? []).map((list: { id: string }) => list.id);
+    if (!listIds.length) throw new Error("This song is not in one of your saved lists.");
+
+    const { data: savedItem, error: savedItemError } = await database
+      .from("supporter_music_list_items")
+      .select("id")
+      .eq("track_id", trackId)
+      .in("list_id", listIds)
+      .limit(1)
+      .maybeSingle();
+    if (savedItemError) throw savedItemError;
+    if (!savedItem) throw new Error("This song is not in one of your saved lists.");
+
+    const { data: row, error: trackError } = await database
+      .from("tracks")
+      .select("*")
+      .eq("id", trackId)
+      .maybeSingle();
+    if (trackError) throw trackError;
+    if (!row) throw new Error("This saved song is no longer available.");
+
+    const track = row as Track;
+    let url: string | null = null;
+    if (track.playback_mode === "preview") {
+      url = await signedUrl(PREVIEW_BUCKET, track.preview_audio_path ?? null);
+    } else if (track.playback_mode !== "none") {
+      url = await signedUrl(AUDIO_BUCKET, track.audio_url);
+    }
+    if (!url) throw new Error("Playback is unavailable for this saved song.");
+    return url;
+  },
+
   async lists(): Promise<SupporterMusicList[]> {
     const identity = supporterIdentity();
     const { data, error } = await database
