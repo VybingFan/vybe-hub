@@ -66,6 +66,7 @@ export function CreatorContinuationPlayer({
   const [elapsed, setElapsed] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.85);
+  const [previousVolume, setPreviousVolume] = useState(0.85);
   const [repeat, setRepeat] = useState(false);
   const [choice, setChoice] = useState<"top-five" | "library" | null>(null);
   const [nowPlayingOpen, setNowPlayingOpen] = useState(false);
@@ -195,7 +196,30 @@ export function CreatorContinuationPlayer({
   const changeVolume = ([value]: number[]) => {
     const safe = Math.min(1, Math.max(0, value));
     setVolume(safe);
-    if (audioRef.current) audioRef.current.volume = safe;
+    if (safe > 0) setPreviousVolume(safe);
+    if (audioRef.current) {
+      audioRef.current.volume = safe;
+      audioRef.current.muted = safe === 0;
+    }
+  };
+
+  const toggleMute = () => {
+    if (volume > 0) {
+      setPreviousVolume(volume);
+      setVolume(0);
+      if (audioRef.current) {
+        audioRef.current.volume = 0;
+        audioRef.current.muted = true;
+      }
+      return;
+    }
+
+    const restoredVolume = previousVolume > 0 ? previousVolume : 0.85;
+    setVolume(restoredVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = restoredVolume;
+      audioRef.current.muted = false;
+    }
   };
 
   return (
@@ -320,6 +344,16 @@ export function CreatorContinuationPlayer({
                 >
                   <Repeat2 />
                 </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleMute}
+                  aria-label={volume === 0 ? "Unmute" : "Mute"}
+                  title={volume === 0 ? "Unmute" : "Mute"}
+                >
+                  {volume === 0 ? <VolumeX /> : <Volume2 />}
+                </Button>
                 {canExpandNowPlaying ? (
                   <Button
                     type="button"
@@ -335,17 +369,13 @@ export function CreatorContinuationPlayer({
               </div>
               <TrackSupportActions trackId={track.id} />
               <div className="hidden w-28 items-center gap-2 lg:flex">
-                {volume === 0 ? (
-                  <VolumeX className="h-4 w-4" />
-                ) : (
-                  <Volume2 className="h-4 w-4" />
-                )}
                 <Slider
                   min={0}
                   max={1}
                   step={0.05}
                   value={[volume]}
                   onValueChange={changeVolume}
+                  aria-label="Playback volume"
                 />
               </div>
             </div>

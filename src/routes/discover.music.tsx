@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Headphones, ListMusic, Loader2, Music2, Pause, Play, Search, SkipBack, SkipForward, UserRound } from "lucide-react";
+import { ArrowRight, Headphones, ListMusic, Loader2, Music2, Pause, Play, Search, SkipBack, SkipForward, UserRound, Volume2, VolumeX } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
 import { MarketingNav } from "@/components/layout/MarketingNav";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import { publicDiscoveryService, type DiscoveryTrack } from "@/services/discovery/publicDiscoveryService";
 
 export const Route = createFileRoute("/discover/music")({ component: MusicDiscoveryPage });
@@ -41,6 +42,8 @@ function MusicDiscoveryPage() {
   const [error, setError] = useState<string | null>(null);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [volume, setVolume] = useState(0.85);
+  const [previousVolume, setPreviousVolume] = useState(0.85);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -160,6 +163,35 @@ function MusicDiscoveryPage() {
     void choose(tracks[next]);
   };
 
+  const changeVolume = ([value]: number[]) => {
+    const safe = Math.min(1, Math.max(0, value));
+    setVolume(safe);
+    if (safe > 0) setPreviousVolume(safe);
+    if (audioRef.current) {
+      audioRef.current.volume = safe;
+      audioRef.current.muted = safe === 0;
+    }
+  };
+
+  const toggleMute = () => {
+    if (volume > 0) {
+      setPreviousVolume(volume);
+      setVolume(0);
+      if (audioRef.current) {
+        audioRef.current.volume = 0;
+        audioRef.current.muted = true;
+      }
+      return;
+    }
+
+    const restoredVolume = previousVolume > 0 ? previousVolume : 0.85;
+    setVolume(restoredVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = restoredVolume;
+      audioRef.current.muted = false;
+    }
+  };
+
   return <div className="min-h-screen bg-background pb-28">
     <MarketingNav />
     <main>
@@ -182,9 +214,10 @@ function MusicDiscoveryPage() {
     {current ? <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 p-3 shadow-[0_-10px_35px_rgba(0,0,0,.25)] backdrop-blur-xl"><div className="mx-auto flex max-w-7xl items-center gap-3 sm:gap-5">
       <Avatar className="h-12 w-12 shrink-0 rounded-xl sm:h-14 sm:w-14"><AvatarImage src={current.cover_url || current.creator?.avatar_url || undefined} /><AvatarFallback className="rounded-xl"><UserRound className="h-5 w-5" /></AvatarFallback></Avatar>
       <div className="min-w-0 flex-1"><p className="truncate font-semibold">{current.title}</p><p className="truncate text-sm text-muted-foreground">{current.primary_artist_name || current.creator?.artist_name}</p>{playbackError ? <p className="truncate text-xs text-destructive" role="alert">{playbackError}</p> : null}</div>
-      <div className="flex items-center gap-1 sm:gap-2"><Button size="icon" variant="ghost" onClick={() => move(-1)} aria-label="Previous track"><SkipBack className="h-5 w-5 fill-current" /></Button><Button size="icon" className="h-11 w-11 rounded-full bg-gradient-brand sm:h-12 sm:w-12" onClick={() => void toggle()} disabled={!current.playback_available || loadingAudio} aria-label={playing ? "Pause" : "Play"}>{loadingAudio ? <Loader2 className="h-5 w-5 animate-spin" /> : playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="ml-0.5 h-5 w-5 fill-current" />}</Button><Button size="icon" variant="ghost" onClick={() => move(1)} aria-label="Next track"><SkipForward className="h-5 w-5 fill-current" /></Button></div>
+      <div className="flex items-center gap-1 sm:gap-2"><Button size="icon" variant="ghost" onClick={() => move(-1)} aria-label="Previous track"><SkipBack className="h-5 w-5 fill-current" /></Button><Button size="icon" className="h-11 w-11 rounded-full bg-gradient-brand sm:h-12 sm:w-12" onClick={() => void toggle()} disabled={!current.playback_available || loadingAudio} aria-label={playing ? "Pause" : "Play"}>{loadingAudio ? <Loader2 className="h-5 w-5 animate-spin" /> : playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="ml-0.5 h-5 w-5 fill-current" />}</Button><Button size="icon" variant="ghost" onClick={() => move(1)} aria-label="Next track"><SkipForward className="h-5 w-5 fill-current" /></Button><Button size="icon" variant="ghost" onClick={toggleMute} aria-label={volume === 0 ? "Unmute" : "Mute"}>{volume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</Button></div>
+      <div className="hidden w-28 items-center gap-2 lg:flex"><Slider min={0} max={1} step={0.05} value={[volume]} onValueChange={changeVolume} aria-label="Discovery playback volume" /></div>
       <Button asChild variant="outline" className="hidden sm:flex">{current.creator ? <Link to="/artist/$username" params={{ username: current.creator.username }}><ListMusic className="mr-2 h-4 w-4" />Open creator</Link> : <Link to="/explore" search={{ q: "" }}>Explore</Link>}</Button>
-      <audio key={`${current.id}-${audioUrl || "idle"}`} ref={audioRef} src={audioUrl || undefined} onPlay={() => { setPlaying(true); setPlaybackError(null); }} onPause={() => setPlaying(false)} onEnded={() => move(1)} onError={() => { setPlaying(false); setPlaybackError("The selected audio source could not be loaded."); }} preload="metadata" />
+      <audio key={`${current.id}-${audioUrl || "idle"}`} ref={audioRef} src={audioUrl || undefined} onLoadedMetadata={(event) => { event.currentTarget.volume = volume; event.currentTarget.muted = volume === 0; }} onPlay={() => { setPlaying(true); setPlaybackError(null); }} onPause={() => setPlaying(false)} onEnded={() => move(1)} onError={() => { setPlaying(false); setPlaybackError("The selected audio source could not be loaded."); }} preload="metadata" />
     </div></div> : null}
     <Footer />
   </div>;

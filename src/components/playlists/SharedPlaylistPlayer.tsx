@@ -369,6 +369,18 @@ export function SharedPlaylistPlayer({
     setElapsed(value);
   }
 
+  function changeVolume([value]: number[]) {
+    const safe = Math.min(1, Math.max(0, value));
+    setVolume(safe);
+    if (safe > 0) setPreviousVolume(safe);
+
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = safe;
+      audio.muted = safe === 0;
+    }
+  }
+
   function toggleMute() {
     const audio = audioRef.current;
 
@@ -598,6 +610,16 @@ export function SharedPlaylistPlayer({
             >
               <SkipForward />
             </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="sm:hidden"
+              onClick={toggleMute}
+              aria-label={volume === 0 ? "Unmute" : "Mute"}
+            >
+              {volume === 0 ? <VolumeX /> : <Volume2 />}
+            </Button>
 
         </div>
       </div>
@@ -609,6 +631,16 @@ export function SharedPlaylistPlayer({
             <Button type="button" variant="ghost" size="icon" className={cn("h-7 w-7", shuffle && "text-cyan-300")} onClick={() => setShuffle((value) => !value)} aria-pressed={shuffle} aria-label="Shuffle playlist"><Shuffle className="h-3.5 w-3.5" /></Button>
             <Button type="button" variant="ghost" size="icon" className={cn("h-7 w-7", repeat && "text-pink-300")} onClick={() => setRepeat((value) => !value)} aria-pressed={repeat} aria-label="Repeat current song"><Repeat2 className="h-3.5 w-3.5" /></Button>
             <Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={toggleMute} aria-label={volume === 0 ? "Unmute" : "Mute"}>{volume === 0 ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}</Button>
+            <div className="w-24">
+              <Slider
+                min={0}
+                max={1}
+                step={0.05}
+                value={[volume]}
+                onValueChange={changeVolume}
+                aria-label="Playlist volume"
+              />
+            </div>
           </div>
         </div>
 
@@ -667,6 +699,7 @@ export function SharedPlaylistPlayer({
           <Button type="button" variant="ghost" size="icon" onClick={previousTrack} disabled={tracks.length < 2} aria-label="Previous song"><SkipBack className="h-4 w-4" /></Button>
           <Button type="button" size="icon" className="h-11 w-11 rounded-full bg-gradient-brand text-white" onClick={() => void togglePlayback()} disabled={!canPlay || loadingAudio} aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause className="h-4 w-4 fill-current" /> : <Play className="ml-0.5 h-4 w-4 fill-current" />}</Button>
           <Button type="button" variant="ghost" size="icon" onClick={nextTrack} disabled={tracks.length < 2} aria-label="Next song"><SkipForward className="h-4 w-4" /></Button>
+          <Button type="button" variant="ghost" size="icon" onClick={toggleMute} aria-label={volume === 0 ? "Unmute" : "Mute"}>{volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}</Button>
         </div>
         <div className="mx-auto mt-1 max-w-6xl"><div className="h-0.5 overflow-hidden rounded-full bg-white/10"><div className="h-full bg-gradient-to-r from-fuchsia-500 to-cyan-400" style={{ width: `${Math.min(100, (elapsed / Math.max(displayedDuration, 1)) * 100)}%` }} /></div></div>
       </div>
