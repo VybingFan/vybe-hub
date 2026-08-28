@@ -40,7 +40,8 @@ export const ROUTE_ACCESS_REGISTRY: readonly RouteAccessRule[] = [
   { id: "public-experiences", experience: "public", paths: ["/experience/*", "/explore", "/demo/*"], protection: ["public"] },
   { id: "public-marketing", experience: "public", paths: ["/", "/about", "/community-guidelines", "/copyright", "/copyright/report", "/creator-memberships", "/faq", "/for-artists", "/for-businesses", "/for-film-video", "/for-writers-poets", "/help", "/privacy", "/terms", "/trust"], protection: ["public"] },
   { id: "stripe-webhook", experience: "server_api", paths: ["/api/stripe/webhook"], protection: ["signature"] },
-  { id: "authenticated-apis", experience: "server_api", paths: ["/api/account-deletion", "/api/admin-team-invite", "/api/secure-playlist", "/api/stripe/checkout", "/api/stripe/connect", "/api/stripe/focus-checkout", "/api/stripe/portal", "/api/video-status", "/api/video-upload-url"], protection: ["session", "role"] },
+  { id: "stripe-connect", experience: "server_api", paths: ["/api/stripe/connect"], roles: creatorRoles, protection: ["session", "role", "membership"] },
+  { id: "authenticated-apis", experience: "server_api", paths: ["/api/account-deletion", "/api/admin-team-invite", "/api/secure-playlist", "/api/stripe/checkout", "/api/stripe/focus-checkout", "/api/stripe/portal", "/api/video-status", "/api/video-upload-url"], protection: ["session", "role"] },
 ] as const;
 
 function matches(pathname: string, pattern: string) {

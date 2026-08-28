@@ -36,6 +36,19 @@ export const Route = createFileRoute("/api/stripe/connect")({ server: { handlers
     const userId = data.user.id;
     const { data: role } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", userId).in("role", ["creator", "admin"]).limit(1).maybeSingle();
     if (!role) return Response.json({ error: "Creator access is required." }, { status: 403 });
+    if (role.role !== "admin") {
+      const { data: canPrepare, error: membershipError } = await supabaseAdmin.rpc(
+        "creator_has_commerce_feature_v24_41h1",
+        { p_user_id: userId, p_feature: "commerce.prepare" },
+      );
+      if (membershipError) throw new Error(membershipError.message);
+      if (!canPrepare) {
+        return Response.json(
+          { error: "Stripe seller setup requires Creator Plus or higher." },
+          { status: 403 },
+        );
+      }
+    }
     let { data: seller } = await supabaseAdmin.from("commerce_seller_accounts").select("*").eq("creator_id", userId).maybeSingle();
     if (seller?.provider_account_id) {
       const account = await stripeV2(`/v2/core/accounts/${seller.provider_account_id}?include[]=configuration.recipient&include[]=requirements`, "GET");
