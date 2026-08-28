@@ -31,13 +31,32 @@ function CommerceStudio() {
   const canPrepareCommerce = hasCreatorFeature(membership?.plan_code, "commerce.prepare");
   const canPublishCommerce = hasCreatorFeature(membership?.plan_code, "commerce.publish");
   const client = useQueryClient();
-  const { data: tracks = [] } = useCreatorTracks(creatorId);
-  const { data: playlists = [] } = useMyPlaylists(creatorId);
-  const { data: products = [] } = useQuery({ queryKey: ["commerce-products", creatorId], queryFn: () => commerceService.creatorProducts(creatorId!), enabled: !!creatorId });
-  const { data: settings } = useQuery({ queryKey: ["commerce-settings"], queryFn: commerceService.settings });
+  const { data: tracks = [] } = useCreatorTracks(canPrepareCommerce ? creatorId : undefined);
+  const { data: playlists = [] } = useMyPlaylists(canPrepareCommerce ? creatorId : undefined);
+  const { data: products = [] } = useQuery({ queryKey: ["commerce-products", creatorId], queryFn: () => commerceService.creatorProducts(creatorId!), enabled: !!creatorId && canPrepareCommerce });
+  const { data: settings } = useQuery({ queryKey: ["commerce-settings"], queryFn: commerceService.settings, enabled: canPrepareCommerce });
   const publishedTracks = useMemo(() => tracks.filter((track) => track.status === "published"), [tracks]);
   const create = useMutation({ mutationFn: commerceService.createProduct, onSuccess: async () => { await client.invalidateQueries({ queryKey: ["commerce-products", creatorId] }); toast.success("Sales listing prepared."); } });
   const changeStatus = useMutation({ mutationFn: ({ id, status }: { id: string; status: "active" | "retired" }) => commerceService.setStatus(id, creatorId!, status), onSuccess: () => client.invalidateQueries({ queryKey: ["commerce-products", creatorId] }) });
+
+  if (!canPrepareCommerce) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-5">
+        <WorkspacePageHeader
+          eyebrow="Creator commerce"
+          title="Music sales"
+          description="Music Sales is available with Creator Plus and higher. Upgrade when you are ready to prepare songs and permanent collections for sale."
+          status={<Badge variant="outline">Upgrade available</Badge>}
+        />
+        <LockedFeatureCard
+          title="Prepare music sales listings"
+          description="Creator Plus unlocks seller setup and product preparation. Creator Pro adds publishing controls when VYBE checkout is active."
+          requiredPlan="creator_plus"
+          educationKey="commerce_prepare"
+        />
+      </div>
+    );
+  }
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!creatorId) return;

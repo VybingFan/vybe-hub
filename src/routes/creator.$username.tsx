@@ -119,15 +119,17 @@ export function PublicArtistHome({
       </div>
       <main>
         <section className="relative">
-          <div className={compactProfile ? "h-20 overflow-hidden sm:h-24" : "h-36 overflow-hidden sm:h-44 md:h-56"}>
-            <img
-              src={profile.cover_url || "/banners/default-creator-banner.png"}
-              alt=""
-              className="h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-          </div>
-          <div className="relative mx-auto max-w-7xl px-5 py-5 sm:px-6 md:py-6">
+          {!compactProfile && (
+            <div className="h-36 overflow-hidden sm:h-44 md:h-56">
+              <img
+                src={profile.cover_url || "/banners/default-creator-banner.png"}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+            </div>
+          )}
+          <div className={compactProfile ? "relative mx-auto mt-6 max-w-5xl rounded-3xl border border-border bg-card px-5 py-6 shadow-sm sm:px-6" : "relative mx-auto max-w-7xl px-5 py-5 sm:px-6 md:py-6"}>
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 <img
@@ -171,31 +173,33 @@ export function PublicArtistHome({
             </div>
           </div>
         </section>
-        <nav
-          aria-label={`${name} website sections`}
-          className="sticky top-16 z-30 border-y border-primary/15 bg-background/92 shadow-[0_12px_30px_rgba(0,0,0,.08)] backdrop-blur-xl"
-        >
-          <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[.16em] text-primary">
-              {compactProfile ? `${name}'s VYBE creator profile` : `Explore everything ${name} is sharing`}
-            </p>
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              <CreatorSectionLink href="#music">Music</CreatorSectionLink>
-              <CreatorSectionLink href="#happening">What's Happening</CreatorSectionLink>
-              <CreatorSectionLink href="#about">About</CreatorSectionLink>
-              {!!videos.length && (
-                <CreatorSectionLink href="#videos">Videos</CreatorSectionLink>
-              )}
-              {!!merch.length && (
-                <CreatorSectionLink href="#shop">Shop</CreatorSectionLink>
-              )}
-              <CreatorSectionLink href="#community">Community</CreatorSectionLink>
+        {!compactProfile && (
+          <nav
+            aria-label={`${name} website sections`}
+            className="sticky top-16 z-30 border-y border-primary/15 bg-background/92 shadow-[0_12px_30px_rgba(0,0,0,.08)] backdrop-blur-xl"
+          >
+            <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[.16em] text-primary">
+                {`Explore everything ${name} is sharing`}
+              </p>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                <CreatorSectionLink href="#music">Music</CreatorSectionLink>
+                <CreatorSectionLink href="#happening">What's Happening</CreatorSectionLink>
+                <CreatorSectionLink href="#about">About</CreatorSectionLink>
+                {!!videos.length && (
+                  <CreatorSectionLink href="#videos">Videos</CreatorSectionLink>
+                )}
+                {!!merch.length && (
+                  <CreatorSectionLink href="#shop">Shop</CreatorSectionLink>
+                )}
+                <CreatorSectionLink href="#community">Community</CreatorSectionLink>
+              </div>
             </div>
-          </div>
-        </nav>
+          </nav>
+        )}
         <section
           id="music"
-          className="mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 md:py-14"
+          className={compactProfile ? "mx-auto max-w-5xl scroll-mt-24 px-4 py-7 sm:px-6" : "mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 md:py-14"}
         >
           <PublicCreatorMusicExperience
             tracks={tracks}
@@ -211,10 +215,10 @@ export function PublicArtistHome({
 
         <PublicCreatorUpdates creatorId={profile.user_id} creatorName={name} />
 
-        <PublicCreatorShop creatorId={profile.user_id} creatorName={name} />
+        {!compactProfile && <PublicCreatorShop creatorId={profile.user_id} creatorName={name} />}
         <section
           id="about"
-          className="mx-auto grid max-w-7xl scroll-mt-28 gap-5 px-4 pb-16 sm:px-6 lg:grid-cols-[1.4fr_.6fr]"
+          className={compactProfile ? "mx-auto grid max-w-5xl scroll-mt-24 gap-4 px-4 pb-10 sm:px-6 md:grid-cols-[1.35fr_.65fr]" : "mx-auto grid max-w-7xl scroll-mt-28 gap-5 px-4 pb-16 sm:px-6 lg:grid-cols-[1.4fr_.6fr]"}
         >
           <div className="rounded-3xl border border-border bg-card p-6 sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[.2em] text-primary">
@@ -230,7 +234,7 @@ export function PublicArtistHome({
             <div className="mt-4">
               <SocialLinksDisplay profile={profile} />
             </div>
-            {profile.merch_url ? (
+            {!compactProfile && profile.merch_url ? (
               <Button asChild className="mt-6" variant="outline">
                 <a
                   href={profile.merch_url}
@@ -294,13 +298,13 @@ export function PublicArtistHome({
         {!!merch.length && (
           <section
             id="shop"
-            className="mx-auto max-w-7xl scroll-mt-28 px-6 pb-16"
+            className={compactProfile ? "mx-auto max-w-5xl scroll-mt-24 px-4 pb-10 sm:px-6" : "mx-auto max-w-7xl scroll-mt-28 px-6 pb-16"}
           >
             <p className="text-sm font-semibold uppercase tracking-[.2em] text-genre-country">
-              Artist collection
+              {compactProfile ? "Creator merch" : "Artist collection"}
             </p>
             <h2 className="mt-2 text-3xl font-semibold">
-              Merch, art, and experiences
+              {compactProfile ? `Merch from ${name}` : "Merch, art, and experiences"}
             </h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {merch.map((product) => (
