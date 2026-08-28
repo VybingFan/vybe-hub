@@ -26,7 +26,7 @@ export const authService = {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${window.location.origin}/auth/redirect`,
         data: {
           display_name: displayName,
           legal_accepted: true,
@@ -36,7 +36,10 @@ export const authService = {
     });
     if (error) throw error;
     persistRememberPreference(true);
-    return data;
+    return {
+      userId: data.user?.id ?? null,
+      requiresEmailConfirmation: !data.session,
+    };
   },
 
   async signOut() {

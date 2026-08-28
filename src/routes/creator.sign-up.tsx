@@ -11,8 +11,11 @@ import { Label } from "@/components/ui/label";
 import { LEGAL_POLICY_VERSION } from "@/constants/legal";
 import { useAuth } from "@/hooks/useAuth";
 import { signUpSchema } from "@/features/auth/roles";
-import { requestCreatorOnboardingLaunch } from "@/features/guide/creatorOnboardingState";
 import { CREATOR_PLAN_CATALOG } from "@/features/membership/catalog";
+
+const PENDING_ROLE_KEY = "vybe:pending-signup-role";
+const PENDING_PLAN_KEY = "vybe:pending-creator-plan";
+const PENDING_INTERVAL_KEY = "vybe:pending-creator-interval";
 
 const creatorSignUpSearchSchema = z.object({
   plan: z.enum(["creator_free", "creator_plus", "creator_pro"]).optional(),
@@ -26,7 +29,7 @@ export const Route = createFileRoute("/creator/sign-up")({
 
 function CreatorSignUpPage() {
   const { plan, interval } = Route.useSearch();
-  const { signUp, assignInitialRole } = useAuth();
+  const { signUp } = useAuth();
   const navigate = useNavigate();
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -34,6 +37,7 @@ function CreatorSignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
 
   const selectedPlan =
     CREATOR_PLAN_CATALOG.find(
@@ -70,36 +74,65 @@ function CreatorSignUpPage() {
 
     setLoading(true);
     try {
-      await signUp(
+      window.localStorage.setItem(PENDING_ROLE_KEY, "creator");
+      window.localStorage.setItem(PENDING_PLAN_KEY, selectedPlan.code);
+      window.localStorage.setItem(PENDING_INTERVAL_KEY, selectedInterval);
+
+      const result = await signUp(
         parsed.data.email,
         parsed.data.password,
         parsed.data.displayName,
         LEGAL_POLICY_VERSION,
       );
 
-      requestCreatorOnboardingLaunch();
-
       const pendingInvite = window.localStorage.getItem("vybe:pending-creator-invite");
+
+      if (result.requiresEmailConfirmation) {
+        setConfirmationEmail(parsed.data.email);
+        toast.success("Check your email to confirm your VYBE Creator account.");
+        return;
+      }
       if (pendingInvite) {
         toast.success("Account created. Continue your creator invitation.");
         navigate({ to: "/creator-invite/$token", params: { token: pendingInvite } });
         return;
       }
 
-      await assignInitialRole("creator");
-      window.sessionStorage.setItem("vybe:active-workspace", "creator_studio");
       toast.success("Creator account created");
-
-      if (selectedPlan.code === "creator_plus" || selectedPlan.code === "creator_pro") {
-        navigate({ to: "/creator-memberships" });
-      } else {
-        navigate({ to: "/dashboard" });
-      }
+      navigate({ to: "/auth/onboarding", search: { role: "creator" } });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create creator account");
     } finally {
       setLoading(false);
     }
+  }
+  if (confirmationEmail) {
+    return (
+      <CreatorAuthShell
+        wide
+        eyebrow={selectedPlan.name}
+        title="Check your email"
+        description={`We sent a confirmation link to ${confirmationEmail}. Confirm your email to continue your Creator setup.`}
+        footer={
+          <div className="space-y-2 text-center">
+            <p>
+              Already confirmed?{" "}
+              <Link to="/creator/sign-in" className="text-foreground underline-offset-4 hover:underline">
+                Creator sign in
+              </Link>
+            </p>
+          </div>
+        }
+      >
+        <div className="space-y-3 rounded-2xl border border-primary/20 bg-primary/5 p-5 text-sm">
+          <p className="font-semibold">Confirmation is required before Creator Studio can open.</p>
+          <p className="text-muted-foreground">
+            Open the VYBE email and select <strong>Confirm my email</strong>. VYBE will then continue
+            with Creator onboarding and your selected membership path.
+          </p>
+        </div>
+      </CreatorAuthShell>
+    );
   }
 
   return (

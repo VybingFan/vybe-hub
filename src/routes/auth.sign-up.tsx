@@ -11,6 +11,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { signUpSchema } from "@/features/auth/roles";
 import { z } from "zod";
 
+const PENDING_ROLE_KEY = "vybe:pending-signup-role";
+
 const signUpSearchSchema = z.object({
   role: z.enum(["creator", "supporter", "business"]).optional(),
 });
@@ -30,6 +32,7 @@ function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,13 +51,22 @@ function SignUpPage() {
     }
     setLoading(true);
     try {
-      await signUp(
+      if (role) window.localStorage.setItem(PENDING_ROLE_KEY, role);
+      else window.localStorage.removeItem(PENDING_ROLE_KEY);
+
+      const result = await signUp(
         parsed.data.email,
         parsed.data.password,
         parsed.data.displayName,
         LEGAL_POLICY_VERSION,
       );
       const pendingInvite = window.localStorage.getItem("vybe:pending-creator-invite");
+
+      if (result.requiresEmailConfirmation) {
+        setConfirmationEmail(parsed.data.email);
+        toast.success("Check your email to confirm your VYBE account.");
+        return;
+      }
       toast.success(
         pendingInvite ? "Account created. Continue your creator invitation." : "Account created.",
       );
@@ -68,6 +80,30 @@ function SignUpPage() {
     } finally {
       setLoading(false);
     }
+  }
+  if (confirmationEmail) {
+    return (
+      <AuthCard
+        title="Check your email"
+        description={`We sent a confirmation link to ${confirmationEmail}. Confirm your email to continue setting up your VYBE account.`}
+        footer={
+          <>
+            Already confirmed?{" "}
+            <Link to="/auth/sign-in" className="text-foreground underline-offset-4 hover:underline">
+              Sign in
+            </Link>
+          </>
+        }
+      >
+        <div className="space-y-3 rounded-xl border border-border/70 bg-muted/25 p-4 text-sm">
+          <p className="font-medium">Confirmation is required before VYBE can sign you in.</p>
+          <p className="text-muted-foreground">
+            Open the VYBE email and select <strong>Confirm my email</strong>. VYBE will then continue
+            with the correct account setup.
+          </p>
+        </div>
+      </AuthCard>
+    );
   }
 
   return (
