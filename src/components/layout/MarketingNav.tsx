@@ -44,6 +44,7 @@ export function MarketingNav() {
           <PublicLink link={NAV_LINKS[0]} pathname={pathname} />
           <NavDropdown label="Explore" items={EXPERIENCE_LINKS.filter((item) => item.to !== "/discover/music")} />
           <NavDropdown label="Community" items={COMMUNITY_LINKS} />
+          <PublicLink link={{ label: "Blog", to: "/blog" }} pathname={pathname} />
           <PublicLink link={NAV_LINKS[1]} pathname={pathname} />
           <NavDropdown label="More" items={[...MORE_LINKS, { label: "Build With VYBE", to: "/build-with-vybe" }]} />
         </nav>
@@ -96,6 +97,7 @@ export function MarketingNav() {
             />
             <MobileSection title="Explore VYBE" items={EXPERIENCE_LINKS.filter((item) => item.to !== "/discover/music")} />
             <MobileSection title="Community" items={COMMUNITY_LINKS} />
+            <MobileSection title="VYBE Editorial" items={[{ label: "Blog", to: "/blog" }]} />
             <MobileSection title="More" items={[...MORE_LINKS, { label: "Build With VYBE", to: "/build-with-vybe" }]} />
             <div className="border-t border-border/50 pt-4">
               <ThemeToggle showLabel />

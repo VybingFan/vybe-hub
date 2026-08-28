@@ -20,6 +20,7 @@ export const ADMIN_SEARCH_DESTINATIONS: AdminSearchDestination[] = [
   { title: "Offers", detail: "Business and promotional offers", href: "/admin/offers", keywords: "offer promotion discount business" },
   { title: "Memberships", detail: "Creator tiers, packages, entitlements, and renewals", href: "/admin/memberships", keywords: "membership tier plan entitlement renewal cancellation price" },
   { title: "Membership & Privacy Audit", detail: "Membership, privacy, continuity, commerce, and RLS diagnostics", href: "/admin/membership-audit", keywords: "audit privacy access lock continuity rls protected playback" },
+  { title: "VYBE Blog", detail: "Create, edit, feature, and publish official VYBE editorial articles", href: "/admin/blog", keywords: "blog article editorial publishing post newsroom content" },
   { title: "Reports", detail: "Administrative analytics and reporting", href: "/admin/reports", keywords: "report analytics metric export" },
   { title: "Play Operations", detail: "Games, questions, packs, and publishing", href: "/admin/play", keywords: "play game trivia pack question publish" },
   { title: "System Health", detail: "Platform status and operational health", href: "/admin/system-health", keywords: "system health error status performance" },

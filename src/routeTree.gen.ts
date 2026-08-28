@@ -25,10 +25,12 @@ import { Route as CreatorMembershipsRouteImport } from './routes/creator-members
 import { Route as CopyrightRouteImport } from './routes/copyright'
 import { Route as CommunityGuidelinesRouteImport } from './routes/community-guidelines'
 import { Route as BuildWithVybeRouteImport } from './routes/build-with-vybe'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as VideoVideoIdRouteImport } from './routes/video.$videoId'
 import { Route as PlaylistSlugRouteImport } from './routes/playlist.$slug'
 import { Route as PlayPackIdRouteImport } from './routes/play.$packId'
@@ -48,6 +50,7 @@ import { Route as CreatorSignInRouteImport } from './routes/creator.sign-in'
 import { Route as CreatorUsernameRouteImport } from './routes/creator.$username'
 import { Route as CreatorInviteTokenRouteImport } from './routes/creator-invite.$token'
 import { Route as CopyrightReportRouteImport } from './routes/copyright_.report'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
@@ -130,6 +133,7 @@ import { Route as AuthenticatedAdminCopyrightRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminCommerceRightsRouteImport } from './routes/_authenticated/admin_.commerce-rights'
 import { Route as AuthenticatedAdminBusinessesRouteImport } from './routes/_authenticated/admin_.businesses'
 import { Route as AuthenticatedAdminBusinessPilotRouteImport } from './routes/_authenticated/admin_.business-pilot'
+import { Route as AuthenticatedAdminBlogRouteImport } from './routes/_authenticated/admin_.blog'
 import { Route as AuthenticatedAdminAccountsRouteImport } from './routes/_authenticated/admin_.accounts'
 import { Route as ArtistUsernamePlaylistSlugRouteImport } from './routes/artist.$username_.playlist.$slug'
 import { Route as AuthenticatedMusicTrackIdLyricsRouteImport } from './routes/_authenticated/music_.$trackId_.lyrics'
@@ -216,6 +220,11 @@ const BuildWithVybeRoute = BuildWithVybeRouteImport.update({
   path: '/build-with-vybe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -234,6 +243,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BlogRoute,
 } as any)
 const VideoVideoIdRoute = VideoVideoIdRouteImport.update({
   id: '/video/$videoId',
@@ -329,6 +343,11 @@ const CopyrightReportRoute = CopyrightReportRouteImport.update({
   id: '/copyright_/report',
   path: '/copyright/report',
   getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
   id: '/sign-up',
@@ -775,6 +794,11 @@ const AuthenticatedAdminBusinessPilotRoute =
     path: '/admin/business-pilot',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminBlogRoute = AuthenticatedAdminBlogRouteImport.update({
+  id: '/admin_/blog',
+  path: '/admin/blog',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminAccountsRoute =
   AuthenticatedAdminAccountsRouteImport.update({
     id: '/admin_/accounts',
@@ -810,6 +834,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
+  '/blog': typeof BlogRouteWithChildren
   '/build-with-vybe': typeof BuildWithVybeRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/copyright': typeof CopyrightRoute
@@ -877,6 +902,7 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/copyright/report': typeof CopyrightReportRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
@@ -896,7 +922,9 @@ export interface FileRoutesByFullPath {
   '/play/$packId': typeof PlayPackIdRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/blog/': typeof BlogIndexRoute
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
+  '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/business-pilot': typeof AuthenticatedAdminBusinessPilotRoute
   '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/admin/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
@@ -1004,6 +1032,7 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/copyright/report': typeof CopyrightReportRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
@@ -1023,7 +1052,9 @@ export interface FileRoutesByTo {
   '/play/$packId': typeof PlayPackIdRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/blog': typeof BlogIndexRoute
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
+  '/admin/blog': typeof AuthenticatedAdminBlogRoute
   '/admin/business-pilot': typeof AuthenticatedAdminBusinessPilotRoute
   '/admin/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/admin/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
@@ -1066,6 +1097,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
+  '/blog': typeof BlogRouteWithChildren
   '/build-with-vybe': typeof BuildWithVybeRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/copyright': typeof CopyrightRoute
@@ -1133,6 +1165,7 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/copyright_/report': typeof CopyrightReportRoute
   '/creator-invite/$token': typeof CreatorInviteTokenRoute
   '/creator/$username': typeof CreatorUsernameRoute
@@ -1152,7 +1185,9 @@ export interface FileRoutesById {
   '/play/$packId': typeof PlayPackIdRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/blog/': typeof BlogIndexRoute
   '/_authenticated/admin_/accounts': typeof AuthenticatedAdminAccountsRoute
+  '/_authenticated/admin_/blog': typeof AuthenticatedAdminBlogRoute
   '/_authenticated/admin_/business-pilot': typeof AuthenticatedAdminBusinessPilotRoute
   '/_authenticated/admin_/businesses': typeof AuthenticatedAdminBusinessesRoute
   '/_authenticated/admin_/commerce-rights': typeof AuthenticatedAdminCommerceRightsRoute
@@ -1195,6 +1230,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/blog'
     | '/build-with-vybe'
     | '/community-guidelines'
     | '/copyright'
@@ -1262,6 +1298,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/blog/$slug'
     | '/copyright/report'
     | '/creator-invite/$token'
     | '/creator/$username'
@@ -1281,7 +1318,9 @@ export interface FileRouteTypes {
     | '/play/$packId'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/blog/'
     | '/admin/accounts'
+    | '/admin/blog'
     | '/admin/business-pilot'
     | '/admin/businesses'
     | '/admin/commerce-rights'
@@ -1389,6 +1428,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/blog/$slug'
     | '/copyright/report'
     | '/creator-invite/$token'
     | '/creator/$username'
@@ -1408,7 +1448,9 @@ export interface FileRouteTypes {
     | '/play/$packId'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/blog'
     | '/admin/accounts'
+    | '/admin/blog'
     | '/admin/business-pilot'
     | '/admin/businesses'
     | '/admin/commerce-rights'
@@ -1450,6 +1492,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/auth'
+    | '/blog'
     | '/build-with-vybe'
     | '/community-guidelines'
     | '/copyright'
@@ -1517,6 +1560,7 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/auth/sign-in'
     | '/auth/sign-up'
+    | '/blog/$slug'
     | '/copyright_/report'
     | '/creator-invite/$token'
     | '/creator/$username'
@@ -1536,7 +1580,9 @@ export interface FileRouteTypes {
     | '/play/$packId'
     | '/playlist/$slug'
     | '/video/$videoId'
+    | '/blog/'
     | '/_authenticated/admin_/accounts'
+    | '/_authenticated/admin_/blog'
     | '/_authenticated/admin_/business-pilot'
     | '/_authenticated/admin_/businesses'
     | '/_authenticated/admin_/commerce-rights'
@@ -1579,6 +1625,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRouteWithChildren
+  BlogRoute: typeof BlogRouteWithChildren
   BuildWithVybeRoute: typeof BuildWithVybeRoute
   CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
   CopyrightRoute: typeof CopyrightRoute
@@ -1746,6 +1793,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BuildWithVybeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -1773,6 +1827,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/video/$videoId': {
       id: '/video/$videoId'
@@ -1906,6 +1967,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/copyright/report'
       preLoaderRoute: typeof CopyrightReportRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/auth/sign-up': {
       id: '/auth/sign-up'
@@ -2481,6 +2549,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBusinessPilotRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/blog': {
+      id: '/_authenticated/admin_/blog'
+      path: '/admin/blog'
+      fullPath: '/admin/blog'
+      preLoaderRoute: typeof AuthenticatedAdminBlogRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/accounts': {
       id: '/_authenticated/admin_/accounts'
       path: '/admin/accounts'
@@ -2559,6 +2634,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
   AuthenticatedAdminAccountsRoute: typeof AuthenticatedAdminAccountsRoute
+  AuthenticatedAdminBlogRoute: typeof AuthenticatedAdminBlogRoute
   AuthenticatedAdminBusinessPilotRoute: typeof AuthenticatedAdminBusinessPilotRoute
   AuthenticatedAdminBusinessesRoute: typeof AuthenticatedAdminBusinessesRoute
   AuthenticatedAdminCommerceRightsRoute: typeof AuthenticatedAdminCommerceRightsRoute
@@ -2627,6 +2703,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
   AuthenticatedAdminAccountsRoute: AuthenticatedAdminAccountsRoute,
+  AuthenticatedAdminBlogRoute: AuthenticatedAdminBlogRoute,
   AuthenticatedAdminBusinessPilotRoute: AuthenticatedAdminBusinessPilotRoute,
   AuthenticatedAdminBusinessesRoute: AuthenticatedAdminBusinessesRoute,
   AuthenticatedAdminCommerceRightsRoute: AuthenticatedAdminCommerceRightsRoute,
@@ -2683,11 +2760,24 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRouteWithChildren,
+  BlogRoute: BlogRouteWithChildren,
   BuildWithVybeRoute: BuildWithVybeRoute,
   CommunityGuidelinesRoute: CommunityGuidelinesRoute,
   CopyrightRoute: CopyrightRoute,

@@ -443,6 +443,12 @@ export function AppSidebar() {
                   ],
                 },
                 {
+                  title: "Blog",
+                  url: "/admin/blog",
+                  icon: BookOpenText,
+                  allow: ["admin"],
+                },
+                {
                   title: "Reports",
                   url: "/admin/reports",
                   icon: BarChart3,
