@@ -122,8 +122,8 @@ async function syncSubscription(subscription: Stripe.Subscription, eventCreated:
   }
   if ((existing?.last_billing_event_created || 0) > eventCreated) return false;
 
-  const activeStatuses = ["active", "trialing", "past_due"];
-  if (activeStatuses.includes(subscription.status)) {
+  const paidAccessStatuses = ["active", "trialing", "past_due"];
+  if (paidAccessStatuses.includes(subscription.status)) {
     const { error } = await supabaseAdmin.from("account_entitlements").upsert({
       user_id: userId,
       ...stripeServer.activeSubscriptionUpdate(subscription, selection, eventCreated),
@@ -154,19 +154,29 @@ async function syncSubscription(subscription: Stripe.Subscription, eventCreated:
     return true;
   }
 
-  const { error } = await supabaseAdmin.from("account_entitlements").upsert({
-    user_id: userId,
-    plan_code: selection.planCode,
-    billing_provider: "stripe",
-    billing_customer_ref: customerRef,
-    billing_subscription_ref: subscription.id,
-    stripe_subscription_status: subscription.status,
-    current_period_end: stripeServer.periodEnd(subscription),
-    cancel_at_period_end: subscription.cancel_at_period_end,
-    last_billing_event_created: eventCreated,
-  });
-  if (error) throw error;
-  return true;
+  if (["incomplete", "paused"].includes(subscription.status)) {
+    const { error } = await supabaseAdmin.from("account_entitlements").upsert({
+      user_id: userId,
+      plan_code: "creator_free",
+      status: "active",
+      recognition_code: null,
+      billing_interval: null,
+      billing_provider: "stripe",
+      billing_customer_ref: customerRef,
+      billing_subscription_ref: subscription.id,
+      stripe_subscription_status: subscription.status,
+      current_period_end: stripeServer.periodEnd(subscription),
+      cancel_at_period_end: subscription.cancel_at_period_end,
+      scheduled_plan_code: null,
+      adjustment_ends_at: null,
+      last_billing_event_created: eventCreated,
+      expires_at: null,
+    });
+    if (error) throw error;
+    return true;
+  }
+
+  throw new Error(`Unhandled Stripe subscription status: ${subscription.status}`);
 }
 
 async function syncFocusSubscription(
