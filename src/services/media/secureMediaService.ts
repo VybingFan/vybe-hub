@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Track } from "@/features/music/schema";
 import type { SharedPlaylist } from "@/features/playlists/schema";
 
 export type MediaAccessReason =
@@ -63,7 +64,7 @@ async function readJson(response: Response): Promise<SecurePlaylistApiResponse> 
 }
 
 export const secureMediaService = {
-  async authorizePlaylist(slug: string, password?: string): Promise<PlaylistAuthorizationResult> {
+  async authorizePlaylist(slug: string, password?: string, trackId?: string): Promise<PlaylistAuthorizationResult> {
     const response = await fetch("/api/secure-playlist", {
       method: "POST",
       headers: await authHeaders(),
@@ -71,6 +72,7 @@ export const secureMediaService = {
         action: "authorize",
         slug,
         password: password || undefined,
+        trackId: trackId || undefined,
       }),
     });
 
@@ -81,6 +83,17 @@ export const secureMediaService = {
     }
 
     return payload.result as PlaylistAuthorizationResult;
+  },
+
+  async playbackUrl(slug: string, track: Track, password?: string): Promise<string> {
+    const result = await this.authorizePlaylist(slug, password, track.id);
+
+    if (!result.authorized || !result.playlist) {
+      return "";
+    }
+
+    const resolvedTrack = result.playlist.tracks.find((item) => item.id === track.id);
+    return resolvedTrack?.audio_url || "";
   },
 
   async setPlaylistPassword(slug: string, password: string): Promise<void> {

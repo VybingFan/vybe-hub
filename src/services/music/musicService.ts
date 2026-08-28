@@ -306,7 +306,33 @@ export const musicService = {
       .eq("creator_id", userId)
       .order("created_at", { ascending: false });
     if (error) throw error;
-    return Promise.all((data ?? []).map((row) => hydrateTrack(row as unknown as Track)));
+
+    return Promise.all(
+      (data ?? []).map(async (row) => {
+        const track = row as unknown as Track;
+        const parsedDiscovery = trackDiscoveryMetadataSchema.safeParse(
+          track.discovery_metadata ?? {},
+        );
+        const playbackAvailable =
+          track.playback_mode === "preview"
+            ? Boolean(track.preview_audio_path)
+            : track.playback_mode === "none"
+              ? false
+              : Boolean(track.audio_url);
+
+        return {
+          ...track,
+          discovery_metadata: parsedDiscovery.success
+            ? parsedDiscovery.data
+            : { ...EMPTY_TRACK_DISCOVERY_METADATA },
+          audio_storage_path: track.audio_url || null,
+          preview_storage_path: track.preview_audio_path ?? null,
+          playback_available: playbackAvailable,
+          audio_url: "",
+          cover_url: await signedUrl(COVER_BUCKET, track.cover_url),
+        };
+      }),
+    );
   },
 
   async listCreatorAlbums(userId: string): Promise<Album[]> {

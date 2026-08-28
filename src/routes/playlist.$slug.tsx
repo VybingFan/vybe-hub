@@ -25,6 +25,7 @@ import { Label } from "@/components/ui/label";
 import { appLinks, getPreferredAppLink } from "@/config/appLinks";
 import { useSharedPlaylist } from "@/hooks/usePlaylists";
 import { activityService } from "@/services/activity/activityService";
+import { secureMediaService } from "@/services/media/secureMediaService";
 
 export const Route = createFileRoute("/playlist/$slug")({
   component: SharedPlaylistPage,
@@ -274,7 +275,18 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
                 <span>{data.tracks.length} tracks · {minutes} min</span>
                 <span className="inline-flex items-center gap-1"><Headphones className="h-3 w-3 text-cyan-300" />{accessLabel}</span>
               </div>
-              <SharedPlaylistPlayer tracks={data.tracks} playlistSlug={slug} autoPlayOnOpen />
+              <SharedPlaylistPlayer
+                tracks={data.tracks}
+                playlistSlug={slug}
+                autoPlayOnOpen
+                resolvePlaybackUrl={(track) =>
+                  secureMediaService.playbackUrl(
+                    slug,
+                    track,
+                    submittedPassword || undefined,
+                  )
+                }
+              />
             </div>
           </div>
 

@@ -24,6 +24,7 @@ interface SharedPlaylistPlayerProps {
   initialTrackId?: string;
   queueLabel?: string;
   autoPlayOnOpen?: boolean;
+  resolvePlaybackUrl?: (track: Track) => Promise<string>;
 }
 
 interface ActivePlaybackProgress {
@@ -61,6 +62,7 @@ export function SharedPlaylistPlayer({
   initialTrackId,
   queueLabel = "Playlist queue",
   autoPlayOnOpen = false,
+  resolvePlaybackUrl,
 }: SharedPlaylistPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const recordedTracks = useRef(new Set<string>());
@@ -84,8 +86,16 @@ export function SharedPlaylistPlayer({
   const [playbackError, setPlaybackError] = useState<string | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [queueExpanded, setQueueExpanded] = useState(false);
+  const [resolvedAudioUrl, setResolvedAudioUrl] = useState("");
+  const [resolvedTrackId, setResolvedTrackId] = useState<string | null>(null);
 
   const track = tracks[current];
+  const sourceUrl =
+    track?.audio_url ||
+    (resolvedTrackId === track?.id ? resolvedAudioUrl : "");
+  const canPlay = track
+    ? (track.playback_available ?? Boolean(track.audio_url))
+    : false;
 
   useEffect(() => {
     if (!initialTrackId) {
@@ -101,8 +111,8 @@ export function SharedPlaylistPlayer({
   }, [initialTrackId, tracks]);
 
   /*
-   * Reset and load the audio element whenever the selected track
-   * or its signed URL changes.
+   * Reset playback state when selection changes. Resolve only the selected
+   * track when autoplay is requested instead of signing the full queue.
    */
   useEffect(() => {
     const audio = audioRef.current;
@@ -116,28 +126,62 @@ export function SharedPlaylistPlayer({
     setAudioDuration(0);
     setPlaybackError(null);
     setPlaying(false);
+    setResolvedAudioUrl("");
+    setResolvedTrackId(null);
 
-    if (!audio) {
-      return;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.volume = volume;
     }
-
-    audio.pause();
-    audio.currentTime = 0;
-    audio.volume = volume;
-
-    if (!track?.audio_url) {
-      setLoadingAudio(false);
-      shouldAutoplayRef.current = false;
-      return;
-    }
-
-    setLoadingAudio(true);
-    audio.load();
 
     if (autoPlayOnOpen && !attemptedInitialAutoplayRef.current) {
       attemptedInitialAutoplayRef.current = true;
       shouldAutoplayRef.current = true;
     }
+
+    if (
+      track &&
+      canPlay &&
+      !track.audio_url &&
+      shouldAutoplayRef.current &&
+      resolvePlaybackUrl
+    ) {
+      setLoadingAudio(true);
+
+      void resolvePlaybackUrl(track)
+        .then((url) => {
+          if (!url) throw new Error("No authorized audio URL was returned.");
+          setResolvedTrackId(track.id);
+          setResolvedAudioUrl(url);
+        })
+        .catch((error) => {
+          console.error("Playlist audio authorization failed:", error);
+          shouldAutoplayRef.current = false;
+          setLoadingAudio(false);
+          setPlaybackError("The selected audio could not be authorized for playback.");
+        });
+
+      return;
+    }
+
+    if (!track?.audio_url) {
+      setLoadingAudio(false);
+      if (!canPlay) shouldAutoplayRef.current = false;
+    }
+  }, [autoPlayOnOpen, current, track?.id]);
+
+  /*
+   * Once the selected track has a signed source, load it and honor a pending
+   * autoplay request.
+   */
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (!audio || !sourceUrl) return;
+
+    setLoadingAudio(true);
+    audio.load();
 
     if (shouldAutoplayRef.current) {
       const playWhenReady = async () => {
@@ -145,10 +189,7 @@ export function SharedPlaylistPlayer({
           await audio.play();
         } catch (error) {
           console.error("Playlist audio playback failed:", error);
-
           setPlaying(false);
-          // Mobile browsers may require one explicit tap before audio can start.
-          // Keep the primary play control ready instead of presenting an error.
           if (!autoPlayOnOpen) {
             setPlaybackError("The selected audio could not begin playing.");
           }
@@ -159,7 +200,7 @@ export function SharedPlaylistPlayer({
 
       void playWhenReady();
     }
-  }, [autoPlayOnOpen, current, track?.audio_url]);
+  }, [autoPlayOnOpen, sourceUrl]);
 
   function flushProgress(completed = false) {
     const progress = progressRef.current;
@@ -185,12 +226,11 @@ export function SharedPlaylistPlayer({
 
   const displayedDuration = audioDuration || track.duration_sec || 0;
 
-  const canPlay = Boolean(track.audio_url);
 
   async function startPlayback() {
     const audio = audioRef.current;
 
-    if (!track.audio_url) {
+    if (!canPlay) {
       setPlaybackError("Playback is unavailable for this song.");
       return;
     }
@@ -200,12 +240,38 @@ export function SharedPlaylistPlayer({
       return;
     }
 
+    if (!sourceUrl) {
+      if (!resolvePlaybackUrl) {
+        setPlaybackError("Playback is unavailable for this song.");
+        return;
+      }
+
+      try {
+        setPlaybackError(null);
+        setLoadingAudio(true);
+        shouldAutoplayRef.current = true;
+
+        const url = await resolvePlaybackUrl(track);
+
+        if (!url) throw new Error("No authorized audio URL was returned.");
+
+        setResolvedTrackId(track.id);
+        setResolvedAudioUrl(url);
+      } catch (error) {
+        console.error("Playlist audio authorization failed:", error);
+        shouldAutoplayRef.current = false;
+        setLoadingAudio(false);
+        setPlaybackError("The selected audio could not be authorized for playback.");
+      }
+
+      return;
+    }
+
     try {
       setPlaybackError(null);
       await audio.play();
     } catch (error) {
       console.error("Playlist audio playback failed:", error);
-
       setPlaying(false);
       setPlaybackError(getAudioErrorMessage(audio));
     }
@@ -236,7 +302,7 @@ export function SharedPlaylistPlayer({
       return;
     }
 
-    shouldAutoplayRef.current = Boolean(tracks[index]?.audio_url);
+    shouldAutoplayRef.current = tracks[index]?.playback_available ?? Boolean(tracks[index]?.audio_url);
 
     setCurrent(index);
   }
@@ -331,14 +397,14 @@ export function SharedPlaylistPlayer({
   return (
     <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#0a0c16] text-white shadow-elevated">
       <audio
-        key={`${track.id}-${track.audio_url || "restricted"}`}
+        key={`${track.id}-${sourceUrl || "restricted"}`}
         ref={audioRef}
-        src={track.audio_url || undefined}
+        src={sourceUrl || undefined}
         preload="metadata"
         controlsList="nodownload noremoteplayback"
 
         onLoadStart={() => {
-          if (track.audio_url) {
+          if (sourceUrl) {
             setLoadingAudio(true);
           }
         }}
@@ -419,7 +485,7 @@ export function SharedPlaylistPlayer({
 
           console.error("Playlist audio element error:", audio.error, {
             trackId: track.id,
-            audioUrlPresent: Boolean(track.audio_url),
+            audioUrlPresent: Boolean(sourceUrl),
           });
         }}
       />

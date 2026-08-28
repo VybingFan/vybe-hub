@@ -12,6 +12,7 @@ const requestSchema = z.discriminatedUnion("action", [
     action: z.literal("authorize"),
     slug: z.string().trim().min(1).max(160),
     password: z.string().max(128).optional(),
+    trackId: z.string().uuid().optional(),
   }),
   z.object({
     action: z.literal("set_password"),
@@ -465,6 +466,10 @@ export const Route = createFileRoute("/api/secure-playlist")({
         const tracks = await Promise.all(
           rawTracks
             .filter((track: any) => {
+              if (parsed.data.trackId && track.id !== parsed.data.trackId) {
+                return false;
+              }
+
               if (accessMode === "public" || accessMode === "unlisted") {
                 return track.visibility === "public" && track.status === "published";
               }
@@ -472,25 +477,32 @@ export const Route = createFileRoute("/api/secure-playlist")({
               return track.status === "published";
             })
             .map(async (track: any) => {
+              const playbackAvailable =
+                track.playback_mode === "preview"
+                  ? Boolean(track.preview_audio_path)
+                  : track.playback_mode === "none"
+                    ? false
+                    : track.playback_mode === "approved_listeners" &&
+                        accessMode !== "approved_listeners"
+                      ? false
+                      : Boolean(track.audio_url);
+
               let playableUrl = "";
 
-              if (track.playback_mode === "preview") {
-                playableUrl =
-                  (await signedUrl(client, PREVIEW_BUCKET, track.preview_audio_path)) ?? "";
-              } else if (track.playback_mode === "none") {
-                playableUrl = "";
-              } else if (
-                track.playback_mode === "approved_listeners" &&
-                accessMode !== "approved_listeners"
-              ) {
-                playableUrl = "";
-              } else {
-                playableUrl = (await signedUrl(client, AUDIO_BUCKET, track.audio_url)) ?? "";
+              if (parsed.data.trackId && playbackAvailable) {
+                if (track.playback_mode === "preview") {
+                  playableUrl =
+                    (await signedUrl(client, PREVIEW_BUCKET, track.preview_audio_path)) ?? "";
+                } else {
+                  playableUrl =
+                    (await signedUrl(client, AUDIO_BUCKET, track.audio_url)) ?? "";
+                }
               }
 
               return {
                 ...track,
                 audio_url: playableUrl,
+                playback_available: playbackAvailable,
                 cover_url: await signedUrl(client, COVER_BUCKET, track.cover_url),
               };
             }),
@@ -512,13 +524,15 @@ export const Route = createFileRoute("/api/secure-playlist")({
           tracks,
         };
 
-        await logAccess(client, {
-          playlistId: playlist.id,
-          listenerUserId: listener?.id,
-          accessMode,
-          outcome: "granted",
-          reason: "AUTHORIZED",
-        });
+        if (!parsed.data.trackId) {
+          await logAccess(client, {
+            playlistId: playlist.id,
+            listenerUserId: listener?.id,
+            accessMode,
+            outcome: "granted",
+            reason: "AUTHORIZED",
+          });
+        }
 
         return Response.json({
           result: {
