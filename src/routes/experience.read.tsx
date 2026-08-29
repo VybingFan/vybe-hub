@@ -2,43 +2,42 @@ import { createFileRoute } from "@tanstack/react-router";
 import { BookHeart, BookOpenText, Feather, PenLine } from "lucide-react";
 import { PublicExperiencePage } from "@/components/experience/PublicExperiencePage";
 
-export const Route = createFileRoute("/experience/read")({ component: ReadPreview });
+export const Route = createFileRoute("/experience/read")({ component: ReadExperience });
 
-function ReadPreview() {
+function ReadExperience() {
   return (
     <PublicExperiencePage
-      eyebrow="Read on VYBE · Preview"
+      eyebrow="Read on VYBE"
       title="Words deserve a stage, too."
-      description="A future home for poets, lyricists, storytellers, journalists, and creators sharing the meaning behind their work."
+      description="Discover poetry, lyrics, stories, creator notes, and original writing from people with something to say."
       accent="#f59e0b"
       cards={[
         {
           title: "Poetry",
           image: "/images/experience-cards/poetry.webp",
-          description: "Poems presented as creative works with the identity and voice of the poet.",
+          description: "Discover poems and spoken-word work presented with the identity and voice of the creator.",
           icon: Feather,
         },
         {
           title: "Lyrics",
           image: "/images/experience-cards/lyrics.webp",
-          description: "Creator-authorized lyrics paired with songs, credits, and their stories.",
+          description: "Read creator-authorized lyrics alongside songs, credits, and the story behind the work.",
           icon: PenLine,
         },
         {
           title: "Creator stories",
           image: "/images/supporter-cards/creator-stories.webp",
-          description:
-            "Personal essays, milestones, inspirations, and experiences shaping the work.",
+          description: "Explore personal essays, milestones, inspirations, and experiences shaping what creators make.",
           icon: BookHeart,
         },
         {
           title: "Behind the work",
           image: "/images/experience-cards/behind-the-work.webp",
-          description: "Notes from the studio, set, writing desk, stage, and editing room.",
+          description: "Read notes from the studio, set, writing desk, stage, editing room, and creative process.",
           icon: BookOpenText,
         },
       ]}
-      note="Written-content drafts, publishing, rights, moderation, and reading collections must be built before public submissions open."
+      note="Public written-content publishing is still expanding. VYBE will open deeper reading experiences as creator rights, moderation, collections, and publishing tools are completed."
     />
   );
 }

@@ -42,11 +42,19 @@ export function MarketingNav() {
 
         <nav className="hidden items-center gap-6 md:flex" aria-label="Primary navigation">
           <PublicLink link={NAV_LINKS[0]} pathname={pathname} />
-          <NavDropdown label="Explore" items={EXPERIENCE_LINKS.filter((item) => item.to !== "/discover/music")} />
-          <NavDropdown label="Community" items={COMMUNITY_LINKS} />
-          <PublicLink link={{ label: "Blog", to: "/blog" }} pathname={pathname} />
+          <NavDropdown label="Explore" items={EXPERIENCE_LINKS} />
+          <NavDropdown label="Connect" items={COMMUNITY_LINKS} />
           <PublicLink link={NAV_LINKS[1]} pathname={pathname} />
-          <NavDropdown label="More" items={[...MORE_LINKS, { label: "Build With VYBE", to: "/build-with-vybe" }]} />
+          <PublicLink link={{ label: "Blog", to: "/blog" }} pathname={pathname} />
+                    <NavDropdown
+            label="Build on VYBE"
+            items={[
+              { label: "For Creators ↗", to: "https://creators.vybewithvybe.com" },
+              { label: "For Supporters", to: "/build-with-vybe" },
+              { label: "For Businesses ↗", to: "https://businessads.vybewithvybe.com" },
+            ]}
+          />
+          <NavDropdown label="More" items={MORE_LINKS} />
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
@@ -69,10 +77,10 @@ export function MarketingNav() {
           ) : !isLoading ? (
             <>
               <Button asChild variant="ghost">
-                <Link to="/auth/sign-in">Supporter Sign In</Link>
+                <Link to="/auth/sign-in">Sign in</Link>
               </Button>
               <Button asChild className="bg-gradient-brand text-primary-foreground shadow-glow">
-                <Link to="/auth/sign-up">Create Free Account</Link>
+                <Link to="/auth/sign-up">Join VYBE</Link>
               </Button>
             </>
           ) : null}
@@ -95,10 +103,18 @@ export function MarketingNav() {
               title="Discover"
               items={NAV_LINKS.map((item) => ({ label: item.label, to: item.to }))}
             />
-            <MobileSection title="Explore VYBE" items={EXPERIENCE_LINKS.filter((item) => item.to !== "/discover/music")} />
+            <MobileSection title="Explore VYBE" items={EXPERIENCE_LINKS} />
             <MobileSection title="Community" items={COMMUNITY_LINKS} />
-            <MobileSection title="VYBE Editorial" items={[{ label: "Blog", to: "/blog" }]} />
-            <MobileSection title="More" items={[...MORE_LINKS, { label: "Build With VYBE", to: "/build-with-vybe" }]} />
+            <MobileSection title="Blog" items={[{ label: "VYBE Blog", to: "/blog" }]} />
+            <MobileSection
+              title="Build on VYBE"
+              items={[
+                { label: "For Creators ↗", to: "https://creators.vybewithvybe.com" },
+                { label: "For Supporters", to: "/build-with-vybe" },
+                { label: "For Businesses ↗", to: "https://businessads.vybewithvybe.com" },
+              ]}
+            />
+            <MobileSection title="About & Help" items={MORE_LINKS} />
             <div className="border-t border-border/50 pt-4">
               <ThemeToggle showLabel />
             </div>
@@ -119,10 +135,10 @@ export function MarketingNav() {
               <div className="space-y-2 border-t border-border/50 pt-4">
                 <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
                   <Button asChild variant="outline">
-                    <Link to="/auth/sign-in">Supporter Sign In</Link>
+                    <Link to="/auth/sign-in">Sign in</Link>
                   </Button>
                   <Button asChild className="bg-gradient-brand text-primary-foreground">
-                    <Link to="/auth/sign-up">Create Free Account</Link>
+                    <Link to="/auth/sign-up">Join VYBE</Link>
                   </Button>
                 </div>
               </div>

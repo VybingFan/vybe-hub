@@ -20,10 +20,12 @@ import { Route as ForBusinessesRouteImport } from './routes/for-businesses'
 import { Route as ForArtistsRouteImport } from './routes/for-artists'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as CreatorsRouteImport } from './routes/creators'
 import { Route as CreatorRouteImport } from './routes/creator_'
 import { Route as CreatorMembershipsRouteImport } from './routes/creator-memberships'
 import { Route as CopyrightRouteImport } from './routes/copyright'
 import { Route as CommunityGuidelinesRouteImport } from './routes/community-guidelines'
+import { Route as BusinessadsRouteImport } from './routes/businessads'
 import { Route as BuildWithVybeRouteImport } from './routes/build-with-vybe'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -195,6 +197,11 @@ const ExploreRoute = ExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreatorsRoute = CreatorsRouteImport.update({
+  id: '/creators',
+  path: '/creators',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreatorRoute = CreatorRouteImport.update({
   id: '/creator_',
   path: '/creator',
@@ -213,6 +220,11 @@ const CopyrightRoute = CopyrightRouteImport.update({
 const CommunityGuidelinesRoute = CommunityGuidelinesRouteImport.update({
   id: '/community-guidelines',
   path: '/community-guidelines',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessadsRoute = BusinessadsRouteImport.update({
+  id: '/businessads',
+  path: '/businessads',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BuildWithVybeRoute = BuildWithVybeRouteImport.update({
@@ -836,10 +848,12 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/build-with-vybe': typeof BuildWithVybeRoute
+  '/businessads': typeof BusinessadsRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/copyright': typeof CopyrightRoute
   '/creator-memberships': typeof CreatorMembershipsRoute
   '/creator': typeof CreatorRoute
+  '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
@@ -966,10 +980,12 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
   '/build-with-vybe': typeof BuildWithVybeRoute
+  '/businessads': typeof BusinessadsRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/copyright': typeof CopyrightRoute
   '/creator-memberships': typeof CreatorMembershipsRoute
   '/creator': typeof CreatorRoute
+  '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
@@ -1099,10 +1115,12 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/build-with-vybe': typeof BuildWithVybeRoute
+  '/businessads': typeof BusinessadsRoute
   '/community-guidelines': typeof CommunityGuidelinesRoute
   '/copyright': typeof CopyrightRoute
   '/creator-memberships': typeof CreatorMembershipsRoute
   '/creator_': typeof CreatorRoute
+  '/creators': typeof CreatorsRoute
   '/explore': typeof ExploreRoute
   '/faq': typeof FaqRoute
   '/for-artists': typeof ForArtistsRoute
@@ -1232,10 +1250,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/blog'
     | '/build-with-vybe'
+    | '/businessads'
     | '/community-guidelines'
     | '/copyright'
     | '/creator-memberships'
     | '/creator'
+    | '/creators'
     | '/explore'
     | '/faq'
     | '/for-artists'
@@ -1362,10 +1382,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/build-with-vybe'
+    | '/businessads'
     | '/community-guidelines'
     | '/copyright'
     | '/creator-memberships'
     | '/creator'
+    | '/creators'
     | '/explore'
     | '/faq'
     | '/for-artists'
@@ -1494,10 +1516,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/blog'
     | '/build-with-vybe'
+    | '/businessads'
     | '/community-guidelines'
     | '/copyright'
     | '/creator-memberships'
     | '/creator_'
+    | '/creators'
     | '/explore'
     | '/faq'
     | '/for-artists'
@@ -1627,10 +1651,12 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   BlogRoute: typeof BlogRouteWithChildren
   BuildWithVybeRoute: typeof BuildWithVybeRoute
+  BusinessadsRoute: typeof BusinessadsRoute
   CommunityGuidelinesRoute: typeof CommunityGuidelinesRoute
   CopyrightRoute: typeof CopyrightRoute
   CreatorMembershipsRoute: typeof CreatorMembershipsRoute
   CreatorRoute: typeof CreatorRoute
+  CreatorsRoute: typeof CreatorsRoute
   ExploreRoute: typeof ExploreRoute
   FaqRoute: typeof FaqRoute
   ForArtistsRoute: typeof ForArtistsRoute
@@ -1758,6 +1784,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/creators': {
+      id: '/creators'
+      path: '/creators'
+      fullPath: '/creators'
+      preLoaderRoute: typeof CreatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/creator_': {
       id: '/creator_'
       path: '/creator'
@@ -1784,6 +1817,13 @@ declare module '@tanstack/react-router' {
       path: '/community-guidelines'
       fullPath: '/community-guidelines'
       preLoaderRoute: typeof CommunityGuidelinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/businessads': {
+      id: '/businessads'
+      path: '/businessads'
+      fullPath: '/businessads'
+      preLoaderRoute: typeof BusinessadsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/build-with-vybe': {
@@ -2779,10 +2819,12 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   BlogRoute: BlogRouteWithChildren,
   BuildWithVybeRoute: BuildWithVybeRoute,
+  BusinessadsRoute: BusinessadsRoute,
   CommunityGuidelinesRoute: CommunityGuidelinesRoute,
   CopyrightRoute: CopyrightRoute,
   CreatorMembershipsRoute: CreatorMembershipsRoute,
   CreatorRoute: CreatorRoute,
+  CreatorsRoute: CreatorsRoute,
   ExploreRoute: ExploreRoute,
   FaqRoute: FaqRoute,
   ForArtistsRoute: ForArtistsRoute,

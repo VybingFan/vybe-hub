@@ -4,12 +4,11 @@ export const COMPANY = "Aision Labs";
 
 export const NAV_LINKS = [
   { label: "Discover", to: "/explore" },
-  { label: "Merch", to: "/shop" },
+  { label: "Marketplace", to: "/shop" },
 ] as const;
 
 export const EXPERIENCE_LINKS = [
-  { label: "Start Discovering", to: "/experience/discover" },
-  { label: "Music & Audio", to: "/discover/music" },
+  { label: "Listen", to: "/experience/listen" },
   { label: "Watch", to: "/experience/watch" },
   { label: "Read", to: "/experience/read" },
   { label: "Play", to: "/experience/play" },
@@ -17,7 +16,7 @@ export const EXPERIENCE_LINKS = [
 
 export const COMMUNITY_LINKS = [
   { label: "Communities", to: "/experience/communities" },
-  { label: "Events", to: "/experience/events" },
+  { label: "VYBE Events", to: "/experience/events" },
 ] as const;
 
 export const BUILD_ON_VYBE_LINKS = [

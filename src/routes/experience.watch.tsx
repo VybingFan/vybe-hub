@@ -2,44 +2,42 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Clapperboard, Film, PlaySquare, Video } from "lucide-react";
 import { PublicExperiencePage } from "@/components/experience/PublicExperiencePage";
 
-export const Route = createFileRoute("/experience/watch")({ component: WatchPreview });
+export const Route = createFileRoute("/experience/watch")({ component: WatchExperience });
 
-function WatchPreview() {
+function WatchExperience() {
   return (
     <PublicExperiencePage
-      eyebrow="Watch on VYBE · Preview"
+      eyebrow="Watch on VYBE"
       title="A screen for independent vision."
-      description="A future destination for filmmakers, directors, musicians, performers, and video creators to share their work and reach an audience."
+      description="Discover films, trailers, performances, music videos, and visual stories from creators bringing their ideas to the screen."
       accent="#f43f5e"
       cards={[
         {
-          title: "Short films",
+          title: "Films & stories",
           image: "/images/experience-cards/short-films.webp",
-          description:
-            "Independent films presented with credits, creator context, and a path to the filmmaker.",
+          description: "Independent visual work with creator context, credits, and a path back to the people who made it.",
           icon: Film,
         },
         {
           title: "Trailers & scenes",
           image: "/images/experience-cards/trailers-scenes.webp",
-          description: "Shareable previews for upcoming films, screenings, series, and projects.",
+          description: "Preview upcoming films, screenings, series, performances, and creator projects.",
           icon: Clapperboard,
         },
         {
           title: "Music videos",
           image: "/images/experience-cards/music-videos.webp",
-          description: "Pair a release with the visual world the artist created around it.",
+          description: "Experience the visual world creators build around a song or release.",
           icon: PlaySquare,
         },
         {
-          title: "Behind the scenes",
+          title: "Behind the work",
           image: "/images/experience-cards/behind-scenes.webp",
-          description:
-            "Production diaries, director commentary, studio sessions, and works in progress.",
+          description: "Go behind the scenes with production diaries, commentary, studio sessions, and works in progress.",
           icon: Video,
         },
       ]}
-      note="Creators can now publish YouTube and Vimeo work through a VYBE Video Library and shareable VYBE pages. Native uploads, VYBE-hosted streaming, advanced moderation, and premieres activate in later infrastructure stages."
+      note="YouTube and Vimeo work can already be published through VYBE creator video tools. Native VYBE-hosted video continues to expand as streaming infrastructure is completed."
     />
   );
 }
