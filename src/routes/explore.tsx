@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, Loader2, MapPin, Music2, Search, UserRound } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
@@ -150,7 +150,7 @@ function PublicExplorePage() {
                 <div>
                   <p className="text-sm font-medium text-primary">Creators</p>
                   <h2 className="mt-1 text-2xl font-semibold">
-                    {q ? `Creators connected to â€œ${q}â€` : "Explore creators across VYBE"}
+                    {q ? `Creators connected to “${q}”` : "Explore creators across VYBE"}
                   </h2>
                 </div>
                 <span className="shrink-0 text-sm text-muted-foreground">{creators.length} found</span>
@@ -206,7 +206,7 @@ function PublicExplorePage() {
                 <div>
                   <p className="text-sm font-medium text-primary">Artist credits</p>
                   <h2 className="mt-1 text-2xl font-semibold">
-                    {q ? `Artists matching â€œ${q}â€` : "Credited performing artists"}
+                    {q ? `Artists matching “${q}”` : "Credited performing artists"}
                   </h2>
                 </div>
                 <span className="shrink-0 text-sm text-muted-foreground">{artists.length} found</span>
@@ -227,7 +227,7 @@ function PublicExplorePage() {
                         <div className="min-w-0 flex-1">
                           <h3 className="truncate font-semibold">{artist.name}</h3>
                           <p className="text-xs text-muted-foreground">
-                            {artist.songCount} {artist.songCount === 1 ? "song" : "songs"} Â·{" "}
+                            {artist.songCount} {artist.songCount === 1 ? "song" : "songs"} ·{" "}
                             {artist.uploaderCount}{" "}
                             {artist.uploaderCount === 1 ? "creator account" : "creator accounts"}
                           </p>
@@ -248,7 +248,7 @@ function PublicExplorePage() {
                 <div>
                   <p className="text-sm font-medium text-primary">Published music</p>
                   <h2 className="mt-1 text-2xl font-semibold">
-                    {q ? `Songs matching â€œ${q}â€` : "Music to explore"}
+                    {q ? `Songs matching “${q}”` : "Music to explore"}
                   </h2>
                 </div>
                 <span className="shrink-0 text-sm text-muted-foreground">{tracks.length} found</span>
@@ -284,7 +284,7 @@ function PublicExplorePage() {
                           {track.featured_artist_names.length
                             ? ` feat. ${track.featured_artist_names.join(", ")}`
                             : ""}
-                          {track.genre ? ` Â· ${track.genre}` : ""}
+                          {track.genre ? ` · ${track.genre}` : ""}
                         </p>
                         <p className="truncate text-xs text-muted-foreground/70">
                           Uploaded by {track.creator?.artist_name || track.creator?.display_name}
