@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, Loader2, MapPin, Music2, Search, UserRound } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
@@ -22,6 +22,7 @@ export const Route = createFileRoute("/explore")({
   component: PublicExplorePage,
 });
 
+const creatorFocusChoices = ["Music", "Film & Video", "Writers & Poets", "Actors", "Comedians"];
 const genreChoices = ["Hip-Hop", "R&B", "Rock", "Country", "Pop", "Electronic", "Gospel", "Jazz"];
 
 function PublicExplorePage() {
@@ -29,6 +30,7 @@ function PublicExplorePage() {
   const navigate = useNavigate();
   const { user } = useUser();
   const [input, setInput] = useState(q);
+  const [selectedFocus, setSelectedFocus] = useState<string | null>(null);
   const [creators, setCreators] = useState<DiscoveryCreator[]>([]);
   const [artists, setArtists] = useState<DiscoveryArtistCredit[]>([]);
   const [tracks, setTracks] = useState<DiscoveryTrack[]>([]);
@@ -65,36 +67,73 @@ function PublicExplorePage() {
           <div className="relative mx-auto max-w-3xl">
           <Badge className="rounded-full bg-primary/10 text-primary">Open VYBE discovery</Badge>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:mt-5 sm:text-4xl md:text-6xl">
-            Find your sound, city, or creator.
+            Find creators worth coming back for.
           </h1>
           <p className="mt-4 text-muted-foreground">
             {user
-              ? "You are signed in. Discover creators and music, then follow, heart, save, or participate across VYBE."
-              : "Browse published VYBE music freely. Create a free Supporter account when you want to follow, save, or participate."}
+              ? "You are signed in. Discover creators across entertainment and creative work, then follow, heart, save, or participate across VYBE."
+              : "Browse VYBE creators freely. Create a free Supporter account when you want to follow, save, or participate."}
           </p>
           <form onSubmit={submit} className="relative mx-auto mt-6 flex max-w-2xl flex-col gap-3 sm:mt-8 sm:block">
             <Search className="pointer-events-none absolute left-4 top-7 h-5 w-5 -translate-y-1/2 text-muted-foreground sm:top-1/2" />
             <Input
               value={input}
               onChange={(event) => setInput(event.target.value)}
-              placeholder="Search artist, song, city, or genre"
+              placeholder="Search creator, interest, city, genre, or name"
               className="h-14 rounded-full pl-12 pr-4 text-base sm:pr-28"
             />
             <Button className="h-11 w-full rounded-full px-6 sm:absolute sm:right-1.5 sm:top-1.5 sm:w-auto">Search</Button>
           </form>
-          <div className="mt-4 flex flex-wrap justify-center gap-2">
-            {genreChoices.map((genre) => (
-              <Button
-                key={genre}
-                size="sm"
-                variant="outline"
-                className="rounded-full"
-                onClick={() => navigate({ to: "/explore", search: { q: genre } })}
-              >
-                {genre}
-              </Button>
-            ))}
+          <div className="mt-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Explore creator focuses</p>
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              {creatorFocusChoices.map((focus) => {
+                const active = selectedFocus === focus;
+                return (
+                  <Button
+                    key={focus}
+                    size="sm"
+                    variant={active ? "default" : "secondary"}
+                    className="rounded-full"
+                    aria-pressed={active}
+                    onClick={() => setSelectedFocus(active ? null : focus)}
+                  >
+                    {focus}
+                  </Button>
+                );
+              })}
+            </div>
           </div>
+
+          {selectedFocus ? (
+            <div className="mt-5 border-t border-border/50 pt-5">
+              {selectedFocus === "Music" ? (
+                <>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Explore music genres</p>
+                  <div className="mt-3 flex flex-wrap justify-center gap-2">
+                    {genreChoices.map((genre) => (
+                      <Button
+                        key={genre}
+                        size="sm"
+                        variant="outline"
+                        className="rounded-full"
+                        onClick={() => navigate({ to: "/explore", search: { q: genre } })}
+                      >
+                        {genre}
+                      </Button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="mx-auto max-w-2xl rounded-2xl border border-border/60 bg-background/40 px-4 py-4">
+                  <p className="text-sm font-medium">{selectedFocus} discovery</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    Focus-specific filters will appear here as this creator area is connected to VYBE discovery.
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : null}
           </div>
         </div>
 
@@ -111,7 +150,7 @@ function PublicExplorePage() {
                 <div>
                   <p className="text-sm font-medium text-primary">Creators</p>
                   <h2 className="mt-1 text-2xl font-semibold">
-                    {q ? `Creator accounts connected to “${q}”` : "Explore VYBE creator accounts"}
+                    {q ? `Creators connected to â€œ${q}â€` : "Explore creators across VYBE"}
                   </h2>
                 </div>
                 <span className="shrink-0 text-sm text-muted-foreground">{creators.length} found</span>
@@ -159,11 +198,15 @@ function PublicExplorePage() {
             </section>
 
             <section>
+              <div className="mb-6 rounded-2xl border border-border/60 bg-muted/20 p-4 sm:p-5">
+                <p className="text-sm font-medium text-primary">Music discovery</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">Music remains one part of VYBE discovery. Artist credits and published songs appear here while additional creator-focus discovery grows across the platform.</p>
+              </div>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-sm font-medium text-primary">Artist credits</p>
                   <h2 className="mt-1 text-2xl font-semibold">
-                    {q ? `Artists matching “${q}”` : "Credited performing artists"}
+                    {q ? `Artists matching â€œ${q}â€` : "Credited performing artists"}
                   </h2>
                 </div>
                 <span className="shrink-0 text-sm text-muted-foreground">{artists.length} found</span>
@@ -184,7 +227,7 @@ function PublicExplorePage() {
                         <div className="min-w-0 flex-1">
                           <h3 className="truncate font-semibold">{artist.name}</h3>
                           <p className="text-xs text-muted-foreground">
-                            {artist.songCount} {artist.songCount === 1 ? "song" : "songs"} ·{" "}
+                            {artist.songCount} {artist.songCount === 1 ? "song" : "songs"} Â·{" "}
                             {artist.uploaderCount}{" "}
                             {artist.uploaderCount === 1 ? "creator account" : "creator accounts"}
                           </p>
@@ -205,7 +248,7 @@ function PublicExplorePage() {
                 <div>
                   <p className="text-sm font-medium text-primary">Published music</p>
                   <h2 className="mt-1 text-2xl font-semibold">
-                    {q ? `Songs matching “${q}”` : "Music to explore"}
+                    {q ? `Songs matching â€œ${q}â€` : "Music to explore"}
                   </h2>
                 </div>
                 <span className="shrink-0 text-sm text-muted-foreground">{tracks.length} found</span>
@@ -241,7 +284,7 @@ function PublicExplorePage() {
                           {track.featured_artist_names.length
                             ? ` feat. ${track.featured_artist_names.join(", ")}`
                             : ""}
-                          {track.genre ? ` · ${track.genre}` : ""}
+                          {track.genre ? ` Â· ${track.genre}` : ""}
                         </p>
                         <p className="truncate text-xs text-muted-foreground/70">
                           Uploaded by {track.creator?.artist_name || track.creator?.display_name}
