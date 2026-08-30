@@ -34,6 +34,7 @@ interface AuthContextValue {
     password: string,
     displayName: string,
     legalPolicyVersion: string,
+    signupRole?: SelectableRole,
   ) => Promise<{ userId: string | null; requiresEmailConfirmation: boolean }>;
   signOut: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
@@ -122,8 +123,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn: async (email, password, rememberMe) => {
         await authService.signIn(email, password, rememberMe);
       },
-      signUp: async (email, password, displayName, legalPolicyVersion) => {
-        return authService.signUp(email, password, displayName, legalPolicyVersion);
+      signUp: async (email, password, displayName, legalPolicyVersion, signupRole) => {
+        return authService.signUp(email, password, displayName, legalPolicyVersion, signupRole);
       },
       signOut: async () => {
         await operationsSessionService.end().catch(() => undefined);

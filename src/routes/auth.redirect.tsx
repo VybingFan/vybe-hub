@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,7 +9,8 @@ const PENDING_ROLE_KEY = "vybe:pending-signup-role";
 const PENDING_PLAN_KEY = "vybe:pending-creator-plan";
 const PENDING_INTERVAL_KEY = "vybe:pending-creator-interval";
 
-function pendingRole() {
+function pendingRole(searchRole?: "creator" | "supporter" | "business") {
+  if (searchRole) return searchRole;
   const value = window.localStorage.getItem(PENDING_ROLE_KEY);
   return value === "creator" || value === "supporter" || value === "business" ? value : undefined;
 }
@@ -20,19 +22,30 @@ function clearPendingSignupIntent() {
 }
 
 /** Post-auth router: sends the user to onboarding or their role-based home. */
+const redirectSearchSchema = z.object({
+  role: z.enum(["creator", "supporter", "business"]).optional(),
+});
+
 export const Route = createFileRoute("/auth/redirect")({
+  validateSearch: redirectSearchSchema,
   component: RedirectPage,
 });
 
 function RedirectPage() {
+  const { role: searchRole } = Route.useSearch();
   const { isAuthenticated, isLoading } = useAuth();
   const { primaryRole, defaultRoute, isLoading: userLoading } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isLoading || userLoading) return;
+    const signupRole = pendingRole(searchRole);
     if (!isAuthenticated) {
-      navigate({ to: "/auth/sign-in", replace: true });
+      if (signupRole === "creator") {
+        navigate({ to: "/creator/sign-in", replace: true });
+      } else {
+        navigate({ to: "/auth/sign-in", replace: true });
+      }
       return;
     }
     const pendingAdminInvite = window.localStorage.getItem("vybe:pending-admin-invite");
@@ -49,8 +62,6 @@ function RedirectPage() {
       navigate({ to: "/creator-invite/$token", params: { token: pendingInvite }, replace: true });
       return;
     }
-    const signupRole = pendingRole();
-
     if (!primaryRole) {
       navigate({ to: "/auth/onboarding", search: { role: signupRole }, replace: true });
       return;

@@ -21,12 +21,17 @@ export const authService = {
     return data;
   },
 
-  async signUp(email: string, password: string, displayName: string, legalPolicyVersion: string) {
+  async signUp(email: string, password: string, displayName: string, legalPolicyVersion: string, signupRole?: SelectableRole) {
+    const redirectOrigin =
+      window.location.hostname === "creators.vybewithvybe.com"
+        ? "https://vybewithvybe.com"
+        : window.location.origin;
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/redirect`,
+        emailRedirectTo: `${redirectOrigin}/auth/redirect${signupRole ? `?role=${encodeURIComponent(signupRole)}` : ""}`,
         data: {
           display_name: displayName,
           legal_accepted: true,

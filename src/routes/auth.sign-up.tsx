@@ -59,6 +59,7 @@ function SignUpPage() {
         parsed.data.password,
         parsed.data.displayName,
         LEGAL_POLICY_VERSION,
+        role,
       );
       const pendingInvite = window.localStorage.getItem("vybe:pending-creator-invite");
 
