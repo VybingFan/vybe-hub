@@ -1,34 +1,65 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { ArrowLeft, BookOpenText, Clock3, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BlogArticleBody } from "@/components/blog/BlogArticleBody";
-import { blogService, type BlogPost } from "@/services/blog/blogService";
+import { blogService } from "@/services/blog/blogService";
+import { toast } from "sonner";
 
-export const Route = createFileRoute("/blog/$slug")({ component: BlogArticlePage });
+export const Route = createFileRoute("/blog/$slug")({
+  loader: ({ params }) => blogService.getPublishedBySlug(params.slug),
+  head: ({ loaderData }) => {
+    if (!loaderData) return {};
+    const title = loaderData.seo_title?.trim() || loaderData.title;
+    const description = loaderData.seo_description?.trim() || loaderData.excerpt?.trim() || "Read this story from the VYBE Blog.";
+    const canonical = `https://vybewithvybe.com/blog/${loaderData.slug}`;
+    const image = loaderData.hero_image_url?.trim() || "https://vybewithvybe.com/pwa/icon-512-v24-38.png";
+    return {
+      meta: [
+        { title: `${title} | VYBE Blog` },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: canonical },
+        { property: "og:image", content: image },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: image },
+      ],
+      links: [{ rel: "canonical", href: canonical }],
+    };
+  },
+  component: BlogArticlePage,
+});
 
 function estimateReadingMinutes(body: string) {
   return Math.max(1, Math.ceil(body.trim().split(/\s+/).filter(Boolean).length / 220));
 }
 
 function BlogArticlePage() {
-  const { slug } = Route.useParams();
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [loading, setLoading] = useState(true);
+  const post = Route.useLoaderData();
 
-  useEffect(() => {
-    blogService.getPublishedBySlug(slug).then(setPost).catch(() => setPost(null)).finally(() => setLoading(false));
-  }, [slug]);
-
-  if (loading) return <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6"><p className="text-muted-foreground">Loading article...</p></main>;
   if (!post) return <main className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6"><BookOpenText className="mx-auto h-10 w-10 text-primary" /><h1 className="mt-4 text-3xl font-semibold">Article not found</h1><p className="mt-2 text-muted-foreground">This VYBE Blog article is unavailable or has not been published.</p><Button asChild className="mt-6"><Link to="/blog">Back to the Blog</Link></Button></main>;
 
   const minutes = estimateReadingMinutes(post.body);
   const share = async () => {
     const data = { title: post.title, text: post.excerpt ?? post.title, url: window.location.href };
-    if (navigator.share) await navigator.share(data);
-    else await navigator.clipboard.writeText(window.location.href);
+    if (navigator.share) {
+      try {
+        await navigator.share(data);
+        return;
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success("Article link copied");
+    } catch {
+      toast.error("Could not share this article");
+    }
   };
 
   return (

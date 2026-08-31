@@ -61,8 +61,8 @@ export function BlogArticleBody({ body }: BlogArticleBodyProps) {
         if (block.type === "h2") return <h2 key={index} className="pt-5 text-2xl font-semibold tracking-tight md:text-3xl">{block.text}</h2>;
         if (block.type === "h3") return <h3 key={index} className="pt-3 text-xl font-semibold tracking-tight md:text-2xl">{block.text}</h3>;
         if (block.type === "quote") return <blockquote key={index} className="border-l-4 border-primary pl-5 text-xl font-medium italic leading-8 text-foreground">{block.text}</blockquote>;
-        if (block.type === "ul") return <ul key={index} className="list-disc space-y-2 pl-6">{block.items?.map((item) => <li key={item}>{item}</li>)}</ul>;
-        if (block.type === "ol") return <ol key={index} className="list-decimal space-y-2 pl-6">{block.items?.map((item) => <li key={item}>{item}</li>)}</ol>;
+        if (block.type === "ul") return <ul key={index} className="list-disc space-y-2 pl-6">{block.items?.map((item, itemIndex) => <li key={`${index}-${itemIndex}`}>{item}</li>)}</ul>;
+        if (block.type === "ol") return <ol key={index} className="list-decimal space-y-2 pl-6">{block.items?.map((item, itemIndex) => <li key={`${index}-${itemIndex}`}>{item}</li>)}</ol>;
         return <p key={index}>{block.text}</p>;
       })}
     </div>

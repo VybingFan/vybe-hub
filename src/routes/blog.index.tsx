@@ -14,17 +14,23 @@ function BlogPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("All");
   const { primaryRole } = useUser();
 
   useEffect(() => {
     blogService.listPublished().then(setPosts).catch((err) => setError(err instanceof Error ? err.message : "Could not load the VYBE Blog.")).finally(() => setLoading(false));
   }, []);
 
+  const categories = useMemo(() => ["All", ...Array.from(new Set(posts.map((post) => post.category?.trim()).filter((value): value is string => Boolean(value)))).sort((a, b) => a.localeCompare(b))], [posts]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return posts;
-    return posts.filter((post) => [post.title, post.excerpt ?? "", post.category ?? "", ...(post.tags ?? [])].join(" ").toLowerCase().includes(q));
-  }, [posts, query]);
+    return posts.filter((post) => {
+      const matchesCategory = category === "All" || post.category === category;
+      const matchesQuery = !q || [post.title, post.excerpt ?? "", post.category ?? "", ...(post.tags ?? [])].join(" ").toLowerCase().includes(q);
+      return matchesCategory && matchesQuery;
+    });
+  }, [posts, query, category]);
 
   const featured = filtered.find((post) => post.is_featured) ?? filtered[0];
   const rest = featured ? filtered.filter((post) => post.id !== featured.id) : filtered;
@@ -42,6 +48,7 @@ function BlogPage() {
             {primaryRole === "admin" ? <Button asChild variant="outline"><Link to="/admin/blog">Manage Blog</Link></Button> : null}
           </div>
           <div className="relative mt-8 max-w-xl"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search the VYBE Blog" className="pl-10" /></div>
+          {categories.length > 1 ? <div className="mt-5 flex flex-wrap gap-2" aria-label="Filter blog articles by category">{categories.map((item) => <Button key={item} type="button" size="sm" variant={category === item ? "default" : "outline"} onClick={() => setCategory(item)}>{item}</Button>)}</div> : null}
         </div>
       </section>
 
@@ -54,10 +61,10 @@ function BlogPage() {
           <article className="grid overflow-hidden rounded-3xl border bg-card shadow-sm lg:grid-cols-[1.1fr_.9fr]">
             <div className="min-h-72 bg-muted">{featured.hero_image_url ? <img src={featured.hero_image_url} alt={featured.hero_image_alt || featured.title} className="h-full w-full object-cover" /> : <div className="flex h-full min-h-72 items-center justify-center bg-gradient-to-br from-primary/20 to-muted"><BookOpenText className="h-16 w-16 text-primary/60" /></div>}</div>
             <div className="flex flex-col justify-center p-7 md:p-10">
-              <div className="flex flex-wrap gap-2">{featured.category ? <Badge>{featured.category}</Badge> : null}<Badge variant="secondary">Featured</Badge></div>
+              <div className="flex flex-wrap gap-2">{featured.category ? <Badge>{featured.category}</Badge> : null}{featured.is_featured ? <Badge variant="secondary">Featured</Badge> : null}</div>
               <h2 className="mt-5 text-3xl font-semibold tracking-tight md:text-4xl">{featured.title}</h2>
               {featured.excerpt ? <p className="mt-4 text-base leading-7 text-muted-foreground">{featured.excerpt}</p> : null}
-              <p className="mt-5 text-sm text-muted-foreground">By {featured.author_name} {featured.published_at ? `· ${new Date(featured.published_at).toLocaleDateString()}` : ""}</p>
+              <p className="mt-5 text-sm text-muted-foreground">By {featured.author_name} {featured.published_at ? ` · ${new Date(featured.published_at).toLocaleDateString()}` : ""}</p>
               <Button asChild className="mt-6 w-fit"><Link to="/blog/$slug" params={{ slug: featured.slug }}>Read article <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
             </div>
           </article>
