@@ -11,7 +11,23 @@ export interface PublicCreatorPage {
   playlists: PublicCreatorPlaylist[];
   merch: MerchProduct[];
   videos: CreatorVideo[];
+  writtenWorks: PublicCreatorWrittenWork[];
   planCode: CreatorPlanCode;
+}
+
+export interface PublicCreatorWrittenWork {
+  id: string;
+  creator_id: string;
+  project_id: string | null;
+  slug: string;
+  title: string;
+  work_type: string;
+  excerpt: string;
+  cover_path: string | null;
+  cover_url: string | null;
+  profile_display_order: number;
+  published_at: string | null;
+  project_title: string | null;
 }
 
 export interface PublicCreatorPlaylist {
@@ -63,6 +79,7 @@ export const publicCreatorService = {
       { data: merch, error: merchError },
       { data: videos, error: videosError },
       { data: playlistRows, error: playlistsError },
+      { data: writtenRows, error: writtenWorksError },
     ] = await Promise.all([
       supabase
         .from("tracks")
@@ -92,11 +109,63 @@ export const publicCreatorService = {
         .eq("creator_id", profile.user_id)
         .eq("is_published", true)
         .order("updated_at", { ascending: false }),
+      (supabase as any)
+        .from("creator_written_works")
+        .select("id,creator_id,project_id,slug,title,work_type,excerpt,cover_path,profile_display_order,published_at")
+        .eq("creator_id", profile.user_id)
+        .eq("status", "published")
+        .eq("visibility", "public")
+        .eq("show_on_public_profile", true)
+        .order("profile_display_order", { ascending: true })
+        .order("published_at", { ascending: false }),
     ]);
     if (tracksError) throw tracksError;
     if (merchError) throw merchError;
     if (videosError) console.warn("Public creator videos are unavailable", videosError);
     if (playlistsError) throw playlistsError;
+    if (writtenWorksError) throw writtenWorksError;
+
+    const projectIds = Array.from(
+      new Set(
+        ((writtenRows ?? []) as Array<{ project_id?: string | null }>)
+          .map((work) => work.project_id)
+          .filter((id): id is string => Boolean(id)),
+      ),
+    );
+    const projectTitles = new Map<string, string>();
+    if (projectIds.length) {
+      const { data: projectRows, error: projectsError } = await (supabase as any)
+        .from("creator_written_projects")
+        .select("id,title")
+        .eq("creator_id", profile.user_id)
+        .in("id", projectIds);
+      if (projectsError) {
+        console.warn("Public creator writing projects are unavailable", projectsError);
+      } else {
+        for (const project of projectRows ?? []) {
+          projectTitles.set(project.id, project.title);
+        }
+      }
+    }
+
+    const writtenWorks = await Promise.all(
+      ((writtenRows ?? []) as Array<{
+        id: string;
+        creator_id: string;
+        project_id: string | null;
+        slug: string;
+        title: string;
+        work_type: string;
+        excerpt: string;
+        cover_path: string | null;
+        profile_display_order: number;
+        published_at: string | null;
+      }>).map(async (work) => ({
+        ...work,
+        cover_url: await signedUrl("writing-covers", work.cover_path),
+        project_title: work.project_id ? projectTitles.get(work.project_id) ?? null : null,
+      })),
+    );
 
     const tracks = (await Promise.all(
       ((rows ?? []) as unknown as Track[])
@@ -201,6 +270,7 @@ export const publicCreatorService = {
       playlists,
       merch: hydratedMerch,
       videos: videoAllowed ? hydratedVideos : [],
+      writtenWorks,
       planCode,
     };
   },

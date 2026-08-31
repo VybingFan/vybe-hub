@@ -13,6 +13,7 @@ import {
 import { Logo } from "@/components/common/Logo";
 import { MarketingNav } from "@/components/layout/MarketingNav";
 import { PublicCreatorMusicExperience } from "@/components/music/PublicCreatorMusicExperience";
+import { PublicCreatorWriting } from "@/components/writing/PublicCreatorWriting";
 import { PublicCreatorShop } from "@/components/commerce/PublicCreatorShop";
 import { SocialLinksDisplay } from "@/components/socialLinks/SocialLinksDisplay";
 import { Button } from "@/components/ui/button";
@@ -67,7 +68,7 @@ export function PublicArtistHome({
       </div>
     );
 
-  const { profile, tracks, playlists, merch, videos, planCode } = data;
+  const { profile, tracks, playlists, merch, videos, writtenWorks, planCode } = data;
   const compactProfile = planCode === "creator_free";
   const isOwner = user?.id === profile.user_id;
   const name = profile.artist_name || profile.display_name;
@@ -184,6 +185,9 @@ export function PublicArtistHome({
               </p>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 <CreatorSectionLink href="#music">Music</CreatorSectionLink>
+                {!!writtenWorks.length && (
+                  <CreatorSectionLink href="#writing">Writing</CreatorSectionLink>
+                )}
                 <CreatorSectionLink href="#happening">What's Happening</CreatorSectionLink>
                 <CreatorSectionLink href="#about">About</CreatorSectionLink>
                 {!!videos.length && (
@@ -212,6 +216,12 @@ export function PublicArtistHome({
             planCode={planCode}
           />
         </section>
+
+        <PublicCreatorWriting
+          works={writtenWorks}
+          creatorName={name}
+          compactProfile={compactProfile}
+        />
 
         <PublicCreatorUpdates creatorId={profile.user_id} creatorName={name} />
 
