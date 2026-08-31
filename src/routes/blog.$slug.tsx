@@ -7,13 +7,19 @@ import { blogService } from "@/services/blog/blogService";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/blog/$slug")({
-  loader: ({ params }) => blogService.getPublishedBySlug(params.slug),
+  loader: async ({ params }) => {
+    const post = await blogService.getPublishedBySlug(params.slug);
+    if (!post) return { post: null, media: [] };
+    const media = await blogService.listPublicMedia(post.id);
+    return { post, media };
+  },
   head: ({ loaderData }) => {
-    if (!loaderData) return {};
-    const title = loaderData.seo_title?.trim() || loaderData.title;
-    const description = loaderData.seo_description?.trim() || loaderData.excerpt?.trim() || "Read this story from the VYBE Blog.";
-    const canonical = `https://vybewithvybe.com/blog/${loaderData.slug}`;
-    const image = loaderData.hero_image_url?.trim() || "https://vybewithvybe.com/pwa/icon-512-v24-38.png";
+    const post = loaderData?.post;
+    if (!post) return {};
+    const title = post.seo_title?.trim() || post.title;
+    const description = post.seo_description?.trim() || post.excerpt?.trim() || "Read this story from the VYBE Blog.";
+    const canonical = `https://vybewithvybe.com/blog/${post.slug}`;
+    const image = post.hero_image_url?.trim() || "https://vybewithvybe.com/pwa/icon-512-v24-38.png";
     return {
       meta: [
         { title: `${title} | VYBE Blog` },
@@ -39,7 +45,7 @@ function estimateReadingMinutes(body: string) {
 }
 
 function BlogArticlePage() {
-  const post = Route.useLoaderData();
+  const { post, media } = Route.useLoaderData();
 
   if (!post) return <main className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6"><BookOpenText className="mx-auto h-10 w-10 text-primary" /><h1 className="mt-4 text-3xl font-semibold">Article not found</h1><p className="mt-2 text-muted-foreground">This VYBE Blog article is unavailable or has not been published.</p><Button asChild className="mt-6"><Link to="/blog">Back to the Blog</Link></Button></main>;
 
@@ -73,7 +79,7 @@ function BlogArticlePage() {
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y py-4 text-sm text-muted-foreground"><div>By <span className="font-medium text-foreground">{post.author_name}</span>{post.published_at ? ` · ${new Date(post.published_at).toLocaleDateString()}` : ""}<span className="ml-3 inline-flex items-center"><Clock3 className="mr-1 h-4 w-4" /> {minutes} min read</span></div><Button variant="ghost" size="sm" onClick={() => void share()}><Share2 className="mr-2 h-4 w-4" /> Share</Button></div>
         </header>
         {post.hero_image_url ? <div className="mx-auto max-w-6xl px-4 sm:px-6"><img src={post.hero_image_url} alt={post.hero_image_alt || post.title} className="max-h-[680px] w-full rounded-3xl object-cover" /></div> : null}
-        <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 md:py-14"><BlogArticleBody body={post.body} /></div>
+        <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 md:py-14"><BlogArticleBody body={post.body} media={media} /></div>
       </article>
     </main>
   );

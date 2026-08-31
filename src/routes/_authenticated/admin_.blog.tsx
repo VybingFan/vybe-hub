@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ExternalLink, Newspaper, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { AdminBlogMediaManager } from "@/components/blog/AdminBlogMediaManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -57,6 +58,10 @@ function AdminBlogPage() {
       <div className="space-y-2"><Label>SEO description (optional)</Label><Input value={form.seo_description ?? ""} onChange={(e) => setForm((f) => ({ ...f, seo_description: e.target.value }))} /></div>
       <div className="flex flex-wrap gap-2 md:col-span-2"><Button disabled={saving}><Save className="mr-2 h-4 w-4" />{saving ? "Saving..." : editingId ? "Update article" : "Save article"}</Button>{editingId ? <Button type="button" variant="outline" onClick={reset}><Plus className="mr-2 h-4 w-4" />New article</Button> : null}</div>
     </form></CardContent></Card>
+
+    {editingId ? <AdminBlogMediaManager postId={editingId} body={form.body} /> : (
+      <Card><CardContent className="p-5 text-sm text-muted-foreground">Save the article first, then choose Edit to add inline article images and control where they appear.</CardContent></Card>
+    )}
 
     <section><h2 className="text-2xl font-semibold">Articles</h2><div className="mt-4 grid gap-3">{posts.length === 0 ? <p className="text-sm text-muted-foreground">No blog posts yet.</p> : posts.map((post) => <Card key={post.id}><CardContent className="flex flex-col justify-between gap-4 p-5 md:flex-row md:items-center"><div><div className="flex flex-wrap items-center gap-2"><span className="font-semibold">{post.title}</span><span className="rounded-full bg-muted px-2 py-1 text-xs">{post.status}</span>{post.is_featured ? <span className="rounded-full bg-primary/10 px-2 py-1 text-xs text-primary">featured</span> : null}</div><p className="mt-1 text-xs text-muted-foreground">/{post.slug} · updated {new Date(post.updated_at).toLocaleString()}</p></div><div className="flex gap-2"><Button type="button" variant="outline" size="sm" onClick={() => edit(post)}>Edit</Button>{post.status === "published" ? <Button asChild type="button" variant="outline" size="sm"><Link to="/blog/$slug" params={{ slug: post.slug }}>View</Link></Button> : null}<Button type="button" variant="destructive" size="sm" onClick={() => void remove(post)}><Trash2 className="h-4 w-4" /></Button></div></CardContent></Card>)}</div></section>
   </div></RoleGuard>;
