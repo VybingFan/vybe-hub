@@ -38,10 +38,11 @@ function ContentPage() {
           },
           {
             title: "Poetry & writing",
-            description: "Future publishing for poems, lyrics, essays, stories, and creator notes.",
+            description: "Create poems, stories, essays, excerpts and creator notes, then connect spoken-word audio and performance video.",
             icon: BookOpenText,
-          },
-          {
+            status: "Available now",
+            to: "/writing-studio",
+          },          {
             title: "Podcasts & audio",
             description:
               "Future episodes, spoken word, interviews, serialized audio, and creator conversations.",
@@ -54,7 +55,7 @@ function ContentPage() {
             icon: Mic2,
           },
         ]}
-        note="Music and hosted-video publishing are enabled. Native VYBE video uploads will activate after Cloudflare Stream is connected; the remaining preview categories still require their own foundations."
+        note="Music, video, and the Writers & Poets publishing foundation are enabled. Other creator-focus categories remain staged for their own foundations."
       />
     </RoleGuard>
   );

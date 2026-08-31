@@ -33,7 +33,9 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as WorkSlugRouteImport } from './routes/work.$slug'
 import { Route as VideoVideoIdRouteImport } from './routes/video.$videoId'
+import { Route as ReadingSlugRouteImport } from './routes/reading.$slug'
 import { Route as PlaylistSlugRouteImport } from './routes/playlist.$slug'
 import { Route as PlayPackIdRouteImport } from './routes/play.$packId'
 import { Route as OperationsSignInRouteImport } from './routes/operations.sign-in'
@@ -66,6 +68,8 @@ import { Route as ApiSecurePlaylistRouteImport } from './routes/api.secure-playl
 import { Route as ApiAdminTeamInviteRouteImport } from './routes/api.admin-team-invite'
 import { Route as ApiAccountDeletionRouteImport } from './routes/api.account-deletion'
 import { Route as AdminInviteTokenRouteImport } from './routes/admin-invite.$token'
+import { Route as AuthenticatedWritingStudioRouteImport } from './routes/_authenticated/writing-studio'
+import { Route as AuthenticatedWritingCollectionsRouteImport } from './routes/_authenticated/writing-collections'
 import { Route as AuthenticatedWatchRouteImport } from './routes/_authenticated/watch'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as AuthenticatedSupporterProfileRouteImport } from './routes/_authenticated/supporter-profile'
@@ -112,6 +116,7 @@ import { Route as ApiStripePortalRouteImport } from './routes/api.stripe.portal'
 import { Route as ApiStripeFocusCheckoutRouteImport } from './routes/api.stripe.focus-checkout'
 import { Route as ApiStripeConnectRouteImport } from './routes/api.stripe.connect'
 import { Route as ApiStripeCheckoutRouteImport } from './routes/api.stripe.checkout'
+import { Route as AuthenticatedWritingWorkWorkIdRouteImport } from './routes/_authenticated/writing-work.$workId'
 import { Route as AuthenticatedPlaylistsPlaylistIdRouteImport } from './routes/_authenticated/playlists_.$playlistId'
 import { Route as AuthenticatedMusicUploadRouteImport } from './routes/_authenticated/music_.upload'
 import { Route as AuthenticatedMusicTrackIdRouteImport } from './routes/_authenticated/music_.$trackId'
@@ -261,9 +266,19 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/',
   getParentRoute: () => BlogRoute,
 } as any)
+const WorkSlugRoute = WorkSlugRouteImport.update({
+  id: '/work/$slug',
+  path: '/work/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VideoVideoIdRoute = VideoVideoIdRouteImport.update({
   id: '/video/$videoId',
   path: '/video/$videoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReadingSlugRoute = ReadingSlugRouteImport.update({
+  id: '/reading/$slug',
+  path: '/reading/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlaylistSlugRoute = PlaylistSlugRouteImport.update({
@@ -426,6 +441,18 @@ const AdminInviteTokenRoute = AdminInviteTokenRouteImport.update({
   path: '/admin-invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWritingStudioRoute =
+  AuthenticatedWritingStudioRouteImport.update({
+    id: '/writing-studio',
+    path: '/writing-studio',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedWritingCollectionsRoute =
+  AuthenticatedWritingCollectionsRouteImport.update({
+    id: '/writing-collections',
+    path: '/writing-collections',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedWatchRoute = AuthenticatedWatchRouteImport.update({
   id: '/watch',
   path: '/watch',
@@ -670,6 +697,12 @@ const ApiStripeCheckoutRoute = ApiStripeCheckoutRouteImport.update({
   path: '/api/stripe/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWritingWorkWorkIdRoute =
+  AuthenticatedWritingWorkWorkIdRouteImport.update({
+    id: '/writing-work/$workId',
+    path: '/writing-work/$workId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPlaylistsPlaylistIdRoute =
   AuthenticatedPlaylistsPlaylistIdRouteImport.update({
     id: '/playlists_/$playlistId',
@@ -903,6 +936,8 @@ export interface FileRoutesByFullPath {
   '/supporter-profile': typeof AuthenticatedSupporterProfileRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
+  '/writing-collections': typeof AuthenticatedWritingCollectionsRoute
+  '/writing-studio': typeof AuthenticatedWritingStudioRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
   '/api/account-deletion': typeof ApiAccountDeletionRoute
   '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
@@ -935,7 +970,9 @@ export interface FileRoutesByFullPath {
   '/operations/sign-in': typeof OperationsSignInRoute
   '/play/$packId': typeof PlayPackIdRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
+  '/reading/$slug': typeof ReadingSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/work/$slug': typeof WorkSlugRoute
   '/blog/': typeof BlogIndexRoute
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
@@ -962,6 +999,7 @@ export interface FileRoutesByFullPath {
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
+  '/writing-work/$workId': typeof AuthenticatedWritingWorkWorkIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/connect': typeof ApiStripeConnectRoute
   '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
@@ -1035,6 +1073,8 @@ export interface FileRoutesByTo {
   '/supporter-profile': typeof AuthenticatedSupporterProfileRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/watch': typeof AuthenticatedWatchRoute
+  '/writing-collections': typeof AuthenticatedWritingCollectionsRoute
+  '/writing-studio': typeof AuthenticatedWritingStudioRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
   '/api/account-deletion': typeof ApiAccountDeletionRoute
   '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
@@ -1067,7 +1107,9 @@ export interface FileRoutesByTo {
   '/operations/sign-in': typeof OperationsSignInRoute
   '/play/$packId': typeof PlayPackIdRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
+  '/reading/$slug': typeof ReadingSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/work/$slug': typeof WorkSlugRoute
   '/blog': typeof BlogIndexRoute
   '/admin/accounts': typeof AuthenticatedAdminAccountsRoute
   '/admin/blog': typeof AuthenticatedAdminBlogRoute
@@ -1094,6 +1136,7 @@ export interface FileRoutesByTo {
   '/music/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/music/upload': typeof AuthenticatedMusicUploadRoute
   '/playlists/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
+  '/writing-work/$workId': typeof AuthenticatedWritingWorkWorkIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/connect': typeof ApiStripeConnectRoute
   '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
@@ -1170,6 +1213,8 @@ export interface FileRoutesById {
   '/_authenticated/supporter-profile': typeof AuthenticatedSupporterProfileRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_authenticated/watch': typeof AuthenticatedWatchRoute
+  '/_authenticated/writing-collections': typeof AuthenticatedWritingCollectionsRoute
+  '/_authenticated/writing-studio': typeof AuthenticatedWritingStudioRoute
   '/admin-invite/$token': typeof AdminInviteTokenRoute
   '/api/account-deletion': typeof ApiAccountDeletionRoute
   '/api/admin-team-invite': typeof ApiAdminTeamInviteRoute
@@ -1202,7 +1247,9 @@ export interface FileRoutesById {
   '/operations/sign-in': typeof OperationsSignInRoute
   '/play/$packId': typeof PlayPackIdRoute
   '/playlist/$slug': typeof PlaylistSlugRoute
+  '/reading/$slug': typeof ReadingSlugRoute
   '/video/$videoId': typeof VideoVideoIdRoute
+  '/work/$slug': typeof WorkSlugRoute
   '/blog/': typeof BlogIndexRoute
   '/_authenticated/admin_/accounts': typeof AuthenticatedAdminAccountsRoute
   '/_authenticated/admin_/blog': typeof AuthenticatedAdminBlogRoute
@@ -1229,6 +1276,7 @@ export interface FileRoutesById {
   '/_authenticated/music_/$trackId': typeof AuthenticatedMusicTrackIdRoute
   '/_authenticated/music_/upload': typeof AuthenticatedMusicUploadRoute
   '/_authenticated/playlists_/$playlistId': typeof AuthenticatedPlaylistsPlaylistIdRoute
+  '/_authenticated/writing-work/$workId': typeof AuthenticatedWritingWorkWorkIdRoute
   '/api/stripe/checkout': typeof ApiStripeCheckoutRoute
   '/api/stripe/connect': typeof ApiStripeConnectRoute
   '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
@@ -1305,6 +1353,8 @@ export interface FileRouteTypes {
     | '/supporter-profile'
     | '/videos'
     | '/watch'
+    | '/writing-collections'
+    | '/writing-studio'
     | '/admin-invite/$token'
     | '/api/account-deletion'
     | '/api/admin-team-invite'
@@ -1337,7 +1387,9 @@ export interface FileRouteTypes {
     | '/operations/sign-in'
     | '/play/$packId'
     | '/playlist/$slug'
+    | '/reading/$slug'
     | '/video/$videoId'
+    | '/work/$slug'
     | '/blog/'
     | '/admin/accounts'
     | '/admin/blog'
@@ -1364,6 +1416,7 @@ export interface FileRouteTypes {
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
+    | '/writing-work/$workId'
     | '/api/stripe/checkout'
     | '/api/stripe/connect'
     | '/api/stripe/focus-checkout'
@@ -1437,6 +1490,8 @@ export interface FileRouteTypes {
     | '/supporter-profile'
     | '/videos'
     | '/watch'
+    | '/writing-collections'
+    | '/writing-studio'
     | '/admin-invite/$token'
     | '/api/account-deletion'
     | '/api/admin-team-invite'
@@ -1469,7 +1524,9 @@ export interface FileRouteTypes {
     | '/operations/sign-in'
     | '/play/$packId'
     | '/playlist/$slug'
+    | '/reading/$slug'
     | '/video/$videoId'
+    | '/work/$slug'
     | '/blog'
     | '/admin/accounts'
     | '/admin/blog'
@@ -1496,6 +1553,7 @@ export interface FileRouteTypes {
     | '/music/$trackId'
     | '/music/upload'
     | '/playlists/$playlistId'
+    | '/writing-work/$workId'
     | '/api/stripe/checkout'
     | '/api/stripe/connect'
     | '/api/stripe/focus-checkout'
@@ -1571,6 +1629,8 @@ export interface FileRouteTypes {
     | '/_authenticated/supporter-profile'
     | '/_authenticated/videos'
     | '/_authenticated/watch'
+    | '/_authenticated/writing-collections'
+    | '/_authenticated/writing-studio'
     | '/admin-invite/$token'
     | '/api/account-deletion'
     | '/api/admin-team-invite'
@@ -1603,7 +1663,9 @@ export interface FileRouteTypes {
     | '/operations/sign-in'
     | '/play/$packId'
     | '/playlist/$slug'
+    | '/reading/$slug'
     | '/video/$videoId'
+    | '/work/$slug'
     | '/blog/'
     | '/_authenticated/admin_/accounts'
     | '/_authenticated/admin_/blog'
@@ -1630,6 +1692,7 @@ export interface FileRouteTypes {
     | '/_authenticated/music_/$trackId'
     | '/_authenticated/music_/upload'
     | '/_authenticated/playlists_/$playlistId'
+    | '/_authenticated/writing-work/$workId'
     | '/api/stripe/checkout'
     | '/api/stripe/connect'
     | '/api/stripe/focus-checkout'
@@ -1693,7 +1756,9 @@ export interface RootRouteChildren {
   OperationsSignInRoute: typeof OperationsSignInRoute
   PlayPackIdRoute: typeof PlayPackIdRoute
   PlaylistSlugRoute: typeof PlaylistSlugRoute
+  ReadingSlugRoute: typeof ReadingSlugRoute
   VideoVideoIdRoute: typeof VideoVideoIdRoute
+  WorkSlugRoute: typeof WorkSlugRoute
   ApiStripeCheckoutRoute: typeof ApiStripeCheckoutRoute
   ApiStripeConnectRoute: typeof ApiStripeConnectRoute
   ApiStripeFocusCheckoutRoute: typeof ApiStripeFocusCheckoutRoute
@@ -1875,11 +1940,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/work/$slug': {
+      id: '/work/$slug'
+      path: '/work/$slug'
+      fullPath: '/work/$slug'
+      preLoaderRoute: typeof WorkSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/video/$videoId': {
       id: '/video/$videoId'
       path: '/video/$videoId'
       fullPath: '/video/$videoId'
       preLoaderRoute: typeof VideoVideoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reading/$slug': {
+      id: '/reading/$slug'
+      path: '/reading/$slug'
+      fullPath: '/reading/$slug'
+      preLoaderRoute: typeof ReadingSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playlist/$slug': {
@@ -2105,6 +2184,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin-invite/$token'
       preLoaderRoute: typeof AdminInviteTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/writing-studio': {
+      id: '/_authenticated/writing-studio'
+      path: '/writing-studio'
+      fullPath: '/writing-studio'
+      preLoaderRoute: typeof AuthenticatedWritingStudioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/writing-collections': {
+      id: '/_authenticated/writing-collections'
+      path: '/writing-collections'
+      fullPath: '/writing-collections'
+      preLoaderRoute: typeof AuthenticatedWritingCollectionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/watch': {
       id: '/_authenticated/watch'
@@ -2428,6 +2521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStripeCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/writing-work/$workId': {
+      id: '/_authenticated/writing-work/$workId'
+      path: '/writing-work/$workId'
+      fullPath: '/writing-work/$workId'
+      preLoaderRoute: typeof AuthenticatedWritingWorkWorkIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/playlists_/$playlistId': {
       id: '/_authenticated/playlists_/$playlistId'
       path: '/playlists/$playlistId'
@@ -2673,6 +2773,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSupporterProfileRoute: typeof AuthenticatedSupporterProfileRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedWatchRoute: typeof AuthenticatedWatchRoute
+  AuthenticatedWritingCollectionsRoute: typeof AuthenticatedWritingCollectionsRoute
+  AuthenticatedWritingStudioRoute: typeof AuthenticatedWritingStudioRoute
   AuthenticatedAdminAccountsRoute: typeof AuthenticatedAdminAccountsRoute
   AuthenticatedAdminBlogRoute: typeof AuthenticatedAdminBlogRoute
   AuthenticatedAdminBusinessPilotRoute: typeof AuthenticatedAdminBusinessPilotRoute
@@ -2698,6 +2800,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMusicTrackIdRoute: typeof AuthenticatedMusicTrackIdRoute
   AuthenticatedMusicUploadRoute: typeof AuthenticatedMusicUploadRoute
   AuthenticatedPlaylistsPlaylistIdRoute: typeof AuthenticatedPlaylistsPlaylistIdRoute
+  AuthenticatedWritingWorkWorkIdRoute: typeof AuthenticatedWritingWorkWorkIdRoute
   AuthenticatedAdminCampaignsCampaignIdRoute: typeof AuthenticatedAdminCampaignsCampaignIdRoute
   AuthenticatedMusicTrackIdLyricsRoute: typeof AuthenticatedMusicTrackIdLyricsRoute
   AuthenticatedAdminCampaignsCampaignIdAnalyticsRoute: typeof AuthenticatedAdminCampaignsCampaignIdAnalyticsRoute
@@ -2742,6 +2845,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSupporterProfileRoute: AuthenticatedSupporterProfileRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedWatchRoute: AuthenticatedWatchRoute,
+  AuthenticatedWritingCollectionsRoute: AuthenticatedWritingCollectionsRoute,
+  AuthenticatedWritingStudioRoute: AuthenticatedWritingStudioRoute,
   AuthenticatedAdminAccountsRoute: AuthenticatedAdminAccountsRoute,
   AuthenticatedAdminBlogRoute: AuthenticatedAdminBlogRoute,
   AuthenticatedAdminBusinessPilotRoute: AuthenticatedAdminBusinessPilotRoute,
@@ -2770,6 +2875,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMusicTrackIdRoute: AuthenticatedMusicTrackIdRoute,
   AuthenticatedMusicUploadRoute: AuthenticatedMusicUploadRoute,
   AuthenticatedPlaylistsPlaylistIdRoute: AuthenticatedPlaylistsPlaylistIdRoute,
+  AuthenticatedWritingWorkWorkIdRoute: AuthenticatedWritingWorkWorkIdRoute,
   AuthenticatedAdminCampaignsCampaignIdRoute:
     AuthenticatedAdminCampaignsCampaignIdRoute,
   AuthenticatedMusicTrackIdLyricsRoute: AuthenticatedMusicTrackIdLyricsRoute,
@@ -2861,7 +2967,9 @@ const rootRouteChildren: RootRouteChildren = {
   OperationsSignInRoute: OperationsSignInRoute,
   PlayPackIdRoute: PlayPackIdRoute,
   PlaylistSlugRoute: PlaylistSlugRoute,
+  ReadingSlugRoute: ReadingSlugRoute,
   VideoVideoIdRoute: VideoVideoIdRoute,
+  WorkSlugRoute: WorkSlugRoute,
   ApiStripeCheckoutRoute: ApiStripeCheckoutRoute,
   ApiStripeConnectRoute: ApiStripeConnectRoute,
   ApiStripeFocusCheckoutRoute: ApiStripeFocusCheckoutRoute,

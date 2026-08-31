@@ -162,8 +162,21 @@ const creatorStudio: NavItem[] = [
     allow: ["creator", "admin"],
   },
   {
-    title: "Video Library",
-    url: "/videos",
+    title: "Writing Studio",
+    url: "/writing-studio",
+    icon: BookOpenText,
+    allow: ["creator", "admin"],
+    focus: "writing",
+  },
+  {
+    title: "Writing Collections",
+    url: "/writing-collections",
+    icon: BookOpenText,
+    allow: ["creator", "admin"],
+    focus: "writing",
+  },
+  {
+    title: "Video Library",    url: "/videos",
     icon: Clapperboard,
     allow: ["creator", "admin"],
     capability: "video.library",

@@ -1,0 +1,9 @@
+export type WrittenWorkType = "poem" | "short_story" | "essay_article" | "excerpt_chapter" | "creator_note";
+export type WrittenVisibility = "public" | "unlisted" | "private";
+export type WrittenStatus = "draft" | "published" | "archived";
+export interface WrittenProject { id:string; creator_id:string; title:string; project_type:string; description:string; cover_path:string|null; external_url:string|null; status:string; created_at:string; updated_at:string; }
+export interface WrittenWork { id:string; creator_id:string; project_id:string|null; slug:string; title:string; work_type:WrittenWorkType; excerpt:string; body:string; cover_path:string|null; status:WrittenStatus; visibility:WrittenVisibility; show_on_public_profile:boolean; profile_display_order:number; rights_confirmed:boolean; published_at:string|null; created_at:string; updated_at:string; cover_url?:string|null; }
+export interface WrittenWorkMedia { id:string; work_id:string; creator_id:string; media_type:"audio"|"video"|"external"; audio_path:string|null; video_id:string|null; external_url:string|null; title:string; caption:string; sort_order:number; created_at:string; audio_url?:string|null; }
+export interface WrittenCollection { id:string; creator_id:string; slug:string; title:string; description:string; cover_path:string|null; status:"draft"|"published"; visibility:WrittenVisibility; show_on_public_profile:boolean; profile_display_order:number; created_at:string; updated_at:string; cover_url?:string|null; items?:WrittenCollectionItem[]; }
+export interface WrittenCollectionItem { id:string; collection_id:string; work_id:string; media_id:string|null; position:number; created_at:string; work?:WrittenWork; media?:WrittenWorkMedia|null; }
+export const WORK_TYPES:[WrittenWorkType,string][]=[["poem","Poem"],["short_story","Short Story"],["essay_article","Essay / Article"],["excerpt_chapter","Excerpt / Chapter"],["creator_note","Creator Note"]];
