@@ -78,7 +78,7 @@ export function extractBlogHeadings(body: string): string[] {
 
 function InlineMediaFigure({ item }: { item: BlogPostMedia }) {
   return (
-    <figure className={item.display_style === "wide" ? "my-8 md:-mx-12 lg:-mx-24" : "my-8"}>
+    <figure className={item.display_style === "wide" ? "my-6 md:-mx-12 md:my-8 lg:-mx-24" : "my-6 md:my-8"}>
       <img
         src={item.resolved_url || item.media_url || ""}
         alt={item.alt_text}
@@ -110,12 +110,12 @@ export function BlogArticleBody({ body, media = [] }: BlogArticleBodyProps) {
   });
 
   return (
-    <div className="space-y-6 text-[1.05rem] leading-8 text-foreground/90">
+    <div className="space-y-4 text-[1.05rem] leading-8 text-foreground/90 md:space-y-5">
       {beforeMedia.map((item) => <InlineMediaFigure key={item.id} item={item} />)}
       {blocks.map((block, index) => {
         let content;
-        if (block.type === "h2") content = <h2 className="pt-5 text-2xl font-semibold tracking-tight md:text-3xl">{block.text}</h2>;
-        else if (block.type === "h3") content = <h3 className="pt-3 text-xl font-semibold tracking-tight md:text-2xl">{block.text}</h3>;
+        if (block.type === "h2") content = <h2 className="pt-7 text-2xl font-semibold tracking-tight md:pt-8 md:text-3xl">{block.text}</h2>;
+        else if (block.type === "h3") content = <h3 className="pt-5 text-xl font-semibold tracking-tight md:text-2xl">{block.text}</h3>;
         else if (block.type === "quote") content = <blockquote className="border-l-4 border-primary pl-5 text-xl font-medium italic leading-8 text-foreground">{block.text}</blockquote>;
         else if (block.type === "ul") content = <ul className="list-disc space-y-2 pl-6">{block.items?.map((item, itemIndex) => <li key={`${index}-${itemIndex}`}>{item}</li>)}</ul>;
         else if (block.type === "ol") content = <ol className="list-decimal space-y-2 pl-6">{block.items?.map((item, itemIndex) => <li key={`${index}-${itemIndex}`}>{item}</li>)}</ol>;

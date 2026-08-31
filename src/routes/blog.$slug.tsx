@@ -76,10 +76,20 @@ function BlogArticlePage() {
           <div className="mt-8 flex flex-wrap gap-2">{post.category ? <Badge>{post.category}</Badge> : null}{post.tags?.slice(0, 3).map((tag) => <Badge key={tag} variant="secondary">{tag}</Badge>)}</div>
           <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl md:text-6xl">{post.title}</h1>
           {post.excerpt ? <p className="mt-5 text-lg leading-8 text-muted-foreground md:text-xl">{post.excerpt}</p> : null}
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y py-4 text-sm text-muted-foreground"><div>By <span className="font-medium text-foreground">{post.author_name}</span>{post.published_at ? ` · ${new Date(post.published_at).toLocaleDateString()}` : ""}<span className="ml-3 inline-flex items-center"><Clock3 className="mr-1 h-4 w-4" /> {minutes} min read</span></div><Button variant="ghost" size="sm" onClick={() => void share()}><Share2 className="mr-2 h-4 w-4" /> Share</Button></div>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y py-4 text-sm text-muted-foreground"><div>By <span className="font-medium text-foreground">{post.author_name}</span>{post.published_at ? ` \u00b7 ${new Date(post.published_at).toLocaleDateString()}` : ""}<span className="ml-3 inline-flex items-center"><Clock3 className="mr-1 h-4 w-4" /> {minutes} min read</span></div><Button variant="ghost" size="sm" onClick={() => void share()}><Share2 className="mr-2 h-4 w-4" /> Share</Button></div>
         </header>
         {post.hero_image_url ? <div className="mx-auto max-w-6xl px-4 sm:px-6"><img src={post.hero_image_url} alt={post.hero_image_alt || post.title} className="max-h-[680px] w-full rounded-3xl object-cover" /></div> : null}
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 md:py-14"><BlogArticleBody body={post.body} media={media} /></div>
+        <footer className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 md:pb-20">
+          <div className="border-t pt-7">
+            <p className="text-sm font-medium text-foreground">Keep exploring VYBE</p>
+            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-3 text-sm">
+              <Link to="/blog" className="text-muted-foreground transition-colors hover:text-foreground">Back to VYBE Blog</Link>
+              <Link to="/discover" className="text-muted-foreground transition-colors hover:text-foreground">Discover creators</Link>
+              <Link to="/explore" className="text-muted-foreground transition-colors hover:text-foreground">Explore VYBE</Link>
+            </div>
+          </div>
+        </footer>
       </article>
     </main>
   );
