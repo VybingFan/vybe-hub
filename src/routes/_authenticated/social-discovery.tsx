@@ -12,6 +12,7 @@ import {
   type SocialContentType,
   type SocialDiscoveryPost,
   type SocialDiscoverySummary,
+  type SocialDiscoverySearchAnalytics,
 } from "@/services/social/socialDiscoveryService";
 
 export const Route = createFileRoute("/_authenticated/social-discovery")({ component: SocialDiscoveryPage });
@@ -48,6 +49,7 @@ const blank: Draft = {
 function SocialDiscoveryPage() {
   const [summary, setSummary] = useState<SocialDiscoverySummary | null>(null);
   const [posts, setPosts] = useState<SocialDiscoveryPost[]>([]);
+  const [analytics, setAnalytics] = useState<SocialDiscoverySearchAnalytics | null>(null);
   const [draft, setDraft] = useState<Draft>(blank);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -63,12 +65,14 @@ function SocialDiscoveryPage() {
     setLoading(true);
     setError(null);
     try {
-      const [nextSummary, nextPosts] = await Promise.all([
+      const [nextSummary, nextPosts, nextAnalytics] = await Promise.all([
         socialDiscoveryService.getSummary(),
         socialDiscoveryService.listMine(),
+        socialDiscoveryService.getSearchAnalytics(30),
       ]);
       setSummary(nextSummary);
       setPosts(nextPosts);
+      setAnalytics(nextAnalytics);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Social Discovery could not load.");
     } finally {
@@ -179,6 +183,20 @@ function SocialDiscoveryPage() {
             </> : <p className="text-sm text-muted-foreground">{summary.subscription?.billing_provider === "stripe" ? "Stripe subscription connected." : "Testing access is active."}</p>}
           </CardContent></Card>
         </section>
+
+        <Card>
+          <CardHeader><CardTitle className="text-base">Social Discovery performance - last 30 days</CardTitle></CardHeader>
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              <div><p className="text-2xl font-semibold">{analytics?.searches_appeared_in ?? 0}</p><p className="text-xs text-muted-foreground">Searches appeared in</p></div>
+              <div><p className="text-2xl font-semibold">{analytics?.result_impressions ?? 0}</p><p className="text-xs text-muted-foreground">Result impressions</p></div>
+              <div><p className="text-2xl font-semibold">{analytics?.outbound_clicks ?? 0}</p><p className="text-xs text-muted-foreground">Outbound visits</p></div>
+              <div><p className="text-2xl font-semibold">{analytics?.unique_searchers ?? 0}</p><p className="text-xs text-muted-foreground">Unique VYBE searchers</p></div>
+              <div><p className="text-2xl font-semibold">{Number(analytics?.outbound_rate ?? 0).toFixed(1)}%</p><p className="text-xs text-muted-foreground">Outbound rate</p></div>
+            </div>
+            <p className="mt-4 text-xs leading-5 text-muted-foreground">These numbers measure activity inside VYBE Social Discovery. They do not claim views, likes, or engagement on the external social platform.</p>
+          </CardContent>
+        </Card>
 
         {message ? <p className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">{message}</p> : null}
         {error ? <p className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">{error}</p> : null}

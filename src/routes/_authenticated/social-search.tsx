@@ -220,7 +220,12 @@ function SocialSearchPage() {
                           ) : null}
                           <div className="mt-5 flex flex-wrap gap-2">
                             <Button asChild size="sm">
-                              <a href={post.original_url} target="_blank" rel="noreferrer">
+                              <a
+                                href={post.original_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={() => void socialDiscoverySearchService.recordOutboundClick(post.search_event_id, post.id)}
+                              >
                                 View original post
                                 <ExternalLink className="ml-2 h-3.5 w-3.5" />
                               </a>

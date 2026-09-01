@@ -37,6 +37,15 @@ export interface SocialDiscoverySummary {
   active_post_count: number;
 }
 
+export interface SocialDiscoverySearchAnalytics {
+  days: number;
+  searches_appeared_in: number;
+  result_impressions: number;
+  outbound_clicks: number;
+  unique_searchers: number;
+  outbound_rate: number;
+}
+
 export interface SaveSocialPostInput {
   original_url: string;
   title: string;
@@ -87,6 +96,14 @@ export const socialDiscoveryService = {
     const { data, error } = await client.rpc("get_my_social_discovery_summary");
     if (error) throw error;
     return data as SocialDiscoverySummary;
+  },
+
+  async getSearchAnalytics(days = 30): Promise<SocialDiscoverySearchAnalytics> {
+    const { data, error } = await client.rpc("get_my_social_discovery_search_analytics", {
+      _days: Math.max(1, Math.min(days, 365)),
+    });
+    if (error) throw error;
+    return data as SocialDiscoverySearchAnalytics;
   },
 
   async listMine(): Promise<SocialDiscoveryPost[]> {

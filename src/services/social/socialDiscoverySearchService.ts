@@ -18,6 +18,7 @@ export interface SocialDiscoverySearchPost {
   creator_display_name: string;
   creator_avatar_url: string | null;
   creator_avatar_path: string | null;
+  search_event_id: string;
 }
 
 export interface SocialDiscoverySearchOptions {
@@ -65,7 +66,7 @@ export const socialDiscoverySearchService = {
     if (!query) return [] as SocialDiscoverySearchPost[];
 
     const limit = Math.max(1, Math.min(options.limit ?? 40, 60));
-    const { data, error } = await client.rpc("search_social_discovery_posts", {
+    const { data, error } = await client.rpc("search_social_discovery_posts_v24_72c", {
       _query: query,
       _limit: limit,
     });
@@ -77,5 +78,14 @@ export const socialDiscoverySearchService = {
         creator_avatar_url: await signedAvatar(post.creator_avatar_path, post.creator_avatar_url),
       })),
     );
+  },
+
+  async recordOutboundClick(searchEventId: string, postId: string) {
+    if (!searchEventId || !postId) return;
+    const { error } = await client.rpc("record_social_discovery_outbound_click", {
+      _search_event_id: searchEventId,
+      _post_id: postId,
+    });
+    if (error) console.warn("Social Discovery outbound analytics could not be recorded.", error);
   },
 };
