@@ -1,6 +1,6 @@
-import { FormEvent, useEffect, useState, type ReactNode } from "react";
+import { FormEvent, useEffect, useRef, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Loader2, MapPin, Music2, Search, SlidersHorizontal, UserRound, UsersRound } from "lucide-react";
+import { ArrowRight, Loader2, MapPin, Music2, Search, SlidersHorizontal, UserRound, UsersRound, X } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -16,16 +16,20 @@ import {
 
 export const Route = createFileRoute("/_authenticated/discover")({ component: DiscoverPage });
 
+const creatorFocusChoices = ["Music", "Film & Video", "Writers & Poets", "Actors", "Comedians"];
 const genres = ["Hip-Hop", "R&B", "Rock", "Country", "Pop", "Electronic", "Gospel", "Jazz"];
 
 function DiscoverPage() {
   const [query, setQuery] = useState("");
   const [input, setInput] = useState("");
+  const [selectedFocus, setSelectedFocus] = useState<string | null>(null);
   const [creators, setCreators] = useState<DiscoveryCreator[]>([]);
   const [artists, setArtists] = useState<DiscoveryArtistCredit[]>([]);
   const [tracks, setTracks] = useState<DiscoveryTrack[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searched, setSearched] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLoading(true); setError(null);
@@ -35,30 +39,53 @@ function DiscoverPage() {
       .finally(() => setLoading(false));
   }, [query]);
 
-  const submit = (event: FormEvent) => { event.preventDefault(); setQuery(input.trim()); };
-  const choose = (value: string) => { setInput(value); setQuery(value); };
+  useEffect(() => {
+    if (!searched || loading) return;
+    window.requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }, [searched, loading, query]);
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    setSearched(true);
+    setQuery(input.trim());
+  };
+  const choose = (value: string) => {
+    setSearched(true);
+    setInput(value);
+    setQuery(value);
+  };
+  const clearSearch = () => {
+    setInput("");
+    setQuery("");
+    setSearched(false);
+    setSelectedFocus(null);
+  };
 
   return <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
     <div className="mx-auto max-w-6xl space-y-7">
       <WorkspacePageHeader eyebrow="Supporter discovery" title="Find your next VYBE." description="Discover real VYBE creators and published music. Open a creator page to listen, follow, heart, save, and participate." status={<Button asChild variant="outline" className="rounded-full"><Link to="/supporter-interests"><SlidersHorizontal className="mr-2 h-4 w-4" />Tune interests</Link></Button>} />
 
       <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card"><CardContent className="p-5 sm:p-7">
-        <form onSubmit={submit} className="relative"><Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" /><Input value={input} onChange={(event) => setInput(event.target.value)} placeholder="Search creator, performing artist, song, city, or genre" className="h-14 rounded-full bg-background pl-12 pr-28 text-base" /><Button className="absolute right-1.5 top-1.5 h-11 rounded-full px-6">Search</Button></form>
-        <div className="mt-4 flex flex-wrap gap-2">{genres.map((genre) => <Button key={genre} size="sm" variant={query === genre ? "default" : "outline"} className="rounded-full" onClick={() => choose(genre)}>{genre}</Button>)}{query ? <Button size="sm" variant="ghost" className="rounded-full" onClick={() => choose("")}>Show everything</Button> : null}</div>
+        <form onSubmit={submit} className="relative">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <Input value={input} onChange={(event) => setInput(event.target.value)} placeholder="Search creators, interests, city, genre, or content" className="h-14 rounded-full bg-background pl-12 pr-36 text-base" />
+          {input ? <button type="button" onClick={clearSearch} aria-label="Clear search" className="absolute right-[7.5rem] top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"><X className="h-4 w-4" /></button> : null}
+          <Button className="absolute right-1.5 top-1.5 h-11 rounded-full px-6" disabled={loading}>{loading && searched ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Searching</> : "Search"}</Button>
+        </form>
+        <div className="mt-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Explore creator focuses</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {creatorFocusChoices.map((focus) => {
+              const active = selectedFocus === focus;
+              return <Button key={focus} size="sm" variant={active ? "default" : "outline"} className="rounded-full" onClick={() => setSelectedFocus(active ? null : focus)}>{focus}</Button>;
+            })}
+          </div>
+          {selectedFocus === "Music" ? <div className="mt-4 border-t border-border/50 pt-4"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Explore music genres</p><div className="mt-3 flex flex-wrap gap-2">{genres.map((genre) => <Button key={genre} size="sm" variant={query === genre ? "default" : "outline"} className="rounded-full" onClick={() => choose(genre)}>{genre}</Button>)}</div></div> : null}
+        </div>
+        {searched ? <p className="mt-4 text-sm text-muted-foreground">{loading ? `Searching for â€œ${query || input.trim()}â€â€¦` : query ? `Showing results for â€œ${query}â€` : "Showing all discovery results"}</p> : null}
       </CardContent></Card>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><ActionCard title="Tune interests" text="Choose the genres and experiences that should shape your discovery." to="/supporter-interests" image="/images/supporter-cards/discover.webp" icon={<SlidersHorizontal className="h-5 w-5" />} /><ActionCard title="Read creator stories" text="Go behind the music through stories, interviews, and creative journeys." to="/read" image="/images/supporter-cards/creator-stories.webp" icon={<ArrowRight className="h-5 w-5" />} /><ActionCard title="Find your people" text="Join conversations about creators, releases, scenes, and shared interests." to="/communities" image="/images/supporter-cards/community.webp" icon={<UsersRound className="h-5 w-5" />} /><ActionCard title="Return to My VYBE" text="Open your hearted songs, lists, followed creators, and saved experiences." to="/my-vybe" image="/images/supporter-cards/my-vybe.webp" icon={<Music2 className="h-5 w-5" />} /></section>
-
-      <Link to="/demo/creator" className="group grid overflow-hidden rounded-3xl border border-fuchsia-400/25 bg-gradient-to-r from-fuchsia-500/10 via-card to-cyan-400/10 transition hover:border-fuchsia-400/50 md:grid-cols-[220px_1fr]">
-        <img src="/images/demo/nova-vale/epk/theater-portrait.webp" alt="Nova Vale guided demo creator" className="h-48 w-full object-cover md:h-full" />
-        <span className="flex flex-col justify-center p-6 md:p-8">
-          <span className="text-xs font-semibold uppercase tracking-[.18em] text-fuchsia-300">Guided creator demonstration</span>
-          <span className="mt-2 text-2xl font-semibold">Meet Nova Vale and practice the supporter experience</span>
-          <span className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">Switch between public visitor, free member, and follower views. Practice listening, hearting, commenting, following, and saving without changing your real account.</span>
-          <span className="mt-5 inline-flex items-center text-sm font-medium text-primary">Open Nova's guided page <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" /></span>
-        </span>
-      </Link>
-
+      <div ref={resultsRef} className="scroll-mt-6">
       {loading ? <div className="flex min-h-56 items-center justify-center"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div> : null}
       {error ? <p className="rounded-2xl border border-destructive/30 bg-destructive/10 p-5 text-sm text-destructive">{error}</p> : null}
       {!loading && !error ? <div className="space-y-10">
@@ -73,6 +100,19 @@ function DiscoverPage() {
         </section>
 
       </div> : null}
+      </div>
+
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><ActionCard title="Tune interests" text="Choose the genres and experiences that should shape your discovery." to="/supporter-interests" image="/images/supporter-cards/discover.webp" icon={<SlidersHorizontal className="h-5 w-5" />} /><ActionCard title="Read creator stories" text="Go behind creators through stories, interviews, and creative journeys." to="/read" image="/images/supporter-cards/creator-stories.webp" icon={<ArrowRight className="h-5 w-5" />} /><ActionCard title="Find your people" text="Join conversations about creators, releases, scenes, and shared interests." to="/communities" image="/images/supporter-cards/community.webp" icon={<UsersRound className="h-5 w-5" />} /><ActionCard title="Return to My VYBE" text="Open your hearted songs, lists, followed creators, and saved experiences." to="/my-vybe" image="/images/supporter-cards/my-vybe.webp" icon={<Music2 className="h-5 w-5" />} /></section>
+
+      <Link to="/demo/creator" className="group grid overflow-hidden rounded-3xl border border-fuchsia-400/25 bg-gradient-to-r from-fuchsia-500/10 via-card to-cyan-400/10 transition hover:border-fuchsia-400/50 md:grid-cols-[220px_1fr]">
+        <img src="/images/demo/nova-vale/epk/theater-portrait.webp" alt="Nova Vale guided demo creator" className="h-48 w-full object-cover md:h-full" />
+        <span className="flex flex-col justify-center p-6 md:p-8">
+          <span className="text-xs font-semibold uppercase tracking-[.18em] text-fuchsia-300">Guided creator demonstration</span>
+          <span className="mt-2 text-2xl font-semibold">Meet Nova Vale and practice the supporter experience</span>
+          <span className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">Switch between public visitor, free member, and follower views. Practice listening, hearting, commenting, following, and saving without changing your real account.</span>
+          <span className="mt-5 inline-flex items-center text-sm font-medium text-primary">Open Nova's guided page <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" /></span>
+        </span>
+      </Link>
     </div>
   </RoleGuard>;
 }

@@ -24,6 +24,7 @@ import {
   ListMusic,
   LockKeyhole,
   Music2,
+  Search,
   Settings,
   ShieldCheck,
   ShoppingBag,
@@ -121,6 +122,12 @@ const memberMore: NavItem[] = [
     title: "Events",
     url: "/events",
     icon: CalendarDays,
+    allow: ["supporter", "creator", "business", "admin"],
+  },
+  {
+    title: "Social Search",
+    url: "/social-search",
+    icon: Search,
     allow: ["supporter", "creator", "business", "admin"],
   },
 ];

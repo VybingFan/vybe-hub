@@ -75,6 +75,7 @@ import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSupporterProfileRouteImport } from './routes/_authenticated/supporter-profile'
 import { Route as AuthenticatedSupporterInterestsRouteImport } from './routes/_authenticated/supporter-interests'
 import { Route as AuthenticatedStoriesRouteImport } from './routes/_authenticated/stories'
+import { Route as AuthenticatedSocialSearchRouteImport } from './routes/_authenticated/social-search'
 import { Route as AuthenticatedSocialDiscoveryRouteImport } from './routes/_authenticated/social-discovery'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedReadRouteImport } from './routes/_authenticated/read'
@@ -482,6 +483,12 @@ const AuthenticatedStoriesRoute = AuthenticatedStoriesRouteImport.update({
   path: '/stories',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSocialSearchRoute =
+  AuthenticatedSocialSearchRouteImport.update({
+    id: '/social-search',
+    path: '/social-search',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSocialDiscoveryRoute =
   AuthenticatedSocialDiscoveryRouteImport.update({
     id: '/social-discovery',
@@ -946,6 +953,7 @@ export interface FileRoutesByFullPath {
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/social-discovery': typeof AuthenticatedSocialDiscoveryRoute
+  '/social-search': typeof AuthenticatedSocialSearchRoute
   '/stories': typeof AuthenticatedStoriesRoute
   '/supporter-interests': typeof AuthenticatedSupporterInterestsRoute
   '/supporter-profile': typeof AuthenticatedSupporterProfileRoute
@@ -1085,6 +1093,7 @@ export interface FileRoutesByTo {
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/social-discovery': typeof AuthenticatedSocialDiscoveryRoute
+  '/social-search': typeof AuthenticatedSocialSearchRoute
   '/stories': typeof AuthenticatedStoriesRoute
   '/supporter-interests': typeof AuthenticatedSupporterInterestsRoute
   '/supporter-profile': typeof AuthenticatedSupporterProfileRoute
@@ -1227,6 +1236,7 @@ export interface FileRoutesById {
   '/_authenticated/read': typeof AuthenticatedReadRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/social-discovery': typeof AuthenticatedSocialDiscoveryRoute
+  '/_authenticated/social-search': typeof AuthenticatedSocialSearchRoute
   '/_authenticated/stories': typeof AuthenticatedStoriesRoute
   '/_authenticated/supporter-interests': typeof AuthenticatedSupporterInterestsRoute
   '/_authenticated/supporter-profile': typeof AuthenticatedSupporterProfileRoute
@@ -1369,6 +1379,7 @@ export interface FileRouteTypes {
     | '/read'
     | '/settings'
     | '/social-discovery'
+    | '/social-search'
     | '/stories'
     | '/supporter-interests'
     | '/supporter-profile'
@@ -1508,6 +1519,7 @@ export interface FileRouteTypes {
     | '/read'
     | '/settings'
     | '/social-discovery'
+    | '/social-search'
     | '/stories'
     | '/supporter-interests'
     | '/supporter-profile'
@@ -1649,6 +1661,7 @@ export interface FileRouteTypes {
     | '/_authenticated/read'
     | '/_authenticated/settings'
     | '/_authenticated/social-discovery'
+    | '/_authenticated/social-search'
     | '/_authenticated/stories'
     | '/_authenticated/supporter-interests'
     | '/_authenticated/supporter-profile'
@@ -2261,6 +2274,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/social-search': {
+      id: '/_authenticated/social-search'
+      path: '/social-search'
+      fullPath: '/social-search'
+      preLoaderRoute: typeof AuthenticatedSocialSearchRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/social-discovery': {
       id: '/_authenticated/social-discovery'
       path: '/social-discovery'
@@ -2810,6 +2830,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReadRoute: typeof AuthenticatedReadRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSocialDiscoveryRoute: typeof AuthenticatedSocialDiscoveryRoute
+  AuthenticatedSocialSearchRoute: typeof AuthenticatedSocialSearchRoute
   AuthenticatedStoriesRoute: typeof AuthenticatedStoriesRoute
   AuthenticatedSupporterInterestsRoute: typeof AuthenticatedSupporterInterestsRoute
   AuthenticatedSupporterProfileRoute: typeof AuthenticatedSupporterProfileRoute
@@ -2883,6 +2904,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReadRoute: AuthenticatedReadRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSocialDiscoveryRoute: AuthenticatedSocialDiscoveryRoute,
+  AuthenticatedSocialSearchRoute: AuthenticatedSocialSearchRoute,
   AuthenticatedStoriesRoute: AuthenticatedStoriesRoute,
   AuthenticatedSupporterInterestsRoute: AuthenticatedSupporterInterestsRoute,
   AuthenticatedSupporterProfileRoute: AuthenticatedSupporterProfileRoute,
