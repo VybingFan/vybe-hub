@@ -75,6 +75,7 @@ import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSupporterProfileRouteImport } from './routes/_authenticated/supporter-profile'
 import { Route as AuthenticatedSupporterInterestsRouteImport } from './routes/_authenticated/supporter-interests'
 import { Route as AuthenticatedStoriesRouteImport } from './routes/_authenticated/stories'
+import { Route as AuthenticatedSocialDiscoveryRouteImport } from './routes/_authenticated/social-discovery'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedReadRouteImport } from './routes/_authenticated/read'
 import { Route as AuthenticatedPublicMusicRouteImport } from './routes/_authenticated/public-music'
@@ -112,6 +113,7 @@ import { Route as PlayPreviewPreviewKeyRouteImport } from './routes/play.preview
 import { Route as DemoStorySlugRouteImport } from './routes/demo.story.$slug'
 import { Route as DemoPoemSlugRouteImport } from './routes/demo.poem.$slug'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api.stripe.webhook'
+import { Route as ApiStripeSocialDiscoveryCheckoutRouteImport } from './routes/api.stripe.social-discovery-checkout'
 import { Route as ApiStripePortalRouteImport } from './routes/api.stripe.portal'
 import { Route as ApiStripeFocusCheckoutRouteImport } from './routes/api.stripe.focus-checkout'
 import { Route as ApiStripeConnectRouteImport } from './routes/api.stripe.connect'
@@ -480,6 +482,12 @@ const AuthenticatedStoriesRoute = AuthenticatedStoriesRouteImport.update({
   path: '/stories',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSocialDiscoveryRoute =
+  AuthenticatedSocialDiscoveryRouteImport.update({
+    id: '/social-discovery',
+    path: '/social-discovery',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -677,6 +685,12 @@ const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
   path: '/api/stripe/webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiStripeSocialDiscoveryCheckoutRoute =
+  ApiStripeSocialDiscoveryCheckoutRouteImport.update({
+    id: '/api/stripe/social-discovery-checkout',
+    path: '/api/stripe/social-discovery-checkout',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiStripePortalRoute = ApiStripePortalRouteImport.update({
   id: '/api/stripe/portal',
   path: '/api/stripe/portal',
@@ -931,6 +945,7 @@ export interface FileRoutesByFullPath {
   '/public-music': typeof AuthenticatedPublicMusicRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/social-discovery': typeof AuthenticatedSocialDiscoveryRoute
   '/stories': typeof AuthenticatedStoriesRoute
   '/supporter-interests': typeof AuthenticatedSupporterInterestsRoute
   '/supporter-profile': typeof AuthenticatedSupporterProfileRoute
@@ -1004,6 +1019,7 @@ export interface FileRoutesByFullPath {
   '/api/stripe/connect': typeof ApiStripeConnectRoute
   '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
+  '/api/stripe/social-discovery-checkout': typeof ApiStripeSocialDiscoveryCheckoutRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
@@ -1068,6 +1084,7 @@ export interface FileRoutesByTo {
   '/public-music': typeof AuthenticatedPublicMusicRoute
   '/read': typeof AuthenticatedReadRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/social-discovery': typeof AuthenticatedSocialDiscoveryRoute
   '/stories': typeof AuthenticatedStoriesRoute
   '/supporter-interests': typeof AuthenticatedSupporterInterestsRoute
   '/supporter-profile': typeof AuthenticatedSupporterProfileRoute
@@ -1141,6 +1158,7 @@ export interface FileRoutesByTo {
   '/api/stripe/connect': typeof ApiStripeConnectRoute
   '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
+  '/api/stripe/social-discovery-checkout': typeof ApiStripeSocialDiscoveryCheckoutRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
@@ -1208,6 +1226,7 @@ export interface FileRoutesById {
   '/_authenticated/public-music': typeof AuthenticatedPublicMusicRoute
   '/_authenticated/read': typeof AuthenticatedReadRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/social-discovery': typeof AuthenticatedSocialDiscoveryRoute
   '/_authenticated/stories': typeof AuthenticatedStoriesRoute
   '/_authenticated/supporter-interests': typeof AuthenticatedSupporterInterestsRoute
   '/_authenticated/supporter-profile': typeof AuthenticatedSupporterProfileRoute
@@ -1281,6 +1300,7 @@ export interface FileRoutesById {
   '/api/stripe/connect': typeof ApiStripeConnectRoute
   '/api/stripe/focus-checkout': typeof ApiStripeFocusCheckoutRoute
   '/api/stripe/portal': typeof ApiStripePortalRoute
+  '/api/stripe/social-discovery-checkout': typeof ApiStripeSocialDiscoveryCheckoutRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
@@ -1348,6 +1368,7 @@ export interface FileRouteTypes {
     | '/public-music'
     | '/read'
     | '/settings'
+    | '/social-discovery'
     | '/stories'
     | '/supporter-interests'
     | '/supporter-profile'
@@ -1421,6 +1442,7 @@ export interface FileRouteTypes {
     | '/api/stripe/connect'
     | '/api/stripe/focus-checkout'
     | '/api/stripe/portal'
+    | '/api/stripe/social-discovery-checkout'
     | '/api/stripe/webhook'
     | '/demo/poem/$slug'
     | '/demo/story/$slug'
@@ -1485,6 +1507,7 @@ export interface FileRouteTypes {
     | '/public-music'
     | '/read'
     | '/settings'
+    | '/social-discovery'
     | '/stories'
     | '/supporter-interests'
     | '/supporter-profile'
@@ -1558,6 +1581,7 @@ export interface FileRouteTypes {
     | '/api/stripe/connect'
     | '/api/stripe/focus-checkout'
     | '/api/stripe/portal'
+    | '/api/stripe/social-discovery-checkout'
     | '/api/stripe/webhook'
     | '/demo/poem/$slug'
     | '/demo/story/$slug'
@@ -1624,6 +1648,7 @@ export interface FileRouteTypes {
     | '/_authenticated/public-music'
     | '/_authenticated/read'
     | '/_authenticated/settings'
+    | '/_authenticated/social-discovery'
     | '/_authenticated/stories'
     | '/_authenticated/supporter-interests'
     | '/_authenticated/supporter-profile'
@@ -1697,6 +1722,7 @@ export interface FileRouteTypes {
     | '/api/stripe/connect'
     | '/api/stripe/focus-checkout'
     | '/api/stripe/portal'
+    | '/api/stripe/social-discovery-checkout'
     | '/api/stripe/webhook'
     | '/demo/poem/$slug'
     | '/demo/story/$slug'
@@ -1763,6 +1789,7 @@ export interface RootRouteChildren {
   ApiStripeConnectRoute: typeof ApiStripeConnectRoute
   ApiStripeFocusCheckoutRoute: typeof ApiStripeFocusCheckoutRoute
   ApiStripePortalRoute: typeof ApiStripePortalRoute
+  ApiStripeSocialDiscoveryCheckoutRoute: typeof ApiStripeSocialDiscoveryCheckoutRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
   DemoPoemSlugRoute: typeof DemoPoemSlugRoute
   DemoStorySlugRoute: typeof DemoStorySlugRoute
@@ -2234,6 +2261,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/social-discovery': {
+      id: '/_authenticated/social-discovery'
+      path: '/social-discovery'
+      fullPath: '/social-discovery'
+      preLoaderRoute: typeof AuthenticatedSocialDiscoveryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -2491,6 +2525,13 @@ declare module '@tanstack/react-router' {
       path: '/api/stripe/webhook'
       fullPath: '/api/stripe/webhook'
       preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/stripe/social-discovery-checkout': {
+      id: '/api/stripe/social-discovery-checkout'
+      path: '/api/stripe/social-discovery-checkout'
+      fullPath: '/api/stripe/social-discovery-checkout'
+      preLoaderRoute: typeof ApiStripeSocialDiscoveryCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/stripe/portal': {
@@ -2768,6 +2809,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPublicMusicRoute: typeof AuthenticatedPublicMusicRoute
   AuthenticatedReadRoute: typeof AuthenticatedReadRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSocialDiscoveryRoute: typeof AuthenticatedSocialDiscoveryRoute
   AuthenticatedStoriesRoute: typeof AuthenticatedStoriesRoute
   AuthenticatedSupporterInterestsRoute: typeof AuthenticatedSupporterInterestsRoute
   AuthenticatedSupporterProfileRoute: typeof AuthenticatedSupporterProfileRoute
@@ -2840,6 +2882,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPublicMusicRoute: AuthenticatedPublicMusicRoute,
   AuthenticatedReadRoute: AuthenticatedReadRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSocialDiscoveryRoute: AuthenticatedSocialDiscoveryRoute,
   AuthenticatedStoriesRoute: AuthenticatedStoriesRoute,
   AuthenticatedSupporterInterestsRoute: AuthenticatedSupporterInterestsRoute,
   AuthenticatedSupporterProfileRoute: AuthenticatedSupporterProfileRoute,
@@ -2974,6 +3017,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiStripeConnectRoute: ApiStripeConnectRoute,
   ApiStripeFocusCheckoutRoute: ApiStripeFocusCheckoutRoute,
   ApiStripePortalRoute: ApiStripePortalRoute,
+  ApiStripeSocialDiscoveryCheckoutRoute: ApiStripeSocialDiscoveryCheckoutRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
   DemoPoemSlugRoute: DemoPoemSlugRoute,
   DemoStorySlugRoute: DemoStorySlugRoute,

@@ -82,6 +82,10 @@ async function syncSubscription(subscription: Stripe.Subscription, eventCreated:
   ]);
   const priceId = subscription.items.data[0]?.price.id;
   if (!priceId) return false;
+  const socialSelection = stripeServer.socialDiscoverySelectionForPrice(priceId);
+  if (socialSelection) {
+    return syncSocialDiscoverySubscription(subscription, socialSelection, eventCreated);
+  }
   const focusSelection = stripeServer.focusSelectionForPrice(priceId);
   if (focusSelection) {
     return syncFocusSubscription(subscription, focusSelection, eventCreated);
@@ -239,6 +243,58 @@ async function syncFocusSubscription(
       status: "grace", ends_at: graceEnd, updated_at: new Date().toISOString(),
     }).eq("creator_id", userId).eq("focus_subscription_id", saved.id).eq("access_kind", "additional");
     if (accessError) throw accessError;
+  }
+  return true;
+}
+
+async function syncSocialDiscoverySubscription(
+  subscription: Stripe.Subscription,
+  selection: import("@/integrations/stripe/server").StripeSocialDiscoveryPriceSelection,
+  eventCreated: number,
+) {
+  const [{ supabaseAdmin }, stripeServer] = await Promise.all([
+    import("@/integrations/supabase/client.server"),
+    import("@/integrations/stripe/server"),
+  ]);
+  const admin = supabaseAdmin as any;
+  const customerRef = stripeServer.stripeId(subscription.customer);
+  let userId = subscription.metadata.vybe_user_id;
+  if (!userId) {
+    const { data } = await admin.from("creator_social_discovery_subscriptions").select("creator_id")
+      .or(`billing_subscription_ref.eq.${subscription.id}${customerRef ? `,billing_customer_ref.eq.${customerRef}` : ""}`)
+      .limit(1).maybeSingle();
+    userId = data?.creator_id || "";
+  }
+  if (!userId) return false;
+
+  const { data: existing, error: existingError } = await admin
+    .from("creator_social_discovery_subscriptions")
+    .select("last_billing_event_created")
+    .eq("creator_id", userId).maybeSingle();
+  if (existingError) throw existingError;
+  if ((existing?.last_billing_event_created || 0) > eventCreated) return false;
+
+  const activeStatuses = ["active", "trialing", "past_due"];
+  const { error } = await admin.from("creator_social_discovery_subscriptions").upsert({
+    creator_id: userId,
+    add_on_code: selection.addOnCode,
+    status: subscription.status,
+    billing_interval: selection.interval,
+    billing_provider: "stripe",
+    billing_customer_ref: customerRef,
+    billing_subscription_ref: subscription.id,
+    current_period_end: stripeServer.periodEnd(subscription),
+    cancel_at_period_end: subscription.cancel_at_period_end,
+    last_billing_event_created: eventCreated,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: "creator_id" });
+  if (error) throw error;
+
+  if (!activeStatuses.includes(subscription.status)) {
+    const { error: deactivateError } = await admin.from("creator_social_posts")
+      .update({ is_active: false, updated_at: new Date().toISOString() })
+      .eq("creator_id", userId).eq("is_active", true);
+    if (deactivateError) throw deactivateError;
   }
   return true;
 }

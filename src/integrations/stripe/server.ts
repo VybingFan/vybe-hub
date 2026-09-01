@@ -4,6 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 export type PaidCreatorPlanCode = "creator_plus" | "creator_pro" | "creator_studio";
 export type BillingInterval = "monthly" | "annual";
 export type FocusAddOnCode = "second_focus" | "pro_multi_focus" | "studio_multi_focus";
+export type SocialDiscoveryAddOnCode = "social_discovery";
 
 export type StripePriceSelection = {
   planCode: PaidCreatorPlanCode;
@@ -13,6 +14,12 @@ export type StripePriceSelection = {
 
 export type StripeFocusPriceSelection = {
   addOnCode: FocusAddOnCode;
+  interval: BillingInterval;
+  priceId: string;
+};
+
+export type StripeSocialDiscoveryPriceSelection = {
+  addOnCode: SocialDiscoveryAddOnCode;
   interval: BillingInterval;
   priceId: string;
 };
@@ -76,6 +83,16 @@ function configuredFocusPrices(): StripeFocusPriceSelection[] {
   );
 }
 
+function configuredSocialDiscoveryPrices(): StripeSocialDiscoveryPriceSelection[] {
+  const entries: Array<[SocialDiscoveryAddOnCode, BillingInterval, string | undefined]> = [
+    ["social_discovery", "monthly", process.env.STRIPE_PRICE_SOCIAL_DISCOVERY_MONTHLY],
+    ["social_discovery", "annual", process.env.STRIPE_PRICE_SOCIAL_DISCOVERY_ANNUAL],
+  ];
+  return entries.flatMap(([addOnCode, interval, priceId]) =>
+    priceId ? [{ addOnCode, interval, priceId }] : [],
+  );
+}
+
 export function priceFor(planCode: string, interval: string): StripePriceSelection {
   const match = configuredPrices().find(
     (price) => price.planCode === planCode && price.interval === interval,
@@ -100,6 +117,16 @@ export function focusPriceFor(addOnCode: string, interval: string): StripeFocusP
 
 export function focusSelectionForPrice(priceId: string): StripeFocusPriceSelection | null {
   return configuredFocusPrices().find((price) => price.priceId === priceId) ?? null;
+}
+
+export function socialDiscoveryPriceFor(interval: string): StripeSocialDiscoveryPriceSelection {
+  const match = configuredSocialDiscoveryPrices().find((price) => price.interval === interval);
+  if (!match) throw new Error(`Stripe Social Discovery price is not configured for ${interval}.`);
+  return match;
+}
+
+export function socialDiscoverySelectionForPrice(priceId: string): StripeSocialDiscoveryPriceSelection | null {
+  return configuredSocialDiscoveryPrices().find((price) => price.priceId === priceId) ?? null;
 }
 
 export function appUrlFor(request: Request) {

@@ -211,6 +211,12 @@ const creatorAudience: NavItem[] = [
     icon: ContactRound,
     allow: ["creator", "admin"],
   },
+  {
+    title: "Social Discovery",
+    url: "/social-discovery",
+    icon: Compass,
+    allow: ["creator", "admin"],
+  },
 ];
 
 const creatorGrowth: NavItem[] = [

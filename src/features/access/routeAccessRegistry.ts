@@ -31,6 +31,7 @@ export const ROUTE_ACCESS_REGISTRY: readonly RouteAccessRule[] = [
   { id: "creator-film-review", experience: "creator_studio", paths: ["/film-project-media"], roles: creatorRoles, protection: ["session", "role", "membership", "focus"], capability: "film.project_media_review", focus: "film" },
   { id: "creator-film", experience: "creator_studio", paths: ["/film-studio", "/film-playlists"], roles: creatorRoles, protection: ["session", "role", "focus"], focus: "film" },
   { id: "creator-writing", experience: "creator_studio", paths: ["/writing-studio", "/writing-work/:workId", "/writing-collections"], roles: creatorRoles, protection: ["session", "role", "focus"], focus: "writing" },
+  { id: "creator-social-discovery", experience: "creator_studio", paths: ["/social-discovery"], roles: creatorRoles, protection: ["session", "role"] },
   { id: "creator-team", experience: "creator_studio", paths: ["/organization"], roles: creatorRoles, protection: ["session", "role", "membership"], capability: "team.workspace" },
   { id: "creator-priority-support", experience: "creator_studio", paths: ["/creator-support"], roles: creatorRoles, protection: ["session", "role", "membership"], capability: "support.priority" },
   { id: "creator-studio", experience: "creator_studio", paths: ["/activity", "/commerce", "/connections", "/content", "/content-continuity", "/creator-analytics", "/creator-compliance", "/creator-focuses", "/dashboard", "/epk", "/merch", "/music", "/music/:trackId", "/music/:trackId/lyrics", "/music/upload", "/playlists", "/playlists/:playlistId", "/public-music", "/stories"], roles: creatorRoles, protection: ["session", "role"] },
@@ -42,7 +43,7 @@ export const ROUTE_ACCESS_REGISTRY: readonly RouteAccessRule[] = [
   { id: "public-marketing", experience: "public", paths: ["/", "/about", "/community-guidelines", "/copyright", "/copyright/report", "/creator-memberships", "/faq", "/for-artists", "/for-businesses", "/for-film-video", "/for-writers-poets", "/help", "/privacy", "/terms", "/trust"], protection: ["public"] },
   { id: "stripe-webhook", experience: "server_api", paths: ["/api/stripe/webhook"], protection: ["signature"] },
   { id: "stripe-connect", experience: "server_api", paths: ["/api/stripe/connect"], roles: creatorRoles, protection: ["session", "role", "membership"] },
-  { id: "authenticated-apis", experience: "server_api", paths: ["/api/account-deletion", "/api/admin-team-invite", "/api/secure-playlist", "/api/stripe/checkout", "/api/stripe/focus-checkout", "/api/stripe/portal", "/api/video-status", "/api/video-upload-url"], protection: ["session", "role"] },
+  { id: "authenticated-apis", experience: "server_api", paths: ["/api/account-deletion", "/api/admin-team-invite", "/api/secure-playlist", "/api/stripe/checkout", "/api/stripe/focus-checkout", "/api/stripe/social-discovery-checkout", "/api/stripe/portal", "/api/video-status", "/api/video-upload-url"], protection: ["session", "role"] },
 ] as const;
 
 function matches(pathname: string, pattern: string) {
