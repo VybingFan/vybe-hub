@@ -87,8 +87,30 @@ export function detectSocialPlatform(value: string): SocialPlatform {
   return "other";
 }
 
-function normalizeUrl(value: string) {
-  return parsePublicUrl(value).toString();
+export function normalizeSocialPostUrl(value: string) {
+  const parsed = parsePublicUrl(value);
+  parsed.hash = "";
+  ["fbclid", "gclid", "igshid", "si", "feature"].forEach((key) => parsed.searchParams.delete(key));
+  return parsed.toString();
+}
+
+async function getSignedInUserId() {
+  const { data: session } = await supabase.auth.getSession();
+  const userId = session.session?.user.id;
+  if (!userId) throw new Error("Sign in as a creator to manage Social Discovery.");
+  return userId;
+}
+
+async function findMineByNormalizedUrl(userId: string, originalUrl: string): Promise<SocialDiscoveryPost | null> {
+  const { data, error } = await client
+    .from("creator_social_posts")
+    .select("*")
+    .eq("creator_id", userId)
+    .eq("original_url", originalUrl)
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return (data || null) as SocialDiscoveryPost | null;
 }
 
 export const socialDiscoveryService = {
@@ -117,11 +139,17 @@ export const socialDiscoveryService = {
     return (data || []) as SocialDiscoveryPost[];
   },
 
+  async findMineByUrl(value: string): Promise<SocialDiscoveryPost | null> {
+    const userId = await getSignedInUserId();
+    const originalUrl = normalizeSocialPostUrl(value);
+    return findMineByNormalizedUrl(userId, originalUrl);
+  },
+
   async create(input: SaveSocialPostInput): Promise<SocialDiscoveryPost> {
-    const { data: session } = await supabase.auth.getSession();
-    const userId = session.session?.user.id;
-    if (!userId) throw new Error("Sign in as a creator to manage Social Discovery.");
-    const originalUrl = normalizeUrl(input.original_url);
+    const userId = await getSignedInUserId();
+    const originalUrl = normalizeSocialPostUrl(input.original_url);
+    const existing = await findMineByNormalizedUrl(userId, originalUrl);
+    if (existing) throw new Error(`This social post is already in your library as "${existing.title}".`);
     const platform = detectSocialPlatform(originalUrl);
     const { data, error } = await client.from("creator_social_posts").insert({
       creator_id: userId,
@@ -142,7 +170,7 @@ export const socialDiscoveryService = {
   },
 
   async update(id: string, input: SaveSocialPostInput): Promise<SocialDiscoveryPost> {
-    const originalUrl = normalizeUrl(input.original_url);
+    const originalUrl = normalizeSocialPostUrl(input.original_url);
     const platform = detectSocialPlatform(originalUrl);
     const { data, error } = await client.from("creator_social_posts").update({
       platform,

@@ -53,6 +53,9 @@ function SocialDiscoveryPage() {
   const [draft, setDraft] = useState<Draft>(blank);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [preparing, setPreparing] = useState(false);
+  const [quickPrepared, setQuickPrepared] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -82,6 +85,27 @@ function SocialDiscoveryPage() {
 
   useEffect(() => { void refresh(); }, []);
 
+  async function prepareQuickAdd() {
+    setPreparing(true);
+    setMessage(null);
+    setError(null);
+    try {
+      if (!draft.original_url.trim()) throw new Error("Paste a public social-post link first.");
+      const platform = detectSocialPlatform(draft.original_url);
+      const existing = await socialDiscoveryService.findMineByUrl(draft.original_url);
+      if (existing) {
+        throw new Error(`That ${existing.platform} post is already in your library as "${existing.title}".`);
+      }
+      setQuickPrepared(true);
+      setMessage(`${platform === "other" ? "Social" : platform} post recognized. Add a title, optional topics, and choose whether to make it searchable now.`);
+    } catch (reason) {
+      setQuickPrepared(false);
+      setError(reason instanceof Error ? reason.message : "That social-post link could not be prepared.");
+    } finally {
+      setPreparing(false);
+    }
+  }
+
   function edit(post: SocialDiscoveryPost) {
     setDraft({
       id: post.id,
@@ -96,13 +120,26 @@ function SocialDiscoveryPage() {
       is_active: post.is_active,
       discovery_order: String(post.discovery_order || 0),
     });
-    setMessage(null); setError(null);
+    setQuickPrepared(true);
+    setShowAdvanced(true);
+    setMessage(null);
+    setError(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function resetDraft() {
+    setDraft(blank);
+    setQuickPrepared(false);
+    setShowAdvanced(false);
+    setMessage(null);
+    setError(null);
   }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    setSaving(true); setMessage(null); setError(null);
+    setSaving(true);
+    setMessage(null);
+    setError(null);
     try {
       if (!draft.title.trim()) throw new Error("Add a title for this social post.");
       const input = {
@@ -119,12 +156,17 @@ function SocialDiscoveryPage() {
       };
       if (draft.id) await socialDiscoveryService.update(draft.id, input);
       else await socialDiscoveryService.create(input);
+      const savedWasEdit = Boolean(draft.id);
       setDraft(blank);
-      setMessage(draft.id ? "Social post updated." : "Social post added to your library.");
+      setQuickPrepared(false);
+      setShowAdvanced(false);
+      setMessage(savedWasEdit ? "Social post updated." : "Social post added to your library.");
       await refresh();
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "The social post could not be saved.");
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function toggle(post: SocialDiscoveryPost) {
@@ -143,7 +185,7 @@ function SocialDiscoveryPage() {
     setMessage(null); setError(null);
     try {
       await socialDiscoveryService.remove(post.id);
-      if (draft.id === post.id) setDraft(blank);
+      if (draft.id === post.id) resetDraft();
       setMessage("Social post deleted.");
       await refresh();
     } catch (reason) {
@@ -201,26 +243,44 @@ function SocialDiscoveryPage() {
         {message ? <p className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">{message}</p> : null}
         {error ? <p className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">{error}</p> : null}
 
-        {summary?.entitled ? <Card><CardHeader><CardTitle className="flex items-center gap-2"><Plus className="h-5 w-5" />{draft.id ? "Edit social post" : "Add a social post"}</CardTitle></CardHeader><CardContent>
+        {summary?.entitled ? <Card><CardHeader><CardTitle className="flex items-center gap-2"><Plus className="h-5 w-5" />{draft.id ? "Edit social post" : "Quick Add a social post"}</CardTitle></CardHeader><CardContent>
           <form onSubmit={submit} className="grid gap-4 md:grid-cols-2">
-            <label className="space-y-1 md:col-span-2"><span className="text-sm font-medium">Public post URL</span><Input value={draft.original_url} onChange={(e) => setDraft({ ...draft, original_url: e.target.value })} placeholder="https://www.instagram.com/..." required /><span className="text-xs text-muted-foreground">Detected platform: {detectedPlatform || "Enter a valid URL"}</span></label>
-            <label className="space-y-1 md:col-span-2"><span className="text-sm font-medium">Discovery title</span><Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} maxLength={160} required /></label>
-            <label className="space-y-1 md:col-span-2"><span className="text-sm font-medium">Caption / description</span><textarea value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} className="min-h-28 w-full rounded-md border bg-background px-3 py-2 text-sm" maxLength={2000} /></label>
-            <label className="space-y-1"><span className="text-sm font-medium">Keywords / topics</span><Input value={draft.keywords} onChange={(e) => setDraft({ ...draft, keywords: e.target.value })} placeholder="spoken word, relationships, poetry" /></label>
-            <label className="space-y-1"><span className="text-sm font-medium">Content type</span><select value={draft.content_type} onChange={(e) => setDraft({ ...draft, content_type: e.target.value as SocialContentType })} className="h-10 w-full rounded-md border bg-background px-3 text-sm">{contentTypes.map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
-            <label className="space-y-1"><span className="text-sm font-medium">Creator focus (optional)</span><Input value={draft.focus_code} onChange={(e) => setDraft({ ...draft, focus_code: e.target.value })} placeholder="music, writing, film..." /></label>
-            <label className="space-y-1"><span className="text-sm font-medium">Original post date (optional)</span><Input type="date" value={draft.original_published_at} onChange={(e) => setDraft({ ...draft, original_published_at: e.target.value })} /></label>
-            <label className="space-y-1 md:col-span-2"><span className="text-sm font-medium">Related VYBE link (optional)</span><Input value={draft.related_vybe_url} onChange={(e) => setDraft({ ...draft, related_vybe_url: e.target.value })} placeholder="/work/... or https://vybewithvybe.com/..." /></label>
-            <label className="flex items-center gap-2"><input type="checkbox" checked={draft.is_active} onChange={(e) => setDraft({ ...draft, is_active: e.target.checked })} /><span className="text-sm">Activate in Social Discovery now</span></label>
-            <label className="space-y-1"><span className="text-sm font-medium">Discovery order</span><Input type="number" value={draft.discovery_order} onChange={(e) => setDraft({ ...draft, discovery_order: e.target.value })} /></label>
-            <div className="flex gap-2 md:col-span-2"><Button type="submit" disabled={saving}>{saving ? "Saving..." : draft.id ? "Save changes" : "Add post"}</Button>{draft.id ? <Button type="button" variant="outline" onClick={() => setDraft(blank)}>Cancel edit</Button> : null}</div>
+            <label className="space-y-1 md:col-span-2">
+              <span className="text-sm font-medium">Paste your public post link</span>
+              <Input value={draft.original_url} onChange={(event) => { setDraft({ ...draft, original_url: event.target.value }); if (!draft.id) setQuickPrepared(false); }} placeholder="Instagram, TikTok, YouTube, Facebook, X or Threads" required />
+              <span className="text-xs text-muted-foreground">{detectedPlatform ? `${detectedPlatform} link detected` : "VYBE will recognize the social platform from the link."}</span>
+            </label>
+
+            {!draft.id && !quickPrepared ? <div className="md:col-span-2">
+              <Button type="button" disabled={preparing} onClick={() => void prepareQuickAdd()}>{preparing ? "Checking..." : "Prepare post"}</Button>
+              <p className="mt-2 text-xs text-muted-foreground">VYBE checks the platform and your library before asking for the remaining details.</p>
+            </div> : <>
+              <label className="space-y-1 md:col-span-2"><span className="text-sm font-medium">Discovery title</span><Input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} maxLength={160} placeholder="Give people a clear reason to open this post" required /></label>
+              <label className="space-y-1"><span className="text-sm font-medium">Topics (optional)</span><Input value={draft.keywords} onChange={(event) => setDraft({ ...draft, keywords: event.target.value })} placeholder="new music, behind the scenes, poetry" /></label>
+              <label className="space-y-1"><span className="text-sm font-medium">Content type</span><select value={draft.content_type} onChange={(event) => setDraft({ ...draft, content_type: event.target.value as SocialContentType })} className="h-10 w-full rounded-md border bg-background px-3 text-sm">{contentTypes.map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
+              <label className="flex items-center gap-2 md:col-span-2"><input type="checkbox" checked={draft.is_active} onChange={(event) => setDraft({ ...draft, is_active: event.target.checked })} /><span className="text-sm">Add to active Social Discovery now</span></label>
+              <div className="md:col-span-2"><Button type="button" variant="ghost" size="sm" onClick={() => setShowAdvanced((value) => !value)}>{showAdvanced ? "Hide advanced details" : "Advanced details (optional)"}</Button></div>
+
+              {showAdvanced ? <>
+                <label className="space-y-1 md:col-span-2"><span className="text-sm font-medium">Caption / description</span><textarea value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} className="min-h-28 w-full rounded-md border bg-background px-3 py-2 text-sm" maxLength={2000} /></label>
+                <label className="space-y-1"><span className="text-sm font-medium">Creator focus</span><Input value={draft.focus_code} onChange={(event) => setDraft({ ...draft, focus_code: event.target.value })} placeholder="music, writing, film..." /></label>
+                <label className="space-y-1"><span className="text-sm font-medium">Original post date</span><Input type="date" value={draft.original_published_at} onChange={(event) => setDraft({ ...draft, original_published_at: event.target.value })} /></label>
+                <label className="space-y-1 md:col-span-2"><span className="text-sm font-medium">Related VYBE link</span><Input value={draft.related_vybe_url} onChange={(event) => setDraft({ ...draft, related_vybe_url: event.target.value })} placeholder="/work/... or https://vybewithvybe.com/..." /></label>
+                <label className="space-y-1"><span className="text-sm font-medium">Discovery order</span><Input type="number" value={draft.discovery_order} onChange={(event) => setDraft({ ...draft, discovery_order: event.target.value })} /></label>
+              </> : null}
+
+              <div className="flex flex-wrap gap-2 md:col-span-2">
+                <Button type="submit" disabled={saving}>{saving ? "Saving..." : draft.id ? "Save changes" : "Add to Social Discovery"}</Button>
+                <Button type="button" variant="outline" onClick={resetDraft}>{draft.id ? "Cancel edit" : "Start over"}</Button>
+              </div>
+            </>}
           </form>
         </CardContent></Card> : <Card><CardContent className="p-6"><p className="font-medium">Subscribe to begin your Social Discovery library.</p><p className="mt-2 text-sm text-muted-foreground">The add-on is separate from your creator membership and works across all of your creator focuses.</p></CardContent></Card>}
 
         <Card><CardHeader><CardTitle className="flex items-center gap-2"><Search className="h-5 w-5" />Social post library</CardTitle></CardHeader><CardContent className="space-y-3">
           {!posts.length ? <p className="text-sm text-muted-foreground">No social posts have been added yet.</p> : null}
           {posts.map((post) => <div key={post.id} className="rounded-2xl border p-4"><div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0"><div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground"><span className="rounded-full border px-2 py-0.5">{post.platform}</span><span>{post.content_type}</span><span>{post.is_active ? "Active in discovery" : "Library only"}</span></div><h3 className="mt-2 font-semibold">{post.title}</h3>{post.description ? <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.description}</p> : null}{post.keywords.length ? <p className="mt-2 text-xs text-muted-foreground">{post.keywords.join(" · ")}</p> : null}</div>
+            <div className="min-w-0"><div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground"><span className="rounded-full border px-2 py-0.5">{post.platform}</span><span>{post.content_type}</span><span>{post.is_active ? "Active in discovery" : "Library only"}</span></div><h3 className="mt-2 font-semibold">{post.title}</h3>{post.description ? <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.description}</p> : null}{post.keywords.length ? <p className="mt-2 text-xs text-muted-foreground">{post.keywords.join(" / ")}</p> : null}</div>
             <div className="flex flex-wrap gap-2"><Button size="sm" variant="outline" asChild><a href={post.original_url} target="_blank" rel="noreferrer"><ExternalLink className="mr-1 h-4 w-4" />Open</a></Button>{summary?.entitled ? <><Button size="sm" variant="outline" onClick={() => edit(post)}><Pencil className="mr-1 h-4 w-4" />Edit</Button><Button size="sm" variant="outline" onClick={() => void toggle(post)}>{post.is_active ? "Deactivate" : "Activate"}</Button><Button size="sm" variant="ghost" onClick={() => void remove(post)}><Trash2 className="mr-1 h-4 w-4" />Delete</Button></> : null}</div>
           </div></div>)}
         </CardContent></Card>
