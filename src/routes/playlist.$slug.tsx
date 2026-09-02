@@ -304,7 +304,7 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
               <Heart className="h-5 w-5 text-fuchsia-300" />
               <h3 className="mt-2 font-semibold text-fuchsia-200">For Supporters</h3>
               <p className="mt-1 text-sm leading-5 text-white/55">Listen freely, then join when you are ready to:</p>
-              <ul className="mt-2 space-y-1 text-xs leading-5 text-white/60"><li>â€¢ Follow creators and receive updates</li><li>â€¢ Save playlists and return anytime</li><li>â€¢ Connect directly when creators allow it</li><li>â€¢ Discover music, films, stories, and more</li></ul>
+              <ul className="mt-2 space-y-1 text-xs leading-5 text-white/60"><li>• Follow creators and receive updates</li><li>• Save playlists and return anytime</li><li>• Connect directly when creators allow it</li><li>• Discover music, films, stories, and more</li></ul>
               <Button asChild size="sm" variant="outline" className="mt-3 w-full border-fuchsia-300/35 bg-transparent text-fuchsia-200 hover:bg-fuchsia-400/10 hover:text-white"><Link to="/auth/sign-up">Get your VYBE</Link></Button>
               <div className="mt-2 flex justify-center"><PlaylistSaveButton playlistId={data.id} /></div>
             </div>
@@ -312,7 +312,7 @@ export function SharedPlaylistExperience({ slug }: { slug: string }) {
               <UserPlus className="h-5 w-5 text-cyan-300" />
               <h3 className="mt-2 font-semibold text-cyan-200">For Creators</h3>
               <p className="mt-1 text-sm leading-5 text-white/55">Bring your work and audience together:</p>
-              <ul className="mt-2 space-y-1 text-xs leading-5 text-white/60"><li>â€¢ Share playable work through one link</li><li>â€¢ Build a recognizable creator presence</li><li>â€¢ Connect directly with supporters</li><li>â€¢ See listening and engagement insights</li></ul>
+              <ul className="mt-2 space-y-1 text-xs leading-5 text-white/60"><li>• Share playable work through one link</li><li>• Build a recognizable creator presence</li><li>• Connect directly with supporters</li><li>• See listening and engagement insights</li></ul>
               <Button asChild size="sm" variant="outline" className="mt-3 w-full border-cyan-300/35 bg-transparent text-cyan-200 hover:bg-cyan-400/10 hover:text-white"><Link to="/for-artists">Create on VYBE</Link></Button>
             </div>
           </div>

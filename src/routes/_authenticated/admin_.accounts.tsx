@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, RefreshCw, Search, UsersRound } from "lucide-react";
 import { toast } from "sonner";
@@ -73,7 +73,7 @@ function AccountRow({
       </td>
 
       <td className="whitespace-nowrap px-2 py-1.5 text-[10px] text-muted-foreground">
-        {focusLabel || "â€”"}
+        {focusLabel || "\u2014"}
       </td>
 
       <td className="whitespace-nowrap px-2 py-1.5">
