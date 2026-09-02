@@ -41,7 +41,7 @@ const VISIBILITY: Array<{
   {
     value: "private",
     title: "Private",
-    description: "Lyrics remain in Creator Studio and are excluded from fan search.",
+    description: "Lyrics remain in Creator HQ and are excluded from fan search.",
   },
 ];
 

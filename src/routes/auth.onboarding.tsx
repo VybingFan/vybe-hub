@@ -63,10 +63,10 @@ function OnboardingPage() {
     navigate({ to: "/auth/sign-in" });
     return null;
   }
-  const isAddingCreatorStudio =
-    role === "creator" && hasRole("supporter") && !hasRole("creator");
+  const isAddingCreatorIdentity =
+    role === "creator" && !!primaryRole && !hasRole("creator") && !hasRole("admin");
 
-  if (primaryRole && !isAddingCreatorStudio) {
+  if (primaryRole && !isAddingCreatorIdentity) {
     navigate({ to: defaultRoute });
     return null;
   }
@@ -96,8 +96,8 @@ function OnboardingPage() {
     <AuthCard
       title={
         intendedRole && !showRoleChoices
-          ? isAddingCreatorStudio
-            ? "Add Creator Studio to your VYBE account"
+          ? isAddingCreatorIdentity
+            ? "Add Creator to your VYBE account"
             : role === "creator"
               ? "You're setting up your Creator account"
               : role === "supporter"
@@ -107,12 +107,12 @@ function OnboardingPage() {
       }
       description={
         intendedRole && !showRoleChoices
-          ? isAddingCreatorStudio
-            ? "Creator Studio is for publishing and managing your creative work. It will be added to this same VYBE login and starts on Creator Free."
+          ? isAddingCreatorIdentity
+            ? "Set up your Creator identity using this same VYBE login. You will start with Creator Free and manage your creator presence from Creator HQ."
             : role === "creator"
               ? "Your Creator account starts on Creator Free. You can add other VYBE identities later without creating another login."
               : role === "supporter"
-                ? "You're creating a Supporter account. You can add Creator Studio later from the same login if you decide to create on VYBE."
+                ? "You're creating a Supporter account. You can add a Creator identity later from the same login if you decide to create on VYBE."
                 : "You're creating a Business account for VYBE partnerships and campaigns."
           : "Choose the account type that matches what you want to do on VYBE. You must make a selection before continuing."
       }
@@ -190,8 +190,8 @@ function OnboardingPage() {
         </div>
         <SubmitButton loading={saving} disabled={!selected}>
           {intendedRole && !showRoleChoices
-            ? isAddingCreatorStudio
-              ? "Add Creator Studio"
+            ? isAddingCreatorIdentity
+              ? "Start Creator Setup"
               : role === "creator"
                 ? "Continue with Creator account"
                 : role === "business"

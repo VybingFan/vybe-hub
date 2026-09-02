@@ -396,7 +396,7 @@ function PlaylistStudio() {
   return (
     <div className="mx-auto max-w-6xl space-y-5">
       <WorkspacePageHeader
-        eyebrow="Creator Studio"
+        eyebrow="Creator HQ"
         title="Playlist Workspace"
         description="Build public releases, private reviews, pitches, and listening experiences from songs already in your Music Library. Playlist access does not change a song's own visibility."
         status={<Badge variant="secondary">{playlists.length} total</Badge>}

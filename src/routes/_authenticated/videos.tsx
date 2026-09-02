@@ -125,7 +125,7 @@ function VideoStudio() {
     <div className="mx-auto max-w-7xl space-y-8 min-[900px]:space-y-5">
       <header>
         <p className="text-sm font-semibold uppercase tracking-[.2em] text-rose-400">
-          Creator Studio
+          Creator HQ
         </p>
         <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">Video Library</h1>
         <p className="mt-3 max-w-3xl text-muted-foreground">

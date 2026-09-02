@@ -523,7 +523,7 @@ export function AppSidebar() {
                   allow: ["admin"],
                 },
                 {
-                  title: "Creator Studio",
+                  title: "Creator HQ",
                   url: "/dashboard",
                   icon: Music2,
                   allow: ["admin"],
@@ -565,7 +565,7 @@ export function AppSidebar() {
             ) : null}
             {visible(creatorStudio).length ? (
               <NavGroup
-                label="Creator Studio"
+                label="Creator HQ"
                 items={visible(creatorStudio)}
                 isActive={isActive}
                 isLocked={isLocked}

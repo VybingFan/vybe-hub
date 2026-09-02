@@ -65,7 +65,7 @@ function CopyrightPage() {
       <div className="sm:col-span-2"><Label htmlFor="signature">Electronic signature (type full legal name)</Label><Input id="signature" name="signature" required className="mt-2" /></div>
       <Button disabled={submitting} className="sm:col-span-2">{submitting ? "Submitting..." : "Submit copyright notice"}</Button>
     </form>}</CardContent></Card>
-    <p className="text-xs leading-5 text-muted-foreground">Misrepresentations in notices or counter-notices may create liability under 17 U.S.C. §512(f). This page describes VYBE operations and is not legal advice. Creators can review affected cases and submit eligible counter-notices from Creator Studio → Copyright Center.</p>
+    <p className="text-xs leading-5 text-muted-foreground">Misrepresentations in notices or counter-notices may create liability under 17 U.S.C. §512(f). This page describes VYBE operations and is not legal advice. Creators can review affected cases and submit eligible counter-notices from Creator HQ → Copyright Center.</p>
     <Button asChild variant="outline"><Link to="/">Return to VYBE</Link></Button>
   </main>;
 }

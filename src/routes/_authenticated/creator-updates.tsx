@@ -83,7 +83,7 @@ function CreatorUpdatesPage() {
   return (
     <div className="mx-auto max-w-7xl space-y-8">
       <header>
-        <p className="text-sm font-semibold uppercase tracking-[.2em] text-cyan-400">Creator Studio</p>
+        <p className="text-sm font-semibold uppercase tracking-[.2em] text-cyan-400">Creator HQ</p>
         <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">Events & Updates</h1>
         <p className="mt-3 max-w-3xl text-muted-foreground">Keep supporters current with shows, appearances, releases, promotions, announcements, and links to tickets, registration, videos, interviews, or anywhere else they should go.</p>
       </header>
@@ -177,7 +177,7 @@ function CreatorUpdatesPage() {
 
           <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-border p-3">
             <input name="publish_now" type="checkbox" className="mt-1 h-4 w-4" />
-            <span className="text-sm"><strong>Publish now</strong><span className="mt-0.5 block text-muted-foreground">Otherwise this stays in your Creator Studio as a draft.</span></span>
+            <span className="text-sm"><strong>Publish now</strong><span className="mt-0.5 block text-muted-foreground">Otherwise this stays in your Creator HQ as a draft.</span></span>
           </label>
 
           <Button disabled={create.isPending} className="w-full bg-gradient-brand text-white">

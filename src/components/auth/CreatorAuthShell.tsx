@@ -16,7 +16,7 @@ export function CreatorAuthShell({ eyebrow,title,description,children,footer,wid
             <span className="grid h-10 w-10 place-items-center rounded-xl border border-violet-400/30 bg-violet-500/15"><Music2 className="h-5 w-5 text-violet-300" /></span>VYBE
           </Link>
           <div className="relative z-10 max-w-md">
-            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.24em] text-violet-300">VYBE Creator Studio</p>
+            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.24em] text-violet-300">VYBE Creator Headquarters</p>
             <h1 className="text-5xl font-black leading-[1.04] tracking-tight">Your work.<br/>Your audience.<br/><span className="text-violet-300">Your VYBE.</span></h1>
             <p className="mt-6 text-base leading-7 text-zinc-400">A professional home for independent creators to organize their presence, share what they create, and grow direct relationships with supporters.</p>
             <div className="mt-8 grid gap-3 text-sm text-zinc-300">
@@ -31,7 +31,7 @@ export function CreatorAuthShell({ eyebrow,title,description,children,footer,wid
           <div className={cn("w-full", wide ? "max-w-2xl" : "max-w-lg")}>
             <div className="mb-8 lg:hidden">
               <Link to="/" className="inline-flex items-center gap-3 text-xl font-black"><span className="grid h-9 w-9 place-items-center rounded-xl border border-violet-400/30 bg-violet-500/15"><Music2 className="h-4 w-4 text-violet-300"/></span>VYBE</Link>
-              <p className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">Creator Studio</p>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">Creator HQ</p>
             </div>
             <div className="rounded-3xl border border-white/10 bg-[#0e0e15] p-6 shadow-2xl shadow-black/40 sm:p-8">
               <p className="text-sm font-semibold text-violet-300">{eyebrow}</p>

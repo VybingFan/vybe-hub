@@ -344,7 +344,7 @@ function DemoCreatorPage() {
                   <a href="#tour">Start guided example</a>
                 </Button>
                 <Button asChild variant="outline">
-                  <Link to="/creator-academy/nova">Study the Creator Studio build</Link>
+                  <Link to="/creator-academy/nova">Study the Creator HQ build</Link>
                 </Button>
               </div>
             </div>

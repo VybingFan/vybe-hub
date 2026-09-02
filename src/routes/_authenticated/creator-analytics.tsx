@@ -90,7 +90,7 @@ function CreatorInsightsPage() {
     <div className="mx-auto max-w-6xl space-y-6 min-[900px]:space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Creator Studio</p>
+          <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Creator HQ</p>
           <h1 className="mt-1 text-3xl font-semibold sm:text-4xl">Creator Insights</h1>
           <p className="mt-2 text-muted-foreground">Understand how people discover, experience, and engage with your content.</p>
           <p className="mt-1 text-sm text-muted-foreground">Reporting period: {periodLabel} · Creator self-plays excluded</p>

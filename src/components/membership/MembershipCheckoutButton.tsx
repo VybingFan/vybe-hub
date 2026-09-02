@@ -17,7 +17,7 @@ export function MembershipCheckoutButton({
   planName: string;
   interval: BillingInterval;
 }) {
-  const { user, primaryRole, isLoading } = useUser();
+  const { user, primaryRole, isLoading, hasRole } = useUser();
   const { data: membership } = useMembership(primaryRole === "creator" || primaryRole === "admin");
   const [isPending, setIsPending] = useState(false);
 
@@ -25,9 +25,15 @@ export function MembershipCheckoutButton({
     return (
       <Button asChild className="mt-7 bg-gradient-brand text-white">
         {user ? (
-          <Link to="/dashboard">
-            Open Creator Studio <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
+          hasRole("creator") || hasRole("admin") ? (
+            <Link to="/dashboard">
+              Open Creator HQ <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          ) : (
+            <Link to="/auth/onboarding" search={{ role: "creator" }}>
+              Start Creator Setup <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          )
         ) : (
           <Link
             to="/creator/sign-up"

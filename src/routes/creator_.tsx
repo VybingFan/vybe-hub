@@ -77,7 +77,7 @@ function CreatorStartPage() {
                     className="bg-gradient-brand text-primary-foreground shadow-glow"
                   >
                     <a href={defaultRoute}>
-                      Open Creator Studio <ArrowRight className="ml-2 h-4 w-4" />
+                      Open Creator HQ <ArrowRight className="ml-2 h-4 w-4" />
                     </a>
                   </Button>
                 </div>
@@ -158,7 +158,7 @@ function CreatorStartPage() {
               Start creating
             </p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Everything begins inside Creator Studio.
+              Everything begins inside Creator HQ.
             </h2>
           </div>
           <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

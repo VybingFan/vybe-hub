@@ -27,7 +27,7 @@ export function MarketingNav() {
   const { user, primaryRole, defaultRoute, isLoading } = useUser();
   const professionalCta =
     primaryRole === "creator"
-      ? { label: "Open Creator Studio", href: defaultRoute }
+      ? { label: "Open Creator HQ", href: defaultRoute }
       : primaryRole === "business"
         ? { label: "Open Business Portal", href: defaultRoute }
         : null;

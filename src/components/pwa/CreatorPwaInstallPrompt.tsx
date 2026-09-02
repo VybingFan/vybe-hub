@@ -86,7 +86,7 @@ export function CreatorPwaInstallPrompt() {
             <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
               {isIos
                 ? "This message is a guide: tap Share above, choose Add to Home Screen, then tap Add."
-                : "Add your Creator Studio to this device for faster access from your home screen."}
+                : "Add Creator HQ to this device for faster access from your home screen."}
             </p>
           </div>
         </div>

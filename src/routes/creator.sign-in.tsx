@@ -34,7 +34,7 @@ function CreatorSignInPage() {
     try {
       await signIn(parsed.data.email, parsed.data.password, parsed.data.rememberMe);
       window.sessionStorage.setItem("vybe:active-workspace", "creator_studio");
-      toast.success("Welcome back to Creator Studio");
+      toast.success("Welcome back to Creator HQ");
       navigate({ to: "/dashboard" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not sign in");
@@ -45,7 +45,7 @@ function CreatorSignInPage() {
 
   return (
     <CreatorAuthShell eyebrow="Professional creator access"
-      title="Creator Studio Sign In"
+      title="Creator HQ Sign In"
       description="Professional access for VYBE creators. Manage your creator home, music, content, audience, and growth tools."
       footer={
         <div className="space-y-2 text-center">
@@ -72,7 +72,7 @@ function CreatorSignInPage() {
           <Sparkles className="h-4 w-4 text-primary" /> Your professional creator workspace
         </p>
         <p className="flex items-center gap-2 text-muted-foreground">
-          <ShieldCheck className="h-4 w-4 text-primary" /> Your professional tools stay organized in Creator Studio
+          <ShieldCheck className="h-4 w-4 text-primary" /> Your professional tools stay organized in Creator HQ
         </p>
       </div>
 
@@ -119,7 +119,7 @@ function CreatorSignInPage() {
           <span>Remember me on this device</span>
         </label>
 
-        <SubmitButton loading={loading}>Open Creator Studio</SubmitButton>
+        <SubmitButton loading={loading}>Open Creator HQ</SubmitButton>
       </form>
     </CreatorAuthShell>
   );

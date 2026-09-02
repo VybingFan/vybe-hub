@@ -201,7 +201,7 @@ function FilmPlaylistWorkspace() {
   return (
     <div className="mx-auto max-w-7xl space-y-7">
       <header>
-        <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Creator Studio</p>
+        <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Creator HQ</p>
         <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">Film Playlist Studio</h1>
         <p className="mt-3 max-w-3xl text-muted-foreground">
           Arrange trailers, finished or unfinished scenes, and authorized Watch links into the same controlled playlist concept used across VYBE.

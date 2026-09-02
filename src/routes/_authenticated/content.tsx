@@ -9,7 +9,7 @@ function ContentPage() {
   return (
     <RoleGuard allow={["creator", "admin"]}>
       <ExperiencePreviewPage
-        eyebrow="Creator Studio"
+        eyebrow="Creator HQ"
         title="One studio for every part of your creative world."
         description="Music works today. The wider VYBE content studio shows how filmmakers, poets, video creators, podcasters, photographers, and storytellers will eventually publish."
         accent="#7c3aed"

@@ -126,7 +126,7 @@ function CreatorSignUpPage() {
         }
       >
         <div className="space-y-3 rounded-2xl border border-primary/20 bg-primary/5 p-5 text-sm">
-          <p className="font-semibold">Confirmation is required before Creator Studio can open.</p>
+          <p className="font-semibold">Confirmation is required before Creator HQ can open.</p>
           <p className="text-muted-foreground">
             Open the VYBE email and select <strong>Confirm my email</strong>. VYBE will then continue
             with Creator onboarding and your selected membership path.

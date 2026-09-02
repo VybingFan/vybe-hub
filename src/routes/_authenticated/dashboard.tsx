@@ -118,7 +118,7 @@ function DashboardContent() {
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <WorkspacePageHeader
-        eyebrow="Creator Studio"
+        eyebrow="Creator HQ"
         title={`${creator?.artist_name || account?.display_name || "Creator"} Studio`}
         description="See what needs attention, create quickly, and follow your audience activity."
         action={

@@ -124,7 +124,7 @@ export const LOCKED_FEATURE_EDUCATION: Record<LockedFeatureEducationKey, LockedF
   creator_browsing: {
     title: "Browse VYBE while keeping your creator identity active",
     description: "Creator-mode browsing lets you explore and engage without repeatedly switching away from your creator workspace.",
-    howItWorks: ["Open VYBE discovery from creator mode.", "Browse public creators and experiences with the appropriate identity context.", "Return to Creator Studio without losing your working mode."],
+    howItWorks: ["Open VYBE discovery from creator mode.", "Browse public creators and experiences with the appropriate identity context.", "Return to Creator HQ without losing your working mode."],
     benefits: ["Makes collaboration discovery easier", "Reduces account-mode friction", "Supports creator-to-creator networking", "Keeps work and discovery connected"],
     requiredPlan: "creator_pro",
     requiredPlanLabel: "Creator Pro or Creator Studio",

@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Film, LockKeyhole, Music2, Sparkles, Workflow } from "lucide-react";
@@ -45,7 +45,7 @@ function CreatorFocusesPage() {
 
   return <div className="mx-auto max-w-6xl space-y-7 min-[900px]:space-y-5">
     <header>
-      <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Creator Studio</p>
+      <p className="text-sm font-semibold uppercase tracking-[.2em] text-primary">Creator HQ</p>
       <h1 className="mt-1 text-3xl font-semibold sm:text-4xl">Creator Focuses</h1>
       <p className="mt-2 max-w-3xl text-muted-foreground">Each focus is a separate creator workspace. Your primary focus controls your default Studio experience; changing it never deletes content.</p>
     </header>
@@ -86,7 +86,7 @@ function CreatorFocusesPage() {
 
     <Pricing planCode={membership?.plan_code || ""} founding={membership?.plan_code === "founding_beta"} />
 
-    <AlertDialog open={Boolean(confirmation)} onOpenChange={(open) => !open && setConfirmation(null)}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{confirmation?.kind === "primary" ? `Make ${confirmation?.name} primary?` : `Remove ${confirmation?.name} workspace?`}</AlertDialogTitle><AlertDialogDescription>{confirmation?.kind === "primary" ? "This changes your default Creator Studio focus. It does not delete or move content in any workspace." : "Access will be removed, but existing content is preserved. This does not cancel a paid focus subscription."}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction disabled={action.isPending} onClick={() => confirmation && action.mutate({ kind: confirmation.kind, code: confirmation.code })}>Confirm change</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+    <AlertDialog open={Boolean(confirmation)} onOpenChange={(open) => !open && setConfirmation(null)}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{confirmation?.kind === "primary" ? `Make ${confirmation?.name} primary?` : `Remove ${confirmation?.name} workspace?`}</AlertDialogTitle><AlertDialogDescription>{confirmation?.kind === "primary" ? "This changes your primary Creator HQ focus. It does not delete or move content in any workspace." : "Access will be removed, but existing content is preserved. This does not cancel a paid focus subscription."}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction disabled={action.isPending} onClick={() => confirmation && action.mutate({ kind: confirmation.kind, code: confirmation.code })}>Confirm change</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
   </div>;
 }
 
