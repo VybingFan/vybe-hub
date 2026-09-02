@@ -1,3 +1,5 @@
+import { env as cloudflareEnv } from "cloudflare:workers";
+
 type R2UploadedPart = { partNumber:number; etag:string };
 type R2MultipartUpload = { uploadId:string; uploadPart(partNumber:number,body:ReadableStream|ArrayBuffer|Blob):Promise<{partNumber:number;etag:string}>; complete(parts:R2UploadedPart[]):Promise<unknown>; abort():Promise<void> };
 type R2Object = { body:ReadableStream; size:number };
@@ -6,15 +8,19 @@ type TransferEnv = { VYBE_CREATOR_TRANSFERS?:R2Bucket; SUPABASE_URL?:string; SUP
 
 const json=(value:unknown,status=200)=>new Response(JSON.stringify(value),{status,headers:{"content-type":"application/json"}});
 const cleanFileName=(value:string)=>value.replace(/[\r\n]/g," ").slice(0,255);
-function config(env:TransferEnv){const url=env.SUPABASE_URL||env.VITE_SUPABASE_URL;const key=env.SUPABASE_PUBLISHABLE_KEY||env.VITE_SUPABASE_PUBLISHABLE_KEY;if(!url||!key)throw new Error("Supabase server environment is not configured.");return{url,key};}
+function config(env:TransferEnv){const url=env.SUPABASE_URL||env.VITE_SUPABASE_URL||import.meta.env.VITE_SUPABASE_URL;const key=env.SUPABASE_PUBLISHABLE_KEY||env.VITE_SUPABASE_PUBLISHABLE_KEY||import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;if(!url||!key)throw new Error("Supabase server environment is not configured.");return{url,key};}
 async function rpc(env:TransferEnv,token:string,name:string,args:Record<string,unknown>){const{url,key}=config(env);const res=await fetch(`${url}/rest/v1/rpc/${name}`,{method:"POST",headers:{apikey:key,authorization:`Bearer ${token}`,"content-type":"application/json"},body:JSON.stringify(args)});if(!res.ok)throw new Error(await res.text());return await res.json();}
 async function publicRpc(env:TransferEnv,name:string,args:Record<string,unknown>){const{url,key}=config(env);const res=await fetch(`${url}/rest/v1/rpc/${name}`,{method:"POST",headers:{apikey:key,"content-type":"application/json"},body:JSON.stringify(args)});if(!res.ok)throw new Error(await res.text());return await res.json();}
 function bearer(request:Request){const h=request.headers.get("authorization")||"";if(!h.startsWith("Bearer "))throw new Error("Authentication required.");return h.slice(7);}
 async function authorizedFile(env:TransferEnv,token:string,fileId:string){const rows=await rpc(env,token,"creator_transfer_authorize_upload",{p_file_id:fileId}) as Array<{object_key:string;size_bytes:number}>;if(!rows[0])throw new Error("Upload is not authorized.");return rows[0];}
+function resolveEnv(rawEnv:unknown):TransferEnv{
+ const candidate=(rawEnv && typeof rawEnv==="object") ? rawEnv as TransferEnv : cloudflareEnv as unknown as TransferEnv;
+ return candidate;
+}
 
-export async function handleCreatorTransferRequest(request:Request,rawEnv:unknown):Promise<Response|null>{
+export async function handleCreatorTransferRequest(request:Request,rawEnv?:unknown):Promise<Response|null>{
  const url=new URL(request.url);if(!url.pathname.startsWith("/api/creator-transfer/"))return null;
- const env=rawEnv as TransferEnv;const bucket=env.VYBE_CREATOR_TRANSFERS;if(!bucket)return json({error:"VYBE Creator Transfer R2 binding is not configured."},503);
+ const env=resolveEnv(rawEnv);const bucket=env?.VYBE_CREATOR_TRANSFERS;if(!bucket)return json({error:"VYBE Creator Transfer R2 binding is not configured."},503);
  try{
   if(url.pathname.endsWith("/download")&&request.method==="GET"){
    const ticket=url.searchParams.get("ticket")||"";if(!ticket)return json({error:"Download ticket required."},400);
