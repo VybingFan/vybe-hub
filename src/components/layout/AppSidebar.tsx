@@ -24,6 +24,7 @@ import {
   ListMusic,
   LockKeyhole,
   Music2,
+  MessageCircle,
   Search,
   Settings,
   ShieldCheck,
@@ -162,7 +163,8 @@ const creatorStudio: NavItem[] = [
     url: "/playlists",
     icon: ListMusic,
     allow: ["creator", "admin"],
-  },  {
+  },
+  {
     title: "Upload Music",
     url: "/music/upload",
     icon: Music2,
@@ -219,6 +221,12 @@ const creatorAudience: NavItem[] = [
     allow: ["creator", "admin"],
   },
   {
+    title: "Creator Messages",
+    url: "/creator-messages",
+    icon: MessageCircle,
+    allow: ["creator", "admin"],
+  },
+  {
     title: "Social Discovery",
     url: "/social-discovery",
     icon: Compass,
@@ -244,18 +252,21 @@ const creatorGrowth: NavItem[] = [
     url: "/merch",
     icon: ShoppingBag,
     allow: ["creator", "admin"],
-  },  {
+  },
+  {
     title: "Music Sales",
     url: "/commerce",
     icon: CreditCard,
     allow: ["creator", "admin"],
     capability: "commerce.prepare",
-  },  {
+  },
+  {
     title: "Rights Review",
     url: "/admin/commerce-rights",
     icon: CreditCard,
     allow: ["admin"],
-  },  {
+  },
+  {
     title: "Copyright Center",
     url: "/creator-compliance",
     icon: CreditCard,
@@ -699,3 +710,4 @@ function NavGroup({
     </SidebarGroup>
   );
 }
+

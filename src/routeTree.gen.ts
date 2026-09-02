@@ -99,6 +99,7 @@ import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCreatorUpdatesRouteImport } from './routes/_authenticated/creator-updates'
 import { Route as AuthenticatedCreatorSupportRouteImport } from './routes/_authenticated/creator-support'
+import { Route as AuthenticatedCreatorMessagesRouteImport } from './routes/_authenticated/creator-messages'
 import { Route as AuthenticatedCreatorFocusesRouteImport } from './routes/_authenticated/creator-focuses'
 import { Route as AuthenticatedCreatorComplianceRouteImport } from './routes/_authenticated/creator-compliance'
 import { Route as AuthenticatedCreatorAnalyticsRouteImport } from './routes/_authenticated/creator-analytics'
@@ -611,6 +612,12 @@ const AuthenticatedCreatorSupportRoute =
     path: '/creator-support',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCreatorMessagesRoute =
+  AuthenticatedCreatorMessagesRouteImport.update({
+    id: '/creator-messages',
+    path: '/creator-messages',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCreatorFocusesRoute =
   AuthenticatedCreatorFocusesRouteImport.update({
     id: '/creator-focuses',
@@ -930,6 +937,7 @@ export interface FileRoutesByFullPath {
   '/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
   '/creator-compliance': typeof AuthenticatedCreatorComplianceRoute
   '/creator-focuses': typeof AuthenticatedCreatorFocusesRoute
+  '/creator-messages': typeof AuthenticatedCreatorMessagesRoute
   '/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/creator-updates': typeof AuthenticatedCreatorUpdatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -1070,6 +1078,7 @@ export interface FileRoutesByTo {
   '/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
   '/creator-compliance': typeof AuthenticatedCreatorComplianceRoute
   '/creator-focuses': typeof AuthenticatedCreatorFocusesRoute
+  '/creator-messages': typeof AuthenticatedCreatorMessagesRoute
   '/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/creator-updates': typeof AuthenticatedCreatorUpdatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -1213,6 +1222,7 @@ export interface FileRoutesById {
   '/_authenticated/creator-analytics': typeof AuthenticatedCreatorAnalyticsRoute
   '/_authenticated/creator-compliance': typeof AuthenticatedCreatorComplianceRoute
   '/_authenticated/creator-focuses': typeof AuthenticatedCreatorFocusesRoute
+  '/_authenticated/creator-messages': typeof AuthenticatedCreatorMessagesRoute
   '/_authenticated/creator-support': typeof AuthenticatedCreatorSupportRoute
   '/_authenticated/creator-updates': typeof AuthenticatedCreatorUpdatesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -1356,6 +1366,7 @@ export interface FileRouteTypes {
     | '/creator-analytics'
     | '/creator-compliance'
     | '/creator-focuses'
+    | '/creator-messages'
     | '/creator-support'
     | '/creator-updates'
     | '/dashboard'
@@ -1496,6 +1507,7 @@ export interface FileRouteTypes {
     | '/creator-analytics'
     | '/creator-compliance'
     | '/creator-focuses'
+    | '/creator-messages'
     | '/creator-support'
     | '/creator-updates'
     | '/dashboard'
@@ -1638,6 +1650,7 @@ export interface FileRouteTypes {
     | '/_authenticated/creator-analytics'
     | '/_authenticated/creator-compliance'
     | '/_authenticated/creator-focuses'
+    | '/_authenticated/creator-messages'
     | '/_authenticated/creator-support'
     | '/_authenticated/creator-updates'
     | '/_authenticated/dashboard'
@@ -2442,6 +2455,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCreatorSupportRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/creator-messages': {
+      id: '/_authenticated/creator-messages'
+      path: '/creator-messages'
+      fullPath: '/creator-messages'
+      preLoaderRoute: typeof AuthenticatedCreatorMessagesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/creator-focuses': {
       id: '/_authenticated/creator-focuses'
       path: '/creator-focuses'
@@ -2807,6 +2827,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCreatorAnalyticsRoute: typeof AuthenticatedCreatorAnalyticsRoute
   AuthenticatedCreatorComplianceRoute: typeof AuthenticatedCreatorComplianceRoute
   AuthenticatedCreatorFocusesRoute: typeof AuthenticatedCreatorFocusesRoute
+  AuthenticatedCreatorMessagesRoute: typeof AuthenticatedCreatorMessagesRoute
   AuthenticatedCreatorSupportRoute: typeof AuthenticatedCreatorSupportRoute
   AuthenticatedCreatorUpdatesRoute: typeof AuthenticatedCreatorUpdatesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -2881,6 +2902,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCreatorAnalyticsRoute: AuthenticatedCreatorAnalyticsRoute,
   AuthenticatedCreatorComplianceRoute: AuthenticatedCreatorComplianceRoute,
   AuthenticatedCreatorFocusesRoute: AuthenticatedCreatorFocusesRoute,
+  AuthenticatedCreatorMessagesRoute: AuthenticatedCreatorMessagesRoute,
   AuthenticatedCreatorSupportRoute: AuthenticatedCreatorSupportRoute,
   AuthenticatedCreatorUpdatesRoute: AuthenticatedCreatorUpdatesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,

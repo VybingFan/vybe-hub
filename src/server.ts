@@ -1,5 +1,7 @@
 import "./lib/error-capture";
 
+import { handleCreatorTransferRequest } from "./server/creator-transfer-r2";
+
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
@@ -47,6 +49,9 @@ function isH3SwallowedErrorBody(body: string): boolean {
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const transferResponse = await handleCreatorTransferRequest(request, env);
+      if (transferResponse) return transferResponse;
+
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
