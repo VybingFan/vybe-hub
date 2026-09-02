@@ -162,6 +162,7 @@ function PublicExplorePage() {
                       key={creator.user_id}
                       to="/artist/$username"
                       params={{ username: creator.username }}
+                      search={{ track: "", autoplay: true }}
                       className="group min-w-0 rounded-2xl border bg-card p-4 transition hover:-translate-y-0.5 hover:border-primary/40 sm:p-5"
                     >
                       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
@@ -260,7 +261,7 @@ function PublicExplorePage() {
                       key={track.id}
                       to="/artist/$username"
                       params={{ username: track.creator!.username }}
-                      search={{ track: track.id }}
+                      search={{ track: track.id, autoplay: true }}
                       hash="music"
                       className="flex min-w-0 items-center gap-3 rounded-2xl border bg-card p-3 transition hover:border-primary/40 sm:gap-4 sm:p-4"
                     >

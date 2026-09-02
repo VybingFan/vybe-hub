@@ -33,6 +33,7 @@ export function PublicCreatorMusicExperience({
   creatorUserId,
   creatorName,
   initialTrackId,
+  autoPlayOnOpen = false,
   planCode,
   featuredCollectionLabel = "Artist’s Top 5",
 }: {
@@ -42,6 +43,7 @@ export function PublicCreatorMusicExperience({
   creatorUserId: string;
   creatorName: string;
   initialTrackId?: string;
+  autoPlayOnOpen?: boolean;
   planCode?: import("@/features/membership/catalog").CreatorPlanCode | null;
   featuredCollectionLabel?: string;
 }) {
@@ -161,6 +163,7 @@ export function PublicCreatorMusicExperience({
           creatorUserId={creatorUserId}
           creatorName={creatorName}
           featuredCollectionLabel={featuredCollectionLabel}
+          autoPlayOnOpen={autoPlayOnOpen}
           onSelect={setSelectedId}
           resolvePlaybackUrl={publicCreatorService.playbackUrl}
           planCode={planCode}

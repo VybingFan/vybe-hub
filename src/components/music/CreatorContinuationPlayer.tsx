@@ -36,6 +36,7 @@ export function CreatorContinuationPlayer({
   topTrackIds,
   creatorUserId,
   creatorName,
+  autoPlayOnOpen = false,
   featuredCollectionLabel = "Artist’s Top 5",
   onSelect,
   resolvePlaybackUrl,
@@ -48,6 +49,7 @@ export function CreatorContinuationPlayer({
   creatorUserId: string;
   creatorName: string;
   featuredCollectionLabel?: string;
+  autoPlayOnOpen?: boolean;
   onSelect: (id: string) => void;
   resolvePlaybackUrl?: (track: Track) => Promise<string>;
   docked?: boolean;
@@ -79,10 +81,11 @@ export function CreatorContinuationPlayer({
   useEffect(() => {
     if (!mounted.current) {
       mounted.current = true;
+      shouldAutoplay.current = autoPlayOnOpen;
       return;
     }
     shouldAutoplay.current = true;
-  }, [selectedId]);
+  }, [autoPlayOnOpen, selectedId]);
   useEffect(() => {
     if (!track) return;
     if (resolvedTrackId.current !== track.id) {
@@ -110,7 +113,7 @@ export function CreatorContinuationPlayer({
 
   useEffect(() => {
     const audio = audioRef.current;
-    const sourceUrl = track?.audio_url || resolvedAudioUrl;
+    const sourceUrl = track?.audio_url || (resolvedTrackId.current === track?.id ? resolvedAudioUrl : "");
     if (!audio || !sourceUrl) return;
     setElapsed(0);
     setDuration(track.duration_sec || 0);
@@ -182,12 +185,9 @@ export function CreatorContinuationPlayer({
       return;
     }
     completed.current.add(track.id);
-    const finishedTopFive = index === topTrackIds.size - 1 && Boolean(next);
-    if (finishedTopFive) {
-      setPlaying(false);
-      setChoice("top-five");
-    } else if (next) choose(next);
-    else {
+    if (next) {
+      choose(next);
+    } else {
       setPlaying(false);
       setChoice("library");
     }

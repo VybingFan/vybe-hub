@@ -307,7 +307,7 @@ export function SharedPlaylistPlayer({
     setCurrent(index);
   }
 
-  function nextTrack() {
+  function nextTrack(continuePlayback = playing) {
     if (!tracks.length) {
       return;
     }
@@ -322,7 +322,7 @@ export function SharedPlaylistPlayer({
       nextIndex = current + 1 < tracks.length ? current + 1 : 0;
     }
 
-    shouldAutoplayRef.current = playing;
+    shouldAutoplayRef.current = continuePlayback;
     setCurrent(nextIndex);
   }
 
@@ -354,8 +354,7 @@ export function SharedPlaylistPlayer({
       return;
     }
 
-    shouldAutoplayRef.current = true;
-    nextTrack();
+    nextTrack(true);
   }
 
   function seek([value]: number[]) {
@@ -604,7 +603,7 @@ export function SharedPlaylistPlayer({
               type="button"
               variant="ghost"
               size="icon"
-              onClick={nextTrack}
+              onClick={() => nextTrack()}
               disabled={tracks.length < 2}
               aria-label="Next song"
             >
@@ -698,7 +697,7 @@ export function SharedPlaylistPlayer({
           </div>
           <Button type="button" variant="ghost" size="icon" onClick={previousTrack} disabled={tracks.length < 2} aria-label="Previous song"><SkipBack className="h-4 w-4" /></Button>
           <Button type="button" size="icon" className="h-11 w-11 rounded-full bg-gradient-brand text-white" onClick={() => void togglePlayback()} disabled={!canPlay || loadingAudio} aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause className="h-4 w-4 fill-current" /> : <Play className="ml-0.5 h-4 w-4 fill-current" />}</Button>
-          <Button type="button" variant="ghost" size="icon" onClick={nextTrack} disabled={tracks.length < 2} aria-label="Next song"><SkipForward className="h-4 w-4" /></Button>
+          <Button type="button" variant="ghost" size="icon" onClick={() => nextTrack()} disabled={tracks.length < 2} aria-label="Next song"><SkipForward className="h-4 w-4" /></Button>
           <Button type="button" variant="ghost" size="icon" onClick={toggleMute} aria-label={volume === 0 ? "Unmute" : "Mute"}>{volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}</Button>
         </div>
         <div className="mx-auto mt-1 max-w-6xl"><div className="h-0.5 overflow-hidden rounded-full bg-white/10"><div className="h-full bg-gradient-to-r from-fuchsia-500 to-cyan-400" style={{ width: `${Math.min(100, (elapsed / Math.max(displayedDuration, 1)) * 100)}%` }} /></div></div>
@@ -742,7 +741,7 @@ export function SharedPlaylistPlayer({
                   <Button type="button" size="icon" className="h-16 w-16 rounded-full bg-gradient-brand text-white" onClick={() => void togglePlayback()} disabled={!canPlay || loadingAudio} aria-label={playing ? "Pause" : "Play"}>
                     {playing ? <Pause className="fill-current" /> : <Play className="ml-1 fill-current" />}
                   </Button>
-                  <Button type="button" variant="ghost" size="icon" onClick={nextTrack} disabled={tracks.length < 2} aria-label="Next song"><SkipForward /></Button>
+                  <Button type="button" variant="ghost" size="icon" onClick={() => nextTrack()} disabled={tracks.length < 2} aria-label="Next song"><SkipForward /></Button>
                 </div>
               </div>
             </div>

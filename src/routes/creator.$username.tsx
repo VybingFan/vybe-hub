@@ -42,9 +42,11 @@ function CreatorPage() {
 export function PublicArtistHome({
   username,
   selectedTrackId,
+  autoPlayOnOpen = false,
 }: {
   username: string;
   selectedTrackId?: string;
+  autoPlayOnOpen?: boolean;
 }) {
   const navigate = useNavigate();
   const { user, defaultRoute } = useUser();
@@ -212,6 +214,7 @@ export function PublicArtistHome({
             creatorUserId={profile.user_id}
             creatorName={name}
             initialTrackId={selectedTrackId}
+            autoPlayOnOpen={autoPlayOnOpen}
             featuredCollectionLabel={compactProfile ? "Featured Music" : undefined}
             planCode={planCode}
           />
