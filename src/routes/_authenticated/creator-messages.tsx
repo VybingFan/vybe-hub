@@ -64,10 +64,27 @@ function CreatorMessagesPage() {
   }, []);
 
   useEffect(() => {
-    void refreshMessages(active);
+    void (async () => {
+      if (active) await creatorMessagingService.markRead(active);
+      await refreshMessages(active);
+      if (active) await refreshThreads();
+    })().catch((error) => toast.error(error instanceof Error ? error.message : "Could not refresh conversation"));
     setText("");
     setPendingFile(null);
     if (fileRef.current) fileRef.current.value = "";
+  }, [active]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      void (async () => {
+        if (active) {
+          await creatorMessagingService.markRead(active);
+          await refreshMessages(active);
+        }
+        await refreshThreads();
+      })().catch(() => undefined);
+    }, 12000);
+    return () => window.clearInterval(timer);
   }, [active]);
 
   useEffect(() => {
@@ -238,8 +255,15 @@ function CreatorMessagesPage() {
                           @{thread.other_username}
                         </span>
                       )}
-                      <span className="mt-1 block truncate text-xs text-muted-foreground">
-                        {thread.last_preview || "Start the conversation"}
+                      <span className="mt-1 flex items-center gap-2">
+                        <span className={`min-w-0 flex-1 truncate text-xs ${thread.unread_count ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
+                          {thread.last_preview || "Start the conversation"}
+                        </span>
+                        {thread.unread_count ? (
+                          <span className="shrink-0 rounded-full bg-destructive px-2 py-0.5 text-[10px] font-semibold text-destructive-foreground" aria-label={`${thread.unread_count} unread messages`}>
+                            {thread.unread_count > 99 ? "99+" : thread.unread_count}
+                          </span>
+                        ) : null}
                       </span>
                     </span>
                   </button>

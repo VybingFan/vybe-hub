@@ -1,9 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export type CreatorDirectoryEntry = { user_id:string; artist_name:string; username:string|null; avatar_url:string|null };
-export type CreatorThread = { thread_id:string; other_user_id:string; other_name:string; other_username:string|null; other_avatar:string|null; last_message_at:string|null; last_preview:string|null };
+export type CreatorThread = { thread_id:string; other_user_id:string; other_name:string; other_username:string|null; other_avatar:string|null; last_message_at:string|null; last_preview:string|null; unread_count:number };
 export type CreatorMessage = { message_id:string; sender_user_id:string; body:string|null; created_at:string; transfer_id:string|null; file_id:string|null; file_name:string|null; size_bytes:number|null; content_type:string|null; expires_at:string|null; transfer_status:string|null };
 export type TransferSummary = { plan_code:string; monthly_bytes:number; used_bytes:number; remaining_bytes:number; max_file_bytes:number; retention_days:number };
+export type CreatorUnreadSummary = { unread_count:number; latest_thread_id:string|null; latest_sender_name:string|null; latest_preview:string|null; latest_kind:string|null };
 
 type PreparedTransfer = { transfer_id:string; file_id:string; object_key:string; expires_at:string };
 const db = supabase as any;
@@ -14,10 +15,13 @@ async function token() { const {data,error}=await supabase.auth.getSession(); if
 
 export const creatorMessagingService = {
   directory:(query="")=>rpc<CreatorDirectoryEntry[]>("creator_message_directory",{p_query:query}),
-  threads:()=>rpc<CreatorThread[]>("creator_message_threads_list"),
+  threads:()=>rpc<CreatorThread[]>("creator_message_threads_list_v2"),
   messages:(threadId:string)=>rpc<CreatorMessage[]>("creator_message_thread_messages",{p_thread_id:threadId}),
   start:(otherUserId:string)=>rpc<string>("creator_message_start",{p_other_user_id:otherUserId}),
   send:(threadId:string,body:string)=>rpc<string>("creator_message_send",{p_thread_id:threadId,p_body:body}),
+  markRead:(threadId:string)=>rpc<number>("creator_message_mark_read",{p_thread_id:threadId}),
+  unreadCount:()=>rpc<number>("creator_message_unread_count"),
+  unreadSummary:async()=>{ const rows=await rpc<CreatorUnreadSummary[]>("creator_message_unread_summary"); return rows[0] ?? { unread_count:0, latest_thread_id:null, latest_sender_name:null, latest_preview:null, latest_kind:null }; },
   summary:async()=>{ const rows=await rpc<TransferSummary[]>("creator_transfer_summary"); return rows[0]; },
   setLargeFilePreference:async(allow:boolean)=>{ const {data:{user}}=await supabase.auth.getUser(); if(!user) throw new Error("Sign in again to continue."); const {error}=await db.from("creator_transfer_preferences").upsert({user_id:user.id,allow_large_files:allow,updated_at:new Date().toISOString()}); if(error) throw error; },
   async upload(threadId:string,file:File,onProgress?:(pct:number)=>void) {

@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import {
   Activity,
   BarChart3,
@@ -54,6 +55,7 @@ import { hasActiveCreatorFocus, hasCreatorCapability, type CreatorCapability } f
 import type { CreatorFocusCode } from "@/features/membership/creatorFocusAccess";
 import type { AppRole } from "@/features/auth/roles";
 import type { AdminAccess } from "@/services/admin/adminTeamService";
+import { creatorMessagingService } from "@/services/messaging/creatorMessagingService";
 
 interface NavItem {
   title: string;
@@ -305,6 +307,8 @@ export function AppSidebar() {
   });
   const isAdmin = hasAnyRole(["admin"]) && pathname.startsWith("/admin");
   const [pendingWork, setPendingWork] = useState(0);
+  const [creatorUnread, setCreatorUnread] = useState(0);
+  const lastCreatorUnread = useRef<number | null>(null);
   const [adminAccess, setAdminAccess] = useState<AdminAccess | null>(null);
   const isActive = (url: string) =>
     pathname === url || pathname.startsWith(url + "/");
@@ -337,6 +341,56 @@ export function AppSidebar() {
       .then((summary) => setPendingWork(summary.unread))
       .catch(() => undefined);
   }, [isAdmin, pathname, adminAccess]);
+  useEffect(() => {
+    if (!user?.id || !hasAnyRole(["creator"]) || isAdmin) {
+      setCreatorUnread(0);
+      lastCreatorUnread.current = null;
+      return;
+    }
+
+    let cancelled = false;
+    const refreshUnread = async () => {
+      const summary = await creatorMessagingService.unreadSummary();
+      if (cancelled) return;
+
+      const next = Number(summary.unread_count || 0);
+      const previous = lastCreatorUnread.current;
+      setCreatorUnread(next);
+
+      if (
+        previous !== null &&
+        next > previous &&
+        !pathname.startsWith("/creator-messages")
+      ) {
+        const sender = summary.latest_sender_name || "A creator";
+        toast.info(
+          summary.latest_kind === "file"
+            ? `${sender} sent you a file`
+            : `${sender} sent you a message`,
+          summary.latest_preview
+            ? { description: summary.latest_preview }
+            : undefined,
+        );
+      }
+
+      lastCreatorUnread.current = next;
+    };
+
+    void refreshUnread().catch(() => undefined);
+    const timer = window.setInterval(
+      () => void refreshUnread().catch(() => undefined),
+      15000,
+    );
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [user?.id, hasAnyRole, isAdmin, pathname]);
+
+  const creatorAudienceWithBadges = creatorAudience.map((item) =>
+    item.url === "/creator-messages" ? { ...item, badge: creatorUnread } : item,
+  );
 
   return (
     <Sidebar collapsible="icon">
@@ -582,10 +636,10 @@ export function AppSidebar() {
                 isLocked={isLocked}
               />
             ) : null}
-            {visible(creatorAudience).length ? (
+            {visible(creatorAudienceWithBadges).length ? (
               <NavGroup
                 label="Audience"
-                items={visible(creatorAudience)}
+                items={visible(creatorAudienceWithBadges)}
                 isActive={isActive}
                 isLocked={isLocked}
               />
