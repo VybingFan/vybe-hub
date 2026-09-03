@@ -1,0 +1,13 @@
+{
+  "name": "vybe-rights-processor",
+  "private": true,
+  "version": "24.76.0",
+  "type": "module",
+  "scripts": {
+    "process:one": "node src/index.mjs --job-id",
+    "doctor": "node src/index.mjs --doctor"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.110.0"
+  }
+}
