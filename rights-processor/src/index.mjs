@@ -1,13 +1,25 @@
 import { createClient } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 
-const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76b1";
+const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76b2";
 const AUDIO_BUCKET = "music-audio";
 const SIMILARITY_THRESHOLD = 0.90;
+
+function positiveIntegerFromEnv(name, fallback) {
+  const raw = process.env[name]?.trim();
+  if (!raw) return fallback;
+  const value = Number(raw);
+  if (!Number.isSafeInteger(value) || value <= 0) throw new Error(`${name} must be a positive integer`);
+  return value;
+}
+
+const PROCESS_TIMEOUT_MS = positiveIntegerFromEnv("VYBE_RIGHTS_PROCESS_TIMEOUT_MS", 120000);
+const PROCESS_OUTPUT_LIMIT_BYTES = positiveIntegerFromEnv("VYBE_RIGHTS_PROCESS_OUTPUT_LIMIT_BYTES", 4 * 1024 * 1024);
+const MAX_AUDIO_BYTES = positiveIntegerFromEnv("VYBE_RIGHTS_MAX_AUDIO_BYTES", 250 * 1024 * 1024);
 
 function required(name) {
   const value = process.env[name]?.trim();
@@ -15,28 +27,68 @@ function required(name) {
   return value;
 }
 
-function run(command, args) {
+function runProcess(command, args, { acceptNonZero = false } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, { stdio: ["ignore", "pipe", "pipe"] });
     let stdout = "";
     let stderr = "";
-    child.stdout.on("data", (chunk) => { stdout += chunk.toString(); });
-    child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
-    child.on("error", reject);
-    child.on("close", (code) => code === 0 ? resolve({ stdout, stderr }) : reject(new Error(`${command} exited ${code}: ${stderr.slice(-1500)}`)));
+    let outputBytes = 0;
+    let settled = false;
+    let timedOut = false;
+    let outputExceeded = false;
+
+    const finishReject = (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(error);
+    };
+
+    const finishResolve = (value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve(value);
+    };
+
+    const append = (streamName, chunk) => {
+      if (settled) return;
+      outputBytes += chunk.length;
+      if (outputBytes > PROCESS_OUTPUT_LIMIT_BYTES) {
+        outputExceeded = true;
+        child.kill("SIGKILL");
+        return;
+      }
+      if (streamName === "stdout") stdout += chunk.toString();
+      else stderr += chunk.toString();
+    };
+
+    child.stdout.on("data", (chunk) => append("stdout", chunk));
+    child.stderr.on("data", (chunk) => append("stderr", chunk));
+    child.on("error", finishReject);
+
+    const timer = setTimeout(() => {
+      if (settled) return;
+      timedOut = true;
+      child.kill("SIGKILL");
+    }, PROCESS_TIMEOUT_MS);
+
+    child.on("close", (code, signal) => {
+      if (outputExceeded) return finishReject(new Error(`${command} exceeded ${PROCESS_OUTPUT_LIMIT_BYTES} bytes of output and was terminated`));
+      if (timedOut) return finishReject(new Error(`${command} exceeded ${PROCESS_TIMEOUT_MS} ms and was terminated`));
+      const result = { code: code ?? -1, signal: signal || null, stdout, stderr };
+      if (acceptNonZero || code === 0) return finishResolve(result);
+      return finishReject(new Error(`${command} exited ${code}${signal ? ` (${signal})` : ""}: ${stderr.slice(-1500)}`));
+    });
   });
 }
 
+function run(command, args) {
+  return runProcess(command, args);
+}
+
 function runWithExitCode(command, args) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { stdio: ["ignore", "pipe", "pipe"] });
-    let stdout = "";
-    let stderr = "";
-    child.stdout.on("data", (chunk) => { stdout += chunk.toString(); });
-    child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
-    child.on("error", reject);
-    child.on("close", (code) => resolve({ code: code ?? -1, stdout, stderr }));
-  });
+  return runProcess(command, args, { acceptNonZero: true });
 }
 
 async function assertBinary(command, args) { await run(command, args); }
@@ -46,7 +98,16 @@ async function doctor() {
   required("SUPABASE_SERVICE_ROLE_KEY");
   await assertBinary("ffprobe", ["-version"]);
   await assertBinary("fpcalc", ["-version"]);
-  console.log(JSON.stringify({ ok: true, workerVersion: WORKER_VERSION, ffprobe: true, chromaprint: true, similarityThreshold: SIMILARITY_THRESHOLD }));
+  console.log(JSON.stringify({
+    ok: true,
+    workerVersion: WORKER_VERSION,
+    ffprobe: true,
+    chromaprint: true,
+    similarityThreshold: SIMILARITY_THRESHOLD,
+    processTimeoutMs: PROCESS_TIMEOUT_MS,
+    processOutputLimitBytes: PROCESS_OUTPUT_LIMIT_BYTES,
+    maxAudioBytes: MAX_AUDIO_BYTES,
+  }));
 }
 
 function parseJobId() {
@@ -164,6 +225,7 @@ async function main() {
 
     const { data: audioBlob, error: downloadError } = await supabase.storage.from(AUDIO_BUCKET).download(track.audio_url);
     if (downloadError) throw downloadError;
+    if (audioBlob.size > MAX_AUDIO_BYTES) throw new Error(`Downloaded audio is ${audioBlob.size} bytes, exceeding the ${MAX_AUDIO_BYTES}-byte processing limit`);
     const bytes = Buffer.from(await audioBlob.arrayBuffer());
     if (!bytes.length) throw new Error("Downloaded audio is empty");
 
@@ -171,7 +233,7 @@ async function main() {
     const audioPath = join(workDir, "source-audio");
     await writeFile(audioPath, bytes);
     const [measured, fp] = await Promise.all([probe(audioPath), chromaprint(audioPath)]);
-    const sha256 = createHash("sha256").update(await readFile(audioPath)).digest("hex");
+    const sha256 = createHash("sha256").update(bytes).digest("hex");
     const metadata = { ...measured.metadata, chromaprint_raw: fp.rawFingerprint.join(",") };
 
     const { error: completeError } = await supabase.rpc("complete_audio_processing_job", {
