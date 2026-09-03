@@ -11,6 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { adminService, type AdminCreatorRecord } from "@/services/admin/adminService";
 
 export const Route = createFileRoute("/_authenticated/admin_/content")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    creator: typeof search.creator === "string" ? search.creator : undefined,
+  }),
   component: AdminContentRoute,
 });
 
@@ -39,12 +42,17 @@ function AdminContentRoute() {
 }
 
 function AdminContentInventory() {
+  const routeSearch = Route.useSearch();
   const [creators, setCreators] = useState<AdminCreatorRecord[]>([]);
   const [tracks, setTracks] = useState<TrackInventoryRow[]>([]);
   const [search, setSearch] = useState("");
-  const [creatorFilter, setCreatorFilter] = useState("all");
+  const [creatorFilter, setCreatorFilter] = useState(routeSearch.creator ?? "all");
   const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setCreatorFilter(routeSearch.creator ?? "all");
+  }, [routeSearch.creator]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -92,6 +100,7 @@ function AdminContentInventory() {
   const creatorsWithContent = creatorSummaries.filter((item) => item.totalItems > 0).length;
   const creatorsWithoutContent = creatorSummaries.length - creatorsWithContent;
   const totalKnownItems = creatorSummaries.reduce((sum, item) => sum + item.totalItems, 0);
+  const selectedCreator = creatorFilter === "all" ? null : creatorMap.get(creatorFilter) ?? null;
 
   const filteredTracks = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -132,6 +141,11 @@ function AdminContentInventory() {
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
               Review what creator accounts currently have on VYBE before catalog cleanup and rights fingerprint backfill. This page is read-only.
             </p>
+            {selectedCreator ? (
+              <p className="mt-2 text-sm font-medium text-primary">
+                Filtered to {selectedCreator.creator_name || selectedCreator.display_name || selectedCreator.email || "selected creator"}
+              </p>
+            ) : null}
           </div>
           <Button variant="outline" size="icon" onClick={() => void load()} aria-label="Refresh">
             <RefreshCw className="h-4 w-4" />
@@ -247,9 +261,9 @@ function AdminContentInventory() {
           <h2 className="font-semibold">Creator catalog summary</h2>
           <p className="mt-1 text-sm text-muted-foreground">Use this summary to identify accounts with content before deciding which test accounts or uploads should be cleaned up.</p>
           <div className="mt-4 overflow-x-auto rounded-lg border">
-            <table className="w-full min-w-[760px] border-collapse text-sm">
+            <table className="w-full min-w-[820px] border-collapse text-sm">
               <thead className="bg-muted/25 text-left text-xs uppercase tracking-wide text-muted-foreground">
-                <tr><th className="px-3 py-2">Creator</th><th className="px-3 py-2">Songs</th><th className="px-3 py-2">Playlists</th><th className="px-3 py-2">Videos</th><th className="px-3 py-2">Merch</th><th className="px-3 py-2">Total</th></tr>
+                <tr><th className="px-3 py-2">Creator</th><th className="px-3 py-2">Songs</th><th className="px-3 py-2">Playlists</th><th className="px-3 py-2">Videos</th><th className="px-3 py-2">Merch</th><th className="px-3 py-2">Total</th><th className="px-3 py-2">Action</th></tr>
               </thead>
               <tbody>
                 {creatorSummaries.map(({ creator, totalItems }) => (
@@ -260,6 +274,11 @@ function AdminContentInventory() {
                     <td className="px-3 py-2">{creator.video_count}</td>
                     <td className="px-3 py-2">{creator.merch_count}</td>
                     <td className="px-3 py-2 font-semibold">{totalItems}</td>
+                    <td className="px-3 py-2">
+                      <Button asChild size="sm" variant="outline">
+                        <Link to="/admin/content" search={{ creator: creator.user_id }}>View content</Link>
+                      </Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
