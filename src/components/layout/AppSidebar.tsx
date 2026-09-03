@@ -69,235 +69,56 @@ interface NavItem {
 }
 
 const memberPrimary: NavItem[] = [
-  {
-    title: "Home",
-    url: "/home",
-    icon: Home,
-    allow: ["supporter", "creator", "business", "admin"],
-  },
-  {
-    title: "Discover",
-    url: "/discover",
-    icon: Compass,
-    allow: ["supporter", "creator", "business", "admin"],
-  },
-  {
-    title: "Listen",
-    url: "/experience/listen",
-    icon: Music2,
-    allow: ["supporter", "creator", "business", "admin"],
-  },
-  {
-    title: "My VYBE",
-    url: "/my-vybe",
-    icon: Heart,
-    allow: ["supporter", "creator", "business", "admin"],
-  },
+  { title: "Home", url: "/home", icon: Home, allow: ["supporter", "creator", "business", "admin"] },
+  { title: "Discover", url: "/discover", icon: Compass, allow: ["supporter", "creator", "business", "admin"] },
+  { title: "Listen", url: "/experience/listen", icon: Music2, allow: ["supporter", "creator", "business", "admin"] },
+  { title: "My VYBE", url: "/my-vybe", icon: Heart, allow: ["supporter", "creator", "business", "admin"] },
 ];
 
 const memberMore: NavItem[] = [
-  {
-    title: "Watch",
-    url: "/watch",
-    icon: Clapperboard,
-    allow: ["supporter", "creator", "business", "admin"],
-  },
-  {
-    title: "Read",
-    url: "/read",
-    icon: BookOpenText,
-    allow: ["supporter", "creator", "business", "admin"],
-  },
-  {
-    title: "Play",
-    url: "/play",
-    icon: Gamepad2,
-    allow: ["supporter", "creator", "business", "admin"],
-  },
-
-  {
-    title: "Communities",
-    url: "/communities",
-    icon: UsersRound,
-    allow: ["supporter", "creator", "business", "admin"],
-  },
-  {
-    title: "Events",
-    url: "/events",
-    icon: CalendarDays,
-    allow: ["supporter", "creator", "business", "admin"],
-  },
-  {
-    title: "Social Search",
-    url: "/social-search",
-    icon: Search,
-    allow: ["supporter", "creator", "business", "admin"],
-  },
+  { title: "Watch", url: "/watch", icon: Clapperboard, allow: ["supporter", "creator", "business", "admin"] },
+  { title: "Read", url: "/read", icon: BookOpenText, allow: ["supporter", "creator", "business", "admin"] },
+  { title: "Play", url: "/play", icon: Gamepad2, allow: ["supporter", "creator", "business", "admin"] },
+  { title: "Communities", url: "/communities", icon: UsersRound, allow: ["supporter", "creator", "business", "admin"] },
+  { title: "Events", url: "/events", icon: CalendarDays, allow: ["supporter", "creator", "business", "admin"] },
+  { title: "Social Search", url: "/social-search", icon: Search, allow: ["supporter", "creator", "business", "admin"] },
 ];
 
 const creatorStudio: NavItem[] = [
-  {
-    title: "Creator Dashboard",
-    url: "/dashboard",
-    icon: LayoutDashboard,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Create & Manage",
-    url: "/content",
-    icon: LibraryBig,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Events & Updates",
-    url: "/creator-updates",
-    icon: CalendarDays,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Music Library",
-    url: "/music",
-    icon: Music2,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Playlists",
-    url: "/playlists",
-    icon: ListMusic,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Upload Music",
-    url: "/music/upload",
-    icon: Music2,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Writing Studio",
-    url: "/writing-studio",
-    icon: BookOpenText,
-    allow: ["creator", "admin"],
-    focus: "writing",
-  },
-  {
-    title: "Writing Collections",
-    url: "/writing-collections",
-    icon: BookOpenText,
-    allow: ["creator", "admin"],
-    focus: "writing",
-  },
-  {
-    title: "Video Library",    url: "/videos",
-    icon: Clapperboard,
-    allow: ["creator", "admin"],
-    capability: "video.library",
-  },
-  {
-    title: "Film Studio",
-    url: "/film-studio",
-    icon: Clapperboard,
-    allow: ["creator", "admin"],
-    focus: "film",
-  },
-  {
-    title: "Project Media & Review",
-    url: "/film-project-media",
-    icon: Clapperboard,
-    allow: ["creator", "admin"],
-    capability: "film.project_media_review",
-    focus: "film",
-  },
+  { title: "Creator Dashboard", url: "/dashboard", icon: LayoutDashboard, allow: ["creator", "admin"] },
+  { title: "Create & Manage", url: "/content", icon: LibraryBig, allow: ["creator", "admin"] },
+  { title: "Events & Updates", url: "/creator-updates", icon: CalendarDays, allow: ["creator", "admin"] },
+  { title: "Music Library", url: "/music", icon: Music2, allow: ["creator", "admin"] },
+  { title: "Playlists", url: "/playlists", icon: ListMusic, allow: ["creator", "admin"] },
+  { title: "Upload Music", url: "/music/upload", icon: Music2, allow: ["creator", "admin"] },
+  { title: "Writing Studio", url: "/writing-studio", icon: BookOpenText, allow: ["creator", "admin"], focus: "writing" },
+  { title: "Writing Collections", url: "/writing-collections", icon: BookOpenText, allow: ["creator", "admin"], focus: "writing" },
+  { title: "Video Library", url: "/videos", icon: Clapperboard, allow: ["creator", "admin"], capability: "video.library" },
+  { title: "Film Studio", url: "/film-studio", icon: Clapperboard, allow: ["creator", "admin"], focus: "film" },
+  { title: "Project Media & Review", url: "/film-project-media", icon: Clapperboard, allow: ["creator", "admin"], capability: "film.project_media_review", focus: "film" },
 ];
 
 const creatorAudience: NavItem[] = [
-  {
-    title: "Insights",
-    url: "/creator-analytics",
-    icon: BarChart3,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Connections",
-    url: "/connections",
-    icon: ContactRound,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Creator Messages",
-    url: "/creator-messages",
-    icon: MessageCircle,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Social Discovery",
-    url: "/social-discovery",
-    icon: Compass,
-    allow: ["creator", "admin"],
-  },
+  { title: "Insights", url: "/creator-analytics", icon: BarChart3, allow: ["creator", "admin"] },
+  { title: "Connections", url: "/connections", icon: ContactRound, allow: ["creator", "admin"] },
+  { title: "Creator Messages", url: "/creator-messages", icon: MessageCircle, allow: ["creator", "admin"] },
+  { title: "Social Discovery", url: "/social-discovery", icon: Compass, allow: ["creator", "admin"] },
 ];
 
 const creatorGrowth: NavItem[] = [
-  {
-    title: "Creator Academy",
-    url: "/creator-academy/nova",
-    icon: GraduationCap,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Public Profile & Discovery",
-    url: "/profile",
-    icon: User,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Merchandise",
-    url: "/merch",
-    icon: ShoppingBag,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Music Sales",
-    url: "/commerce",
-    icon: CreditCard,
-    allow: ["creator", "admin"],
-    capability: "commerce.prepare",
-  },
-  {
-    title: "Rights Review",
-    url: "/admin/commerce-rights",
-    icon: CreditCard,
-    allow: ["admin"],
-  },
-  {
-    title: "Copyright Center",
-    url: "/creator-compliance",
-    icon: CreditCard,
-    allow: ["creator", "admin"],
-  },
-{
-    title: "Industry Kit & EPK",
-    url: "/epk",
-    icon: BriefcaseBusiness,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Creator Focuses",
-    url: "/creator-focuses",
-    icon: Workflow,
-    allow: ["creator", "admin"],
-  },
-  {
-    title: "Creator Settings",
-    url: "/settings",
-    icon: Settings,
-    allow: ["creator", "admin"],
-  },
+  { title: "Creator Academy", url: "/creator-academy/nova", icon: GraduationCap, allow: ["creator", "admin"] },
+  { title: "Public Profile & Discovery", url: "/profile", icon: User, allow: ["creator", "admin"] },
+  { title: "Merchandise", url: "/merch", icon: ShoppingBag, allow: ["creator", "admin"] },
+  { title: "Music Sales", url: "/commerce", icon: CreditCard, allow: ["creator", "admin"], capability: "commerce.prepare" },
+  { title: "Rights Review", url: "/admin/commerce-rights", icon: CreditCard, allow: ["admin"] },
+  { title: "Copyright Center", url: "/creator-compliance", icon: CreditCard, allow: ["creator", "admin"] },
+  { title: "Industry Kit & EPK", url: "/epk", icon: BriefcaseBusiness, allow: ["creator", "admin"] },
+  { title: "Creator Focuses", url: "/creator-focuses", icon: Workflow, allow: ["creator", "admin"] },
+  { title: "Creator Settings", url: "/settings", icon: Settings, allow: ["creator", "admin"] },
 ];
 
 export function AppSidebar() {
-  const pathname = useRouterState({
-    select: (state) => state.location.pathname,
-  });
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const { hasAnyRole, user } = useUser();
   const membership = useMembership(Boolean(user?.id) && hasAnyRole(["creator"]));
   const focusAccess = useQuery({
@@ -310,17 +131,13 @@ export function AppSidebar() {
   const [creatorUnread, setCreatorUnread] = useState(0);
   const lastCreatorUnread = useRef<number | null>(null);
   const [adminAccess, setAdminAccess] = useState<AdminAccess | null>(null);
-  const isActive = (url: string) =>
-    pathname === url || pathname.startsWith(url + "/");
-  const visible = (items: NavItem[]) =>
-    items.filter((item) => {
-      if (!hasAnyRole(item.allow)) return false;
-      if (item.focus && !hasActiveCreatorFocus(item.focus, focusAccess.data?.access)) return false;
-      return true;
-    });
-  const isLocked = (item: NavItem) => Boolean(
-    item.capability && !hasCreatorCapability(membership.data?.plan_code, item.capability),
-  );
+  const isActive = (url: string) => pathname === url || pathname.startsWith(url + "/");
+  const visible = (items: NavItem[]) => items.filter((item) => {
+    if (!hasAnyRole(item.allow)) return false;
+    if (item.focus && !hasActiveCreatorFocus(item.focus, focusAccess.data?.access)) return false;
+    return true;
+  });
+  const isLocked = (item: NavItem) => Boolean(item.capability && !hasCreatorCapability(membership.data?.plan_code, item.capability));
 
   useEffect(() => {
     if (!isAdmin) {
@@ -334,71 +151,47 @@ export function AppSidebar() {
   }, [isAdmin, pathname]);
 
   useEffect(() => {
-    if (!isAdmin || !adminAccess?.permissions.includes("admin.work_queue.read"))
-      return;
+    if (!isAdmin || !adminAccess?.permissions.includes("admin.work_queue.read")) return;
     void import("@/services/admin/adminNotificationService")
       .then(({ adminNotificationService }) => adminNotificationService.summary())
       .then((summary) => setPendingWork(summary.unread))
       .catch(() => undefined);
   }, [isAdmin, pathname, adminAccess]);
+
   useEffect(() => {
     if (!user?.id || !hasAnyRole(["creator"]) || isAdmin) {
       setCreatorUnread(0);
       lastCreatorUnread.current = null;
       return;
     }
-
     let cancelled = false;
     const refreshUnread = async () => {
       const summary = await creatorMessagingService.unreadSummary();
       if (cancelled) return;
-
       const next = Number(summary.unread_count || 0);
       const previous = lastCreatorUnread.current;
       setCreatorUnread(next);
-
-      if (
-        previous !== null &&
-        next > previous &&
-        !pathname.startsWith("/creator-messages")
-      ) {
+      if (previous !== null && next > previous && !pathname.startsWith("/creator-messages")) {
         const sender = summary.latest_sender_name || "A creator";
-        toast.info(
-          summary.latest_kind === "file"
-            ? `${sender} sent you a file`
-            : `${sender} sent you a message`,
-          summary.latest_preview
-            ? { description: summary.latest_preview }
-            : undefined,
-        );
+        toast.info(summary.latest_kind === "file" ? `${sender} sent you a file` : `${sender} sent you a message`, summary.latest_preview ? { description: summary.latest_preview } : undefined);
       }
-
       lastCreatorUnread.current = next;
     };
-
     void refreshUnread().catch(() => undefined);
-    const timer = window.setInterval(
-      () => void refreshUnread().catch(() => undefined),
-      15000,
-    );
-
+    const timer = window.setInterval(() => void refreshUnread().catch(() => undefined), 15000);
     return () => {
       cancelled = true;
       window.clearInterval(timer);
     };
   }, [user?.id, hasAnyRole, isAdmin, pathname]);
 
-  const creatorAudienceWithBadges = creatorAudience.map((item) =>
-    item.url === "/creator-messages" ? { ...item, badge: creatorUnread } : item,
-  );
+  const creatorAudienceWithBadges = creatorAudience.map((item) => item.url === "/creator-messages" ? { ...item, badge: creatorUnread } : item);
 
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="px-3 py-4">
         <div className="flex items-center gap-2">
-          <Link to="/auth/redirect" className="min-w-0 flex-1">
-            <Logo />
-          </Link>
+          <Link to="/auth/redirect" className="min-w-0 flex-1"><Logo /></Link>
           {!isAdmin ? <VybeGuideLauncher /> : null}
         </div>
       </SidebarHeader>
@@ -408,62 +201,21 @@ export function AppSidebar() {
             <NavGroup
               label="Operations"
               items={[
-                {
-                  title: "Back Office Home",
-                  url: "/admin",
-                  icon: LayoutDashboard,
-                  allow: ["admin"],
-                },
-                {
-                  title: "Work Queue",
-                  url: "/admin/work-queue",
-                  icon: ClipboardList,
-                  allow: ["admin"],
-                  badge: pendingWork,
-                  permissionAnyOf: ["admin.work_queue.read"],
-                },
-                {
-                  title: "Accounts",
-                  url: "/admin/accounts",
-                  icon: ContactRound,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.accounts.read"],
-                },
-                {
-                  title: "Creators",
-                  url: "/admin/creators",
-                  icon: UsersRound,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.creator.read"],
-                },
-                {
-                  title: "Rights & Content",
-                  url: "/admin/rights",
-                  icon: ShieldCheck,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.rights.read", "admin.content.read"],
-                },
-                {
-                  title: "Music Rights Review",
-                  url: "/admin/commerce-rights",
-                  icon: ShieldCheck,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.rights.read", "admin.content.read"],
-                },
-                {
-                  title: "Copyright & DMCA",
-                  url: "/admin/copyright",
-                  icon: ShieldCheck,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.rights.read", "admin.content.read"],
-                },
-                {
-                  title: "Seller Payout Readiness",
-                  url: "/admin/seller-readiness",
-                  icon: CreditCard,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.finance.read", "admin.content.read"],
-                },
+                { title: "Back Office Home", url: "/admin", icon: LayoutDashboard, allow: ["admin"] },
+                { title: "Work Queue", url: "/admin/work-queue", icon: ClipboardList, allow: ["admin"], badge: pendingWork, permissionAnyOf: ["admin.work_queue.read"] },
+                { title: "Accounts", url: "/admin/accounts", icon: ContactRound, allow: ["admin"], permissionAnyOf: ["admin.accounts.read"] },
+                { title: "Creators", url: "/admin/creators", icon: UsersRound, allow: ["admin"], permissionAnyOf: ["admin.creator.read"] },
+                { title: "Content Inventory", url: "/admin/content", icon: LibraryBig, allow: ["admin"], permissionAnyOf: ["admin.content.read", "admin.creator.read"] },
+              ]}
+              isActive={isActive}
+              adminPermissions={adminAccess?.permissions ?? []}
+            />
+            <NavGroup
+              label="Rights & Protection"
+              items={[
+                { title: "Rights Overview", url: "/admin/rights", icon: ShieldCheck, allow: ["admin"], permissionAnyOf: ["admin.rights.read", "admin.content.read"] },
+                { title: "Commerce Rights Review", url: "/admin/commerce-rights", icon: ShieldCheck, allow: ["admin"], permissionAnyOf: ["admin.rights.read", "admin.content.read"] },
+                { title: "DMCA & Copyright", url: "/admin/copyright", icon: ShieldCheck, allow: ["admin"], permissionAnyOf: ["admin.rights.read", "admin.content.read"] },
               ]}
               isActive={isActive}
               adminPermissions={adminAccess?.permissions ?? []}
@@ -471,109 +223,34 @@ export function AppSidebar() {
             <NavGroup
               label="Business"
               items={[
-                {
-                  title: "Business Operations",
-                  url: "/admin/businesses",
-                  icon: BriefcaseBusiness,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.business.read"],
-                },
-                {
-                  title: "Business Pilot",
-                  url: "/admin/business-pilot",
-                  icon: Workflow,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.business.pilot"],
-                },
-                {
-                  title: "Partner Center",
-                  url: "/admin/partner-center",
-                  icon: FolderKanban,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.business.read"],
-                },
-                {
-                  title: "Offers",
-                  url: "/admin/offers",
-                  icon: Gift,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.business.read"],
-                },
+                { title: "Business Operations", url: "/admin/businesses", icon: BriefcaseBusiness, allow: ["admin"], permissionAnyOf: ["admin.business.read"] },
+                { title: "Business Pilot", url: "/admin/business-pilot", icon: Workflow, allow: ["admin"], permissionAnyOf: ["admin.business.pilot"] },
+                { title: "Partner Center", url: "/admin/partner-center", icon: FolderKanban, allow: ["admin"], permissionAnyOf: ["admin.business.read"] },
+                { title: "Offers", url: "/admin/offers", icon: Gift, allow: ["admin"], permissionAnyOf: ["admin.business.read"] },
               ]}
               isActive={isActive}
               adminPermissions={adminAccess?.permissions ?? []}
             />
             <NavGroup
-              label="Management"
+              label="Membership & Commerce"
               items={[
-                {
-                  title: "Memberships",
-                  url: "/admin/memberships",
-                  icon: CreditCard,
-                  allow: ["admin"],
-                  permissionAnyOf: [
-                    "admin.finance.read",
-                    "admin.creator.membership",
-                  ],
-                },
-                {
-                  title: "Creator Focus Access",
-                  url: "/admin/creator-focuses",
-                  icon: Workflow,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.creator.read", "admin.creator.manage", "admin.creator.membership"],
-                },
-                {
-                  title: "Membership & Privacy Audit",
-                  url: "/admin/membership-audit",
-                  icon: ShieldCheck,
-                  allow: ["admin"],
-                  permissionAnyOf: [
-                    "admin.finance.read",
-                    "admin.creator.membership",
-                  ],
-                },
-                {
-                  title: "Blog",
-                  url: "/admin/blog",
-                  icon: BookOpenText,
-                  allow: ["admin"],
-                },
-                {
-                  title: "Reports",
-                  url: "/admin/reports",
-                  icon: BarChart3,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.analytics.read"],
-                },
-                {
-                  title: "Play Operations",
-                  url: "/admin/play",
-                  icon: Gamepad2,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.content.read"],
-                },
-                {
-                  title: "System Health",
-                  url: "/admin/system-health",
-                  icon: Activity,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.system.read"],
-                },
-                {
-                  title: "Admin Team",
-                  url: "/admin/team",
-                  icon: UsersRound,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.team.manage"],
-                },
-                {
-                  title: "System Settings",
-                  url: "/settings",
-                  icon: Settings,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.team.manage"],
-                },
+                { title: "Memberships", url: "/admin/memberships", icon: CreditCard, allow: ["admin"], permissionAnyOf: ["admin.finance.read", "admin.creator.membership"] },
+                { title: "Creator Focus Access", url: "/admin/creator-focuses", icon: Workflow, allow: ["admin"], permissionAnyOf: ["admin.creator.read", "admin.creator.manage", "admin.creator.membership"] },
+                { title: "Seller Payout Readiness", url: "/admin/seller-readiness", icon: CreditCard, allow: ["admin"], permissionAnyOf: ["admin.finance.read", "admin.content.read"] },
+                { title: "Membership & Privacy Audit", url: "/admin/membership-audit", icon: ShieldCheck, allow: ["admin"], permissionAnyOf: ["admin.finance.read", "admin.creator.membership"] },
+              ]}
+              isActive={isActive}
+              adminPermissions={adminAccess?.permissions ?? []}
+            />
+            <NavGroup
+              label="Platform"
+              items={[
+                { title: "Blog", url: "/admin/blog", icon: BookOpenText, allow: ["admin"] },
+                { title: "Reports", url: "/admin/reports", icon: BarChart3, allow: ["admin"], permissionAnyOf: ["admin.analytics.read"] },
+                { title: "Play Operations", url: "/admin/play", icon: Gamepad2, allow: ["admin"], permissionAnyOf: ["admin.content.read"] },
+                { title: "System Health", url: "/admin/system-health", icon: Activity, allow: ["admin"], permissionAnyOf: ["admin.system.read"] },
+                { title: "Admin Team", url: "/admin/team", icon: UsersRound, allow: ["admin"], permissionAnyOf: ["admin.team.manage"] },
+                { title: "Account Settings", url: "/settings", icon: Settings, allow: ["admin"], permissionAnyOf: ["admin.team.manage"] },
               ]}
               isActive={isActive}
               adminPermissions={adminAccess?.permissions ?? []}
@@ -581,26 +258,9 @@ export function AppSidebar() {
             <NavGroup
               label="View VYBE"
               items={[
-                {
-                  title: "Member Experience",
-                  url: "/home",
-                  icon: ExternalLink,
-                  allow: ["admin"],
-                },
-                {
-                  title: "Creator HQ",
-                  url: "/dashboard",
-                  icon: Music2,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.creator.manage"],
-                },
-                {
-                  title: "Business Studio",
-                  url: "/business",
-                  icon: BriefcaseBusiness,
-                  allow: ["admin"],
-                  permissionAnyOf: ["admin.business.manage"],
-                },
+                { title: "Member Experience", url: "/home", icon: ExternalLink, allow: ["admin"] },
+                { title: "Creator HQ", url: "/dashboard", icon: Music2, allow: ["admin"], permissionAnyOf: ["admin.creator.manage"] },
+                { title: "Business Studio", url: "/business", icon: BriefcaseBusiness, allow: ["admin"], permissionAnyOf: ["admin.business.manage"] },
               ]}
               isActive={isActive}
               adminPermissions={adminAccess?.permissions ?? []}
@@ -608,104 +268,14 @@ export function AppSidebar() {
           </>
         ) : (
           <>
-            {hasAnyRole(["admin"]) ? (
-              <NavGroup
-                label="Staff"
-                items={[
-                  {
-                    title: "Open Back Office",
-                    url: "/admin",
-                    icon: LayoutDashboard,
-                    allow: ["admin"],
-                  },
-                ]}
-                isActive={isActive}
-              />
-            ) : null}
-            {!hasAnyRole(["creator"]) ? (
-              <>
-                <NavGroup label="Your VYBE" items={visible(memberPrimary)} isActive={isActive} />
-                <NavGroup label="Explore More" items={visible(memberMore)} isActive={isActive} />
-              </>
-            ) : null}
-            {visible(creatorStudio).length ? (
-              <NavGroup
-                label="Creator HQ"
-                items={visible(creatorStudio)}
-                isActive={isActive}
-                isLocked={isLocked}
-              />
-            ) : null}
-            {visible(creatorAudienceWithBadges).length ? (
-              <NavGroup
-                label="Audience"
-                items={visible(creatorAudienceWithBadges)}
-                isActive={isActive}
-                isLocked={isLocked}
-              />
-            ) : null}
-            {visible(creatorGrowth).length ? (
-              <NavGroup
-                label="Profile & Growth"
-                items={visible(creatorGrowth)}
-                isActive={isActive}
-                isLocked={isLocked}
-              />
-            ) : null}            {hasAnyRole(["creator"]) && hasCreatorCapability(membership.data?.plan_code, "creator_mode.browse") ? (
-              <NavGroup
-                label="Browse VYBE"
-                items={[{ title: "Explore the VYBE app", url: "/home", icon: Compass, allow: ["creator"] }]}
-                isActive={isActive}
-              />
-            ) : null}
-            {hasAnyRole(["business"]) ? (
-              <>
-                <NavGroup
-                  label="Business Portal"
-                  items={[
-                    {
-                      title: "Business Overview",
-                      url: "/business",
-                      icon: BriefcaseBusiness,
-                      allow: ["business", "admin"],
-                    },
-                  ]}
-                  isActive={isActive}
-                />
-                <NavGroup
-                  label="VYBE"
-                  items={[
-                    {
-                      title: "Explore VYBE",
-                      url: "/home",
-                      icon: Compass,
-                      allow: ["business"],
-                    },
-                  ]}
-                  isActive={isActive}
-                />
-              </>
-            ) : null}
-            {hasAnyRole(["supporter"]) && !hasAnyRole(["creator", "admin"]) ? (
-              <NavGroup
-                label="Account"
-                items={[
-                  {
-                    title: "Profile",
-                    url: "/supporter-profile",
-                    icon: User,
-                    allow: ["supporter"],
-                  },
-                  {
-                    title: "Settings",
-                    url: "/settings",
-                    icon: Settings,
-                    allow: ["supporter"],
-                  },
-                ]}
-                isActive={isActive}
-              />
-            ) : null}
+            {hasAnyRole(["admin"]) ? <NavGroup label="Staff" items={[{ title: "Open Back Office", url: "/admin", icon: LayoutDashboard, allow: ["admin"] }]} isActive={isActive} /> : null}
+            {!hasAnyRole(["creator"]) ? <><NavGroup label="Your VYBE" items={visible(memberPrimary)} isActive={isActive} /><NavGroup label="Explore More" items={visible(memberMore)} isActive={isActive} /></> : null}
+            {visible(creatorStudio).length ? <NavGroup label="Creator HQ" items={visible(creatorStudio)} isActive={isActive} isLocked={isLocked} /> : null}
+            {visible(creatorAudienceWithBadges).length ? <NavGroup label="Audience" items={visible(creatorAudienceWithBadges)} isActive={isActive} isLocked={isLocked} /> : null}
+            {visible(creatorGrowth).length ? <NavGroup label="Profile & Growth" items={visible(creatorGrowth)} isActive={isActive} isLocked={isLocked} /> : null}
+            {hasAnyRole(["creator"]) && hasCreatorCapability(membership.data?.plan_code, "creator_mode.browse") ? <NavGroup label="Browse VYBE" items={[{ title: "Explore the VYBE app", url: "/home", icon: Compass, allow: ["creator"] }]} isActive={isActive} /> : null}
+            {hasAnyRole(["business"]) ? <><NavGroup label="Business Portal" items={[{ title: "Business Overview", url: "/business", icon: BriefcaseBusiness, allow: ["business", "admin"] }]} isActive={isActive} /><NavGroup label="VYBE" items={[{ title: "Explore VYBE", url: "/home", icon: Compass, allow: ["business"] }]} isActive={isActive} /></> : null}
+            {hasAnyRole(["supporter"]) && !hasAnyRole(["creator", "admin"]) ? <NavGroup label="Account" items={[{ title: "Profile", url: "/supporter-profile", icon: User, allow: ["supporter"] }, { title: "Settings", url: "/settings", icon: Settings, allow: ["supporter"] }]} isActive={isActive} /> : null}
           </>
         )}
       </SidebarContent>
@@ -713,26 +283,8 @@ export function AppSidebar() {
   );
 }
 
-function NavGroup({
-  label,
-  items,
-  isActive,
-  adminPermissions,
-  isLocked,
-}: {
-  label: string;
-  items: NavItem[];
-  isActive: (url: string) => boolean;
-  adminPermissions?: string[];
-  isLocked?: (item: NavItem) => boolean;
-}) {
-  const visibleItems = items.filter(
-    (item) =>
-      !item.permissionAnyOf ||
-      item.permissionAnyOf.some((permission) =>
-        adminPermissions?.includes(permission),
-      ),
-  );
+function NavGroup({ label, items, isActive, adminPermissions, isLocked }: { label: string; items: NavItem[]; isActive: (url: string) => boolean; adminPermissions?: string[]; isLocked?: (item: NavItem) => boolean; }) {
+  const visibleItems = items.filter((item) => !item.permissionAnyOf || item.permissionAnyOf.some((permission) => adminPermissions?.includes(permission)));
   if (!visibleItems.length) return null;
   return (
     <SidebarGroup className="py-1">
@@ -741,20 +293,12 @@ function NavGroup({
         <SidebarMenu>
           {visibleItems.map((item) => (
             <SidebarMenuItem key={item.url}>
-              <SidebarMenuButton
-                asChild
-                isActive={isActive(item.url)}
-                tooltip={item.title}
-              >
+              <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title}>
                 <Link to={item.url} className="flex items-center gap-2">
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
                   {isLocked?.(item) ? <LockKeyhole className="ml-auto h-3.5 w-3.5 text-muted-foreground" aria-label="Locked by membership" /> : null}
-                  {item.badge ? (
-                    <span className="ml-auto rounded-full bg-destructive px-2 py-0.5 text-xs font-semibold text-destructive-foreground">
-                      {item.badge > 99 ? "99+" : item.badge}
-                    </span>
-                  ) : null}
+                  {item.badge ? <span className="ml-auto rounded-full bg-destructive px-2 py-0.5 text-xs font-semibold text-destructive-foreground">{item.badge > 99 ? "99+" : item.badge}</span> : null}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -764,4 +308,3 @@ function NavGroup({
     </SidebarGroup>
   );
 }
-
