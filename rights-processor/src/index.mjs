@@ -5,8 +5,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 
-const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76a1";
+const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76b0";
 const AUDIO_BUCKET = "music-audio";
+const SIMILARITY_THRESHOLD = 0.90;
 
 function required(name) {
   const value = process.env[name]?.trim();
@@ -38,16 +39,14 @@ function runWithExitCode(command, args) {
   });
 }
 
-async function assertBinary(command, args) {
-  await run(command, args);
-}
+async function assertBinary(command, args) { await run(command, args); }
 
 async function doctor() {
   required("SUPABASE_URL");
   required("SUPABASE_SERVICE_ROLE_KEY");
   await assertBinary("ffprobe", ["-version"]);
   await assertBinary("fpcalc", ["-version"]);
-  console.log(JSON.stringify({ ok: true, workerVersion: WORKER_VERSION, ffprobe: true, chromaprint: true }));
+  console.log(JSON.stringify({ ok: true, workerVersion: WORKER_VERSION, ffprobe: true, chromaprint: true, similarityThreshold: SIMILARITY_THRESHOLD }));
 }
 
 function parseJobId() {
@@ -71,31 +70,70 @@ async function probe(filePath) {
     bitrate: Number(format.bit_rate || 0) || null,
     sampleRate: Number(audioStream?.sample_rate || 0) || null,
     fileType: String(format.format_name || "").split(",")[0] || null,
-    metadata: {
-      title: tags.title || null,
-      artist: tags.artist || null,
-      album: tags.album || null,
-      isrc: tags.ISRC || tags.isrc || null,
-      upc: tags.UPC || tags.upc || null,
-    },
+    metadata: { title: tags.title || null, artist: tags.artist || null, album: tags.album || null, isrc: tags.ISRC || tags.isrc || null, upc: tags.UPC || tags.upc || null },
   };
 }
 
 async function chromaprint(filePath) {
-  const { code, stdout, stderr } = await runWithExitCode("fpcalc", ["-json", filePath]);
+  const encoded = await runWithExitCode("fpcalc", ["-json", filePath]);
+  const raw = await runWithExitCode("fpcalc", ["-raw", "-json", filePath]);
   let parsed;
-  try {
-    parsed = JSON.parse(stdout || "{}");
-  } catch {
-    throw new Error(`fpcalc returned invalid JSON${code === 0 ? "" : ` (exit ${code})`}: ${stderr.slice(-1500)}`);
+  let rawParsed;
+  try { parsed = JSON.parse(encoded.stdout || "{}"); } catch { throw new Error(`fpcalc returned invalid JSON${encoded.code === 0 ? "" : ` (exit ${encoded.code})`}: ${encoded.stderr.slice(-1500)}`); }
+  try { rawParsed = JSON.parse(raw.stdout || "{}"); } catch { throw new Error(`fpcalc raw returned invalid JSON${raw.code === 0 ? "" : ` (exit ${raw.code})`}: ${raw.stderr.slice(-1500)}`); }
+  if (!parsed.fingerprint) throw new Error(`Chromaprint did not return a fingerprint${encoded.code === 0 ? "" : ` (fpcalc exit ${encoded.code}: ${encoded.stderr.slice(-1500)})`}`);
+  if (!rawParsed.fingerprint) throw new Error(`Chromaprint did not return a raw fingerprint${raw.code === 0 ? "" : ` (fpcalc raw exit ${raw.code}: ${raw.stderr.slice(-1500)})`}`);
+  const rawFingerprint = Array.isArray(rawParsed.fingerprint) ? rawParsed.fingerprint.map(Number) : String(rawParsed.fingerprint).split(",").filter(Boolean).map(Number);
+  if (!rawFingerprint.length || rawFingerprint.some((value) => !Number.isInteger(value))) throw new Error("Chromaprint raw fingerprint was not a valid integer sequence");
+  const warnings = [encoded, raw].filter((result) => result.code !== 0).map((result) => result.stderr.trim()).filter(Boolean);
+  if (warnings.length) console.warn(`fpcalc returned valid fingerprints with warning: ${warnings.join(" | ").slice(-1500)}`);
+  return { fingerprint: String(parsed.fingerprint), rawFingerprint, algorithm: Number(parsed.algorithm || rawParsed.algorithm || 1) || 1, warning: warnings.length ? warnings.join(" | ").slice(-1500) : null };
+}
+
+function bitCount32(value) {
+  let v = value >>> 0;
+  v -= (v >>> 1) & 0x55555555;
+  v = (v & 0x33333333) + ((v >>> 2) & 0x33333333);
+  return (((v + (v >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24;
+}
+
+function fingerprintSimilarity(left, right) {
+  const a = left.map((value) => Number(value) >>> 0);
+  const b = right.map((value) => Number(value) >>> 0);
+  if (!a.length || !b.length) return 0;
+  const maxOffset = Math.min(12, Math.max(0, Math.abs(a.length - b.length) + 4));
+  let best = 0;
+  for (let offset = -maxOffset; offset <= maxOffset; offset += 1) {
+    let compared = 0;
+    let differingBits = 0;
+    for (let i = 0; i < a.length; i += 1) {
+      const j = i + offset;
+      if (j < 0 || j >= b.length) continue;
+      differingBits += bitCount32((a[i] ^ b[j]) >>> 0);
+      compared += 1;
+    }
+    if (compared < Math.min(a.length, b.length) * 0.75) continue;
+    const score = 1 - differingBits / (compared * 32);
+    if (score > best) best = score;
   }
-  if (!parsed.fingerprint) {
-    throw new Error(`Chromaprint did not return a fingerprint${code === 0 ? "" : ` (fpcalc exit ${code}: ${stderr.slice(-1500)})`}`);
+  return Math.max(0, Math.min(1, best));
+}
+
+async function recordSimilarityMatches(supabase, trackId, rawFingerprint) {
+  const { data: candidates, error: candidatesError } = await supabase.rpc("get_audio_similarity_candidates", { source_track_id: trackId, duration_tolerance: 0.10 });
+  if (candidatesError) throw candidatesError;
+  const matches = [];
+  for (const candidate of candidates || []) {
+    const candidateRaw = String(candidate.raw_fingerprint || "").split(",").filter(Boolean).map(Number);
+    if (!candidateRaw.length || candidateRaw.some((value) => !Number.isInteger(value))) continue;
+    const score = fingerprintSimilarity(rawFingerprint, candidateRaw);
+    if (score < SIMILARITY_THRESHOLD) continue;
+    const rounded = Number(score.toFixed(6));
+    const { data: matchId, error: matchError } = await supabase.rpc("record_audio_similarity_match", { source_track_id: trackId, candidate_track_id: candidate.candidate_track_id, similarity_score: rounded, worker_version: WORKER_VERSION });
+    if (matchError) throw matchError;
+    matches.push({ candidateTrackId: candidate.candidate_track_id, score: rounded, matchId });
   }
-  if (code !== 0) {
-    console.warn(`fpcalc exited ${code} after returning a valid fingerprint; accepting fingerprint. Warning: ${stderr.trim().slice(-1500)}`);
-  }
-  return { fingerprint: String(parsed.fingerprint), algorithm: Number(parsed.algorithm || 1) || 1, warning: code === 0 ? null : stderr.trim() || `fpcalc exited ${code}` };
+  return matches;
 }
 
 async function main() {
@@ -124,6 +162,7 @@ async function main() {
     await writeFile(audioPath, bytes);
     const [measured, fp] = await Promise.all([probe(audioPath), chromaprint(audioPath)]);
     const sha256 = createHash("sha256").update(await readFile(audioPath)).digest("hex");
+    const metadata = { ...measured.metadata, chromaprint_raw: fp.rawFingerprint.join(",") };
 
     const { error: completeError } = await supabase.rpc("complete_audio_processing_job", {
       target_job_id: job.id,
@@ -134,11 +173,12 @@ async function main() {
       measured_sample_rate: measured.sampleRate,
       measured_bitrate: measured.bitrate,
       measured_file_type: measured.fileType,
-      embedded_metadata: measured.metadata,
+      embedded_metadata: metadata,
       worker_version: WORKER_VERSION,
     });
     if (completeError) throw completeError;
-    console.log(JSON.stringify({ ok: true, jobId: job.id, trackId: job.track_id, title: track.title, workerVersion: WORKER_VERSION, chromaprintWarning: fp.warning }));
+    const similarityMatches = await recordSimilarityMatches(supabase, job.track_id, fp.rawFingerprint);
+    console.log(JSON.stringify({ ok: true, jobId: job.id, trackId: job.track_id, title: track.title, workerVersion: WORKER_VERSION, chromaprintWarning: fp.warning, similarityMatches }));
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const { error: failError } = await supabase.rpc("fail_audio_processing_job", { target_job_id: job.id, failure: message });
@@ -149,7 +189,4 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.stack || error.message : error);
-  process.exitCode = 1;
-});
+main().catch((error) => { console.error(error instanceof Error ? error.stack || error.message : error); process.exitCode = 1; });
