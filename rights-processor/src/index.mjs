@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { spawn } from "node:child_process";
 import { createTransformShadowContext, TRANSFORM_MIN_UNIQUE_FRAME_RATIO, TRANSFORM_SEARCH_FACTORS, TRANSFORM_SHADOW_THRESHOLD, TRANSFORM_SHADOW_VERSION } from "./shadow-transform-matcher.mjs";
 
-const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76d6";
+const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76d6d";
 const AUDIO_BUCKET = "music-audio";
 const SIMILARITY_THRESHOLD = 0.90;
 
@@ -202,20 +202,31 @@ async function evaluateSimilarityCandidates(supabase, trackId, rawFingerprint, s
     const score = fingerprintSimilarity(rawFingerprint, candidateRaw);
     const rounded = Number(score.toFixed(6));
 
-    // D6 shadow evaluation is diagnostic only. Its result is never passed to a write RPC.
-    const shadow = shadowContext.evaluateCandidate(candidateRaw);
-    shadowEvaluations.push({ candidateTrackId: candidate.candidate_track_id, skipped: false, productionDirectSimilarityScore: rounded, ...shadow });
+    // Production direct matching is independent of transform-shadow diagnostics.
+    if (score >= SIMILARITY_THRESHOLD) {
+      const { data: matchId, error: matchError } = await supabase.rpc("record_audio_similarity_match", {
+        source_track_id: trackId,
+        candidate_track_id: candidate.candidate_track_id,
+        similarity_score: rounded,
+        worker_version: WORKER_VERSION,
+      });
+      if (matchError) throw matchError;
+      matches.push({ candidateTrackId: candidate.candidate_track_id, score: rounded, matchId });
+    }
 
-    // Existing production direct-match behavior remains the sole basis for this write path.
-    if (score < SIMILARITY_THRESHOLD) continue;
-    const { data: matchId, error: matchError } = await supabase.rpc("record_audio_similarity_match", {
-      source_track_id: trackId,
-      candidate_track_id: candidate.candidate_track_id,
-      similarity_score: rounded,
-      worker_version: WORKER_VERSION,
-    });
-    if (matchError) throw matchError;
-    matches.push({ candidateTrackId: candidate.candidate_track_id, score: rounded, matchId });
+    if (!shadowContext) {
+      shadowEvaluations.push({ candidateTrackId: candidate.candidate_track_id, skipped: true, reason: "shadow_unavailable", productionDirectSimilarityScore: rounded });
+      continue;
+    }
+
+    try {
+      if (process.env.VYBE_RIGHTS_TEST_SHADOW_CANDIDATE_FAILURE === "1") throw new Error("Controlled D6D test hook forced candidate shadow evaluation failure");
+      const shadow = shadowContext.evaluateCandidate(candidateRaw);
+      shadowEvaluations.push({ candidateTrackId: candidate.candidate_track_id, skipped: false, productionDirectSimilarityScore: rounded, ...shadow });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      shadowEvaluations.push({ candidateTrackId: candidate.candidate_track_id, skipped: true, reason: "shadow_candidate_evaluation_failed", productionDirectSimilarityScore: rounded, shadowError: message.slice(0, 1500) });
+    }
   }
 
   return { matches, shadowEvaluations, candidateCount: (candidates || []).length };
@@ -275,8 +286,16 @@ async function main() {
     if (completeError) throw completeError;
     fingerprintCompleted = true;
 
-    // Build the transform context with the B2 hardened runner. Transform results are not persisted.
-    const shadowContext = await createTransformShadowContext({ sourcePath: audioPath, sourceRawFingerprint: fp.rawFingerprint, workDir, runProcess });
+    // D6D: transform shadow is diagnostic-only and cannot fail core/direct processing.
+    let shadowContext = null;
+    let shadowInitializationWarning = null;
+    try {
+      if (process.env.VYBE_RIGHTS_TEST_SHADOW_FAILURE === "1") throw new Error("Controlled D6D test hook forced transform-shadow initialization failure");
+      shadowContext = await createTransformShadowContext({ sourcePath: audioPath, sourceRawFingerprint: fp.rawFingerprint, workDir, runProcess });
+    } catch (error) {
+      shadowInitializationWarning = (error instanceof Error ? error.message : String(error)).slice(0, 1500);
+      console.warn(`Transform shadow unavailable; continuing direct processing: ${shadowInitializationWarning}`);
+    }
     const similarity = await evaluateSimilarityCandidates(supabase, job.track_id, fp.rawFingerprint, shadowContext);
     const shadowMatches = similarity.shadowEvaluations.filter((item) => !item.skipped && item.shadowWouldMatch).length;
     const shadowOnlyMatches = similarity.shadowEvaluations.filter((item) => !item.skipped && item.shadowWouldMatch && item.productionDirectSimilarityScore < SIMILARITY_THRESHOLD).length;
@@ -291,6 +310,7 @@ async function main() {
       similarityMatches: similarity.matches,
       transformShadow: {
         mode: "diagnostic_read_only",
+        status: shadowContext ? "available" : "unavailable",
         version: TRANSFORM_SHADOW_VERSION,
         enforcement: false,
         databaseWritesFromShadow: false,
@@ -298,13 +318,13 @@ async function main() {
         creatorStatusChangesFromShadow: false,
         threshold: TRANSFORM_SHADOW_THRESHOLD,
         minUniqueFrameRatio: TRANSFORM_MIN_UNIQUE_FRAME_RATIO,
-        sourceQuality: shadowContext.sourceQuality,
+        sourceQuality: shadowContext?.sourceQuality || null,
         candidateCount: similarity.candidateCount,
         evaluatedCandidateCount: similarity.shadowEvaluations.filter((item) => !item.skipped).length,
         shadowMatches,
         shadowOnlyMatches,
         evaluations: similarity.shadowEvaluations,
-        warnings: shadowContext.warnings,
+        warnings: [...(shadowContext?.warnings || []), ...(shadowInitializationWarning ? [shadowInitializationWarning] : [])],
         interpretation: "Transform-aware similarity is a shadow review signal only and does not establish copyright ownership or infringement.",
       },
     }));
