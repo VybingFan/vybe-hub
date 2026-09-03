@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 
-const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76a0";
+const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76a1";
 const AUDIO_BUCKET = "music-audio";
 
 function required(name) {
@@ -23,6 +23,18 @@ function run(command, args) {
     child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
     child.on("error", reject);
     child.on("close", (code) => code === 0 ? resolve({ stdout, stderr }) : reject(new Error(`${command} exited ${code}: ${stderr.slice(-1500)}`)));
+  });
+}
+
+function runWithExitCode(command, args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, { stdio: ["ignore", "pipe", "pipe"] });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => { stdout += chunk.toString(); });
+    child.stderr.on("data", (chunk) => { stderr += chunk.toString(); });
+    child.on("error", reject);
+    child.on("close", (code) => resolve({ code: code ?? -1, stdout, stderr }));
   });
 }
 
@@ -70,10 +82,20 @@ async function probe(filePath) {
 }
 
 async function chromaprint(filePath) {
-  const { stdout } = await run("fpcalc", ["-json", filePath]);
-  const parsed = JSON.parse(stdout || "{}");
-  if (!parsed.fingerprint) throw new Error("Chromaprint did not return a fingerprint");
-  return { fingerprint: String(parsed.fingerprint), algorithm: Number(parsed.algorithm || 1) || 1 };
+  const { code, stdout, stderr } = await runWithExitCode("fpcalc", ["-json", filePath]);
+  let parsed;
+  try {
+    parsed = JSON.parse(stdout || "{}");
+  } catch {
+    throw new Error(`fpcalc returned invalid JSON${code === 0 ? "" : ` (exit ${code})`}: ${stderr.slice(-1500)}`);
+  }
+  if (!parsed.fingerprint) {
+    throw new Error(`Chromaprint did not return a fingerprint${code === 0 ? "" : ` (fpcalc exit ${code}: ${stderr.slice(-1500)})`}`);
+  }
+  if (code !== 0) {
+    console.warn(`fpcalc exited ${code} after returning a valid fingerprint; accepting fingerprint. Warning: ${stderr.trim().slice(-1500)}`);
+  }
+  return { fingerprint: String(parsed.fingerprint), algorithm: Number(parsed.algorithm || 1) || 1, warning: code === 0 ? null : stderr.trim() || `fpcalc exited ${code}` };
 }
 
 async function main() {
@@ -116,7 +138,7 @@ async function main() {
       worker_version: WORKER_VERSION,
     });
     if (completeError) throw completeError;
-    console.log(JSON.stringify({ ok: true, jobId: job.id, trackId: job.track_id, title: track.title, workerVersion: WORKER_VERSION }));
+    console.log(JSON.stringify({ ok: true, jobId: job.id, trackId: job.track_id, title: track.title, workerVersion: WORKER_VERSION, chromaprintWarning: fp.warning }));
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const { error: failError } = await supabase.rpc("fail_audio_processing_job", { target_job_id: job.id, failure: message });
