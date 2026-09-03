@@ -4,8 +4,9 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
+import { createTransformShadowContext, TRANSFORM_MIN_UNIQUE_FRAME_RATIO, TRANSFORM_SEARCH_FACTORS, TRANSFORM_SHADOW_THRESHOLD, TRANSFORM_SHADOW_VERSION } from "./shadow-transform-matcher.mjs";
 
-const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76b2";
+const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76d6";
 const AUDIO_BUCKET = "music-audio";
 const SIMILARITY_THRESHOLD = 0.90;
 
@@ -83,14 +84,8 @@ function runProcess(command, args, { acceptNonZero = false } = {}) {
   });
 }
 
-function run(command, args) {
-  return runProcess(command, args);
-}
-
-function runWithExitCode(command, args) {
-  return runProcess(command, args, { acceptNonZero: true });
-}
-
+function run(command, args) { return runProcess(command, args); }
+function runWithExitCode(command, args) { return runProcess(command, args, { acceptNonZero: true }); }
 async function assertBinary(command, args) { await run(command, args); }
 
 async function doctor() {
@@ -98,12 +93,23 @@ async function doctor() {
   required("SUPABASE_SERVICE_ROLE_KEY");
   await assertBinary("ffprobe", ["-version"]);
   await assertBinary("fpcalc", ["-version"]);
+  await assertBinary("ffmpeg", ["-version"]);
   console.log(JSON.stringify({
     ok: true,
     workerVersion: WORKER_VERSION,
     ffprobe: true,
+    ffmpeg: true,
     chromaprint: true,
     similarityThreshold: SIMILARITY_THRESHOLD,
+    transformShadow: {
+      enabled: true,
+      version: TRANSFORM_SHADOW_VERSION,
+      enforcement: false,
+      databaseWrites: false,
+      threshold: TRANSFORM_SHADOW_THRESHOLD,
+      minUniqueFrameRatio: TRANSFORM_MIN_UNIQUE_FRAME_RATIO,
+      searchFactors: TRANSFORM_SEARCH_FACTORS,
+    },
     processTimeoutMs: PROCESS_TIMEOUT_MS,
     processOutputLimitBytes: PROCESS_OUTPUT_LIMIT_BYTES,
     maxAudioBytes: MAX_AUDIO_BYTES,
@@ -180,21 +186,39 @@ function fingerprintSimilarity(left, right) {
   return Math.max(0, Math.min(1, best));
 }
 
-async function recordSimilarityMatches(supabase, trackId, rawFingerprint) {
+async function evaluateSimilarityCandidates(supabase, trackId, rawFingerprint, shadowContext) {
   const { data: candidates, error: candidatesError } = await supabase.rpc("get_audio_similarity_candidates", { source_track_id: trackId, duration_tolerance: 0.10 });
   if (candidatesError) throw candidatesError;
   const matches = [];
+  const shadowEvaluations = [];
+
   for (const candidate of candidates || []) {
     const candidateRaw = String(candidate.raw_fingerprint || "").split(",").filter(Boolean).map(Number);
-    if (!candidateRaw.length || candidateRaw.some((value) => !Number.isInteger(value))) continue;
+    if (!candidateRaw.length || candidateRaw.some((value) => !Number.isInteger(value))) {
+      shadowEvaluations.push({ candidateTrackId: candidate.candidate_track_id, skipped: true, reason: "missing_or_invalid_raw_fingerprint" });
+      continue;
+    }
+
     const score = fingerprintSimilarity(rawFingerprint, candidateRaw);
-    if (score < SIMILARITY_THRESHOLD) continue;
     const rounded = Number(score.toFixed(6));
-    const { data: matchId, error: matchError } = await supabase.rpc("record_audio_similarity_match", { source_track_id: trackId, candidate_track_id: candidate.candidate_track_id, similarity_score: rounded, worker_version: WORKER_VERSION });
+
+    // D6 shadow evaluation is diagnostic only. Its result is never passed to a write RPC.
+    const shadow = shadowContext.evaluateCandidate(candidateRaw);
+    shadowEvaluations.push({ candidateTrackId: candidate.candidate_track_id, skipped: false, productionDirectSimilarityScore: rounded, ...shadow });
+
+    // Existing production direct-match behavior remains the sole basis for this write path.
+    if (score < SIMILARITY_THRESHOLD) continue;
+    const { data: matchId, error: matchError } = await supabase.rpc("record_audio_similarity_match", {
+      source_track_id: trackId,
+      candidate_track_id: candidate.candidate_track_id,
+      similarity_score: rounded,
+      worker_version: WORKER_VERSION,
+    });
     if (matchError) throw matchError;
     matches.push({ candidateTrackId: candidate.candidate_track_id, score: rounded, matchId });
   }
-  return matches;
+
+  return { matches, shadowEvaluations, candidateCount: (candidates || []).length };
 }
 
 async function recordFailure(supabase, jobId, message, fingerprintCompleted) {
@@ -251,8 +275,39 @@ async function main() {
     if (completeError) throw completeError;
     fingerprintCompleted = true;
 
-    const similarityMatches = await recordSimilarityMatches(supabase, job.track_id, fp.rawFingerprint);
-    console.log(JSON.stringify({ ok: true, jobId: job.id, trackId: job.track_id, title: track.title, workerVersion: WORKER_VERSION, chromaprintWarning: fp.warning, similarityMatches }));
+    // Build the transform context with the B2 hardened runner. Transform results are not persisted.
+    const shadowContext = await createTransformShadowContext({ sourcePath: audioPath, sourceRawFingerprint: fp.rawFingerprint, workDir, runProcess });
+    const similarity = await evaluateSimilarityCandidates(supabase, job.track_id, fp.rawFingerprint, shadowContext);
+    const shadowMatches = similarity.shadowEvaluations.filter((item) => !item.skipped && item.shadowWouldMatch).length;
+    const shadowOnlyMatches = similarity.shadowEvaluations.filter((item) => !item.skipped && item.shadowWouldMatch && item.productionDirectSimilarityScore < SIMILARITY_THRESHOLD).length;
+
+    console.log(JSON.stringify({
+      ok: true,
+      jobId: job.id,
+      trackId: job.track_id,
+      title: track.title,
+      workerVersion: WORKER_VERSION,
+      chromaprintWarning: fp.warning,
+      similarityMatches: similarity.matches,
+      transformShadow: {
+        mode: "diagnostic_read_only",
+        version: TRANSFORM_SHADOW_VERSION,
+        enforcement: false,
+        databaseWritesFromShadow: false,
+        moderationCasesFromShadow: false,
+        creatorStatusChangesFromShadow: false,
+        threshold: TRANSFORM_SHADOW_THRESHOLD,
+        minUniqueFrameRatio: TRANSFORM_MIN_UNIQUE_FRAME_RATIO,
+        sourceQuality: shadowContext.sourceQuality,
+        candidateCount: similarity.candidateCount,
+        evaluatedCandidateCount: similarity.shadowEvaluations.filter((item) => !item.skipped).length,
+        shadowMatches,
+        shadowOnlyMatches,
+        evaluations: similarity.shadowEvaluations,
+        warnings: shadowContext.warnings,
+        interpretation: "Transform-aware similarity is a shadow review signal only and does not establish copyright ownership or infringement.",
+      },
+    }));
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     await recordFailure(supabase, job.id, message, fingerprintCompleted);
