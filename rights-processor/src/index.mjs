@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 
-const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76b0";
+const WORKER_VERSION = process.env.VYBE_RIGHTS_PROCESSOR_VERSION || "v24.76b1";
 const AUDIO_BUCKET = "music-audio";
 const SIMILARITY_THRESHOLD = 0.90;
 
@@ -136,6 +136,15 @@ async function recordSimilarityMatches(supabase, trackId, rawFingerprint) {
   return matches;
 }
 
+async function recordFailure(supabase, jobId, message, fingerprintCompleted) {
+  const rpcName = fingerprintCompleted ? "fail_audio_post_processing_job" : "fail_audio_processing_job";
+  const args = fingerprintCompleted
+    ? { target_job_id: jobId, failure: message, worker_version: WORKER_VERSION }
+    : { target_job_id: jobId, failure: message };
+  const { error } = await supabase.rpc(rpcName, args);
+  if (error) console.error(`Could not record ${fingerprintCompleted ? "post-processing" : "processing"} failure: ${error.message}`);
+}
+
 async function main() {
   if (process.argv.includes("--doctor")) return doctor();
   const jobId = parseJobId();
@@ -146,6 +155,7 @@ async function main() {
   if (!job) throw new Error("The selected job was not queued or could not be claimed. No other job was touched.");
 
   let workDir;
+  let fingerprintCompleted = false;
   try {
     const { data: track, error: trackError } = await supabase.from("tracks").select("id,creator_id,audio_url,title").eq("id", job.track_id).single();
     if (trackError) throw trackError;
@@ -177,12 +187,13 @@ async function main() {
       worker_version: WORKER_VERSION,
     });
     if (completeError) throw completeError;
+    fingerprintCompleted = true;
+
     const similarityMatches = await recordSimilarityMatches(supabase, job.track_id, fp.rawFingerprint);
     console.log(JSON.stringify({ ok: true, jobId: job.id, trackId: job.track_id, title: track.title, workerVersion: WORKER_VERSION, chromaprintWarning: fp.warning, similarityMatches }));
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    const { error: failError } = await supabase.rpc("fail_audio_processing_job", { target_job_id: job.id, failure: message });
-    if (failError) console.error(`Could not record failed job: ${failError.message}`);
+    await recordFailure(supabase, job.id, message, fingerprintCompleted);
     throw error;
   } finally {
     if (workDir) await rm(workDir, { recursive: true, force: true });
