@@ -59,21 +59,10 @@ function AdminCreatorsPage() {
         </p>
       </header>
 
-      <form
-        className="flex gap-2"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void load(search);
-        }}
-      >
+      <form className="flex gap-2" onSubmit={(event) => { event.preventDefault(); void load(search); }}>
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            className="pl-9"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by creator name or email"
-          />
+          <Input className="pl-9" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by creator name or email" />
         </div>
         <Button type="submit">Search</Button>
         <Button type="button" variant="outline" size="icon" aria-label="Refresh" onClick={() => void load(search)}>
@@ -82,18 +71,15 @@ function AdminCreatorsPage() {
       </form>
 
       {loading ? <p className="text-sm text-muted-foreground">Loading accounts…</p> : null}
-      {!loading && records.length === 0 ? (
-        <Card><CardContent className="p-7 text-sm text-muted-foreground">No creators match this search.</CardContent></Card>
-      ) : null}
-      <div className="space-y-4">
-        {records.map((record) => <CreatorRecordCard key={record.user_id} record={record} />)}
-      </div>
+      {!loading && records.length === 0 ? <Card><CardContent className="p-7 text-sm text-muted-foreground">No creators match this search.</CardContent></Card> : null}
+      <div className="space-y-4">{records.map((record) => <CreatorRecordCard key={record.user_id} record={record} />)}</div>
     </div>
   );
 }
 
 function CreatorRecordCard({ record }: { record: AdminCreatorRecord }) {
   const totalItems = record.track_count + record.playlist_count + record.video_count + record.merch_count;
+  const contentSearch = { creator: record.user_id };
   return (
     <Card>
       <CardContent className="space-y-5 p-5">
@@ -112,7 +98,7 @@ function CreatorRecordCard({ record }: { record: AdminCreatorRecord }) {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <CatalogMetric icon={Library} label="Songs" value={`${record.published_track_count}/${record.track_count}`} note="published / total" />
+          <CatalogMetric icon={Library} label="Songs" value={`${record.published_track_count}/${record.track_count}`} note="published / total" to="/admin/content" search={contentSearch} />
           <CatalogMetric icon={Library} label="Playlists" value={record.playlist_count} note="total" />
           <CatalogMetric icon={Video} label="Videos" value={record.video_count} note="total" />
           <CatalogMetric icon={Package} label="Merch" value={record.merch_count} note="items" />
@@ -121,9 +107,7 @@ function CreatorRecordCard({ record }: { record: AdminCreatorRecord }) {
         <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4">
           <p className="text-sm text-muted-foreground">{totalItems ? `${totalItems} known creator item${totalItems === 1 ? "" : "s"}` : "No known creator content"}</p>
           <Button asChild size="sm" variant="outline">
-            <Link to="/admin/content" search={{ creator: record.user_id }}>
-              View creator content <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+            <Link to="/admin/content" search={contentSearch}>View creator content <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
       </CardContent>
@@ -131,11 +115,11 @@ function CreatorRecordCard({ record }: { record: AdminCreatorRecord }) {
   );
 }
 
-function CatalogMetric({ icon: Icon, label, value, note }: { icon: typeof Library; label: string; value: string | number; note: string; }) {
-  return (
-    <div className="flex items-center gap-3 rounded-xl border p-3">
-      <Icon className="h-4 w-4 text-primary" />
-      <div><p className="font-semibold">{value}</p><p className="text-xs text-muted-foreground">{label} · {note}</p></div>
-    </div>
+function CatalogMetric({ icon: Icon, label, value, note, to, search }: { icon: typeof Library; label: string; value: string | number; note: string; to?: "/admin/content"; search?: { creator: string }; }) {
+  const content = <><Icon className="h-4 w-4 text-primary" /><div><p className="font-semibold">{value}</p><p className="text-xs text-muted-foreground">{label} · {note}</p></div></>;
+  return to && search ? (
+    <Link to={to} search={search} className="flex items-center gap-3 rounded-xl border p-3 transition hover:border-primary/40 hover:bg-primary/5">{content}</Link>
+  ) : (
+    <div className="flex items-center gap-3 rounded-xl border p-3">{content}</div>
   );
 }
