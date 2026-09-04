@@ -78,6 +78,10 @@ export const trackSchema = z.object({
   rights_confirmed: z.boolean(),
   rights_policy_version: z.string().min(1).nullable(),
   rights_confirmed_at: z.string().datetime().nullable(),
+  upload_rights_declaration_version: z.string().min(1),
+  upload_rights_declaration_confirmed: z.boolean(),
+  upload_rights_declared_at: z.string().datetime(),
+  upload_rights_declaration_note: z.string().trim().max(1000).default(""),
   discovery_metadata: trackDiscoveryMetadataSchema.default(
     EMPTY_TRACK_DISCOVERY_METADATA,
   ),

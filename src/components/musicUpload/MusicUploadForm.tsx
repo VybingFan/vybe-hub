@@ -16,7 +16,7 @@ import {
 import { ProfileCard } from "@/components/profile/ProfileCard";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import type { MusicRightsBasis } from "@/constants/legal";
-import { MUSIC_RIGHTS_BASES } from "@/constants/legal";
+import { MUSIC_RIGHTS_BASES, MUSIC_RIGHTS_DECLARATION_COPY } from "@/constants/legal";
 import {
   ACCEPTED_AUDIO,
   ACCEPTED_IMAGE,
@@ -52,6 +52,8 @@ export interface SingleUploadValues {
   duration_sec: number;
   rights_basis: MusicRightsBasis;
   rights_confirmed: boolean;
+  upload_rights_declaration_confirmed: boolean;
+  upload_rights_declaration_note: string;
   discovery_metadata: TrackDiscoveryMetadata;
   visibility: TrackVisibility;
   playback_mode: TrackPlaybackMode;
@@ -82,7 +84,9 @@ const empty = (defaultRightsBasis: MusicRightsBasis): SingleUploadValues => ({
   cover: null,
   duration_sec: 0,
   rights_basis: defaultRightsBasis,
-  rights_confirmed: true,
+  rights_confirmed: false,
+  upload_rights_declaration_confirmed: false,
+  upload_rights_declaration_note: "",
   discovery_metadata: EMPTY_TRACK_DISCOVERY_METADATA,
   visibility: "private",
   playback_mode: "full",
@@ -108,7 +112,6 @@ export function MusicUploadForm({
     discovery: false,
     release: false,
     promotion: false,
-    rights: false,
   });
 
   const update = <K extends keyof SingleUploadValues>(
@@ -141,6 +144,8 @@ export function MusicUploadForm({
     if (!values.title.trim()) return toast.error("Title is required");
     if (!values.primary_artist_name.trim())
       return toast.error("Primary artist is required");
+    if (!values.upload_rights_declaration_confirmed)
+      return toast.error("Confirm the rights declaration for this song before uploading");
     try {
       await onSubmit(values);
       setValues(empty(defaultRightsBasis));
@@ -375,7 +380,6 @@ export function MusicUploadForm({
             ["discovery", "Genre and discovery"],
             ["release", "Release information"],
             ["promotion", "Story and profile promotion"],
-            ["rights", "Different rights category for this song"],
           ].map(([key, label]) => (
             <label
               key={key}
@@ -517,27 +521,31 @@ export function MusicUploadForm({
             </div>
           </>
         )}
-        {optional.rights && (
-          <Field label="Rights category for this song">
-            <Select
-              value={values.rights_basis}
-              onValueChange={(value) =>
-                update("rights_basis", value as MusicRightsBasis)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {MUSIC_RIGHTS_BASES.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
-        )}
+        </ProfileCard>
+      </div>
+
+      <div className="min-[900px]:col-span-2">
+        <ProfileCard title="Rights for this song" description="Confirm the rights situation for this specific recording before upload.">
+          <div className="space-y-4">
+            <Field label="Which best describes this song?">
+              <Select value={values.rights_basis} onValueChange={(value) => { update("rights_basis", value as MusicRightsBasis); update("upload_rights_declaration_confirmed", false); }}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {MUSIC_RIGHTS_BASES.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            {values.rights_basis !== "entirely_original" && (
+              <Field label="Rights context (optional)">
+                <Textarea rows={3} value={values.upload_rights_declaration_note} onChange={(e) => update("upload_rights_declaration_note", e.target.value)} placeholder="Briefly note the collaboration, license, cover, sample, public-domain source, or other permission that applies." />
+              </Field>
+            )}
+            <label className="flex items-start gap-3 rounded-xl border border-border/70 p-4 text-sm">
+              <input type="checkbox" className="mt-1 h-4 w-4 accent-primary" checked={values.upload_rights_declaration_confirmed} onChange={(e) => update("upload_rights_declaration_confirmed", e.target.checked)} />
+              <span>{MUSIC_RIGHTS_DECLARATION_COPY[values.rights_basis]}</span>
+            </label>
+            <p className="text-xs text-muted-foreground">VYBE may fingerprint eligible audio and screen for potential audio matches. A match does not by itself prove ownership or infringement.</p>
+          </div>
         </ProfileCard>
       </div>
 

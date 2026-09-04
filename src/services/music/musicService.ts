@@ -113,7 +113,10 @@ export const musicService = {
     if (
       !params.input.rights_confirmed ||
       !params.input.rights_policy_version ||
-      !params.input.rights_confirmed_at
+      !params.input.rights_confirmed_at ||
+      !params.input.upload_rights_declaration_confirmed ||
+      !params.input.upload_rights_declaration_version ||
+      !params.input.upload_rights_declared_at
     ) {
       throw new Error("Confirm that you have the rights needed to share this music.");
     }
@@ -139,6 +142,10 @@ export const musicService = {
       rights_confirmed: params.input.rights_confirmed,
       rights_policy_version: params.input.rights_policy_version,
       rights_confirmed_at: params.input.rights_confirmed_at,
+      upload_rights_declaration_version: params.input.upload_rights_declaration_version,
+      upload_rights_declaration_confirmed: params.input.upload_rights_declaration_confirmed,
+      upload_rights_declared_at: params.input.upload_rights_declared_at,
+      upload_rights_declaration_note: params.input.upload_rights_declaration_note || "",
       discovery_metadata: params.input.discovery_metadata,
       visibility: params.input.visibility,
       playback_mode: params.input.playback_mode,

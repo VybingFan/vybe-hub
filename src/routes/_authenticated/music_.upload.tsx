@@ -18,7 +18,10 @@ import { musicService } from "@/services/music/musicService";
 import { useMembership } from "@/hooks/useMembership";
 import { UsageMeter } from "@/components/membership/UsageMeter";
 import { Card, CardContent } from "@/components/ui/card";
-import { MUSIC_RIGHTS_POLICY_VERSION } from "@/constants/legal";
+import {
+  MUSIC_RIGHTS_POLICY_VERSION,
+  MUSIC_UPLOAD_RIGHTS_DECLARATION_VERSION,
+} from "@/constants/legal";
 import { creatorRightsService } from "@/services/rights/creatorRightsService";
 import { CreatorRightsCertificationGate } from "@/components/musicUpload/CreatorRightsCertificationGate";
 import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
@@ -58,6 +61,7 @@ function UploadPage() {
         `Songs on your plan must be ${membership.limits.track_duration_sec / 60} minutes or shorter`,
       );
     }
+    const declaredAt = new Date().toISOString();
     await upload.mutateAsync({
       input: {
         title: values.title,
@@ -77,8 +81,11 @@ function UploadPage() {
         rights_basis: values.rights_basis,
         rights_confirmed: true,
         rights_policy_version: MUSIC_RIGHTS_POLICY_VERSION,
-        rights_confirmed_at:
-          activeRights?.certified_at ?? new Date().toISOString(),
+        rights_confirmed_at: activeRights?.certified_at ?? declaredAt,
+        upload_rights_declaration_version: MUSIC_UPLOAD_RIGHTS_DECLARATION_VERSION,
+        upload_rights_declaration_confirmed: values.upload_rights_declaration_confirmed,
+        upload_rights_declared_at: declaredAt,
+        upload_rights_declaration_note: values.upload_rights_declaration_note,
         discovery_metadata: values.discovery_metadata,
         visibility: values.visibility,
         playback_mode: values.playback_mode,
@@ -134,6 +141,7 @@ function UploadPage() {
       },
       cover: values.cover,
     });
+    const declaredAt = new Date().toISOString();
     for (let i = 0; i < values.tracks.length; i++) {
       const t = values.tracks[i];
       await musicService.createTrack({
@@ -156,11 +164,14 @@ function UploadPage() {
           status: values.status,
           track_number: i + 1,
           album_id: album.id,
-          rights_basis: values.rights_basis,
+          rights_basis: values.same_rights_for_all_tracks ? values.rights_basis : t.rights_basis,
           rights_confirmed: true,
           rights_policy_version: MUSIC_RIGHTS_POLICY_VERSION,
-          rights_confirmed_at:
-            activeRights?.certified_at ?? new Date().toISOString(),
+          rights_confirmed_at: activeRights?.certified_at ?? declaredAt,
+          upload_rights_declaration_version: MUSIC_UPLOAD_RIGHTS_DECLARATION_VERSION,
+          upload_rights_declaration_confirmed: values.same_rights_for_all_tracks ? values.upload_rights_declaration_confirmed : t.upload_rights_declaration_confirmed,
+          upload_rights_declared_at: declaredAt,
+          upload_rights_declaration_note: values.same_rights_for_all_tracks ? values.upload_rights_declaration_note : t.upload_rights_declaration_note,
           visibility: "public",
           playback_mode: "full",
           preview_duration_sec: 30,
