@@ -101,7 +101,7 @@ function CreatorInvitePage() {
         {isAuthenticated ? (
           <Button className="w-full" disabled={redeeming} onClick={() => void redeem()}>
             {redeeming ? (
-              "Activating…"
+              "Activatingâ€¦"
             ) : (
               <>
                 <CheckCircle2 className="mr-2 h-4 w-4" />
@@ -116,7 +116,7 @@ function CreatorInvitePage() {
               issued to.
             </p>
             <Button asChild className="w-full">
-              <Link to="/auth/sign-up">Create account</Link>
+              <Link to="/creator/sign-up">Create account</Link>
             </Button>
             <Button asChild variant="outline" className="w-full">
               <Link to="/auth/sign-in">Sign in</Link>

@@ -16,6 +16,7 @@ import {
   type Profile,
 } from "@/services/auth/authService";
 import type { AppRole, SelectableRole } from "@/features/auth/roles";
+import type { CreatorRightsProtectionAcceptance } from "@/constants/creatorRightsProtection";
 import { operationsSessionService } from "@/services/admin/operationsSessionService";
 
 interface AuthContextValue {
@@ -35,6 +36,7 @@ interface AuthContextValue {
     displayName: string,
     legalPolicyVersion: string,
     signupRole?: SelectableRole,
+    creatorRightsProtection?: CreatorRightsProtectionAcceptance,
   ) => Promise<{ userId: string | null; requiresEmailConfirmation: boolean }>;
   signOut: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
@@ -123,8 +125,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn: async (email, password, rememberMe) => {
         await authService.signIn(email, password, rememberMe);
       },
-      signUp: async (email, password, displayName, legalPolicyVersion, signupRole) => {
-        return authService.signUp(email, password, displayName, legalPolicyVersion, signupRole);
+      signUp: async (
+        email,
+        password,
+        displayName,
+        legalPolicyVersion,
+        signupRole,
+        creatorRightsProtection,
+      ) => {
+        return authService.signUp(
+          email,
+          password,
+          displayName,
+          legalPolicyVersion,
+          signupRole,
+          creatorRightsProtection,
+        );
       },
       signOut: async () => {
         await operationsSessionService.end().catch(() => undefined);

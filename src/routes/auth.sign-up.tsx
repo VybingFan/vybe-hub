@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AuthCard } from "@/components/auth/AuthCard";
@@ -19,6 +19,11 @@ const signUpSearchSchema = z.object({
 
 export const Route = createFileRoute("/auth/sign-up")({
   validateSearch: signUpSearchSchema,
+  beforeLoad: ({ search }) => {
+    if (search.role === "creator") {
+      throw redirect({ to: "/creator/sign-up" });
+    }
+  },
   component: SignUpPage,
 });
 

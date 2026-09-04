@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole, SelectableRole } from "@/features/auth/roles";
+import type { CreatorRightsProtectionAcceptance } from "@/constants/creatorRightsProtection";
 
 const REMEMBER_KEY = "vybe:remember";
 const SESSION_ALIVE_KEY = "vybe:session-alive";
@@ -21,7 +22,14 @@ export const authService = {
     return data;
   },
 
-  async signUp(email: string, password: string, displayName: string, legalPolicyVersion: string, signupRole?: SelectableRole) {
+  async signUp(
+    email: string,
+    password: string,
+    displayName: string,
+    legalPolicyVersion: string,
+    signupRole?: SelectableRole,
+    creatorRightsProtection?: CreatorRightsProtectionAcceptance,
+  ) {
     const redirectOrigin =
       window.location.hostname === "creators.vybewithvybe.com"
         ? "https://vybewithvybe.com"
@@ -36,6 +44,19 @@ export const authService = {
           display_name: displayName,
           legal_accepted: true,
           legal_policy_version: legalPolicyVersion,
+          ...(creatorRightsProtection
+            ? {
+                creator_rights_protection_accepted: true,
+                creator_rights_protection_version: creatorRightsProtection.version,
+                creator_rights_permission_confirmed: creatorRightsProtection.permissionConfirmed,
+                creator_rights_fingerprinting_understood: creatorRightsProtection.fingerprintingUnderstood,
+                creator_rights_match_limit_understood: creatorRightsProtection.matchLimitUnderstood,
+                creator_rights_work_classification_accuracy_confirmed:
+                  creatorRightsProtection.workClassificationAccuracyConfirmed,
+                creator_rights_information_request_understood:
+                  creatorRightsProtection.informationRequestUnderstood,
+              }
+            : {}),
         },
       },
     });

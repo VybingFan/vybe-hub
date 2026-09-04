@@ -66,7 +66,7 @@ function CreatorStartPage() {
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
                 Create one home for your music, playlists, stories, videos, merchandise, and
-                community—then share it directly with the people who support you.
+                communityâ€”then share it directly with the people who support you.
               </p>
 
               {!isLoading && isCreator ? (
@@ -88,7 +88,7 @@ function CreatorStartPage() {
                     size="lg"
                     className="bg-gradient-brand text-primary-foreground shadow-glow"
                   >
-                    <Link to="/auth/sign-up" search={{ role: "creator" }}>
+                    <Link to="/creator/sign-up">
                       Create a free creator account <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -144,7 +144,7 @@ function CreatorStartPage() {
                 </Button>
               ) : (
                 <div className="mt-6 rounded-2xl border border-border/70 bg-muted/35 p-4 text-sm leading-6 text-muted-foreground">
-                  Sign in as a creator, then use your browser’s Install app or Add to Home Screen
+                  Sign in as a creator, then use your browserâ€™s Install app or Add to Home Screen
                   option. If VYBE Creator is already installed, open it from your device.
                 </div>
               )}

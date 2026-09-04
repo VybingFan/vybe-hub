@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { CreatorAuthShell } from "@/components/auth/CreatorAuthShell";
 import { SubmitButton } from "@/components/auth/SubmitButton";
+import { CreatorRightsProtectionAcknowledgements } from "@/components/auth/CreatorRightsProtectionAcknowledgements";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,12 @@ import { LEGAL_POLICY_VERSION } from "@/constants/legal";
 import { useAuth } from "@/hooks/useAuth";
 import { signUpSchema } from "@/features/auth/roles";
 import { CREATOR_PLAN_CATALOG } from "@/features/membership/catalog";
+import {
+  CREATOR_RIGHTS_PROTECTION_VERSION,
+  EMPTY_CREATOR_RIGHTS_PROTECTION_ACKNOWLEDGEMENTS,
+  hasAcceptedCreatorRightsProtection,
+  type CreatorRightsProtectionAcknowledgementState,
+} from "@/constants/creatorRightsProtection";
 
 const PENDING_ROLE_KEY = "vybe:pending-signup-role";
 const PENDING_PLAN_KEY = "vybe:pending-creator-plan";
@@ -36,6 +43,10 @@ function CreatorSignUpPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedPolicies, setAcceptedPolicies] = useState(false);
+  const [rightsAcknowledgements, setRightsAcknowledgements] =
+    useState<CreatorRightsProtectionAcknowledgementState>(
+      EMPTY_CREATOR_RIGHTS_PROTECTION_ACKNOWLEDGEMENTS,
+    );
   const [loading, setLoading] = useState(false);
   const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
 
@@ -66,6 +77,10 @@ function CreatorSignUpPage() {
       return;
     }
 
+    if (!hasAcceptedCreatorRightsProtection(rightsAcknowledgements)) {
+      toast.error("Review and accept each VYBE Rights & Protection acknowledgement.");
+      return;
+    }
     const parsed = signUpSchema.safeParse({ displayName, email, password });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
@@ -84,6 +99,10 @@ function CreatorSignUpPage() {
         parsed.data.displayName,
         LEGAL_POLICY_VERSION,
         "creator",
+        {
+          version: CREATOR_RIGHTS_PROTECTION_VERSION,
+          ...rightsAcknowledgements,
+        },
       );
 
       const pendingInvite = window.localStorage.getItem("vybe:pending-creator-invite");
@@ -219,6 +238,13 @@ function CreatorSignUpPage() {
             Version {LEGAL_POLICY_VERSION}.
           </Label>
         </div>
+
+        <CreatorRightsProtectionAcknowledgements
+          value={rightsAcknowledgements}
+          onChange={(key, checked) =>
+            setRightsAcknowledgements((current) => ({ ...current, [key]: checked }))
+          }
+        />
 
         <SubmitButton loading={loading}>Create Creator Account</SubmitButton>
       </form>
