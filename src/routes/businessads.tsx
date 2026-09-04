@@ -5,7 +5,16 @@ import { Footer } from "@/components/layout/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/businessads")({ component: BusinessAdvertisingHub });
+export const Route = createFileRoute("/businessads")({
+  head: () => ({
+    meta: [
+      { title: "VYBE for Businesses | Advertising & Creator Partnerships" },
+      { name: "description", content: "Explore VYBE business, advertising and creator partnership opportunities through the dedicated VYBE business experience." },
+    ],
+    links: [{ rel: "canonical", href: "https://businessads.vybewithvybe.com/" }],
+  }),
+  component: BusinessAdvertisingHub,
+});
 
 export function BusinessAdvertisingHub() {
   return (

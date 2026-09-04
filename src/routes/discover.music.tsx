@@ -10,7 +10,16 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { publicDiscoveryService, type DiscoveryTrack } from "@/services/discovery/publicDiscoveryService";
 
-export const Route = createFileRoute("/discover/music")({ component: MusicDiscoveryPage });
+export const Route = createFileRoute("/discover/music")({
+  head: () => ({
+    meta: [
+      { title: "Discover Music & Creators | VYBE" },
+      { name: "description", content: "Listen to music on VYBE and discover artists, songs and creator pages across genres." },
+    ],
+    links: [{ rel: "canonical", href: "https://vybewithvybe.com/discover/music" }],
+  }),
+  component: MusicDiscoveryPage,
+});
 
 const GENRE_LABELS: Record<string, string> = {
   hiphop: "Hip-Hop",

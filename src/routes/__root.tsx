@@ -103,7 +103,15 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  loader: ({ serverContext }: any) => ({ publicSiteIdentity: serverContext?.publicSiteIdentity ?? "supporters" }),
+  head: ({ loaderData }) => {
+    const identity = loaderData?.publicSiteIdentity ?? "supporters";
+    const site = identity === "creators"
+      ? { title: "VYBE for Creators | Bring Your Creator World Together", description: "Build your creator home on VYBE, bring your work and important links together, keep supporters connected, and grow across music, film, writing, performance and more.", url: "https://creators.vybewithvybe.com/" }
+      : identity === "business"
+        ? { title: "VYBE for Businesses | Reach Creators & Entertainment Audiences", description: "Explore VYBE business, advertising, partnership and promotional opportunities designed to connect brands with creators and entertainment audiences.", url: "https://businessads.vybewithvybe.com/" }
+        : { title: "VYBE | Discover Creators, Entertainment & More", description: "Discover creators, keep up with what they do, find what you missed, and explore their music, films, stories, performances and more on VYBE.", url: "https://vybewithvybe.com/" };
+    return ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -113,37 +121,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "VYBE" },
-      { title: "VYBE — Where creators and supporters connect" },
-      {
-        name: "description",
-        content:
-          "Discover independent entertainment, connect with creators, and build lasting community on VYBE.",
-      },
-      { name: "author", content: "Aision Labs" },
-      { property: "og:title", content: "VYBE — Where creators and supporters connect" },
-      {
-        property: "og:description",
-        content:
-          "Discover music, film, video, writing, stories, and the independent creators behind them.",
-      },
+      { title: site.title },
+      { name: "description", content: site.description },
+      { property: "og:site_name", content: "VYBE" },
+      { property: "og:title", content: site.title },
+      { property: "og:description", content: site.description },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: site.url },
+      { property: "og:image", content: "https://vybewithvybe.com/pwa/icon-512-v24-38.png" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "VYBE — Where creators and supporters connect" },
-      {
-        name: "twitter:description",
-        content:
-          "Discover independent entertainment and connect directly with creators and supporters.",
-      },
-      {
-        property: "og:image",
-        content:
-          "https://vybewithvybe.com/pwa/icon-512-v24-38.png",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://vybewithvybe.com/pwa/icon-512-v24-38.png",
-      },
+      { name: "twitter:title", content: site.title },
+      { name: "twitter:description", content: site.description },
+      { name: "twitter:image", content: "https://vybewithvybe.com/pwa/icon-512-v24-38.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -153,12 +142,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/pwa/icon-192-v24-38.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap",
-      },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" },
     ],
-  }),
+  });
+  },
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,

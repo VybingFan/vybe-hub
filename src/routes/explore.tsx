@@ -16,6 +16,13 @@ import {
 } from "@/services/discovery/publicDiscoveryService";
 
 export const Route = createFileRoute("/explore")({
+  head: () => ({
+    meta: [
+      { title: "Discover Creators | VYBE" },
+      { name: "description", content: "Discover creators across music, film, writing, performance, comedy and more on VYBE." },
+    ],
+    links: [{ rel: "canonical", href: "https://vybewithvybe.com/explore" }],
+  }),
   validateSearch: (search: Record<string, unknown>) => ({
     q: typeof search.q === "string" ? search.q.slice(0, 80) : "",
   }),

@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useSyncExternalStore } from "react";
 import {
   ArrowRight,
   BookOpenText,
@@ -21,7 +20,38 @@ import { Badge } from "@/components/ui/badge";
 import { CreatorAudienceHub } from "@/routes/creators";
 import { BusinessAdvertisingHub } from "@/routes/businessads";
 
-export const Route = createFileRoute("/")({ component: Landing });
+export const Route = createFileRoute("/")({
+  loader: ({ serverContext }: any) => ({ publicSiteIdentity: serverContext?.publicSiteIdentity ?? "supporters" }),
+  head: ({ loaderData }) => {
+    const identity = loaderData?.publicSiteIdentity ?? "supporters";
+    const canonical = identity === "creators"
+      ? "https://creators.vybewithvybe.com/"
+      : identity === "business"
+        ? "https://businessads.vybewithvybe.com/"
+        : "https://vybewithvybe.com/";
+    const name = identity === "creators" ? "VYBE for Creators" : identity === "business" ? "VYBE for Businesses" : "VYBE";
+    const description = identity === "creators"
+      ? "A creator home for bringing work, updates and important links together and keeping supporters connected."
+      : identity === "business"
+        ? "Business, advertising, partnership and promotional opportunities across VYBE."
+        : "An entertainment discovery and connection platform for creators and the people who support them.";
+    return {
+      links: [{ rel: "canonical", href: canonical }],
+      scripts: [{
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name,
+          url: canonical,
+          description,
+          publisher: { "@type": "Organization", name: "VYBE", url: "https://vybewithvybe.com/" },
+        }),
+      }],
+    };
+  },
+  component: Landing,
+});
 
 const supporterBenefits = [
   {
@@ -99,35 +129,14 @@ const explorePaths = [
 ];
 
 
-const SUBDOMAIN_HOSTS = {
-  creators: "creators.vybewithvybe.com",
-  business: "businessads.vybewithvybe.com",
-} as const;
-
-function subscribeToHostname() {
-  return () => {};
-}
-
-function getBrowserHostname() {
-  return typeof window === "undefined" ? "" : window.location.hostname.toLowerCase();
-}
-
-function getServerHostname() {
-  return "";
-}
-
 function Landing() {
-  const hostname = useSyncExternalStore(
-    subscribeToHostname,
-    getBrowserHostname,
-    getServerHostname,
-  );
+  const { publicSiteIdentity } = Route.useLoaderData();
 
-  if (hostname === SUBDOMAIN_HOSTS.creators) {
+  if (publicSiteIdentity === "creators") {
     return <CreatorAudienceHub />;
   }
 
-  if (hostname === SUBDOMAIN_HOSTS.business) {
+  if (publicSiteIdentity === "business") {
     return <BusinessAdvertisingHub />;
   }
 
@@ -150,13 +159,13 @@ function SupporterLanding() {
               </Badge>
               <h1 className="max-w-3xl text-4xl font-bold leading-[1.04] tracking-tight sm:text-5xl md:text-7xl">
                 Your creators.<br />
-                Their latest.<br />
+                Their world.<br />
                 <span className="text-gradient-brand">Your VYBE.</span>
               </h1>
               <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
-                Follow the creators you care about, discover new ones, and keep up with their music,
-                films, stories, performances, updates, and more—all in one place built to help you
-                find what matters to you.
+                Keep up with the creators you care about and discover new ones. Find what you missed,
+                connect more personally, and find your way to their music, films, stories, performances,
+                social media, websites, events, and more—on VYBE and beyond.
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:mt-9 sm:flex-row sm:flex-wrap">
                 <Button asChild size="lg" className="w-full bg-gradient-brand text-primary-foreground shadow-glow sm:w-auto">
@@ -165,7 +174,7 @@ function SupporterLanding() {
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="w-full rounded-full bg-background/40 backdrop-blur sm:w-auto">
-                  <a href="/about#how-vybe-works">See How VYBE Works</a>
+                  <a href="#how-vybe-works">See How VYBE Works</a>
                 </Button>
               </div>
             </div>
@@ -181,7 +190,14 @@ function SupporterLanding() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-5 py-14 sm:px-6 sm:py-20">
+        <section id="how-vybe-works" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-14 sm:px-6 sm:py-20">
+          <div className="mb-10 max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">How VYBE works</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">Find them. Follow them. Keep their world within reach.</h2>
+            <p className="mt-5 text-lg leading-8 text-muted-foreground">
+              VYBE gives supporters a simple path from discovering a creator to keeping up with what they do. Explore creators, follow the people who matter to you, return through My VYBE, and move directly into their music, videos, stories, updates, events, communities, merchandise, and links across the web.
+            </p>
+          </div>
           <div className="grid items-center gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">Following shouldn't mean hoping.</p>

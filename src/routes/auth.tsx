@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
 import { Logo } from "@/components/common/Logo";
 
 export const Route = createFileRoute("/auth")({
+  head: () => ({ meta: [{ name: "robots", content: "noindex, nofollow" }] }),
   component: AuthLayout,
 });
 

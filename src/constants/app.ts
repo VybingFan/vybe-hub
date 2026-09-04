@@ -59,7 +59,7 @@ export const BUILD_ON_VYBE_LINKS = [
 
 export const MORE_LINKS = [
   { label: "About VYBE", to: "/about" },
-  { label: "How VYBE Works", to: "/about#how-vybe-works" },
+  { label: "How VYBE Works", to: "/#how-vybe-works" },
   { label: "FAQ", to: "/faq" },
   { label: "Trust & Safety", to: "/trust" },
   { label: "Copyright", to: "/copyright" },

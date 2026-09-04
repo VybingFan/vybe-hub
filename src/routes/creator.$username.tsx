@@ -31,6 +31,10 @@ import { PublicCreatorUpdates } from "@/components/creator/PublicCreatorUpdates"
 import { getPublicCreatorThemeStyle } from "@/features/profile/profileThemes";
 
 export const Route = createFileRoute("/creator/$username")({
+  head: ({ params }) => ({
+    meta: [{ name: "robots", content: "noindex, follow" }],
+    links: [{ rel: "canonical", href: `https://vybewithvybe.com/artist/${encodeURIComponent(params.username)}` }],
+  }),
   component: CreatorPage,
 });
 

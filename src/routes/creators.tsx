@@ -5,7 +5,16 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/creators")({ component: CreatorAudienceHub });
+export const Route = createFileRoute("/creators")({
+  head: () => ({
+    meta: [
+      { title: "VYBE for Creators | Bring Your Creator World Together" },
+      { name: "description", content: "Build your VYBE, give supporters a home base, and connect your work, updates, communities and links without replacing the platforms you already use." },
+    ],
+    links: [{ rel: "canonical", href: "https://creators.vybewithvybe.com/" }],
+  }),
+  component: CreatorAudienceHub,
+});
 
 const benefits = [
   "Give supporters one place to find your work, updates, What's Happening, community, and links.",

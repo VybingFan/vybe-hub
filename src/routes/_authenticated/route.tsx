@@ -9,6 +9,7 @@ import { OperationsBoundary } from "@/components/auth/OperationsBoundary";
  * session lives in localStorage and can't be read on the server.
  */
 export const Route = createFileRoute("/_authenticated")({
+  head: () => ({ meta: [{ name: "robots", content: "noindex, nofollow" }] }),
   ssr: false,
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();

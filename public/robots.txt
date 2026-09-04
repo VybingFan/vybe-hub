@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /play/preview/
+
+Sitemap: https://vybewithvybe.com/sitemap.xml
