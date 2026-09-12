@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Loader2, MapPin, Music2, Search, UserRound } from "lucide-react";
+import { ArrowRight, Loader2, MapPin, Music2, Search, UserRound, X } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
 import { MarketingNav } from "@/components/layout/MarketingNav";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -64,6 +64,12 @@ function PublicExplorePage() {
     navigate({ to: "/explore", search: { q: input.trim() } });
   }
 
+  function clearSearch() {
+    setInput("");
+    setSelectedFocus(null);
+    navigate({ to: "/explore", search: { q: "" } });
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <MarketingNav />
@@ -87,8 +93,13 @@ function PublicExplorePage() {
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder="Search creator, interest, city, genre, or name"
-              className="h-14 rounded-full pl-12 pr-4 text-base sm:pr-28"
+              className="h-14 rounded-full pl-12 pr-12 text-base sm:pr-36"
             />
+            {input ? (
+              <button type="button" onClick={clearSearch} aria-label="Clear search" className="absolute right-3 top-7 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground sm:right-[7.5rem] sm:top-1/2">
+                <X className="h-4 w-4" />
+              </button>
+            ) : null}
             <Button className="h-11 w-full rounded-full px-6 sm:absolute sm:right-1.5 sm:top-1.5 sm:w-auto">Search</Button>
           </form>
           <div className="mt-5">

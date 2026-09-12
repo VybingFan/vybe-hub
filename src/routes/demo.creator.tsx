@@ -435,10 +435,10 @@ function DemoCreatorPage() {
                 and community. Labels explain what is public now and what demonstrates future access.
               </p>
             </div>
-            <Badge variant="outline" className="w-fit shrink-0">
+            <Button type="button" variant="outline" className="w-fit shrink-0 rounded-full" onClick={() => document.getElementById("supporter-guide")?.scrollIntoView({ behavior: "smooth", block: "start" })}>
               <Eye className="mr-2 h-4 w-4" />
-              {supporterModes.find((item) => item.id === supporterMode)?.label} view
-            </Badge>
+              Change supporter view · {supporterModes.find((item) => item.id === supporterMode)?.label}
+            </Button>
           </div>
         </section>
 
