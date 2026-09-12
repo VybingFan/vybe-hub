@@ -28,6 +28,8 @@ import { useMyActivity } from "@/hooks/useActivity";
 import { useMyConnections } from "@/hooks/useConnections";
 import { useMembership } from "@/hooks/useMembership";
 import { getCreatorEntitlements } from "@/features/membership/entitlements";
+import { CreatorPreviewMyVybe } from "@/components/creator/CreatorPreviewMyVybe";
+import { useCreatorSetupIntelligence } from "@/features/guide/useCreatorSetupIntelligence";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -49,6 +51,7 @@ function DashboardContent() {
   const { data: activity = [] } = useMyActivity(user?.id);
   const { data: connections = [] } = useMyConnections(user?.id);
   const { data: membership } = useMembership();
+  const setupReadiness = useCreatorSetupIntelligence(user?.id);
   const creatorEntitlements = getCreatorEntitlements(membership?.plan_code);
   const published = tracks.filter(
     (track) => track.status === "published",
@@ -134,6 +137,20 @@ function DashboardContent() {
             </Button>
           ) : undefined
         }
+      />
+
+      <CreatorPreviewMyVybe
+        creator={creator}
+        planCode={membership?.plan_code}
+        tracks={tracks}
+        playlists={playlists}
+        readiness={{
+          isReady: setupReadiness.isReady,
+          completedCount: setupReadiness.completedCount,
+          totalRequired: setupReadiness.totalRequired,
+          complete: setupReadiness.complete,
+          nextRequiredId: setupReadiness.nextRequiredId,
+        }}
       />
 
       <section className="grid gap-3 grid-cols-2 xl:grid-cols-4">

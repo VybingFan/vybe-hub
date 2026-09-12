@@ -22,6 +22,7 @@ import { Footer } from "@/components/layout/Footer";
 import { MarketingNav } from "@/components/layout/MarketingNav";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { NovaCreatorDemoSystem } from "@/components/demo/NovaCreatorDemoSystem";
 
 export const Route = createFileRoute("/demo/creator")({ component: DemoCreatorPage });
 
@@ -365,6 +366,8 @@ function DemoCreatorPage() {
           </div>
         </section>
 
+        <NovaCreatorDemoSystem onSupporterModeChange={(mode) => { setSupporterMode(mode); setActionNote(`Demo changed to ${supporterModes.find((item) => item.id === mode)?.label}.`); }} />
+
         <section className="relative">
           <div className="h-64 overflow-hidden sm:h-80 md:h-[28rem]">
             <img
@@ -437,7 +440,7 @@ function DemoCreatorPage() {
             </div>
             <Button type="button" variant="outline" className="w-fit shrink-0 rounded-full" onClick={() => document.getElementById("supporter-guide")?.scrollIntoView({ behavior: "smooth", block: "start" })}>
               <Eye className="mr-2 h-4 w-4" />
-              Change supporter view · {supporterModes.find((item) => item.id === supporterMode)?.label}
+              Change supporter view - {supporterModes.find((item) => item.id === supporterMode)?.label}
             </Button>
           </div>
         </section>

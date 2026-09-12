@@ -82,7 +82,7 @@ function DiscoverPage() {
           </div>
           {selectedFocus === "Music" ? <div className="mt-4 border-t border-border/50 pt-4"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Explore music genres</p><div className="mt-3 flex flex-wrap gap-2">{genres.map((genre) => <Button key={genre} size="sm" variant={query === genre ? "default" : "outline"} className="rounded-full" onClick={() => choose(genre)}>{genre}</Button>)}</div></div> : null}
         </div>
-        {searched ? <p className="mt-4 text-sm text-muted-foreground">{loading ? `Searching for â€œ${query || input.trim()}â€â€¦` : query ? `Showing results for â€œ${query}â€` : "Showing all discovery results"}</p> : null}
+        {searched ? <p className="mt-4 text-sm text-muted-foreground">{loading ? `Searching for "${query || input.trim()}"...` : query ? `Showing results for "${query}"` : "Showing all discovery results"}</p> : null}
       </CardContent></Card>
 
       <div ref={resultsRef} className="scroll-mt-6">
