@@ -6,6 +6,9 @@ import { BlogArticleBody } from "@/components/blog/BlogArticleBody";
 import { blogService } from "@/services/blog/blogService";
 import { toast } from "sonner";
 
+const BLOG_DEFAULT_HERO = "/images/editorial/vybe-find-what-matters-v24-67b.webp";
+const BLOG_DEFAULT_HERO_ABSOLUTE = `https://vybewithvybe.com${BLOG_DEFAULT_HERO}`;
+
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params }) => {
     const post = await blogService.getPublishedBySlug(params.slug);
@@ -19,7 +22,7 @@ export const Route = createFileRoute("/blog/$slug")({
     const title = post.seo_title?.trim() || post.title;
     const description = post.seo_description?.trim() || post.excerpt?.trim() || "Read this story from the VYBE Blog.";
     const canonical = `https://vybewithvybe.com/blog/${post.slug}`;
-    const image = post.hero_image_url?.trim() || "https://vybewithvybe.com/pwa/icon-512-v24-38.png";
+    const image = post.hero_image_url?.trim() || BLOG_DEFAULT_HERO_ABSOLUTE;
     return {
       meta: [
         { title: `${title} | VYBE Blog` },
@@ -78,7 +81,7 @@ function BlogArticlePage() {
           {post.excerpt ? <p className="mt-5 text-lg leading-8 text-muted-foreground md:text-xl">{post.excerpt}</p> : null}
           <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y py-4 text-sm text-muted-foreground"><div>By <span className="font-medium text-foreground">{post.author_name}</span>{post.published_at ? ` \u00b7 ${new Date(post.published_at).toLocaleDateString()}` : ""}<span className="ml-3 inline-flex items-center"><Clock3 className="mr-1 h-4 w-4" /> {minutes} min read</span></div><Button variant="ghost" size="sm" onClick={() => void share()}><Share2 className="mr-2 h-4 w-4" /> Share</Button></div>
         </header>
-        {post.hero_image_url ? <div className="mx-auto max-w-6xl px-4 sm:px-6"><img src={post.hero_image_url} alt={post.hero_image_alt || post.title} className="max-h-[680px] w-full rounded-3xl object-cover" /></div> : null}
+        <div className="mx-auto max-w-6xl px-4 sm:px-6"><img src={post.hero_image_url || BLOG_DEFAULT_HERO} alt={post.hero_image_alt || post.title} className="max-h-[680px] w-full rounded-3xl object-cover" /></div>
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 md:py-14"><BlogArticleBody body={post.body} media={media} /></div>
         <footer className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 md:pb-20">
           <div className="border-t pt-7">

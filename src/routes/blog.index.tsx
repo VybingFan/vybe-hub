@@ -9,6 +9,8 @@ import { useUser } from "@/hooks/useUser";
 
 export const Route = createFileRoute("/blog/")({ component: BlogPage });
 
+const BLOG_DEFAULT_HERO = "/images/editorial/vybe-find-what-matters-v24-67b.webp";
+
 function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +61,7 @@ function BlogPage() {
 
         {featured ? (
           <article className="grid overflow-hidden rounded-3xl border bg-card shadow-sm lg:grid-cols-[1.1fr_.9fr]">
-            <div className="min-h-72 bg-muted">{featured.hero_image_url ? <img src={featured.hero_image_url} alt={featured.hero_image_alt || featured.title} className="h-full w-full object-cover" /> : <div className="flex h-full min-h-72 items-center justify-center bg-gradient-to-br from-primary/20 to-muted"><BookOpenText className="h-16 w-16 text-primary/60" /></div>}</div>
+            <div className="min-h-72 bg-muted"><img src={featured.hero_image_url || BLOG_DEFAULT_HERO} alt={featured.hero_image_alt || featured.title} className="h-full w-full object-cover" /></div>
             <div className="flex flex-col justify-center p-7 md:p-10">
               <div className="flex flex-wrap gap-2">{featured.category ? <Badge>{featured.category}</Badge> : null}{featured.is_featured ? <Badge variant="secondary">Featured</Badge> : null}</div>
               <h2 className="mt-5 text-3xl font-semibold tracking-tight md:text-4xl">{featured.title}</h2>
@@ -70,7 +72,7 @@ function BlogPage() {
           </article>
         ) : null}
 
-        {rest.length ? <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{rest.map((post) => <article key={post.id} className="overflow-hidden rounded-2xl border bg-card"><div className="aspect-[16/9] bg-muted">{post.hero_image_url ? <img src={post.hero_image_url} alt={post.hero_image_alt || post.title} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center"><BookOpenText className="h-9 w-9 text-primary/50" /></div>}</div><div className="p-5">{post.category ? <Badge variant="secondary">{post.category}</Badge> : null}<h3 className="mt-3 text-xl font-semibold leading-7">{post.title}</h3>{post.excerpt ? <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">{post.excerpt}</p> : null}<p className="mt-4 text-xs text-muted-foreground">{post.author_name}{post.published_at ? ` \u00b7 ${new Date(post.published_at).toLocaleDateString()}` : ""}</p><Link to="/blog/$slug" params={{ slug: post.slug }} className="mt-4 inline-flex items-center text-sm font-medium text-primary">Read article <ArrowRight className="ml-1 h-4 w-4" /></Link></div></article>)}</div> : null}
+        {rest.length ? <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{rest.map((post) => <article key={post.id} className="overflow-hidden rounded-2xl border bg-card"><div className="aspect-[16/9] bg-muted"><img src={post.hero_image_url || BLOG_DEFAULT_HERO} alt={post.hero_image_alt || post.title} className="h-full w-full object-cover" /></div><div className="p-5">{post.category ? <Badge variant="secondary">{post.category}</Badge> : null}<h3 className="mt-3 text-xl font-semibold leading-7">{post.title}</h3>{post.excerpt ? <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">{post.excerpt}</p> : null}<p className="mt-4 text-xs text-muted-foreground">{post.author_name}{post.published_at ? ` \u00b7 ${new Date(post.published_at).toLocaleDateString()}` : ""}</p><Link to="/blog/$slug" params={{ slug: post.slug }} className="mt-4 inline-flex items-center text-sm font-medium text-primary">Read article <ArrowRight className="ml-1 h-4 w-4" /></Link></div></article>)}</div> : null}
       </section>
     </main>
   );

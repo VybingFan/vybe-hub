@@ -294,9 +294,23 @@
 .vybe-motion-icon { transition: transform 180ms ease; }
 .group:hover .vybe-motion-icon { transform: translateX(3px); }
 
+@keyframes vybeNavMenuIn {
+  from { opacity: 0; transform: translateY(-6px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.vybe-nav-menu[data-state="open"] {
+  animation: vybeNavMenuIn 180ms cubic-bezier(.2,.8,.2,1) both;
+  transform-origin: top center;
+}
+.vybe-nav-menu[data-state="open"] .vybe-nav-menu-item {
+  animation: vybePreviewSwap 210ms cubic-bezier(.2,.8,.2,1) both;
+  animation-delay: calc(var(--vybe-menu-index, 0) * 32ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .vybe-reveal, .vybe-stagger > *, .vybe-motion-card, .vybe-motion-icon {
-    opacity: 1 !important; transform: none !important; transition: none !important;
+  .vybe-reveal, .vybe-stagger > *, .vybe-motion-card, .vybe-motion-icon,
+  .vybe-nav-menu, .vybe-nav-menu-item {
+    opacity: 1 !important; transform: none !important; transition: none !important; animation: none !important;
   }
 }
 

@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { ChevronDown, Menu, UserRound, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/common/Logo";
@@ -175,15 +175,20 @@ function NavDropdown({
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-1 text-sm text-muted-foreground outline-none transition-colors hover:text-foreground data-[state=open]:text-foreground">
+      <DropdownMenuTrigger className="group flex items-center gap-1 text-sm text-muted-foreground outline-none transition-colors hover:text-foreground data-[state=open]:text-foreground">
         {label}
-        <ChevronDown className="h-3.5 w-3.5" />
+        <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="center" className={detailed ? "w-80" : "w-56"}>
+      <DropdownMenuContent align="center" className={`vybe-nav-menu ${detailed ? "w-80" : "w-56"}`}>
         <DropdownMenuLabel>{label}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {items.map((item) => (
-          <DropdownMenuItem key={item.to} asChild className={detailed ? "items-start py-3" : ""}>
+        {items.map((item, index) => (
+          <DropdownMenuItem
+            key={item.to}
+            asChild
+            className={`vybe-nav-menu-item ${detailed ? "items-start py-3" : ""}`}
+            style={{ "--vybe-menu-index": index } as CSSProperties}
+          >
             <a href={item.to}>
               <div>
                 <p className="font-medium">{item.label}</p>
