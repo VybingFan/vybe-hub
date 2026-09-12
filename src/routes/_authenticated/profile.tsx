@@ -10,6 +10,7 @@ import { SupporterProfileView } from "@/components/supporter/SupporterProfileVie
 import { ErrorState } from "@/components/common/ErrorState";
 import { CreatorDiscoveryReadiness } from "@/components/discovery/CreatorDiscoveryReadiness";
 import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
+import { VybeReveal } from "@/components/motion/VybeReveal";
 import { useUser } from "@/hooks/useUser";
 import {
   useCreatorProfile,
@@ -97,11 +98,14 @@ function CreatorProfileContent({
         />
       ) : (
         <>
-          <CreatorDiscoveryReadiness
-            profile={profile ?? null}
-            tracks={tracks}
-            onEditProfile={() => setIsEditing(true)}
-          />
+          <VybeReveal distance="sm">
+            <CreatorDiscoveryReadiness
+              profile={profile ?? null}
+              tracks={tracks}
+              onEditProfile={() => setIsEditing(true)}
+            />
+          </VybeReveal>
+          <VybeReveal delayMs={80}>
           <ProfileHeader
             profile={previewProfile ?? {}}
             email={email}
@@ -109,6 +113,7 @@ function CreatorProfileContent({
             onEditToggle={() => canEdit && setIsEditing(true)}
             publicUrl={publicUrl}
           />
+          </VybeReveal>
           <ProfileView profile={profile ?? null} />
         </>
       )}

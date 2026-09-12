@@ -11,6 +11,8 @@ import { SupporterFollowingCreators } from "@/components/engagement/SupporterFol
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
+import { VybeReveal } from "@/components/motion/VybeReveal";
+import { VybeStagger } from "@/components/motion/VybeStagger";
 import { useUser } from "@/hooks/useUser";
 import { useSupporterProfile } from "@/hooks/useSupporterProfile";
 
@@ -29,14 +31,14 @@ function MyVybePage() {
           description="Catch up with creators you care about, keep what moves you close, and jump back into everything VYBE has waiting for you."
         />
 
-        <SupporterIdentityCard profile={supporterProfile} />
+        <VybeReveal distance="sm"><SupporterIdentityCard profile={supporterProfile} /></VybeReveal>
 
         <SupporterFollowingCreators />
 
         <SupporterCreatorUpdates />
 
-        <section className="grid gap-3 sm:gap-4 lg:grid-cols-[1.4fr_.8fr]">
-          <Card className="overflow-hidden border-primary/20 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,.18),transparent_46%)]">
+        <VybeStagger className="grid gap-3 sm:gap-4 lg:grid-cols-[1.4fr_.8fr]">
+          <Card className="vybe-motion-card overflow-hidden border-primary/20 bg-[radial-gradient(circle_at_top_left,rgba(168,85,247,.18),transparent_46%)]">
             <CardContent className="flex min-h-0 flex-col justify-between p-4 sm:min-h-56 sm:p-7">
               <div>
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15 text-primary sm:h-11 sm:w-11 sm:rounded-2xl">
@@ -70,7 +72,7 @@ function MyVybePage() {
               </Button>
             </CardContent>
           </Card>
-        </section>
+        </VybeStagger>
 
         <section className="space-y-3 sm:space-y-4">
           <div>
@@ -154,7 +156,7 @@ function DashboardLink({ to, icon, eyebrow, title, description }: {
   to: string; icon: ReactNode; eyebrow: string; title: string; description: string;
 }) {
   return (
-    <Link to={to} className="group min-w-0 rounded-xl border bg-card p-3 transition hover:border-primary/40 hover:bg-muted/20 sm:rounded-2xl sm:p-5">
+    <Link to={to} className="group vybe-motion-card min-w-0 rounded-xl border bg-card p-3 hover:border-primary/40 hover:bg-muted/20 sm:rounded-2xl sm:p-5">
       <div className="flex items-center justify-between gap-3">
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary sm:h-10 sm:w-10 sm:rounded-xl">{icon}</span>
         <ChevronRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5" />

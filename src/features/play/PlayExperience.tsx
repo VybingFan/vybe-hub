@@ -18,6 +18,8 @@ import {
   WifiOff,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { VybeReveal } from "@/components/motion/VybeReveal";
+import { VybeStagger } from "@/components/motion/VybeStagger";
 import { Button } from "@/components/ui/button";
 import {
   AVAILABLE_PLAY_GENRES,
@@ -297,6 +299,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
   return (
     <main>
       <section className="border-b border-border/60 bg-gradient-hero">
+        <VybeReveal distance="sm">
         <div className="mx-auto max-w-6xl px-5 py-9 text-center sm:px-6 sm:py-16 md:py-24">
           <Badge className="border-lime-700/40 bg-lime-100 text-lime-900 dark:border-lime-300/30 dark:bg-lime-300/10 dark:text-lime-200">
             <Sparkles className="mr-2 h-3.5 w-3.5" />
@@ -329,6 +332,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
             </div>
           </div>
         </div>
+        </VybeReveal>
       </section>
 
       <section className="mx-auto max-w-6xl px-5 pb-2 pt-5 sm:hidden">
@@ -398,7 +402,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
           </div>
         </div>
 
-        <div className="mt-5 hidden gap-3 sm:grid sm:grid-cols-2 sm:mt-7 sm:gap-4 lg:grid-cols-3">
+        <VybeStagger className="mt-5 hidden gap-3 sm:grid sm:grid-cols-2 sm:mt-7 sm:gap-4 lg:grid-cols-3">
           {playDestinations.map((destination) => (
             <a
               key={destination.title}
@@ -420,7 +424,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
               </div>
             </a>
           ))}
-        </div>
+        </VybeStagger>
 
         <div className="mt-4 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-brand p-3.5 text-white sm:mt-6 sm:rounded-[2rem] sm:p-8">
           <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1fr_.9fr] lg:items-center">
@@ -442,7 +446,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
                 {surprise ? "Surprise me again" : "Reveal my surprise"}
               </Button>
             </div>
-            <div className="rounded-2xl border border-white/20 bg-black/20 p-4 sm:rounded-3xl sm:p-6" aria-live="polite">
+            <div key={surprise?.title ?? "waiting"} className="vybe-preview-swap rounded-2xl border border-white/20 bg-black/20 p-4 sm:rounded-3xl sm:p-6" aria-live="polite">
               {surprise ? (
                 <>
                   <p className="text-sm text-white/70">Your surprise</p>
@@ -483,7 +487,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
               Quick activities and rotating reasons to come back and play.
             </p>
           </div>
-          <div className="mt-5 grid grid-cols-2 gap-3 sm:mt-7 sm:gap-4 lg:grid-cols-4">
+          <VybeStagger className="mt-5 grid grid-cols-2 gap-3 sm:mt-7 sm:gap-4 lg:grid-cols-4">
             {DAILY_PLAY_ITEMS.map((item) => (
               <a
                 key={item.id}
@@ -501,7 +505,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
                 </p>
               </a>
             ))}
-          </div>
+          </VybeStagger>
         </div>
       </section>
 
@@ -582,7 +586,7 @@ export function PlayExperience({ isMember = false }: { isMember?: boolean }) {
                     })}
                   </div>
                   {selected !== null && (
-                    <div className="mt-5 rounded-2xl border border-border bg-background/60 p-4">
+                    <div key={`${questionIndex}-${selected}`} className="vybe-preview-swap mt-5 rounded-2xl border border-border bg-background/60 p-4">
                       <p className="flex items-center gap-2 font-medium">
                         <CheckCircle2 className="h-5 w-5 text-lime-300" />
                         {selected === question.answer

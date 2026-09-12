@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { WorkspacePageHeader } from "@/components/workspace/WorkspacePageHeader";
+import { VybeReveal } from "@/components/motion/VybeReveal";
+import { VybeStagger } from "@/components/motion/VybeStagger";
 import {
   publicDiscoveryService,
   type DiscoveryArtistCredit,
@@ -65,6 +67,7 @@ function DiscoverPage() {
     <div className="mx-auto max-w-6xl space-y-7">
       <WorkspacePageHeader eyebrow="Supporter discovery" title="Find your next VYBE." description="Discover real VYBE creators and published music. Open a creator page to listen, follow, heart, save, and participate." status={<Button asChild variant="outline" className="rounded-full"><Link to="/supporter-interests"><SlidersHorizontal className="mr-2 h-4 w-4" />Tune interests</Link></Button>} />
 
+      <VybeReveal distance="sm">
       <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card"><CardContent className="p-5 sm:p-7">
         <form onSubmit={submit} className="relative">
           <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -84,13 +87,14 @@ function DiscoverPage() {
         </div>
         {searched ? <p className="mt-4 text-sm text-muted-foreground">{loading ? `Searching for "${query || input.trim()}"...` : query ? `Showing results for "${query}"` : "Showing all discovery results"}</p> : null}
       </CardContent></Card>
+      </VybeReveal>
 
       <div ref={resultsRef} className="scroll-mt-6">
       {loading ? <div className="flex min-h-56 items-center justify-center"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div> : null}
       {error ? <p className="rounded-2xl border border-destructive/30 bg-destructive/10 p-5 text-sm text-destructive">{error}</p> : null}
       {!loading && !error ? <div className="space-y-10">
         <section><div className="flex items-end justify-between"><div><p className="text-sm font-medium text-primary">Creators</p><h2 className="mt-1 text-2xl font-semibold">{query ? `Creators connected to “${query}”` : "Explore VYBE creator accounts"}</h2></div><span className="text-sm text-muted-foreground">{creators.length} found</span></div>
-          {creators.length ? <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{creators.map((creator) => <Link key={creator.user_id} to="/artist/$username" params={{ username: creator.username }} search={{ track: "", autoplay: true }} className="group rounded-2xl border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/40"><div className="flex items-center gap-4"><Avatar className="h-14 w-14"><AvatarImage src={creator.avatar_url ?? undefined} /><AvatarFallback><UserRound className="h-5 w-5" /></AvatarFallback></Avatar><div className="min-w-0 flex-1"><h3 className="truncate font-semibold">{creator.artist_name || creator.display_name}</h3><p className="truncate text-sm text-muted-foreground">{creator.genres?.join(", ") || creator.genre || "Independent creator"}</p>{creator.location ? <p className="mt-1 flex items-center gap-1 truncate text-xs text-muted-foreground"><MapPin className="h-3 w-3" />{creator.location}</p> : null}</div><ArrowRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5" /></div></Link>)}</div> : <Empty text="No creator accounts match this search yet." />}
+          {creators.length ? <VybeStagger className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{creators.map((creator) => <Link key={creator.user_id} to="/artist/$username" params={{ username: creator.username }} search={{ track: "", autoplay: true }} className="group vybe-motion-card rounded-2xl border bg-card p-5 hover:border-primary/40"><div className="flex items-center gap-4"><Avatar className="h-14 w-14"><AvatarImage src={creator.avatar_url ?? undefined} /><AvatarFallback><UserRound className="h-5 w-5" /></AvatarFallback></Avatar><div className="min-w-0 flex-1"><h3 className="truncate font-semibold">{creator.artist_name || creator.display_name}</h3><p className="truncate text-sm text-muted-foreground">{creator.genres?.join(", ") || creator.genre || "Independent creator"}</p>{creator.location ? <p className="mt-1 flex items-center gap-1 truncate text-xs text-muted-foreground"><MapPin className="h-3 w-3" />{creator.location}</p> : null}</div><ArrowRight className="vybe-motion-icon h-4 w-4 text-muted-foreground" /></div></Link>)}</VybeStagger> : <Empty text="No creator accounts match this search yet." />}
         </section>
 
         {artists.length ? <section><div className="flex items-end justify-between"><div><p className="text-sm font-medium text-primary">Artist credits</p><h2 className="mt-1 text-2xl font-semibold">Credited performing artists</h2></div><span className="text-sm text-muted-foreground">{artists.length} found</span></div><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{artists.map((artist) => <button key={artist.name.toLowerCase()} type="button" onClick={() => choose(artist.name)} className="rounded-2xl border bg-card p-5 text-left transition hover:border-primary/40"><div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary"><Music2 className="h-5 w-5" /></span><span><span className="block font-semibold">{artist.name}</span><span className="text-xs text-muted-foreground">{artist.songCount} {artist.songCount === 1 ? "song" : "songs"} · {artist.uploaderCount} {artist.uploaderCount === 1 ? "creator account" : "creator accounts"}</span></span></div></button>)}</div></section> : null}

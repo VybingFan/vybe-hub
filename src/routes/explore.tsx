@@ -7,6 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { VybeReveal } from "@/components/motion/VybeReveal";
+import { VybeStagger } from "@/components/motion/VybeStagger";
 import { useUser } from "@/hooks/useUser";
 import {
   publicDiscoveryService,
@@ -74,6 +76,7 @@ function PublicExplorePage() {
     <div className="min-h-screen bg-background">
       <MarketingNav />
       <main className="mx-auto min-h-[70vh] max-w-7xl px-5 py-10 sm:px-6 sm:py-14">
+        <VybeReveal distance="sm">
         <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[1.5rem] border border-border/70 px-4 py-8 text-center shadow-elevated sm:rounded-[2rem] sm:px-6 sm:py-12 md:px-12 md:py-16">
           <img src="/images/supporter-cards/discover.webp" alt="" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/88 to-background/70" />
@@ -154,6 +157,7 @@ function PublicExplorePage() {
           ) : null}
           </div>
         </div>
+        </VybeReveal>
 
         {loading && (
           <div className="flex justify-center py-20">
@@ -174,14 +178,14 @@ function PublicExplorePage() {
                 <span className="shrink-0 text-sm text-muted-foreground">{creators.length} found</span>
               </div>
               {creators.length ? (
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <VybeStagger className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {creators.map((creator) => (
                     <Link
                       key={creator.user_id}
                       to="/artist/$username"
                       params={{ username: creator.username }}
                       search={{ track: "", autoplay: true }}
-                      className="group min-w-0 rounded-2xl border bg-card p-4 transition hover:-translate-y-0.5 hover:border-primary/40 sm:p-5"
+                      className="group vybe-motion-card min-w-0 rounded-2xl border bg-card p-4 hover:border-primary/40 sm:p-5"
                     >
                       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
                         <Avatar className="h-14 w-14 shrink-0">
@@ -208,7 +212,7 @@ function PublicExplorePage() {
                       </div>
                     </Link>
                   ))}
-                </div>
+                </VybeStagger>
               ) : (
                 <p className="mt-6 rounded-2xl border border-dashed p-5 text-center text-muted-foreground sm:p-8">
                   No creator accounts are connected to this search yet.

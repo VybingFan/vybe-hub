@@ -10,6 +10,8 @@ import { getCreatorEntitlements, hasCreatorFeature } from "@/features/membership
 import { useMembership } from "@/hooks/useMembership";
 import { supabase } from "@/integrations/supabase/client";
 import { CreatorEngagementPanel } from "@/components/engagement/CreatorEngagementPanel";
+import { VybeReveal } from "@/components/motion/VybeReveal";
+import { VybeStagger } from "@/components/motion/VybeStagger";
 
 export const Route = createFileRoute("/_authenticated/creator-analytics")({
   component: () => <RoleGuard allow={["creator", "admin"]}><CreatorInsightsPage /></RoleGuard>,
@@ -106,10 +108,12 @@ function CreatorInsightsPage() {
         </TabsList></div>
 
         <TabsContent value="overview" className="space-y-6 min-[900px]:space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 min-[900px]:gap-3">
-            {overviewMetrics.map(([label, value, Icon]) => <Card key={label}><CardContent className="flex items-center gap-4 p-5 min-[900px]:gap-3 min-[900px]:p-4"><Icon className="h-6 w-6 text-primary min-[900px]:h-5 min-[900px]:w-5" /><div><p className="text-3xl font-semibold min-[900px]:text-2xl">{value}</p><p className="text-sm text-muted-foreground">{label}</p></div></CardContent></Card>)}
-          </div>
+          <VybeStagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 min-[900px]:gap-3">
+            {overviewMetrics.map(([label, value, Icon]) => <Card key={label} className="vybe-motion-card"><CardContent className="flex items-center gap-4 p-5 min-[900px]:gap-3 min-[900px]:p-4"><Icon className="h-6 w-6 text-primary min-[900px]:h-5 min-[900px]:w-5" /><div><p className="text-3xl font-semibold min-[900px]:text-2xl">{value}</p><p className="text-sm text-muted-foreground">{label}</p></div></CardContent></Card>)}
+          </VybeStagger>
+          <VybeReveal delayMs={90}>
           <Card><CardContent className="p-6 min-[900px]:p-4"><h2 className="text-xl font-semibold">Listening depth</h2><p className="mt-1 text-sm text-muted-foreground">How many playback sessions accumulated each share of a song.</p><div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4 min-[900px]:mt-3">{[["25%", retention.reached_25], ["50%", retention.reached_50], ["75%", retention.reached_75], ["90%", retention.reached_90]].map(([label, value]) => <div key={label} className="rounded-xl border p-4 min-[900px]:p-3"><p className="text-2xl font-semibold">{value}</p><p className="text-xs text-muted-foreground">Listened {label}</p></div>)}</div></CardContent></Card>
+          </VybeReveal>
         </TabsContent>
 
         <TabsContent value="music">

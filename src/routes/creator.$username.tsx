@@ -28,6 +28,8 @@ import { FollowCreatorButton } from "@/components/engagement/FollowCreatorButton
 import { CreatorPlanBadge } from "@/components/membership/CreatorPlanBadge";
 import { PublicCreatorStories } from "@/components/stories/PublicCreatorStories";
 import { PublicCreatorUpdates } from "@/components/creator/PublicCreatorUpdates";
+import { VybeReveal } from "@/components/motion/VybeReveal";
+import { VybeStagger } from "@/components/motion/VybeStagger";
 import { getPublicCreatorThemeStyle } from "@/features/profile/profileThemes";
 
 export const Route = createFileRoute("/creator/$username")({
@@ -125,6 +127,7 @@ export function PublicArtistHome({
         </div>
       </div>
       <main>
+        <VybeReveal distance="sm">
         <section className="relative">
           {!compactProfile && (
             <div className="h-36 overflow-hidden sm:h-44 md:h-56">
@@ -180,6 +183,7 @@ export function PublicArtistHome({
             </div>
           </div>
         </section>
+        </VybeReveal>
         {!compactProfile && (
           <nav
             aria-label={`${name} website sections`}
@@ -207,6 +211,7 @@ export function PublicArtistHome({
             </div>
           </nav>
         )}
+        <VybeReveal>
         <section
           id="music"
           className={compactProfile ? "mx-auto max-w-5xl scroll-mt-24 px-4 py-7 sm:px-6" : "mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 md:py-14"}
@@ -223,6 +228,7 @@ export function PublicArtistHome({
             planCode={planCode}
           />
         </section>
+        </VybeReveal>
 
         <PublicCreatorWriting
           works={writtenWorks}
@@ -273,7 +279,7 @@ export function PublicArtistHome({
               Watch
             </p>
             <h2 className="mt-2 text-3xl font-semibold">Videos from {name}</h2>
-            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <VybeStagger className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {videos.map((video) => (
                 <Link
                   key={video.id}
@@ -309,7 +315,7 @@ export function PublicArtistHome({
                   </div>
                 </Link>
               ))}
-            </div>
+            </VybeStagger>
           </section>
         )}
         {!!merch.length && (
@@ -323,7 +329,7 @@ export function PublicArtistHome({
             <h2 className="mt-2 text-3xl font-semibold">
               {compactProfile ? `Merch from ${name}` : "Merch, art, and experiences"}
             </h2>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <VybeStagger className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {merch.map((product) => (
                 <article
                   key={product.id}
@@ -377,7 +383,7 @@ export function PublicArtistHome({
                   </div>
                 </article>
               ))}
-            </div>
+            </VybeStagger>
           </section>
         )}
         <div id="community" className="scroll-mt-28">

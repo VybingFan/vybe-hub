@@ -366,7 +366,7 @@ function Metric({
 }) {
   return (
     <Link to={to}>
-      <Card className="h-full transition hover:border-primary/40">
+      <Card className="vybe-motion-card h-full hover:border-primary/40">
         <CardContent className="flex items-center gap-3 p-3.5 sm:p-4">
           <span className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 sm:flex">
             <Icon className="h-4 w-4 text-primary" />
@@ -392,7 +392,7 @@ function QuickAction({
   return (
     <Link
       to={to}
-      className="flex min-h-12 items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5 transition hover:border-primary/40"
+      className="vybe-motion-card flex min-h-12 items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5 hover:border-primary/40"
     >
       <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
         <Icon className="h-4 w-4" />

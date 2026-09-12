@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { VybeStagger } from "@/components/motion/VybeStagger";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Section } from "@/components/common/Section";
@@ -313,7 +314,7 @@ function MusicLibrary() {
       >
         {view === "overview" ? (
           <div className="space-y-5 min-[900px]:space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 min-[900px]:gap-2.5">
+            <VybeStagger className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 min-[900px]:gap-2.5">
               <CategoryCard
                 label="All music"
                 count={tracks.length}
@@ -332,7 +333,7 @@ function MusicLibrary() {
                   onClick={() => setView(category)}
                 />
               ))}
-            </div>
+            </VybeStagger>
 
             <div>
               <div className="flex items-end justify-between gap-4">
@@ -351,7 +352,7 @@ function MusicLibrary() {
                 )}
               </div>
 
-              <div className="mt-4 space-y-2 min-[900px]:mt-3">
+              <VybeStagger className="mt-4 space-y-2 min-[900px]:mt-3">
                 {!recent.length ? (
                   <EmptyState
                     title="No music yet"
@@ -385,7 +386,7 @@ function MusicLibrary() {
                     />
                   ))
                 )}
-              </div>
+              </VybeStagger>
             </div>
           </div>
         ) : (
@@ -625,7 +626,7 @@ function CategoryCard({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-xl border border-border bg-card p-3 text-left transition hover:border-primary/50 min-[900px]:p-2.5"
+      className="vybe-motion-card rounded-xl border border-border bg-card p-3 text-left hover:border-primary/50 min-[900px]:p-2.5"
     >
       <div className="flex items-center gap-2">
         <Icon className="h-4 w-4 shrink-0 text-primary" />

@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { VybeReveal } from "@/components/motion/VybeReveal";
+import { VybeStagger } from "@/components/motion/VybeStagger";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -425,7 +427,8 @@ function PlaylistStudio() {
       {!canUseApprovedListeners ? <LockedFeatureCard title="Approved-listener playlist access" description="Learn when recipient-level access is more appropriate than a public, unlisted, or password-protected link." requiredPlan="creator_pro" educationKey="playlist_approved_listeners" compact /> : null}
 
       {createdSlug && (
-        <div className="flex flex-col gap-4 rounded-2xl border border-primary/30 bg-primary/10 p-5 sm:flex-row sm:items-center sm:justify-between min-[900px]:p-4">
+        <VybeReveal distance="sm">
+        <div className="vybe-success-state flex flex-col gap-4 rounded-2xl border border-primary/30 bg-primary/10 p-5 sm:flex-row sm:items-center sm:justify-between min-[900px]:p-4">
           <div>
             <p className="flex items-center gap-2 font-semibold">
               <Check className="h-5 w-5 text-primary" /> Ready to send
@@ -438,6 +441,7 @@ function PlaylistStudio() {
             <Copy className="mr-2 h-4 w-4" /> Copy link
           </Button>
         </div>
+        </VybeReveal>
       )}
       <div className="space-y-6">
         {showCreate ? (
@@ -877,12 +881,12 @@ function PlaylistStudio() {
               ))}
             </div>
           ) : null}
-          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <VybeStagger className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {visiblePlaylists.length ? (
               visiblePlaylists.map((playlist) => (
                 <article
                   key={playlist.id}
-                  className="group flex min-w-0 overflow-hidden rounded-2xl border border-border bg-card transition hover:border-primary/35 hover:shadow-lg hover:shadow-primary/5"
+                  className="group vybe-motion-card flex min-w-0 overflow-hidden rounded-2xl border border-border bg-card hover:border-primary/35 hover:shadow-lg hover:shadow-primary/5"
                 >
                   <div className="relative w-24 shrink-0 overflow-hidden bg-gradient-to-br from-primary/25 via-muted to-background sm:w-28">
                     {playlist.cover_url ? (
@@ -1071,7 +1075,7 @@ function PlaylistStudio() {
                 Load 8 more playlists
               </Button>
             )}
-          </div>
+          </VybeStagger>
         </section>
       </div>
       <AlertDialog

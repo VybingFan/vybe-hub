@@ -17,6 +17,8 @@ import { MarketingNav } from "@/components/layout/MarketingNav";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { VybeReveal } from "@/components/motion/VybeReveal";
+import { VybeStagger } from "@/components/motion/VybeStagger";
 import { CreatorAudienceHub } from "@/routes/creators";
 import { BusinessAdvertisingHub } from "@/routes/businessads";
 
@@ -152,6 +154,7 @@ function SupporterLanding() {
         <section className="relative isolate overflow-hidden">
           <div className="bg-gradient-hero absolute inset-0 -z-20" />
           <div className="absolute inset-x-0 bottom-0 -z-10 h-2/3 bg-gradient-to-t from-background via-background/35 to-transparent" />
+          <VybeReveal distance="sm">
           <div className="mx-auto grid max-w-7xl items-center gap-9 px-5 py-10 sm:gap-12 sm:px-6 sm:py-20 lg:grid-cols-[0.92fr_1.08fr] lg:py-24">
             <div className="relative z-10">
               <Badge className="mb-6 rounded-full border border-primary/25 bg-primary/10 text-primary">
@@ -188,6 +191,7 @@ function SupporterLanding() {
               />
             </picture>
           </div>
+          </VybeReveal>
         </section>
 
         <section id="how-vybe-works" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-14 sm:px-6 sm:py-20">
@@ -217,7 +221,7 @@ function SupporterLanding() {
               className="aspect-[16/9] w-full rounded-[1.5rem] object-cover shadow-elevated sm:rounded-[2rem]"
             />
           </div>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <VybeStagger className="mt-8 grid gap-4 md:grid-cols-3">
             {supporterBenefits.map((item) => (
               <div key={item.eyebrow} className="rounded-3xl border border-border/70 bg-card/75 p-5 sm:p-6">
                 <item.icon className="h-6 w-6 text-primary" />
@@ -226,7 +230,7 @@ function SupporterLanding() {
                 <p className="mt-3 leading-7 text-muted-foreground">{item.body}</p>
               </div>
             ))}
-          </div>
+          </VybeStagger>
         </section>
 
         <section className="border-y border-border/60 bg-card/35">
@@ -251,7 +255,7 @@ function SupporterLanding() {
                 className="aspect-[16/9] w-full rounded-[1.5rem] object-cover shadow-elevated sm:rounded-[2rem]"
               />
             </div>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <VybeStagger className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {discoverFocuses.map((focus) => (
                 <a key={focus.title} href={focus.to} className="group rounded-3xl border border-border/70 bg-background/70 p-5 transition hover:-translate-y-0.5 hover:border-primary/40">
                   <focus.icon className="h-6 w-6 text-primary" />
@@ -262,7 +266,7 @@ function SupporterLanding() {
                   </p>
                 </a>
               ))}
-            </div>
+            </VybeStagger>
           </div>
         </section>
 
@@ -282,7 +286,7 @@ function SupporterLanding() {
               </p>
             </div>
           </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <VybeStagger className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {explorePaths.map((item) => (
               <a key={item.title} href={item.to} className="group rounded-3xl border border-border/70 bg-card/75 p-5 transition hover:-translate-y-0.5 hover:border-primary/40">
                 <item.icon className="h-6 w-6 text-primary" />
@@ -293,10 +297,11 @@ function SupporterLanding() {
                 </p>
               </a>
             ))}
-          </div>
+          </VybeStagger>
         </section>
 
         <section className="border-y border-border/60 bg-surface/45">
+          <VybeReveal>
           <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-14 sm:px-6 sm:py-20 lg:grid-cols-[0.82fr_1.18fr] lg:gap-12">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">My VYBE</p>
@@ -334,6 +339,7 @@ function SupporterLanding() {
               className="max-h-[780px] w-full rounded-[1.5rem] object-contain object-top shadow-elevated sm:rounded-[2rem]"
             />
           </div>
+          </VybeReveal>
         </section>
 
         <section id="find-what-matters" className="mx-auto max-w-7xl scroll-mt-24 px-5 py-12 sm:px-6 sm:py-20">

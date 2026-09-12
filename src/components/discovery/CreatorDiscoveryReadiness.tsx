@@ -27,8 +27,8 @@ export function CreatorDiscoveryReadiness({
     <section
       className={
         ready
-          ? "overflow-hidden rounded-2xl border border-emerald-500/30 bg-emerald-500/10"
-          : "overflow-hidden rounded-2xl border border-primary/25 bg-primary/5"
+          ? "vybe-success-state overflow-hidden rounded-2xl border border-emerald-500/30 bg-emerald-500/10"
+          : "vybe-attention-state overflow-hidden rounded-2xl border border-primary/25 bg-primary/5"
       }
     >
       <div className="flex items-start gap-3 p-4">
