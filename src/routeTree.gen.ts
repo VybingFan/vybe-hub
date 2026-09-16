@@ -47,6 +47,8 @@ import { Route as ExperienceEventsRouteImport } from './routes/experience.events
 import { Route as ExperienceDiscoverRouteImport } from './routes/experience.discover'
 import { Route as ExperienceCommunitiesRouteImport } from './routes/experience.communities'
 import { Route as DiscoverMusicRouteImport } from './routes/discover.music'
+import { Route as DemoSauceWalkaRouteImport } from './routes/demo.sauce-walka'
+import { Route as DemoFindItAgainRouteImport } from './routes/demo.find-it-again'
 import { Route as DemoEpkRouteImport } from './routes/demo.epk'
 import { Route as DemoCreatorRouteImport } from './routes/demo.creator'
 import { Route as CreatorSignUpRouteImport } from './routes/creator.sign-up'
@@ -113,6 +115,9 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticated/activity'
 import { Route as PlayPreviewPreviewKeyRouteImport } from './routes/play.preview.$previewKey'
 import { Route as DemoStorySlugRouteImport } from './routes/demo.story.$slug'
+import { Route as DemoSauceWalkaSocialPostLibraryRouteImport } from './routes/demo.sauce-walka_.social-post-library'
+import { Route as DemoSauceWalkaFindItAgainRouteImport } from './routes/demo.sauce-walka_.find-it-again'
+import { Route as DemoSauceWalkaCreatorHqRouteImport } from './routes/demo.sauce-walka_.creator-hq'
 import { Route as DemoPoemSlugRouteImport } from './routes/demo.poem.$slug'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api.stripe.webhook'
 import { Route as ApiStripeSocialDiscoveryCheckoutRouteImport } from './routes/api.stripe.social-discovery-checkout'
@@ -341,6 +346,16 @@ const ExperienceCommunitiesRoute = ExperienceCommunitiesRouteImport.update({
 const DiscoverMusicRoute = DiscoverMusicRouteImport.update({
   id: '/discover/music',
   path: '/discover/music',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoSauceWalkaRoute = DemoSauceWalkaRouteImport.update({
+  id: '/demo/sauce-walka',
+  path: '/demo/sauce-walka',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoFindItAgainRoute = DemoFindItAgainRouteImport.update({
+  id: '/demo/find-it-again',
+  path: '/demo/find-it-again',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoEpkRoute = DemoEpkRouteImport.update({
@@ -692,6 +707,23 @@ const DemoStorySlugRoute = DemoStorySlugRouteImport.update({
   path: '/demo/story/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoSauceWalkaSocialPostLibraryRoute =
+  DemoSauceWalkaSocialPostLibraryRouteImport.update({
+    id: '/demo/sauce-walka_/social-post-library',
+    path: '/demo/sauce-walka/social-post-library',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DemoSauceWalkaFindItAgainRoute =
+  DemoSauceWalkaFindItAgainRouteImport.update({
+    id: '/demo/sauce-walka_/find-it-again',
+    path: '/demo/sauce-walka/find-it-again',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DemoSauceWalkaCreatorHqRoute = DemoSauceWalkaCreatorHqRouteImport.update({
+  id: '/demo/sauce-walka_/creator-hq',
+  path: '/demo/sauce-walka/creator-hq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoPoemSlugRoute = DemoPoemSlugRouteImport.update({
   id: '/demo/poem/$slug',
   path: '/demo/poem/$slug',
@@ -1011,6 +1043,8 @@ export interface FileRoutesByFullPath {
   '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
   '/demo/epk': typeof DemoEpkRoute
+  '/demo/find-it-again': typeof DemoFindItAgainRoute
+  '/demo/sauce-walka': typeof DemoSauceWalkaRoute
   '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/discover': typeof ExperienceDiscoverRoute
@@ -1062,6 +1096,9 @@ export interface FileRoutesByFullPath {
   '/api/stripe/social-discovery-checkout': typeof ApiStripeSocialDiscoveryCheckoutRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
+  '/demo/sauce-walka/creator-hq': typeof DemoSauceWalkaCreatorHqRoute
+  '/demo/sauce-walka/find-it-again': typeof DemoSauceWalkaFindItAgainRoute
+  '/demo/sauce-walka/social-post-library': typeof DemoSauceWalkaSocialPostLibraryRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
   '/play/preview/$previewKey': typeof PlayPreviewPreviewKeyRoute
   '/admin/campaigns/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
@@ -1155,6 +1192,8 @@ export interface FileRoutesByTo {
   '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
   '/demo/epk': typeof DemoEpkRoute
+  '/demo/find-it-again': typeof DemoFindItAgainRoute
+  '/demo/sauce-walka': typeof DemoSauceWalkaRoute
   '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/discover': typeof ExperienceDiscoverRoute
@@ -1206,6 +1245,9 @@ export interface FileRoutesByTo {
   '/api/stripe/social-discovery-checkout': typeof ApiStripeSocialDiscoveryCheckoutRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
+  '/demo/sauce-walka/creator-hq': typeof DemoSauceWalkaCreatorHqRoute
+  '/demo/sauce-walka/find-it-again': typeof DemoSauceWalkaFindItAgainRoute
+  '/demo/sauce-walka/social-post-library': typeof DemoSauceWalkaSocialPostLibraryRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
   '/play/preview/$previewKey': typeof PlayPreviewPreviewKeyRoute
   '/admin/campaigns/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
@@ -1302,6 +1344,8 @@ export interface FileRoutesById {
   '/creator/sign-up': typeof CreatorSignUpRoute
   '/demo/creator': typeof DemoCreatorRoute
   '/demo/epk': typeof DemoEpkRoute
+  '/demo/find-it-again': typeof DemoFindItAgainRoute
+  '/demo/sauce-walka': typeof DemoSauceWalkaRoute
   '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
   '/experience/discover': typeof ExperienceDiscoverRoute
@@ -1353,6 +1397,9 @@ export interface FileRoutesById {
   '/api/stripe/social-discovery-checkout': typeof ApiStripeSocialDiscoveryCheckoutRoute
   '/api/stripe/webhook': typeof ApiStripeWebhookRoute
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
+  '/demo/sauce-walka_/creator-hq': typeof DemoSauceWalkaCreatorHqRoute
+  '/demo/sauce-walka_/find-it-again': typeof DemoSauceWalkaFindItAgainRoute
+  '/demo/sauce-walka_/social-post-library': typeof DemoSauceWalkaSocialPostLibraryRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
   '/play/preview/$previewKey': typeof PlayPreviewPreviewKeyRoute
   '/_authenticated/admin_/campaigns_/$campaignId': typeof AuthenticatedAdminCampaignsCampaignIdRoute
@@ -1449,6 +1496,8 @@ export interface FileRouteTypes {
     | '/creator/sign-up'
     | '/demo/creator'
     | '/demo/epk'
+    | '/demo/find-it-again'
+    | '/demo/sauce-walka'
     | '/discover/music'
     | '/experience/communities'
     | '/experience/discover'
@@ -1500,6 +1549,9 @@ export interface FileRouteTypes {
     | '/api/stripe/social-discovery-checkout'
     | '/api/stripe/webhook'
     | '/demo/poem/$slug'
+    | '/demo/sauce-walka/creator-hq'
+    | '/demo/sauce-walka/find-it-again'
+    | '/demo/sauce-walka/social-post-library'
     | '/demo/story/$slug'
     | '/play/preview/$previewKey'
     | '/admin/campaigns/$campaignId'
@@ -1593,6 +1645,8 @@ export interface FileRouteTypes {
     | '/creator/sign-up'
     | '/demo/creator'
     | '/demo/epk'
+    | '/demo/find-it-again'
+    | '/demo/sauce-walka'
     | '/discover/music'
     | '/experience/communities'
     | '/experience/discover'
@@ -1644,6 +1698,9 @@ export interface FileRouteTypes {
     | '/api/stripe/social-discovery-checkout'
     | '/api/stripe/webhook'
     | '/demo/poem/$slug'
+    | '/demo/sauce-walka/creator-hq'
+    | '/demo/sauce-walka/find-it-again'
+    | '/demo/sauce-walka/social-post-library'
     | '/demo/story/$slug'
     | '/play/preview/$previewKey'
     | '/admin/campaigns/$campaignId'
@@ -1739,6 +1796,8 @@ export interface FileRouteTypes {
     | '/creator/sign-up'
     | '/demo/creator'
     | '/demo/epk'
+    | '/demo/find-it-again'
+    | '/demo/sauce-walka'
     | '/discover/music'
     | '/experience/communities'
     | '/experience/discover'
@@ -1790,6 +1849,9 @@ export interface FileRouteTypes {
     | '/api/stripe/social-discovery-checkout'
     | '/api/stripe/webhook'
     | '/demo/poem/$slug'
+    | '/demo/sauce-walka_/creator-hq'
+    | '/demo/sauce-walka_/find-it-again'
+    | '/demo/sauce-walka_/social-post-library'
     | '/demo/story/$slug'
     | '/play/preview/$previewKey'
     | '/_authenticated/admin_/campaigns_/$campaignId'
@@ -1836,6 +1898,8 @@ export interface RootRouteChildren {
   CreatorSignUpRoute: typeof CreatorSignUpRoute
   DemoCreatorRoute: typeof DemoCreatorRoute
   DemoEpkRoute: typeof DemoEpkRoute
+  DemoFindItAgainRoute: typeof DemoFindItAgainRoute
+  DemoSauceWalkaRoute: typeof DemoSauceWalkaRoute
   DiscoverMusicRoute: typeof DiscoverMusicRoute
   ExperienceCommunitiesRoute: typeof ExperienceCommunitiesRoute
   ExperienceDiscoverRoute: typeof ExperienceDiscoverRoute
@@ -1857,6 +1921,9 @@ export interface RootRouteChildren {
   ApiStripeSocialDiscoveryCheckoutRoute: typeof ApiStripeSocialDiscoveryCheckoutRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
   DemoPoemSlugRoute: typeof DemoPoemSlugRoute
+  DemoSauceWalkaCreatorHqRoute: typeof DemoSauceWalkaCreatorHqRoute
+  DemoSauceWalkaFindItAgainRoute: typeof DemoSauceWalkaFindItAgainRoute
+  DemoSauceWalkaSocialPostLibraryRoute: typeof DemoSauceWalkaSocialPostLibraryRoute
   DemoStorySlugRoute: typeof DemoStorySlugRoute
   PlayPreviewPreviewKeyRoute: typeof PlayPreviewPreviewKeyRoute
   ArtistUsernamePlaylistSlugRoute: typeof ArtistUsernamePlaylistSlugRoute
@@ -2128,6 +2195,20 @@ declare module '@tanstack/react-router' {
       path: '/discover/music'
       fullPath: '/discover/music'
       preLoaderRoute: typeof DiscoverMusicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/sauce-walka': {
+      id: '/demo/sauce-walka'
+      path: '/demo/sauce-walka'
+      fullPath: '/demo/sauce-walka'
+      preLoaderRoute: typeof DemoSauceWalkaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/find-it-again': {
+      id: '/demo/find-it-again'
+      path: '/demo/find-it-again'
+      fullPath: '/demo/find-it-again'
+      preLoaderRoute: typeof DemoFindItAgainRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/epk': {
@@ -2590,6 +2671,27 @@ declare module '@tanstack/react-router' {
       path: '/demo/story/$slug'
       fullPath: '/demo/story/$slug'
       preLoaderRoute: typeof DemoStorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/sauce-walka_/social-post-library': {
+      id: '/demo/sauce-walka_/social-post-library'
+      path: '/demo/sauce-walka/social-post-library'
+      fullPath: '/demo/sauce-walka/social-post-library'
+      preLoaderRoute: typeof DemoSauceWalkaSocialPostLibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/sauce-walka_/find-it-again': {
+      id: '/demo/sauce-walka_/find-it-again'
+      path: '/demo/sauce-walka/find-it-again'
+      fullPath: '/demo/sauce-walka/find-it-again'
+      preLoaderRoute: typeof DemoSauceWalkaFindItAgainRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/sauce-walka_/creator-hq': {
+      id: '/demo/sauce-walka_/creator-hq'
+      path: '/demo/sauce-walka/creator-hq'
+      fullPath: '/demo/sauce-walka/creator-hq'
+      preLoaderRoute: typeof DemoSauceWalkaCreatorHqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/poem/$slug': {
@@ -3109,6 +3211,8 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorSignUpRoute: CreatorSignUpRoute,
   DemoCreatorRoute: DemoCreatorRoute,
   DemoEpkRoute: DemoEpkRoute,
+  DemoFindItAgainRoute: DemoFindItAgainRoute,
+  DemoSauceWalkaRoute: DemoSauceWalkaRoute,
   DiscoverMusicRoute: DiscoverMusicRoute,
   ExperienceCommunitiesRoute: ExperienceCommunitiesRoute,
   ExperienceDiscoverRoute: ExperienceDiscoverRoute,
@@ -3130,6 +3234,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiStripeSocialDiscoveryCheckoutRoute: ApiStripeSocialDiscoveryCheckoutRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
   DemoPoemSlugRoute: DemoPoemSlugRoute,
+  DemoSauceWalkaCreatorHqRoute: DemoSauceWalkaCreatorHqRoute,
+  DemoSauceWalkaFindItAgainRoute: DemoSauceWalkaFindItAgainRoute,
+  DemoSauceWalkaSocialPostLibraryRoute: DemoSauceWalkaSocialPostLibraryRoute,
   DemoStorySlugRoute: DemoStorySlugRoute,
   PlayPreviewPreviewKeyRoute: PlayPreviewPreviewKeyRoute,
   ArtistUsernamePlaylistSlugRoute: ArtistUsernamePlaylistSlugRoute,
