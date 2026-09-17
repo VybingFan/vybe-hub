@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const APP_ROLES = ["creator", "supporter", "business", "admin"] as const;
+export const APP_ROLES = ["creator", "supporter", "business", "partner", "admin"] as const;
 export type AppRole = (typeof APP_ROLES)[number];
 
 /** Public onboarding offers Supporter and the limited Creator Free plan. */
@@ -43,6 +43,7 @@ export const DEFAULT_ROUTE_FOR_ROLE: Record<AppRole, string> = {
   creator: "/dashboard",
   supporter: "/discover",
   business: "/business",
+  partner: "/partner",
   admin: "/home",
 };
 
@@ -51,6 +52,7 @@ export const ROUTE_ROLE_ACCESS = {
   dashboard: ["creator", "admin"],
   discover: ["supporter", "creator", "admin"],
   admin: ["admin"],
-  settings: ["creator", "supporter", "business", "admin"],
+  settings: ["creator", "supporter", "business", "partner", "admin"],
   business: ["business", "admin"],
+  partner: ["partner", "admin"],
 } satisfies Record<string, AppRole[]>;

@@ -85,6 +85,7 @@ import { Route as AuthenticatedPublicMusicRouteImport } from './routes/_authenti
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPlaylistsRouteImport } from './routes/_authenticated/playlists'
 import { Route as AuthenticatedPlayRouteImport } from './routes/_authenticated/play'
+import { Route as AuthenticatedPartnerRouteImport } from './routes/_authenticated/partner'
 import { Route as AuthenticatedOrganizationRouteImport } from './routes/_authenticated/organization'
 import { Route as AuthenticatedMyVybeRouteImport } from './routes/_authenticated/my-vybe'
 import { Route as AuthenticatedMusicRouteImport } from './routes/_authenticated/music'
@@ -116,6 +117,7 @@ import { Route as AuthenticatedActivityRouteImport } from './routes/_authenticat
 import { Route as PlayPreviewPreviewKeyRouteImport } from './routes/play.preview.$previewKey'
 import { Route as DemoStorySlugRouteImport } from './routes/demo.story.$slug'
 import { Route as DemoSauceWalkaSocialPostLibraryRouteImport } from './routes/demo.sauce-walka_.social-post-library'
+import { Route as DemoSauceWalkaFoundingPartnerRouteImport } from './routes/demo.sauce-walka_.founding-partner'
 import { Route as DemoSauceWalkaFindItAgainRouteImport } from './routes/demo.sauce-walka_.find-it-again'
 import { Route as DemoSauceWalkaCreatorHqRouteImport } from './routes/demo.sauce-walka_.creator-hq'
 import { Route as DemoPoemSlugRouteImport } from './routes/demo.poem.$slug'
@@ -144,6 +146,7 @@ import { Route as AuthenticatedAdminPartnerCenterRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminOffersRouteImport } from './routes/_authenticated/admin_.offers'
 import { Route as AuthenticatedAdminMembershipsRouteImport } from './routes/_authenticated/admin_.memberships'
 import { Route as AuthenticatedAdminMembershipAuditRouteImport } from './routes/_authenticated/admin_.membership-audit'
+import { Route as AuthenticatedAdminFoundingPartnersRouteImport } from './routes/_authenticated/admin_.founding-partners'
 import { Route as AuthenticatedAdminFingerprintsRouteImport } from './routes/_authenticated/admin_.fingerprints'
 import { Route as AuthenticatedAdminCreatorsRouteImport } from './routes/_authenticated/admin_.creators'
 import { Route as AuthenticatedAdminCreatorFocusesRouteImport } from './routes/_authenticated/admin_.creator-focuses'
@@ -545,6 +548,11 @@ const AuthenticatedPlayRoute = AuthenticatedPlayRouteImport.update({
   path: '/play',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPartnerRoute = AuthenticatedPartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOrganizationRoute =
   AuthenticatedOrganizationRouteImport.update({
     id: '/organization',
@@ -713,6 +721,12 @@ const DemoSauceWalkaSocialPostLibraryRoute =
     path: '/demo/sauce-walka/social-post-library',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DemoSauceWalkaFoundingPartnerRoute =
+  DemoSauceWalkaFoundingPartnerRouteImport.update({
+    id: '/demo/sauce-walka_/founding-partner',
+    path: '/demo/sauce-walka/founding-partner',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DemoSauceWalkaFindItAgainRoute =
   DemoSauceWalkaFindItAgainRouteImport.update({
     id: '/demo/sauce-walka_/find-it-again',
@@ -872,6 +886,12 @@ const AuthenticatedAdminMembershipAuditRoute =
     path: '/admin/membership-audit',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminFoundingPartnersRoute =
+  AuthenticatedAdminFoundingPartnersRouteImport.update({
+    id: '/admin_/founding-partners',
+    path: '/admin/founding-partners',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminFingerprintsRoute =
   AuthenticatedAdminFingerprintsRouteImport.update({
     id: '/admin_/fingerprints',
@@ -1007,6 +1027,7 @@ export interface FileRoutesByFullPath {
   '/music': typeof AuthenticatedMusicRoute
   '/my-vybe': typeof AuthenticatedMyVybeRoute
   '/organization': typeof AuthenticatedOrganizationRoute
+  '/partner': typeof AuthenticatedPartnerRoute
   '/play': typeof AuthenticatedPlayRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -1070,6 +1091,7 @@ export interface FileRoutesByFullPath {
   '/admin/creator-focuses': typeof AuthenticatedAdminCreatorFocusesRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/fingerprints': typeof AuthenticatedAdminFingerprintsRoute
+  '/admin/founding-partners': typeof AuthenticatedAdminFoundingPartnersRoute
   '/admin/membership-audit': typeof AuthenticatedAdminMembershipAuditRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
@@ -1098,6 +1120,7 @@ export interface FileRoutesByFullPath {
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/sauce-walka/creator-hq': typeof DemoSauceWalkaCreatorHqRoute
   '/demo/sauce-walka/find-it-again': typeof DemoSauceWalkaFindItAgainRoute
+  '/demo/sauce-walka/founding-partner': typeof DemoSauceWalkaFoundingPartnerRoute
   '/demo/sauce-walka/social-post-library': typeof DemoSauceWalkaSocialPostLibraryRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
   '/play/preview/$previewKey': typeof PlayPreviewPreviewKeyRoute
@@ -1156,6 +1179,7 @@ export interface FileRoutesByTo {
   '/music': typeof AuthenticatedMusicRoute
   '/my-vybe': typeof AuthenticatedMyVybeRoute
   '/organization': typeof AuthenticatedOrganizationRoute
+  '/partner': typeof AuthenticatedPartnerRoute
   '/play': typeof AuthenticatedPlayRoute
   '/playlists': typeof AuthenticatedPlaylistsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -1219,6 +1243,7 @@ export interface FileRoutesByTo {
   '/admin/creator-focuses': typeof AuthenticatedAdminCreatorFocusesRoute
   '/admin/creators': typeof AuthenticatedAdminCreatorsRoute
   '/admin/fingerprints': typeof AuthenticatedAdminFingerprintsRoute
+  '/admin/founding-partners': typeof AuthenticatedAdminFoundingPartnersRoute
   '/admin/membership-audit': typeof AuthenticatedAdminMembershipAuditRoute
   '/admin/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/admin/offers': typeof AuthenticatedAdminOffersRoute
@@ -1247,6 +1272,7 @@ export interface FileRoutesByTo {
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/sauce-walka/creator-hq': typeof DemoSauceWalkaCreatorHqRoute
   '/demo/sauce-walka/find-it-again': typeof DemoSauceWalkaFindItAgainRoute
+  '/demo/sauce-walka/founding-partner': typeof DemoSauceWalkaFoundingPartnerRoute
   '/demo/sauce-walka/social-post-library': typeof DemoSauceWalkaSocialPostLibraryRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
   '/play/preview/$previewKey': typeof PlayPreviewPreviewKeyRoute
@@ -1308,6 +1334,7 @@ export interface FileRoutesById {
   '/_authenticated/music': typeof AuthenticatedMusicRoute
   '/_authenticated/my-vybe': typeof AuthenticatedMyVybeRoute
   '/_authenticated/organization': typeof AuthenticatedOrganizationRoute
+  '/_authenticated/partner': typeof AuthenticatedPartnerRoute
   '/_authenticated/play': typeof AuthenticatedPlayRoute
   '/_authenticated/playlists': typeof AuthenticatedPlaylistsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -1371,6 +1398,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/creator-focuses': typeof AuthenticatedAdminCreatorFocusesRoute
   '/_authenticated/admin_/creators': typeof AuthenticatedAdminCreatorsRoute
   '/_authenticated/admin_/fingerprints': typeof AuthenticatedAdminFingerprintsRoute
+  '/_authenticated/admin_/founding-partners': typeof AuthenticatedAdminFoundingPartnersRoute
   '/_authenticated/admin_/membership-audit': typeof AuthenticatedAdminMembershipAuditRoute
   '/_authenticated/admin_/memberships': typeof AuthenticatedAdminMembershipsRoute
   '/_authenticated/admin_/offers': typeof AuthenticatedAdminOffersRoute
@@ -1399,6 +1427,7 @@ export interface FileRoutesById {
   '/demo/poem/$slug': typeof DemoPoemSlugRoute
   '/demo/sauce-walka_/creator-hq': typeof DemoSauceWalkaCreatorHqRoute
   '/demo/sauce-walka_/find-it-again': typeof DemoSauceWalkaFindItAgainRoute
+  '/demo/sauce-walka_/founding-partner': typeof DemoSauceWalkaFoundingPartnerRoute
   '/demo/sauce-walka_/social-post-library': typeof DemoSauceWalkaSocialPostLibraryRoute
   '/demo/story/$slug': typeof DemoStorySlugRoute
   '/play/preview/$previewKey': typeof PlayPreviewPreviewKeyRoute
@@ -1460,6 +1489,7 @@ export interface FileRouteTypes {
     | '/music'
     | '/my-vybe'
     | '/organization'
+    | '/partner'
     | '/play'
     | '/playlists'
     | '/profile'
@@ -1523,6 +1553,7 @@ export interface FileRouteTypes {
     | '/admin/creator-focuses'
     | '/admin/creators'
     | '/admin/fingerprints'
+    | '/admin/founding-partners'
     | '/admin/membership-audit'
     | '/admin/memberships'
     | '/admin/offers'
@@ -1551,6 +1582,7 @@ export interface FileRouteTypes {
     | '/demo/poem/$slug'
     | '/demo/sauce-walka/creator-hq'
     | '/demo/sauce-walka/find-it-again'
+    | '/demo/sauce-walka/founding-partner'
     | '/demo/sauce-walka/social-post-library'
     | '/demo/story/$slug'
     | '/play/preview/$previewKey'
@@ -1609,6 +1641,7 @@ export interface FileRouteTypes {
     | '/music'
     | '/my-vybe'
     | '/organization'
+    | '/partner'
     | '/play'
     | '/playlists'
     | '/profile'
@@ -1672,6 +1705,7 @@ export interface FileRouteTypes {
     | '/admin/creator-focuses'
     | '/admin/creators'
     | '/admin/fingerprints'
+    | '/admin/founding-partners'
     | '/admin/membership-audit'
     | '/admin/memberships'
     | '/admin/offers'
@@ -1700,6 +1734,7 @@ export interface FileRouteTypes {
     | '/demo/poem/$slug'
     | '/demo/sauce-walka/creator-hq'
     | '/demo/sauce-walka/find-it-again'
+    | '/demo/sauce-walka/founding-partner'
     | '/demo/sauce-walka/social-post-library'
     | '/demo/story/$slug'
     | '/play/preview/$previewKey'
@@ -1760,6 +1795,7 @@ export interface FileRouteTypes {
     | '/_authenticated/music'
     | '/_authenticated/my-vybe'
     | '/_authenticated/organization'
+    | '/_authenticated/partner'
     | '/_authenticated/play'
     | '/_authenticated/playlists'
     | '/_authenticated/profile'
@@ -1823,6 +1859,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/creator-focuses'
     | '/_authenticated/admin_/creators'
     | '/_authenticated/admin_/fingerprints'
+    | '/_authenticated/admin_/founding-partners'
     | '/_authenticated/admin_/membership-audit'
     | '/_authenticated/admin_/memberships'
     | '/_authenticated/admin_/offers'
@@ -1851,6 +1888,7 @@ export interface FileRouteTypes {
     | '/demo/poem/$slug'
     | '/demo/sauce-walka_/creator-hq'
     | '/demo/sauce-walka_/find-it-again'
+    | '/demo/sauce-walka_/founding-partner'
     | '/demo/sauce-walka_/social-post-library'
     | '/demo/story/$slug'
     | '/play/preview/$previewKey'
@@ -1923,6 +1961,7 @@ export interface RootRouteChildren {
   DemoPoemSlugRoute: typeof DemoPoemSlugRoute
   DemoSauceWalkaCreatorHqRoute: typeof DemoSauceWalkaCreatorHqRoute
   DemoSauceWalkaFindItAgainRoute: typeof DemoSauceWalkaFindItAgainRoute
+  DemoSauceWalkaFoundingPartnerRoute: typeof DemoSauceWalkaFoundingPartnerRoute
   DemoSauceWalkaSocialPostLibraryRoute: typeof DemoSauceWalkaSocialPostLibraryRoute
   DemoStorySlugRoute: typeof DemoStorySlugRoute
   PlayPreviewPreviewKeyRoute: typeof PlayPreviewPreviewKeyRoute
@@ -2463,6 +2502,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlayRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/partner': {
+      id: '/_authenticated/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof AuthenticatedPartnerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/organization': {
       id: '/_authenticated/organization'
       path: '/organization'
@@ -2680,6 +2726,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoSauceWalkaSocialPostLibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/sauce-walka_/founding-partner': {
+      id: '/demo/sauce-walka_/founding-partner'
+      path: '/demo/sauce-walka/founding-partner'
+      fullPath: '/demo/sauce-walka/founding-partner'
+      preLoaderRoute: typeof DemoSauceWalkaFoundingPartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/sauce-walka_/find-it-again': {
       id: '/demo/sauce-walka_/find-it-again'
       path: '/demo/sauce-walka/find-it-again'
@@ -2876,6 +2929,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMembershipAuditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/founding-partners': {
+      id: '/_authenticated/admin_/founding-partners'
+      path: '/admin/founding-partners'
+      fullPath: '/admin/founding-partners'
+      preLoaderRoute: typeof AuthenticatedAdminFoundingPartnersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/fingerprints': {
       id: '/_authenticated/admin_/fingerprints'
       path: '/admin/fingerprints'
@@ -3006,6 +3066,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMusicRoute: typeof AuthenticatedMusicRoute
   AuthenticatedMyVybeRoute: typeof AuthenticatedMyVybeRoute
   AuthenticatedOrganizationRoute: typeof AuthenticatedOrganizationRoute
+  AuthenticatedPartnerRoute: typeof AuthenticatedPartnerRoute
   AuthenticatedPlayRoute: typeof AuthenticatedPlayRoute
   AuthenticatedPlaylistsRoute: typeof AuthenticatedPlaylistsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -3031,6 +3092,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminCreatorFocusesRoute: typeof AuthenticatedAdminCreatorFocusesRoute
   AuthenticatedAdminCreatorsRoute: typeof AuthenticatedAdminCreatorsRoute
   AuthenticatedAdminFingerprintsRoute: typeof AuthenticatedAdminFingerprintsRoute
+  AuthenticatedAdminFoundingPartnersRoute: typeof AuthenticatedAdminFoundingPartnersRoute
   AuthenticatedAdminMembershipAuditRoute: typeof AuthenticatedAdminMembershipAuditRoute
   AuthenticatedAdminMembershipsRoute: typeof AuthenticatedAdminMembershipsRoute
   AuthenticatedAdminOffersRoute: typeof AuthenticatedAdminOffersRoute
@@ -3084,6 +3146,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMusicRoute: AuthenticatedMusicRoute,
   AuthenticatedMyVybeRoute: AuthenticatedMyVybeRoute,
   AuthenticatedOrganizationRoute: AuthenticatedOrganizationRoute,
+  AuthenticatedPartnerRoute: AuthenticatedPartnerRoute,
   AuthenticatedPlayRoute: AuthenticatedPlayRoute,
   AuthenticatedPlaylistsRoute: AuthenticatedPlaylistsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
@@ -3109,6 +3172,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminCreatorFocusesRoute: AuthenticatedAdminCreatorFocusesRoute,
   AuthenticatedAdminCreatorsRoute: AuthenticatedAdminCreatorsRoute,
   AuthenticatedAdminFingerprintsRoute: AuthenticatedAdminFingerprintsRoute,
+  AuthenticatedAdminFoundingPartnersRoute:
+    AuthenticatedAdminFoundingPartnersRoute,
   AuthenticatedAdminMembershipAuditRoute:
     AuthenticatedAdminMembershipAuditRoute,
   AuthenticatedAdminMembershipsRoute: AuthenticatedAdminMembershipsRoute,
@@ -3236,6 +3301,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoPoemSlugRoute: DemoPoemSlugRoute,
   DemoSauceWalkaCreatorHqRoute: DemoSauceWalkaCreatorHqRoute,
   DemoSauceWalkaFindItAgainRoute: DemoSauceWalkaFindItAgainRoute,
+  DemoSauceWalkaFoundingPartnerRoute: DemoSauceWalkaFoundingPartnerRoute,
   DemoSauceWalkaSocialPostLibraryRoute: DemoSauceWalkaSocialPostLibraryRoute,
   DemoStorySlugRoute: DemoStorySlugRoute,
   PlayPreviewPreviewKeyRoute: PlayPreviewPreviewKeyRoute,

@@ -11,9 +11,11 @@ export function useUser() {
       ? "creator"
       : roles.includes("business")
         ? "business"
-        : roles.includes("supporter")
-          ? "supporter"
-          : null;
+        : roles.includes("partner")
+          ? "partner"
+          : roles.includes("supporter")
+            ? "supporter"
+            : null;
 
   const defaultRoute = primaryRole ? DEFAULT_ROUTE_FOR_ROLE[primaryRole] : "/auth/onboarding";
 
