@@ -95,6 +95,7 @@ function SauceWalkaDemo() {
             <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
               <Button onClick={() => demo("Supporter view: Sauce's public VYBE is now your return point for new music, saved posts, business and access drops.")} className="rounded-full bg-gradient-brand"><Users className="mr-2 h-4 w-4" />Catch My VYBE</Button>
               <Button asChild variant="outline" className="rounded-full"><a href="/demo/sauce-walka/creator-hq"><BriefcaseBusiness className="mr-2 h-4 w-4" />Creator HQ</a></Button>
+              <Button asChild variant="outline" className="rounded-full"><a href="/demo/founding-partner"><BriefcaseBusiness className="mr-2 h-4 w-4" />Founding Partner Demo</a></Button>
               <Button onClick={() => demo("Share flow: this creator home can be copied, texted, emailed or posted as one destination.")} variant="outline" className="col-span-2 rounded-full sm:col-span-1"><Share2 className="mr-2 h-4 w-4" />Share</Button>
             </div>
           </div>

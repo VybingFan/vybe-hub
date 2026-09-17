@@ -48,6 +48,7 @@ import { Route as ExperienceDiscoverRouteImport } from './routes/experience.disc
 import { Route as ExperienceCommunitiesRouteImport } from './routes/experience.communities'
 import { Route as DiscoverMusicRouteImport } from './routes/discover.music'
 import { Route as DemoSauceWalkaRouteImport } from './routes/demo.sauce-walka'
+import { Route as DemoFoundingPartnerRouteImport } from './routes/demo.founding-partner'
 import { Route as DemoFindItAgainRouteImport } from './routes/demo.find-it-again'
 import { Route as DemoEpkRouteImport } from './routes/demo.epk'
 import { Route as DemoCreatorRouteImport } from './routes/demo.creator'
@@ -354,6 +355,11 @@ const DiscoverMusicRoute = DiscoverMusicRouteImport.update({
 const DemoSauceWalkaRoute = DemoSauceWalkaRouteImport.update({
   id: '/demo/sauce-walka',
   path: '/demo/sauce-walka',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoFoundingPartnerRoute = DemoFoundingPartnerRouteImport.update({
+  id: '/demo/founding-partner',
+  path: '/demo/founding-partner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoFindItAgainRoute = DemoFindItAgainRouteImport.update({
@@ -1065,6 +1071,7 @@ export interface FileRoutesByFullPath {
   '/demo/creator': typeof DemoCreatorRoute
   '/demo/epk': typeof DemoEpkRoute
   '/demo/find-it-again': typeof DemoFindItAgainRoute
+  '/demo/founding-partner': typeof DemoFoundingPartnerRoute
   '/demo/sauce-walka': typeof DemoSauceWalkaRoute
   '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
@@ -1217,6 +1224,7 @@ export interface FileRoutesByTo {
   '/demo/creator': typeof DemoCreatorRoute
   '/demo/epk': typeof DemoEpkRoute
   '/demo/find-it-again': typeof DemoFindItAgainRoute
+  '/demo/founding-partner': typeof DemoFoundingPartnerRoute
   '/demo/sauce-walka': typeof DemoSauceWalkaRoute
   '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
@@ -1372,6 +1380,7 @@ export interface FileRoutesById {
   '/demo/creator': typeof DemoCreatorRoute
   '/demo/epk': typeof DemoEpkRoute
   '/demo/find-it-again': typeof DemoFindItAgainRoute
+  '/demo/founding-partner': typeof DemoFoundingPartnerRoute
   '/demo/sauce-walka': typeof DemoSauceWalkaRoute
   '/discover/music': typeof DiscoverMusicRoute
   '/experience/communities': typeof ExperienceCommunitiesRoute
@@ -1527,6 +1536,7 @@ export interface FileRouteTypes {
     | '/demo/creator'
     | '/demo/epk'
     | '/demo/find-it-again'
+    | '/demo/founding-partner'
     | '/demo/sauce-walka'
     | '/discover/music'
     | '/experience/communities'
@@ -1679,6 +1689,7 @@ export interface FileRouteTypes {
     | '/demo/creator'
     | '/demo/epk'
     | '/demo/find-it-again'
+    | '/demo/founding-partner'
     | '/demo/sauce-walka'
     | '/discover/music'
     | '/experience/communities'
@@ -1833,6 +1844,7 @@ export interface FileRouteTypes {
     | '/demo/creator'
     | '/demo/epk'
     | '/demo/find-it-again'
+    | '/demo/founding-partner'
     | '/demo/sauce-walka'
     | '/discover/music'
     | '/experience/communities'
@@ -1937,6 +1949,7 @@ export interface RootRouteChildren {
   DemoCreatorRoute: typeof DemoCreatorRoute
   DemoEpkRoute: typeof DemoEpkRoute
   DemoFindItAgainRoute: typeof DemoFindItAgainRoute
+  DemoFoundingPartnerRoute: typeof DemoFoundingPartnerRoute
   DemoSauceWalkaRoute: typeof DemoSauceWalkaRoute
   DiscoverMusicRoute: typeof DiscoverMusicRoute
   ExperienceCommunitiesRoute: typeof ExperienceCommunitiesRoute
@@ -2241,6 +2254,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/sauce-walka'
       fullPath: '/demo/sauce-walka'
       preLoaderRoute: typeof DemoSauceWalkaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/founding-partner': {
+      id: '/demo/founding-partner'
+      path: '/demo/founding-partner'
+      fullPath: '/demo/founding-partner'
+      preLoaderRoute: typeof DemoFoundingPartnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/find-it-again': {
@@ -3277,6 +3297,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoCreatorRoute: DemoCreatorRoute,
   DemoEpkRoute: DemoEpkRoute,
   DemoFindItAgainRoute: DemoFindItAgainRoute,
+  DemoFoundingPartnerRoute: DemoFoundingPartnerRoute,
   DemoSauceWalkaRoute: DemoSauceWalkaRoute,
   DiscoverMusicRoute: DiscoverMusicRoute,
   ExperienceCommunitiesRoute: ExperienceCommunitiesRoute,
