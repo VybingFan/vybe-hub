@@ -41,10 +41,10 @@ function PartnerStudioPage(){
   return <RoleGuard allow={["supporter","creator","business","partner","admin"]}>
     <div className="mx-auto max-w-6xl space-y-7">
       <header className="rounded-3xl border bg-card/70 p-6 shadow-sm md:p-8">
-        <div className="flex flex-wrap items-center gap-2"><Badge variant="outline">Professional opportunity workspace</Badge><Badge variant="secondary">Partner Studio</Badge></div>
-        <div className="mt-4 flex items-center gap-2 text-primary"><Handshake className="h-5 w-5"/>VYBE Founding Partner Program</div>
+        <div className="flex flex-wrap items-center gap-2"><Badge variant="outline">Professional opportunity workspace</Badge><Badge variant="secondary">Partner Studio</Badge><Badge variant="outline">Founding Access: first year complimentary</Badge></div>
+        <div className="mt-4 flex items-center gap-2 text-primary"><Handshake className="h-5 w-5"/>VYBE Founding Opportunity Network</div>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">Partner Studio</h1>
-        <p className="mt-3 max-w-3xl leading-7 text-muted-foreground">Trusted people and organizations can discover participating creators, organize talent and create transparent opportunities while creators control what professional information they share.</p>
+        <p className="mt-3 max-w-3xl leading-7 text-muted-foreground">Founding Partners are early ecosystem builders helping VYBE shape better professional pathways for creators. Partners can discover talent, collaborate, offer opportunities when appropriate, and provide feedback while creators remain in control of what they share.</p>
       </header>
       {!profile&&!loading?<PartnerApplication onSubmit={apply}/>:null}
       {profile?<PartnerWorkspace profile={profile} opportunities={opportunities}/>:null}
@@ -53,15 +53,15 @@ function PartnerStudioPage(){
 }
 function PartnerApplication({onSubmit}:{onSubmit:(event:React.FormEvent<HTMLFormElement>)=>Promise<void>}){
  return <Card><CardHeader><CardTitle>Founding Partner application / invite setup</CardTitle></CardHeader><CardContent>
-  <p className="mb-5 text-sm leading-6 text-muted-foreground">Complete this profile so VYBE can review who you are, what kinds of creators you want to discover and what opportunities you may be able to offer.</p>
+  <p className="mb-5 text-sm leading-6 text-muted-foreground">Complete this profile so VYBE can review who you are, how you would like to participate in the Founding Opportunity Network, and what kinds of creators or professional pathways interest you. Founding Partners are not required to guarantee jobs, referrals, promotions or placements.</p>
   <form className="grid gap-4 md:grid-cols-2" onSubmit={onSubmit}>
    <Field name="displayName" label="Public partner name" required/><Field name="slug" label="Partner URL name" required/>
    <div className="space-y-2"><Label htmlFor="partnerType">Partner type</Label><select id="partnerType" name="partnerType" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" defaultValue="creator"><option value="creator">Established creator / artist</option><option value="individual">Individual professional</option><option value="business">Business</option><option value="organization">Organization</option><option value="other">Other</option></select></div>
    <Field name="organizationName" label="Organization / company"/><Field name="headline" label="Professional headline"/><Field name="websiteUrl" label="Official website" type="url"/>
    <Field name="contactEmail" label="Professional contact email" type="email" required/><Field name="serviceArea" label="Markets / service area"/>
-   <Field name="opportunityTypes" label="Opportunity types" placeholder="collaborations, showcases, interviews"/>
+   <Field name="opportunityTypes" label="Ways you would like to participate" placeholder="discover talent, collaborate, mentor, events, media, sponsor, feedback"/>
    <Field name="creatorInterests" label="Creator interests" placeholder="music, film, Houston creators"/>
-   <div className="space-y-2 md:col-span-2"><Label htmlFor="description">About you and the opportunities you can help create</Label><Textarea id="description" name="description" rows={5}/></div>
+   <div className="space-y-2 md:col-span-2"><Label htmlFor="description">About you and how you would like to contribute to the VYBE ecosystem</Label><Textarea id="description" name="description" rows={5}/></div>
    <div className="md:col-span-2"><Button type="submit" className="rounded-full bg-gradient-brand">Submit for VYBE review</Button></div>
   </form>
  </CardContent></Card>;

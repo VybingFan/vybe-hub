@@ -34,7 +34,7 @@ const seedOpportunities: Opportunity[] = [
 const nav = [
   ["Overview", BriefcaseBusiness], ["Discover Talent", Search], ["Saved Creators", Star],
   ["Opportunities", Handshake], ["Invitations", Inbox], ["Messages", MessageSquare],
-  ["Partner Profile", FileText], ["Team", UsersRound], ["Analytics", BarChart3], ["Settings", Settings],
+  ["Partner Profile", FileText], ["Ways to Participate", Compass], ["Help Shape VYBE", Sparkles], ["Team", UsersRound], ["Analytics", BarChart3], ["Settings", Settings],
 ] as const;
 
 function FoundingPartnerDemo() {
@@ -94,7 +94,7 @@ function FoundingPartnerDemo() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-4 sm:px-6">
           <Link to="/" className="text-sm font-semibold text-violet-300 hover:text-white">← VYBE</Link>
           <div className="ml-auto flex items-center gap-2">
-            <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-200">FOUNDING PARTNER CONCEPT</span>
+            <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-200">FOUNDING OPPORTUNITY NETWORK</span>
             <span className="rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1 text-xs text-violet-200">Reusable across VYBE creator demos</span>
           </div>
         </div>
@@ -104,9 +104,9 @@ function FoundingPartnerDemo() {
         <aside className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
           <div className="mb-5 rounded-2xl bg-gradient-to-br from-violet-600/30 to-cyan-400/10 p-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-500/20"><Handshake className="h-6 w-6 text-violet-200" /></div>
-            <p className="mt-3 text-xs font-semibold uppercase tracking-[.18em] text-violet-300">Partner Studio</p>
+            <p className="mt-3 text-xs font-semibold uppercase tracking-[.18em] text-violet-300">VYBE Founding Opportunity Network</p>
             <h1 className="mt-1 text-xl font-bold">Founding Partner Demo</h1>
-            <p className="mt-1 text-sm text-white/60">Shared VYBE opportunity workspace</p>
+            <p className="mt-1 text-sm text-white/60">Early ecosystem builder workspace</p>
           </div>
           <nav className="space-y-1">
             {nav.map(([label, Icon]) => (
@@ -122,9 +122,9 @@ function FoundingPartnerDemo() {
           <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-violet-950/60 via-[#151020] to-[#0c1519] p-5 sm:p-7">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[.2em] text-cyan-300">Founding Partner Studio • Concept Demo</p>
+                <p className="text-xs font-semibold uppercase tracking-[.2em] text-cyan-300">VYBE Founding Opportunity Network • Concept Demo</p>
                 <h2 className="mt-2 text-3xl font-bold sm:text-4xl">{section}</h2>
-                <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65">A professional workspace for trusted people and organizations that can discover creators and create real opportunities while creators stay in control of what they share.</p>
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65">A professional network for trusted people and organizations helping VYBE build better pathways between creators and real-world opportunities. Founding Partners can discover talent, collaborate, create opportunities when appropriate, and help shape the professional tools from the beginning.</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs text-emerald-200"><ShieldCheck className="mr-1 inline h-3.5 w-3.5" />Verified Partner</span>
@@ -133,7 +133,7 @@ function FoundingPartnerDemo() {
             </div>
           </section>
 
-          {notice ? <div className="mt-4 flex items-start gap-3 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4 text-sm text-cyan-100"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /><span>{notice}</span><button onClick={() => setNotice("")} className="ml-auto"><X className="h-4 w-4" /></button></div> : null}
+          <div className="mt-4 grid gap-3 md:grid-cols-2"><div className="rounded-2xl border border-violet-400/20 bg-violet-500/10 p-4 text-sm text-violet-100"><strong>Founding Access:</strong> complimentary first year of applicable VYBE Partner access, plus early tools, recognition and a direct feedback channel.</div><div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4 text-sm text-cyan-100"><strong>No forced commitment:</strong> Founding Partners are not required to guarantee jobs, referrals, promotions, funding or a minimum number of opportunities.</div></div>`r`n          {notice ? <div className="mt-4 flex items-start gap-3 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4 text-sm text-cyan-100"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /><span>{notice}</span><button onClick={() => setNotice("")} className="ml-auto"><X className="h-4 w-4" /></button></div> : null}
           {section === "Overview" ? <Overview saved={saved.length} opportunities={opportunities.length} invitations={invitations.length} responses={invitations.filter((item)=>item.status!=="Invited").length} /> : null}
           {section === "Discover Talent" ? <Discover creators={filteredCreators} query={query} setQuery={setQuery} saved={saved} toggleSaved={toggleSaved} onOpen={setSelectedCreator} /> : null}
           {section === "Saved Creators" ? <Saved saved={saved} toggleSaved={toggleSaved} onOpen={setSelectedCreator} /> : null}
@@ -203,7 +203,9 @@ function Coming({ section }: { section:string }) {
   const details: Record<string,string[]> = {
     Invitations:["Track who was invited, viewed, interested, submitted, shortlisted, selected or declined.","Send private invitations without exposing creator contact information."],
     Messages:["Keep professional conversations tied to a creator or opportunity.","Separate partner communication from ordinary supporter messages."],
-    "Partner Profile":["Show verified identity, organization, markets and opportunity interests.","Control which partner details are public to creators."],
+    "Partner Profile":["Show verified identity, organization, markets and professional interests.","Control which partner details are public to creators.","Founding access includes a complimentary first year of applicable Partner access."],
+    "Ways to Participate":["Discover talent, collaborate, mentor, book talent, interview or feature creators.","Offer opportunities, sponsor opportunities, provide professional services, or help shape VYBE.","Participation does not require a guaranteed number of jobs, referrals, promotions or placements."],
+    "Help Shape VYBE":["Tell VYBE what information was missing from creator profiles or opportunity workflows.","Suggest filters, trust signals and professional tools your team would actually use.","Founding Partner feedback helps shape the professional ecosystem before broader release."],
     Team:["Add authorized managers, staff or collaborators.","Give team members role-based permissions without sharing passwords."],
     Analytics:["Measure opportunity views, invites, responses, shortlists and completed collaborations.","See which creator categories and markets generate meaningful engagement."],
     Settings:["Manage privacy, notifications, security and opportunity preferences.","Control who on the team can discover, invite, message or publish."],
