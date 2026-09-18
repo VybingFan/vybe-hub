@@ -323,3 +323,69 @@ After the human production regression check passes, mark those behaviors PRODUCT
 ## 16. Master Prompt for the next chat
 
 Continue development of the VYBE platform from this handoff. First review the entire handoff and the current `docs/VYBE_PLATFORM_CONSTANTS.md` and `docs/VYBE_HANDOFF_REQUIREMENTS.md`. Inspect the current repository and Git state before changing anything. Preserve all LOCKED constants and re-test affected VERIFY items. Do not reset or overwrite unrelated work. Do not use `git add .`; stage only intentional files. Keep desktop/mobile behavior, membership enforcement, privacy/access controls, identity/workspace boundaries, and persistent playback behavior intact unless I explicitly approve a change. Distinguish coded, built, local-tested, user-verified, committed, pushed, deployed, and production-verified states. Continue from the exact next step documented in this handoff.
+
+## 17. September 18 closeout update — account deletion / admin escalation
+
+Latest application commit:
+`be9c2de8 — Add admin escalation and immediate account deletion workflow`
+
+New Supabase migrations applied:
+- `20260918213000_account_deletion_immediate_review_v24_78a.sql`
+- `20260918221500_admin_escalation_rights_queue_v24_78b.sql`
+- `20260918224500_account_deletion_queue_identity_v24_78c.sql`
+- `20260918231500_account_attention_link_v24_78d.sql`
+
+The standard self-service account-deletion grace period remains **7 days**.
+
+Verified workflow:
+- account holder schedules deletion;
+- account holder may request Immediate Deletion;
+- immediate request does not delete automatically;
+- urgent Account work item is created;
+- Work Queue defaults to All Active and urgent work sorts first;
+- work cards can open their source;
+- deletion work item identifies the target account;
+- Open source deep-links to the Accounts page with the target user ID;
+- Accounts scrolls to and highlights the target row with Needs attention;
+- authorized admin reviews the deletion preview;
+- exact email confirmation is required;
+- Remove Immediately performs permanent deletion;
+- successful deletion closes the related Work Queue item.
+
+Disposable account test:
+`unitedblackings@gmail.com`
+
+The account was permanently removed successfully after one dependency-order repair.
+Post-delete verification showed zero remaining records in the checked account/content tables and the Supabase Auth user was gone.
+
+Deletion dependency rule:
+**playlists → albums → tracks**
+Playlists must be removed before tracks so playlist-owned activity/relationships cascade away before track deletion.
+
+The related Work Queue item was verified as Completed.
+
+## 18. Rights & Ownership escalation status
+
+The copyright/unauthorized-upload escalation is implemented in Supabase.
+
+Expected behavior:
+new copyright report → high-priority Rights & Ownership Work Queue item → source path points to the Back Office rights-review area.
+
+This path is **BUILT / DATABASE IMPLEMENTED**, but not yet end-to-end user verified through the public VYBE report form.
+A synthetic production copyright-report insert was intentionally not forced after the database/tooling blocked that test attempt.
+
+This remains the only focused verification item from this closeout pass.
+
+## 19. Current production deployment
+
+Cloudflare Worker version:
+`53507f26-f471-4ab7-824d-239ec19a67ea`
+
+Production smoke checks returned HTTP 200 for:
+- `https://vybewithvybe.com/`
+- `https://vybewithvybe.com/artist/iron-reign4tstreets`
+- `https://vybewithvybe.com/artist/iron-reign4tstreets/playlist/trial-3230a977`
+- `https://vybewithvybe.com/copyright/report`
+- `https://vybewithvybe.com/admin/work-queue`
+
+The account-deletion/admin-escalation application batch is now deployed.

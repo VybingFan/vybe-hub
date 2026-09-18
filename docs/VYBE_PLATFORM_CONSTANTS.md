@@ -301,3 +301,35 @@ If a browser blocks autoplay, the player must remain visible, docked, and ready 
 
 ### LOCKED — Creator public player remains viewport-docked
 Motion/reveal wrappers, layout transforms, responsive containers, and redesigns must not change the player from viewport-fixed bottom behavior on desktop or mobile.
+
+## 16. Account Deletion / Administrative Escalation
+
+### LOCKED — Standard account deletion keeps the 7-day cancellation period
+A normal self-service deletion request remains pending for 7 days unless the account holder cancels it or requests immediate administrative review.
+
+### LOCKED — Immediate deletion requires administrative review
+Request Immediate Deletion does not permanently delete the account by itself.
+It creates an urgent Back Office work item for an authorized administrator to review and confirm.
+
+### LOCKED — Permanent deletion remains permission-gated and explicitly confirmed
+Immediate permanent deletion requires the appropriate Back Office permission and exact account-email confirmation before execution.
+
+### LOCKED — Work Queue is for administrative authority, not ordinary support
+Normal questions, technical problems, and routine support remain in Contact / Report a Problem flows.
+The Work Queue is reserved for matters requiring an administrative decision, investigation, security/rights review, financial/access review, legal/privacy action, appeal, or irreversible account action.
+
+### LOCKED — Work items should deep-link to the affected record when possible
+Administrative work should carry enough source context to take the reviewer directly to the affected record.
+For account deletion, the Accounts page should scroll to and highlight the account requiring attention.
+
+### LOCKED — Account purge order must respect content dependencies
+For creator-account deletion, playlists must be removed before albums/tracks so playlist-owned activity, access grants, playlist items, and track relationships can cascade safely.
+Do not reorder account purge steps without checking the live foreign-key dependencies.
+
+### VERIFIED — Immediate account deletion workflow
+Verified with a disposable creator account:
+7-day deletion request → Request Immediate Deletion → urgent Account work item → exact-account deep link/highlight → authorized Remove Immediately → Auth/content cleanup → related Work Queue item completed.
+
+### VERIFY — Rights / ownership reports escalate to Back Office
+Copyright or unauthorized-upload reports should create a high-priority Rights & Ownership Work Queue item that points administrators to the appropriate rights-review area.
+The database escalation is implemented, but the public report-form-to-Work-Queue path must still receive an end-to-end user test before being marked VERIFIED.
