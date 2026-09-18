@@ -7,6 +7,7 @@ export interface DeletionRequest {
   status: "pending" | "cancelled" | "processing" | "completed" | "failed";
   scheduled_for: string;
   reason: string | null;
+  immediate_requested_at?: string | null;
 }
 
 export interface DeletionPreview {
@@ -19,6 +20,13 @@ export interface DeletionPreview {
   tableCounts: Record<string, number>;
   storageCounts: Record<string, number>;
   totalObjects: number;
+  deletionRequest?: {
+    id: string;
+    requestType: "self_service" | "administrator";
+    status: "pending" | "processing";
+    scheduledFor: string;
+    immediateRequestedAt?: string | null;
+  } | null;
   warnings?: {
     tables?: Record<string, string>;
     storage?: Record<string, string>;
@@ -148,6 +156,20 @@ export const accountDeletionService = {
 
     if (!result.data || typeof result.data !== "object") {
       throw new Error("The server did not return the deletion request.");
+    }
+
+    return result.data as DeletionRequest;
+  },
+
+  async requestImmediateMine(): Promise<DeletionRequest> {
+    const result = await database.rpc("request_my_immediate_account_deletion_review");
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    if (!result.data || typeof result.data !== "object") {
+      throw new Error("The server did not return the immediate-deletion request.");
     }
 
     return result.data as DeletionRequest;

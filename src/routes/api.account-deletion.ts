@@ -14,9 +14,14 @@ const requestSchema = z.discriminatedUnion("action", [
 ]);
 
 const TABLE_MAP = [
-  ["tracks", "creator_id"],
-  ["albums", "creator_id"],
+  /*
+   * Dependency-safe deletion order matters here.
+   * Playlists must be removed before tracks so playlist-owned activity,
+   * items, access grants, and track relationships cascade away first.
+   */
   ["playlists", "creator_id"],
+  ["albums", "creator_id"],
+  ["tracks", "creator_id"],
   ["track_likes", "user_id"],
   ["follows", "follower_id"],
   ["creator_profiles", "user_id"],
@@ -501,6 +506,26 @@ export const Route = createFileRoute("/api/account-deletion")({
               )
               .maybeSingle();
 
+          const activeDeletionRequestResult =
+            await (client as any)
+              .from("account_deletion_requests")
+              .select("id,request_type,status,scheduled_for,immediate_requested_at")
+              .eq("user_id", parsed.data.userId)
+              .in("status", ["pending", "processing"])
+              .maybeSingle();
+
+          const activeDeletionRequest =
+            activeDeletionRequestResult?.data
+              ? {
+                  id: String(activeDeletionRequestResult.data.id),
+                  requestType: activeDeletionRequestResult.data.request_type,
+                  status: activeDeletionRequestResult.data.status,
+                  scheduledFor: activeDeletionRequestResult.data.scheduled_for,
+                  immediateRequestedAt:
+                    activeDeletionRequestResult.data.immediate_requested_at ?? null,
+                }
+              : null;
+
           const displayName =
             profileResult.data &&
             typeof profileResult.data ===
@@ -541,6 +566,8 @@ export const Route = createFileRoute("/api/account-deletion")({
                   total + count,
                 0,
               ),
+
+            deletionRequest: activeDeletionRequest,
 
             warnings: {
               tables: tableWarnings,
@@ -707,6 +734,63 @@ export const Route = createFileRoute("/api/account-deletion")({
             );
           }
 
+          let completedWorkItemId: string | null = null;
+
+          if (activeDeletionRequest?.id) {
+            const workItemClose = await (client as any)
+              .from("admin_work_items")
+              .update({
+                status: "completed",
+                completed_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              })
+              .eq("source_type", "account_deletion_request")
+              .eq("source_id", activeDeletionRequest.id)
+              .select("id")
+              .maybeSingle();
+
+            if (workItemClose?.error) {
+              throw new Error(
+                `Work-queue cleanup failed: ${workItemClose.error.message}`,
+              );
+            }
+
+            completedWorkItemId =
+              typeof workItemClose?.data?.id === "string"
+                ? workItemClose.data.id
+                : null;
+          }
+
+          /*
+           * Remove active deletion requests before deleting auth.users.
+           * account_deletion_requests intentionally uses ON DELETE RESTRICT.
+           */
+          const deletionRequestDelete =
+            await client
+              .from("account_deletion_requests")
+              .delete()
+              .eq(
+                "user_id",
+                parsed.data.userId,
+              );
+
+          if (deletionRequestDelete.error) {
+            if (completedWorkItemId) {
+              await (client as any)
+                .from("admin_work_items")
+                .update({
+                  status: "unassigned",
+                  completed_at: null,
+                  updated_at: new Date().toISOString(),
+                })
+                .eq("id", completedWorkItemId);
+            }
+
+            throw new Error(
+              `Deletion-request cleanup failed: ${deletionRequestDelete.error.message}`,
+            );
+          }
+
           /*
            * Supabase Authentication is deleted last.
            */
@@ -716,6 +800,17 @@ export const Route = createFileRoute("/api/account-deletion")({
             );
 
           if (authDelete.error) {
+            if (completedWorkItemId) {
+              await (client as any)
+                .from("admin_work_items")
+                .update({
+                  status: "unassigned",
+                  completed_at: null,
+                  updated_at: new Date().toISOString(),
+                })
+                .eq("id", completedWorkItemId);
+            }
+
             throw new Error(
               `Authentication deletion failed: ${authDelete.error.message}`,
             );

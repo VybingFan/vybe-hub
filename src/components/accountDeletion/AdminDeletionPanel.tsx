@@ -203,6 +203,13 @@ export function AdminDeletionPanel({
                   </div>
 
                   <div className="flex flex-wrap gap-2">
+                    {preview.deletionRequest?.requestType === "self_service" ? (
+                      <Badge variant="destructive">
+                        {preview.deletionRequest.immediateRequestedAt
+                          ? "Immediate deletion requested"
+                          : "Pending deletion"}
+                      </Badge>
+                    ) : null}
                     {preview.roles.length ? (
                       preview.roles.map((role) => (
                         <Badge key={role} variant="secondary">
@@ -214,6 +221,16 @@ export function AdminDeletionPanel({
                     )}
                   </div>
                 </div>
+
+                {preview.deletionRequest?.requestType === "self_service" ? (
+                  <div className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
+                    <p className="font-medium">Account holder requested deletion.</p>
+                    <p className="mt-1 text-muted-foreground">
+                      Scheduled permanent deletion: {new Date(preview.deletionRequest.scheduledFor).toLocaleString()}.
+                      An authorized administrator may remove it immediately after confirmation.
+                    </p>
+                  </div>
+                ) : null}
 
                 {preview.blockedReason ? (
                   <div className="mt-4 flex gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3">
@@ -416,7 +433,9 @@ export function AdminDeletionPanel({
 
                 {deleting
                   ? "Processing..."
-                  : "Permanently delete account"}
+                  : preview.deletionRequest?.requestType === "self_service"
+                    ? "Remove Immediately"
+                    : "Permanently delete account"}
               </Button>
             ) : null}
           </DialogFooter>

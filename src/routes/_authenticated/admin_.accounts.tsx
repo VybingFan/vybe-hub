@@ -56,19 +56,44 @@ function AccountRow({
   record,
   focusLabel,
   canDeleteAccounts,
+  highlighted = false,
 }: {
   record: AdminCreatorRecord;
   focusLabel?: string;
   canDeleteAccounts: boolean;
+  highlighted?: boolean;
 }) {
+  const isHighlighted =
+    highlighted ||
+    (typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("attention") ===
+        record.user_id);
+
   return (
-    <tr className="h-9 border-t align-middle hover:bg-muted/20">
+    <tr
+      id={`account-${record.user_id}`}
+      className={`h-9 border-t align-middle transition hover:bg-muted/20 ${
+        isHighlighted
+          ? "bg-amber-500/10 outline outline-2 outline-amber-400/70"
+          : ""
+      }`}
+    >
       <td className="max-w-0 px-2 py-1.5">
         <div className="truncate text-[12px] font-semibold leading-4">
           {record.creator_name || record.display_name || "Unnamed account"}
         </div>
-        <div className="truncate text-[10px] leading-3.5 text-muted-foreground">
-          {record.email || "No email available"}
+        <div className="flex items-center gap-1.5">
+          <div className="truncate text-[10px] leading-3.5 text-muted-foreground">
+            {record.email || "No email available"}
+          </div>
+          {isHighlighted ? (
+            <Badge
+              variant="outline"
+              className="h-[18px] shrink-0 border-amber-400/60 bg-amber-500/10 px-1.5 text-[9px] text-amber-200"
+            >
+              Needs attention
+            </Badge>
+          ) : null}
         </div>
       </td>
 
@@ -121,6 +146,7 @@ function AdminAccountsPage() {
   const [records, setRecords] = useState<AdminCreatorRecord[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [attentionUserId, setAttentionUserId] = useState<string | null>(null);
   const [canDeleteAccounts, setCanDeleteAccounts] = useState(false);
 
   const load = useCallback(async (query = "") => {
@@ -137,6 +163,12 @@ function AdminAccountsPage() {
   }, []);
 
   useEffect(() => {
+    const attention =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("attention")
+        : null;
+
+    setAttentionUserId(attention);
     void load();
 
     let active = true;
@@ -159,6 +191,19 @@ function AdminAccountsPage() {
       active = false;
     };
   }, [load]);
+
+  useEffect(() => {
+    if (!attentionUserId || loading) return;
+
+    const target = document.getElementById(`account-${attentionUserId}`);
+
+    if (!target) return;
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }, [attentionUserId, loading, records]);
 
   const counts = useMemo(
     () => ({
@@ -363,7 +408,12 @@ function AdminAccountsPage() {
                       </td>
                     </tr>
                     {otherAccounts.map((record) => (
-                      <AccountRow key={`other-${record.user_id}`} record={record} />
+                      <AccountRow
+                        key={`other-${record.user_id}`}
+                        record={record}
+                        canDeleteAccounts={canDeleteAccounts}
+                        highlighted={record.user_id === attentionUserId}
+                      />
                     ))}
                   </>
                 ) : null}

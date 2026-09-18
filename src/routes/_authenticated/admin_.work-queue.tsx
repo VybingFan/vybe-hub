@@ -55,6 +55,16 @@ const statusLabels: Record<AdminWorkStatus, string> = {
   cancelled: "Cancelled",
 };
 
+const workCategoryLabels: Record<string, string> = {
+  account_deletion: "Account",
+  rights_ownership: "Rights & Ownership",
+  security: "Security",
+  payments_access: "Payments & Access",
+  safety: "Safety",
+  privacy_legal: "Privacy / Legal",
+  appeals: "Appeals",
+};
+
 function WorkQueuePage() {
   const [summary, setSummary] = useState<WorkQueueSummary | null>(null);
   const [workSummary, setWorkSummary] = useState<AdminWorkSummary | null>(null);
@@ -63,7 +73,7 @@ function WorkQueuePage() {
   const [access, setAccess] = useState<AdminAccess | null>(null);
   const [teamMembers, setTeamMembers] = useState<AdminTeamMember[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [view, setView] = useState<WorkView>("my");
+  const [view, setView] = useState<WorkView>("all");
   const [showCreate, setShowCreate] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -107,10 +117,28 @@ function WorkQueuePage() {
   useEffect(() => void load(), [load]);
 
   const filteredItems = useMemo(() => {
-    if (view === "my") return items.filter((item) => item.assigned_to === currentUserId);
-    if (view === "unassigned")
-      return items.filter((item) => item.status === "unassigned" && !item.assigned_to);
-    return items;
+    const priorityRank: Record<AdminWorkPriority, number> = {
+      urgent: 0,
+      high: 1,
+      normal: 2,
+      low: 3,
+    };
+
+    const visible =
+      view === "my"
+        ? items.filter((item) => item.assigned_to === currentUserId)
+        : view === "unassigned"
+          ? items.filter((item) => item.status === "unassigned" && !item.assigned_to)
+          : items;
+
+    return [...visible].sort((a, b) => {
+      const priorityDifference =
+        priorityRank[a.priority] - priorityRank[b.priority];
+
+      if (priorityDifference !== 0) return priorityDifference;
+
+      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+    });
   }, [items, currentUserId, view]);
 
   async function createManualWork(event: React.FormEvent<HTMLFormElement>) {
@@ -427,14 +455,32 @@ function WorkItemCard({
     <Card className={item.priority === "urgent" ? "border-destructive/40" : undefined}>
       <CardContent className="p-5">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
-          <div className="min-w-0 flex-1">
+          <div
+            className={`min-w-0 flex-1 ${item.action_path ? "cursor-pointer rounded-xl outline-none transition hover:bg-muted/30 focus-visible:ring-2 focus-visible:ring-primary/60" : ""}`}
+            role={item.action_path ? "link" : undefined}
+            tabIndex={item.action_path ? 0 : undefined}
+            onClick={() => {
+              if (item.action_path) window.location.assign(item.action_path);
+            }}
+            onKeyDown={(event) => {
+              if (
+                item.action_path &&
+                (event.key === "Enter" || event.key === " ")
+              ) {
+                event.preventDefault();
+                window.location.assign(item.action_path);
+              }
+            }}
+          >
             <div className="flex flex-wrap items-center gap-2">
               <p className="font-semibold">{item.title}</p>
               <Badge variant={item.priority === "urgent" ? "destructive" : "secondary"}>
                 {item.priority}
               </Badge>
               <Badge variant="outline">{statusLabels[item.status]}</Badge>
-              <Badge variant="outline">{item.category.replaceAll("_", " ")}</Badge>
+              <Badge variant="outline">
+                {workCategoryLabels[item.category] ?? item.category.replaceAll("_", " ")}
+              </Badge>
             </div>
             {item.description ? (
               <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>

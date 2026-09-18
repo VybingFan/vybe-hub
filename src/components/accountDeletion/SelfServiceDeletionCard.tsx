@@ -50,6 +50,23 @@ export function SelfServiceDeletionCard() {
       setBusy(false);
     }
   }
+  async function requestImmediateDeletion() {
+    setBusy(true);
+    try {
+      const updated = await accountDeletionService.requestImmediateMine();
+      setRequest(updated);
+      toast.success("Immediate deletion review requested. Back Office has been notified.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Could not request immediate deletion review.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function cancelDeletion() {
     setBusy(true);
     try {
@@ -97,16 +114,31 @@ export function SelfServiceDeletionCard() {
               </p>
             </div>
           </div>
-          <Button
-            type="button"
-            className="mt-4"
-            variant="outline"
-            disabled={busy}
-            onClick={cancelDeletion}
-          >
-            <RotateCcw className="mr-2 h-4 w-4" />
-            {busy ? "Cancelling..." : "Cancel deletion and keep account"}
-          </Button>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy}
+              onClick={cancelDeletion}
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              {busy ? "Working..." : "Cancel deletion and keep account"}
+            </Button>
+
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={busy || Boolean(request.immediate_requested_at)}
+              onClick={requestImmediateDeletion}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {request.immediate_requested_at
+                ? "Immediate deletion requested"
+                : busy
+                  ? "Requesting..."
+                  : "Request Immediate Deletion"}
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="space-y-3 rounded-xl border border-border/70 p-4">
