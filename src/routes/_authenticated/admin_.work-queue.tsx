@@ -63,6 +63,7 @@ const workCategoryLabels: Record<string, string> = {
   safety: "Safety",
   privacy_legal: "Privacy / Legal",
   appeals: "Appeals",
+  support_escalation: "Support Escalation",
 };
 
 function WorkQueuePage() {

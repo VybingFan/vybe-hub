@@ -382,6 +382,41 @@ New migration:
 
 The broader Rights & Protection dashboard and Copyright Operations remain available as secondary navigation from the focused report.
 
+## 20. Creator Help Center + Tickets Phase 1
+
+Creator Help Center + Tickets Phase 1 is now **USER VERIFIED** end to end.
+
+Creator-facing:
+- Creator HQ now includes **Help & Support** under Profile & Growth.
+- Standard support is available to Creator Free.
+- Plus/Pro/Studio/founding membership can receive Priority support treatment.
+- Help Center provides direct paths for general guidance, rights/unauthorized-use reporting, and account deletion.
+- Creators can submit support tickets, view their ticket history, see status, receive admin replies, and reply in-thread.
+
+Back Office:
+- Operations now includes **Support Tickets**.
+- Admins can review the exact ticket, start review, reply, mark Waiting on Creator, resolve, or explicitly escalate to Work Queue.
+- Routine support stays out of Work Queue by default.
+- Admin escalation creates a **Support Escalation** Work Queue item and deep-links back to the exact support ticket.
+
+Verified test flow:
+creator submitted `profile banner` → Back Office replied → creator saw Waiting on You + reply → ticket resolved successfully.
+
+Verified escalation flow:
+creator submitted `TEST - requires admin review` → admin escalated → high-priority Support Escalation Work Queue item created → source path `/admin/support?ticket=<ticket-id>`.
+
+New migrations:
+- `20260919003000_creator_help_tickets_v24_79a.sql`
+- `20260919004500_creator_help_ticket_security_v24_79a1.sql`
+- `20260919005500_creator_help_ticket_grants_v24_79a2.sql`
+
+Security behavior:
+- support tickets/messages are protected by RLS;
+- creators can read/submit only their own support records;
+- creator ticket priority is normalized server-side from membership;
+- anonymous users have no support-table access;
+- Back Office controls ticket status and escalation.
+
 ## 19. Current production deployment
 
 Cloudflare Worker version:

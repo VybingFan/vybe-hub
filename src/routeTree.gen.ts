@@ -137,6 +137,7 @@ import { Route as AuthenticatedCreatorAcademyNovaRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminWorkQueueRouteImport } from './routes/_authenticated/admin_.work-queue'
 import { Route as AuthenticatedAdminTeamRouteImport } from './routes/_authenticated/admin_.team'
 import { Route as AuthenticatedAdminSystemHealthRouteImport } from './routes/_authenticated/admin_.system-health'
+import { Route as AuthenticatedAdminSupportRouteImport } from './routes/_authenticated/admin_.support'
 import { Route as AuthenticatedAdminSellerReadinessRouteImport } from './routes/_authenticated/admin_.seller-readiness'
 import { Route as AuthenticatedAdminSearchRouteImport } from './routes/_authenticated/admin_.search'
 import { Route as AuthenticatedAdminRightsRegistryRouteImport } from './routes/_authenticated/admin_.rights-registry'
@@ -833,6 +834,12 @@ const AuthenticatedAdminSystemHealthRoute =
     path: '/admin/system-health',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminSupportRoute =
+  AuthenticatedAdminSupportRouteImport.update({
+    id: '/admin_/support',
+    path: '/admin/support',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminSellerReadinessRoute =
   AuthenticatedAdminSellerReadinessRouteImport.update({
     id: '/admin_/seller-readiness',
@@ -1109,6 +1116,7 @@ export interface FileRoutesByFullPath {
   '/admin/rights-registry': typeof AuthenticatedAdminRightsRegistryRoute
   '/admin/search': typeof AuthenticatedAdminSearchRoute
   '/admin/seller-readiness': typeof AuthenticatedAdminSellerReadinessRoute
+  '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
@@ -1262,6 +1270,7 @@ export interface FileRoutesByTo {
   '/admin/rights-registry': typeof AuthenticatedAdminRightsRegistryRoute
   '/admin/search': typeof AuthenticatedAdminSearchRoute
   '/admin/seller-readiness': typeof AuthenticatedAdminSellerReadinessRoute
+  '/admin/support': typeof AuthenticatedAdminSupportRoute
   '/admin/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/admin/team': typeof AuthenticatedAdminTeamRoute
   '/admin/work-queue': typeof AuthenticatedAdminWorkQueueRoute
@@ -1418,6 +1427,7 @@ export interface FileRoutesById {
   '/_authenticated/admin_/rights-registry': typeof AuthenticatedAdminRightsRegistryRoute
   '/_authenticated/admin_/search': typeof AuthenticatedAdminSearchRoute
   '/_authenticated/admin_/seller-readiness': typeof AuthenticatedAdminSellerReadinessRoute
+  '/_authenticated/admin_/support': typeof AuthenticatedAdminSupportRoute
   '/_authenticated/admin_/system-health': typeof AuthenticatedAdminSystemHealthRoute
   '/_authenticated/admin_/team': typeof AuthenticatedAdminTeamRoute
   '/_authenticated/admin_/work-queue': typeof AuthenticatedAdminWorkQueueRoute
@@ -1574,6 +1584,7 @@ export interface FileRouteTypes {
     | '/admin/rights-registry'
     | '/admin/search'
     | '/admin/seller-readiness'
+    | '/admin/support'
     | '/admin/system-health'
     | '/admin/team'
     | '/admin/work-queue'
@@ -1727,6 +1738,7 @@ export interface FileRouteTypes {
     | '/admin/rights-registry'
     | '/admin/search'
     | '/admin/seller-readiness'
+    | '/admin/support'
     | '/admin/system-health'
     | '/admin/team'
     | '/admin/work-queue'
@@ -1882,6 +1894,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin_/rights-registry'
     | '/_authenticated/admin_/search'
     | '/_authenticated/admin_/seller-readiness'
+    | '/_authenticated/admin_/support'
     | '/_authenticated/admin_/system-health'
     | '/_authenticated/admin_/team'
     | '/_authenticated/admin_/work-queue'
@@ -2879,6 +2892,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSystemHealthRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin_/support': {
+      id: '/_authenticated/admin_/support'
+      path: '/admin/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AuthenticatedAdminSupportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin_/seller-readiness': {
       id: '/_authenticated/admin_/seller-readiness'
       path: '/admin/seller-readiness'
@@ -3123,6 +3143,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRightsRegistryRoute: typeof AuthenticatedAdminRightsRegistryRoute
   AuthenticatedAdminSearchRoute: typeof AuthenticatedAdminSearchRoute
   AuthenticatedAdminSellerReadinessRoute: typeof AuthenticatedAdminSellerReadinessRoute
+  AuthenticatedAdminSupportRoute: typeof AuthenticatedAdminSupportRoute
   AuthenticatedAdminSystemHealthRoute: typeof AuthenticatedAdminSystemHealthRoute
   AuthenticatedAdminTeamRoute: typeof AuthenticatedAdminTeamRoute
   AuthenticatedAdminWorkQueueRoute: typeof AuthenticatedAdminWorkQueueRoute
@@ -3206,6 +3227,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminSearchRoute: AuthenticatedAdminSearchRoute,
   AuthenticatedAdminSellerReadinessRoute:
     AuthenticatedAdminSellerReadinessRoute,
+  AuthenticatedAdminSupportRoute: AuthenticatedAdminSupportRoute,
   AuthenticatedAdminSystemHealthRoute: AuthenticatedAdminSystemHealthRoute,
   AuthenticatedAdminTeamRoute: AuthenticatedAdminTeamRoute,
   AuthenticatedAdminWorkQueueRoute: AuthenticatedAdminWorkQueueRoute,

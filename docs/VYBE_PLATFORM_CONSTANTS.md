@@ -315,8 +315,24 @@ It creates an urgent Back Office work item for an authorized administrator to re
 Immediate permanent deletion requires the appropriate Back Office permission and exact account-email confirmation before execution.
 
 ### LOCKED — Work Queue is for administrative authority, not ordinary support
-Normal questions, technical problems, and routine support remain in Contact / Report a Problem flows.
+Normal questions, technical problems, and routine support remain in Contact / Report a Problem flows or Creator Help Center tickets.
 The Work Queue is reserved for matters requiring an administrative decision, investigation, security/rights review, financial/access review, legal/privacy action, appeal, or irreversible account action.
+
+### VERIFIED — Creator Help Center + Tickets
+Verified end to end:
+creator submits support ticket → Back Office Support Tickets review → admin reply/status update → creator sees reply/status → routine ticket can resolve without Work Queue involvement.
+
+### LOCKED — All creators receive standard support access
+Creator Free must not be blocked from the Creator Help Center.
+Plus/Pro/Studio/founding access may receive priority treatment, but membership controls support priority rather than access to the support system itself.
+
+### LOCKED — Routine tickets do not automatically create Work Queue items
+Support tickets remain in the Support Tickets workflow by default.
+Only an explicit administrator escalation should create a Support Escalation Work Queue item.
+
+### VERIFIED — Support escalation deep-links to exact ticket
+Verified with a Priority creator ticket:
+admin escalation → high-priority Support Escalation Work Queue item → exact /admin/support?ticket=<ticket-id> source link.
 
 ### LOCKED — Work items should deep-link to the affected record when possible
 Administrative work should carry enough source context to take the reviewer directly to the affected record.
