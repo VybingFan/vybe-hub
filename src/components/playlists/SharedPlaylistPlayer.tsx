@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Expand,
   LockKeyhole,
@@ -686,22 +687,27 @@ export function SharedPlaylistPlayer({
         ) : null}
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-[80] border-t border-white/15 bg-[#090a12]/95 px-3 py-2 shadow-[0_-18px_45px_rgba(0,0,0,.45)] backdrop-blur-xl sm:px-5">
-        <div className="mx-auto flex max-w-6xl items-center gap-3">
-          <button type="button" onClick={() => setDetailOpen(true)} className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-gradient-brand" aria-label={`Open details for ${track.title}`}>
-            {track.cover_url ? <img src={track.cover_url} alt="" className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center font-bold text-white">V</span>}
-          </button>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold">{track.title}</p>
-            <p className="truncate text-xs text-white/50">{track.primary_artist_name || "VYBE artist"}</p>
-          </div>
-          <Button type="button" variant="ghost" size="icon" onClick={previousTrack} disabled={tracks.length < 2} aria-label="Previous song"><SkipBack className="h-4 w-4" /></Button>
-          <Button type="button" size="icon" className="h-11 w-11 rounded-full bg-gradient-brand text-white" onClick={() => void togglePlayback()} disabled={!canPlay || loadingAudio} aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause className="h-4 w-4 fill-current" /> : <Play className="ml-0.5 h-4 w-4 fill-current" />}</Button>
-          <Button type="button" variant="ghost" size="icon" onClick={() => nextTrack()} disabled={tracks.length < 2} aria-label="Next song"><SkipForward className="h-4 w-4" /></Button>
-          <Button type="button" variant="ghost" size="icon" onClick={toggleMute} aria-label={volume === 0 ? "Unmute" : "Mute"}>{volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}</Button>
-        </div>
-        <div className="mx-auto mt-1 max-w-6xl"><div className="h-0.5 overflow-hidden rounded-full bg-white/10"><div className="h-full bg-gradient-to-r from-fuchsia-500 to-cyan-400" style={{ width: `${Math.min(100, (elapsed / Math.max(displayedDuration, 1)) * 100)}%` }} /></div></div>
-      </div>
+      {typeof document !== "undefined"
+        ? createPortal(
+            <div className="fixed inset-x-0 bottom-0 z-[80] border-t border-white/15 bg-[#090a12]/95 px-3 py-2 shadow-[0_-18px_45px_rgba(0,0,0,.45)] backdrop-blur-xl sm:px-5">
+              <div className="mx-auto flex max-w-6xl items-center gap-3">
+                <button type="button" onClick={() => setDetailOpen(true)} className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-gradient-brand" aria-label={`Open details for ${track.title}`}>
+                  {track.cover_url ? <img src={track.cover_url} alt="" className="h-full w-full object-cover" /> : <span className="flex h-full items-center justify-center font-bold text-white">V</span>}
+                </button>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">{track.title}</p>
+                  <p className="truncate text-xs text-white/50">{track.primary_artist_name || "VYBE artist"}</p>
+                </div>
+                <Button type="button" variant="ghost" size="icon" onClick={previousTrack} disabled={tracks.length < 2} aria-label="Previous song"><SkipBack className="h-4 w-4" /></Button>
+                <Button type="button" size="icon" className="h-11 w-11 rounded-full bg-gradient-brand text-white" onClick={() => void togglePlayback()} disabled={!canPlay || loadingAudio} aria-label={playing ? "Pause" : "Play"}>{playing ? <Pause className="h-4 w-4 fill-current" /> : <Play className="ml-0.5 h-4 w-4 fill-current" />}</Button>
+                <Button type="button" variant="ghost" size="icon" onClick={() => nextTrack()} disabled={tracks.length < 2} aria-label="Next song"><SkipForward className="h-4 w-4" /></Button>
+                <Button type="button" variant="ghost" size="icon" onClick={toggleMute} aria-label={volume === 0 ? "Unmute" : "Mute"}>{volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}</Button>
+              </div>
+              <div className="mx-auto mt-1 max-w-6xl"><div className="h-0.5 overflow-hidden rounded-full bg-white/10"><div className="h-full bg-gradient-to-r from-fuchsia-500 to-cyan-400" style={{ width: `${Math.min(100, (elapsed / Math.max(displayedDuration, 1)) * 100)}%` }} /></div></div>
+            </div>,
+            document.body,
+          )
+        : null}
 
       {detailOpen ? (
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/80 p-3 backdrop-blur-md sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label={`Song details for ${track.title}`}>

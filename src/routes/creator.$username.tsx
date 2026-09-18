@@ -211,7 +211,6 @@ export function PublicArtistHome({
             </div>
           </nav>
         )}
-        <VybeReveal>
         <section
           id="music"
           className={compactProfile ? "mx-auto max-w-5xl scroll-mt-24 px-4 py-7 sm:px-6" : "mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6 md:py-14"}
@@ -228,7 +227,6 @@ export function PublicArtistHome({
             planCode={planCode}
           />
         </section>
-        </VybeReveal>
 
         <PublicCreatorWriting
           works={writtenWorks}

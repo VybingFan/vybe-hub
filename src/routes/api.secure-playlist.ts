@@ -463,33 +463,44 @@ export const Route = createFileRoute("/api/secure-playlist")({
 
         const rawTracks = (items ?? []).flatMap((item: any) => (item.tracks ? [item.tracks] : []));
 
+        const isEligibleTrack = (track: any) => {
+          if (parsed.data.trackId && track.id !== parsed.data.trackId) {
+            return false;
+          }
+
+          if (accessMode === "public" || accessMode === "unlisted") {
+            return track.visibility === "public" && track.status === "published";
+          }
+
+          return track.status === "published";
+        };
+
+        const playbackAvailableFor = (track: any) =>
+          track.playback_mode === "preview"
+            ? Boolean(track.preview_audio_path)
+            : track.playback_mode === "none"
+              ? false
+              : track.playback_mode === "approved_listeners" &&
+                  accessMode !== "approved_listeners"
+                ? false
+                : Boolean(track.audio_url);
+
+        const eligibleTracks = rawTracks.filter(isEligibleTrack);
+        const initialPlaybackTrackId = parsed.data.trackId
+          ? null
+          : eligibleTracks.find(playbackAvailableFor)?.id ?? null;
+
         const tracks = await Promise.all(
-          rawTracks
-            .filter((track: any) => {
-              if (parsed.data.trackId && track.id !== parsed.data.trackId) {
-                return false;
-              }
-
-              if (accessMode === "public" || accessMode === "unlisted") {
-                return track.visibility === "public" && track.status === "published";
-              }
-
-              return track.status === "published";
-            })
-            .map(async (track: any) => {
-              const playbackAvailable =
-                track.playback_mode === "preview"
-                  ? Boolean(track.preview_audio_path)
-                  : track.playback_mode === "none"
-                    ? false
-                    : track.playback_mode === "approved_listeners" &&
-                        accessMode !== "approved_listeners"
-                      ? false
-                      : Boolean(track.audio_url);
+          eligibleTracks.map(async (track: any) => {
+              const playbackAvailable = playbackAvailableFor(track);
 
               let playableUrl = "";
 
-              if (parsed.data.trackId && playbackAvailable) {
+              if (
+                playbackAvailable &&
+                (parsed.data.trackId === track.id ||
+                  (!parsed.data.trackId && track.id === initialPlaybackTrackId))
+              ) {
                 if (track.playback_mode === "preview") {
                   playableUrl =
                     (await signedUrl(client, PREVIEW_BUCKET, track.preview_audio_path)) ?? "";
