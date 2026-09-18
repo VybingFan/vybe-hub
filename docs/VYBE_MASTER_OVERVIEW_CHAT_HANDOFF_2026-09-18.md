@@ -420,7 +420,12 @@ Security behavior:
 ## 19. Current production deployment
 
 Cloudflare Worker version:
-`401d8ca8-4cd4-42a2-afe3-1ba95e003154`
+`03dbd66c-1890-4efd-a9e9-46730af48645`
+
+Creator Help Center + Tickets Phase 1 production smoke checks returned HTTP 200 for:
+- `https://vybewithvybe.com/creator-support`
+- `https://vybewithvybe.com/admin/support`
+- `https://vybewithvybe.com/admin/work-queue`
 
 Focused Rights & Ownership production route verified:
 `https://vybewithvybe.com/admin/rights?report=6f1d645f-b387-456e-9553-b123f01585f6` → HTTP 200.
