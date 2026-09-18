@@ -330,6 +330,13 @@ Do not reorder account purge steps without checking the live foreign-key depende
 Verified with a disposable creator account:
 7-day deletion request → Request Immediate Deletion → urgent Account work item → exact-account deep link/highlight → authorized Remove Immediately → Auth/content cleanup → related Work Queue item completed.
 
-### VERIFY — Rights / ownership reports escalate to Back Office
-Copyright or unauthorized-upload reports should create a high-priority Rights & Ownership Work Queue item that points administrators to the appropriate rights-review area.
-The database escalation is implemented, but the public report-form-to-Work-Queue path must still receive an end-to-end user test before being marked VERIFIED.
+### VERIFIED — Rights / ownership reports escalate to Back Office
+Verified end to end through the public copyright report form:
+report submission → high-priority Rights & Ownership Work Queue item → exact report deep-link → focused report review.
+
+### LOCKED — Rights Work Queue opens the exact report
+A rights/ownership Work Queue item should not drop the reviewer onto the entire Rights & Protection dashboard.
+Open source must deep-link to the exact copyright/ownership report and show only the information needed for that review first.
+
+The focused report review should include the report reference, status, submitted date, reporter identity/email, rights owner, reported VYBE URL, claim description, legal confirmations, electronic signature, admin notes, status controls, and direct access to the reported VYBE content.
+Broader Rights & Protection and Copyright Operations remain secondary navigation.

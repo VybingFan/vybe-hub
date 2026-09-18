@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Activity, AlertTriangle, ArrowRight, CheckCircle2, ChevronLeft, Copyright, ExternalLink, FileCheck2, Fingerprint, LibraryBig, RefreshCw, ShieldCheck, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { AdminPermissionGuard } from "@/components/auth/AdminPermissionGuard";
@@ -12,9 +12,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/hooks/useUser";
 
-export const Route = createFileRoute("/_authenticated/admin_/rights")({ component: RightsReviewRoute });
+export const Route = createFileRoute("/_authenticated/admin_/rights")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    report: typeof search.report === "string" ? search.report : "",
+  }),
+  component: RightsReviewRoute,
+});
 
-type CopyrightReport = { id:string; reporter_name:string; reporter_email:string; rights_owner_name:string; content_url:string; original_work_description:string; signature:string; status:string; internal_notes:string; created_at:string; };
+type CopyrightReport = { id:string; reporter_name:string; reporter_email:string; rights_owner_name:string; content_url:string; original_work_description:string; signature:string; good_faith_statement:boolean; accuracy_statement:boolean; status:string; internal_notes:string; created_at:string; };
 type ProcessingJob = { id:string; track_id:string; status:string; attempt_count:number; processor_version:string|null; queued_at:string; completed_at:string|null; last_error:string|null; tracks:{title:string;primary_artist_name:string}|null; };
 type ModerationCase = { id:string; case_type:string; severity:string; status:string; risk_score:number|null; reason_codes:string[]; summary:string; created_at:string; tracks:{title:string;primary_artist_name:string}|null; };
 type RightsStats = { fingerprints:number; matchCandidates:number; pendingDocuments:number; };
@@ -23,16 +28,25 @@ const statuses=["received","reviewing","actioned","rejected","counter_notice"] a
 function RightsReviewRoute(){return <AdminPermissionGuard anyOf={["admin.rights.read","admin.content.read"]}><RightsReviewPage/></AdminPermissionGuard>;}
 
 function RightsReviewPage(){
+ const {report:focusedReportId}=Route.useSearch();
  const {user}=useUser(); const [reports,setReports]=useState<CopyrightReport[]>([]); const [jobs,setJobs]=useState<ProcessingJob[]>([]); const [cases,setCases]=useState<ModerationCase[]>([]); const [stats,setStats]=useState<RightsStats>({fingerprints:0,matchCandidates:0,pendingDocuments:0}); const [loading,setLoading]=useState(true);
  const load=useCallback(async()=>{setLoading(true); const database=supabase; const [reportResult,jobResult,caseResult,fingerprintResult,matchResult,documentResult]=await Promise.all([
-  database.from("copyright_reports").select("id,reporter_name,reporter_email,rights_owner_name,content_url,original_work_description,signature,status,internal_notes,created_at").order("created_at",{ascending:false}),
+  database.from("copyright_reports").select("id,reporter_name,reporter_email,rights_owner_name,content_url,original_work_description,signature,good_faith_statement,accuracy_statement,status,internal_notes,created_at").order("created_at",{ascending:false}),
   database.from("audio_processing_jobs").select("id,track_id,status,attempt_count,processor_version,queued_at,completed_at,last_error,tracks(title,primary_artist_name)").order("queued_at",{ascending:false}).limit(100),
   database.from("moderation_cases").select("id,case_type,severity,status,risk_score,reason_codes,summary,created_at,tracks(title,primary_artist_name)").order("created_at",{ascending:false}).limit(100),
   database.from("audio_fingerprints").select("id",{count:"exact",head:true}), database.from("audio_match_candidates").select("id",{count:"exact",head:true}), database.from("creator_rights_documents").select("id",{count:"exact",head:true}).eq("review_status","pending")]);
   const firstError=reportResult.error??jobResult.error??caseResult.error??fingerprintResult.error??matchResult.error??documentResult.error; if(firstError)toast.error(firstError.message); setReports((reportResult.data??[]) as CopyrightReport[]); setJobs((jobResult.data??[]) as ProcessingJob[]); setCases((caseResult.data??[]) as ModerationCase[]); setStats({fingerprints:fingerprintResult.count??0,matchCandidates:matchResult.count??0,pendingDocuments:documentResult.count??0}); setLoading(false);
  },[]); useEffect(()=>{void load();},[load]);
  async function updateReport(id:string,status:string,internalNotes:string){const {error}=await supabase.from("copyright_reports").update({status,internal_notes:internalNotes,reviewed_at:new Date().toISOString(),reviewed_by:user?.id??null}).eq("id",id); if(error)toast.error(error.message);else{toast.success("Rights report updated");await load();}}
- const jobCounts=useMemo(()=>jobs.reduce<Record<string,number>>((r,j)=>{r[j.status]=(r[j.status]??0)+1;return r;},{}),[jobs]); const openCases=cases.filter((x)=>!["resolved","closed","dismissed"].includes(x.status)).length; const openCopyright=reports.filter((x)=>!["actioned","rejected"].includes(x.status)).length;
+
+ if(focusedReportId){
+  const focusedReport=reports.find((report)=>report.id===focusedReportId);
+  if(loading)return <div className="mx-auto max-w-4xl p-6 text-muted-foreground">Loading rights report...</div>;
+  if(!focusedReport)return <div className="mx-auto max-w-4xl space-y-4 p-6"><Button variant="ghost" asChild><Link to="/admin/rights"><ChevronLeft className="mr-1 h-4 w-4"/>Back to all Rights & Protection</Link></Button><Card><CardContent className="p-7"><p className="font-medium">Rights report not found.</p><p className="mt-2 text-sm text-muted-foreground">The report may have been removed or the Work Queue link is no longer valid.</p></CardContent></Card></div>;
+  return <FocusedReportReview report={focusedReport} onSave={updateReport}/>;
+ }
+
+ const jobCounts=jobs.reduce<Record<string,number>>((r,j)=>{r[j.status]=(r[j.status]??0)+1;return r;},{}); const openCases=cases.filter((x)=>!["resolved","closed","dismissed"].includes(x.status)).length; const openCopyright=reports.filter((x)=>!["actioned","rejected"].includes(x.status)).length;
  return <div className="mx-auto max-w-6xl space-y-7">
   <header><Button variant="ghost" size="sm" asChild><Link to="/admin"><ChevronLeft className="mr-1 h-4 w-4"/>Back to Back Office</Link></Button><div className="mt-3 flex items-center gap-2 text-primary"><ShieldCheck className="h-5 w-5"/>Rights & Protection</div><div className="mt-2 flex items-start justify-between gap-4"><div><h1 className="text-3xl font-semibold tracking-tight">Rights & Protection Operations</h1><p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">One operational home for VYBE rights records, audio protection, review signals, commerce rights, and formal copyright matters. Automated matches remain review signals—not legal determinations of ownership or infringement.</p></div><Button variant="outline" size="icon" onClick={()=>void load()} aria-label="Refresh"><RefreshCw className="h-4 w-4"/></Button></div></header>
   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"><Metric label="Protected fingerprints" value={stats.fingerprints} icon={Fingerprint} to="/admin/rights-registry"/><Metric label="Match candidates" value={stats.matchCandidates} icon={AlertTriangle} tab="processing"/><Metric label="Open review cases" value={openCases} icon={ShieldCheck} tab="cases"/><Metric label="Open copyright reports" value={openCopyright} icon={Copyright} to="/admin/copyright"/></div>
@@ -55,3 +69,111 @@ function Metric({label,value,icon:Icon,to,tab}:{label:string;value:number;icon:t
 function StatusBadge({status}:{status:string}){const variant=status==="failed"?"destructive":status==="flagged"?"outline":"secondary";return <Badge variant={variant}>{status.replaceAll("_"," ")}</Badge>;}
 function EmptyState({text}:{text:string}){return <Card><CardContent className="p-7 text-sm text-muted-foreground">{text}</CardContent></Card>;}
 function ReportCard({report,onSave}:{report:CopyrightReport;onSave:(id:string,status:string,notes:string)=>Promise<void>;}){const [status,setStatus]=useState(report.status);const [notes,setNotes]=useState(report.internal_notes);const [saving,setSaving]=useState(false);return <Card><CardHeader><div className="flex flex-wrap items-center justify-between gap-3"><CardTitle>{report.rights_owner_name}</CardTitle><Badge variant="secondary">{report.status.replace("_"," ")}</Badge></div></CardHeader><CardContent className="space-y-5"><div className="grid gap-3 text-sm sm:grid-cols-2"><p><span className="text-muted-foreground">Reporter:</span> {report.reporter_name}</p><p><span className="text-muted-foreground">Email:</span> {report.reporter_email}</p><p><span className="text-muted-foreground">Signature:</span> {report.signature}</p><p><span className="text-muted-foreground">Received:</span> {new Date(report.created_at).toLocaleString()}</p></div><Button asChild variant="outline" size="sm"><a href={report.content_url} target="_blank" rel="noreferrer">Open reported VYBE content<ExternalLink className="ml-2 h-4 w-4"/></a></Button><div><p className="text-sm font-medium">Claim description</p><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{report.original_work_description}</p></div><div className="grid gap-4 sm:grid-cols-[180px_1fr]"><div className="space-y-2"><Label>Status</Label><select value={status} onChange={(e)=>setStatus(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">{statuses.map((v)=><option key={v} value={v}>{v.replace("_"," ")}</option>)}</select></div><div className="space-y-2"><Label>Private internal notes</Label><Textarea rows={3} value={notes} onChange={(e)=>setNotes(e.target.value)}/></div></div><Button disabled={saving} onClick={async()=>{setSaving(true);await onSave(report.id,status,notes);setSaving(false);}}>{saving?"Saving…":"Save review record"}</Button></CardContent></Card>;}
+
+function FocusedReportReview({
+  report,
+  onSave,
+}: {
+  report: CopyrightReport;
+  onSave: (id: string, status: string, notes: string) => Promise<void>;
+}) {
+  const [status, setStatus] = useState(report.status);
+  const [notes, setNotes] = useState(report.internal_notes);
+  const [saving, setSaving] = useState(false);
+
+  return (
+    <div className="mx-auto max-w-4xl space-y-6 p-4 sm:p-6">
+      <Button variant="ghost" asChild>
+        <Link to="/admin/rights">
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Back to all Rights & Protection
+        </Link>
+      </Button>
+
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline">Rights & Ownership</Badge>
+          <Badge variant="secondary">{report.status.replaceAll("_", " ")}</Badge>
+        </div>
+
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight">
+          Rights & Ownership Report
+        </h1>
+        <p className="mt-2 font-mono text-xs text-muted-foreground">
+          Reference: {report.id}
+        </p>
+      </div>
+
+      <Card className="border-primary/30">
+        <CardContent className="space-y-6 p-6">
+          <div className="grid gap-4 text-sm sm:grid-cols-2">
+            <p><span className="text-muted-foreground">Submitted:</span> {new Date(report.created_at).toLocaleString()}</p>
+            <p><span className="text-muted-foreground">Rights owner:</span> {report.rights_owner_name}</p>
+            <p><span className="text-muted-foreground">Reporter:</span> {report.reporter_name}</p>
+            <p><span className="text-muted-foreground">Email:</span> {report.reporter_email}</p>
+          </div>
+
+          <div className="rounded-xl border bg-muted/20 p-4">
+            <p className="text-sm font-medium">Reported VYBE content</p>
+            <p className="mt-2 break-all text-sm text-muted-foreground">{report.content_url}</p>
+            <Button asChild variant="outline" size="sm" className="mt-3">
+              <a href={report.content_url} target="_blank" rel="noreferrer">
+                Open reported VYBE content
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium">Claim description</p>
+            <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+              {report.original_work_description}
+            </p>
+          </div>
+
+          <div className="grid gap-3 rounded-xl border p-4 text-sm sm:grid-cols-2">
+            <p><span className="text-muted-foreground">Good-faith statement:</span> {report.good_faith_statement ? "Confirmed" : "Not confirmed"}</p>
+            <p><span className="text-muted-foreground">Accuracy / authority statement:</span> {report.accuracy_statement ? "Confirmed" : "Not confirmed"}</p>
+            <p className="sm:col-span-2"><span className="text-muted-foreground">Electronic signature:</span> {report.signature}</p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-[200px_1fr]">
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <select
+                value={status}
+                onChange={(event) => setStatus(event.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                {statuses.map((value) => (
+                  <option key={value} value={value}>{value.replaceAll("_", " ")}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Private internal notes</Label>
+              <Textarea rows={4} value={notes} onChange={(event) => setNotes(event.target.value)} />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+              disabled={saving}
+              onClick={async () => {
+                setSaving(true);
+                await onSave(report.id, status, notes);
+                setSaving(false);
+              }}
+            >
+              {saving ? "Saving..." : "Save review record"}
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/admin/copyright">Open Copyright Operations</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

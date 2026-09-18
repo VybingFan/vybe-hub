@@ -366,15 +366,21 @@ The related Work Queue item was verified as Completed.
 
 ## 18. Rights & Ownership escalation status
 
-The copyright/unauthorized-upload escalation is implemented in Supabase.
+The copyright/unauthorized-upload escalation is now **USER VERIFIED** end to end.
 
-Expected behavior:
-new copyright report → high-priority Rights & Ownership Work Queue item → source path points to the Back Office rights-review area.
+Verified flow:
+public copyright report submission → high-priority Rights & Ownership Work Queue item → Open source → exact focused report review.
 
-This path is **BUILT / DATABASE IMPLEMENTED**, but not yet end-to-end user verified through the public VYBE report form.
-A synthetic production copyright-report insert was intentionally not forced after the database/tooling blocked that test attempt.
+The focused review shows the report reference, submitted date, reporter/email, rights owner, reported VYBE URL, claim description, good-faith and authority confirmations, electronic signature, status controls, private admin notes, and a direct link to the reported VYBE content.
 
-This remains the only focused verification item from this closeout pass.
+The earlier generic source path to the full Rights & Protection dashboard was rejected as too broad.
+The Work Queue now deep-links to:
+`/admin/rights?report=<report-id>`
+
+New migration:
+- `20260918234500_rights_report_deep_link_v24_78e.sql`
+
+The broader Rights & Protection dashboard and Copyright Operations remain available as secondary navigation from the focused report.
 
 ## 19. Current production deployment
 
