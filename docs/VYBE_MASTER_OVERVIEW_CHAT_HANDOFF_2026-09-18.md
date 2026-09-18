@@ -385,7 +385,10 @@ The broader Rights & Protection dashboard and Copyright Operations remain availa
 ## 19. Current production deployment
 
 Cloudflare Worker version:
-`53507f26-f471-4ab7-824d-239ec19a67ea`
+`401d8ca8-4cd4-42a2-afe3-1ba95e003154`
+
+Focused Rights & Ownership production route verified:
+`https://vybewithvybe.com/admin/rights?report=6f1d645f-b387-456e-9553-b123f01585f6` → HTTP 200.
 
 Production smoke checks returned HTTP 200 for:
 - `https://vybewithvybe.com/`
