@@ -142,7 +142,9 @@ function SettingsContent() {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
+    const currentPassword = String(data.get("currentPassword") || "");
     const password = String(data.get("password") || "");
+    if (!currentPassword) return toast.error("Enter your current password");
     if (password !== String(data.get("confirmPassword") || ""))
       return toast.error("Passwords do not match");
     const parsed = resetPasswordSchema.safeParse({ password });
@@ -151,7 +153,7 @@ function SettingsContent() {
         parsed.error.issues[0]?.message || "Password is not valid",
       );
     try {
-      await updatePassword(parsed.data.password);
+      await updatePassword(parsed.data.password, currentPassword);
       form.reset();
       toast.success("Password updated");
     } catch (error) {
@@ -434,11 +436,22 @@ function SettingsContent() {
                 onSubmit={changePassword}
                 className="grid gap-4 sm:grid-cols-2"
               >
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Current password</Label>
+                  <Input
+                    name="currentPassword"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground">Confirm your current password before choosing a new one.</p>
+                </div>
                 <div className="space-y-2">
                   <Label>New password</Label>
                   <Input
                     name="password"
                     type="password"
+                    autoComplete="new-password"
                     minLength={8}
                     required
                   />
@@ -448,6 +461,7 @@ function SettingsContent() {
                   <Input
                     name="confirmPassword"
                     type="password"
+                    autoComplete="new-password"
                     minLength={8}
                     required
                   />

@@ -40,7 +40,7 @@ interface AuthContextValue {
   ) => Promise<{ userId: string | null; requiresEmailConfirmation: boolean }>;
   signOut: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
-  updatePassword: (password: string) => Promise<void>;
+  updatePassword: (password: string, currentPassword?: string) => Promise<void>;
   assignInitialRole: (role: SelectableRole) => Promise<void>;
 }
 
@@ -147,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await authService.signOut();
       },
       sendPasswordReset: (email) => authService.sendPasswordReset(email),
-      updatePassword: (password) => authService.updatePassword(password),
+      updatePassword: (password, currentPassword) => authService.updatePassword(password, currentPassword, user?.email ?? undefined),
       assignInitialRole: async (role) => {
         if (!user) throw new Error("Not signed in");
         await authService.assignInitialRole(user.id, role);

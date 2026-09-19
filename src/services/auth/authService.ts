@@ -84,8 +84,11 @@ export const authService = {
     if (error) throw error;
   },
 
-  async updatePassword(password: string) {
-    const { error } = await supabase.auth.updateUser({ password });
+  async updatePassword(password: string, currentPassword?: string, email?: string) {
+    const attributes = currentPassword && email
+      ? ({ email, current_password: currentPassword, password } as Parameters<typeof supabase.auth.updateUser>[0])
+      : ({ password } as Parameters<typeof supabase.auth.updateUser>[0]);
+    const { error } = await supabase.auth.updateUser(attributes);
     if (error) throw error;
   },
 
