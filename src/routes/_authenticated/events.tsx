@@ -2,12 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CalendarHeart, Clapperboard, MapPin, Mic2, PartyPopper, Radio } from "lucide-react";
 import { ExperiencePreviewPage } from "@/components/experience/ExperiencePreviewPage";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { CreatorBrowseGuard } from "@/components/membership/CreatorBrowseGuard";
 
 export const Route = createFileRoute("/_authenticated/events")({ component: EventsPage });
 
 function EventsPage() {
   return (
     <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
+      <CreatorBrowseGuard>
       <ExperiencePreviewPage
         eyebrow="VYBE Events · Preview"
         title="Show up for the moments surrounding the work."
@@ -51,6 +53,7 @@ function EventsPage() {
         ]}
         note="Event creation, ticketing, RSVPs, reminders, live synchronization, payments, and venue tools remain planned. This page shows the future member-facing structure."
       />
+      </CreatorBrowseGuard>
     </RoleGuard>
   );
 }

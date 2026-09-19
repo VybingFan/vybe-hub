@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Clapperboard, Film, Loader2, Plus } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { CreatorBrowseGuard } from "@/components/membership/CreatorBrowseGuard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { VIDEO_TYPES } from "@/features/video/schema";
@@ -12,7 +13,9 @@ export const Route = createFileRoute("/_authenticated/watch")({ component: Watch
 function WatchPage() {
   return (
     <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
+      <CreatorBrowseGuard>
       <WatchLibrary />
+      </CreatorBrowseGuard>
     </RoleGuard>
   );
 }

@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useRef, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Loader2, MapPin, Music2, Search, SlidersHorizontal, UserRound, UsersRound, X } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { CreatorBrowseGuard } from "@/components/membership/CreatorBrowseGuard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -64,6 +65,7 @@ function DiscoverPage() {
   };
 
   return <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
+      <CreatorBrowseGuard>
     <div className="mx-auto max-w-6xl space-y-7">
       <WorkspacePageHeader eyebrow="Supporter discovery" title="Find your next VYBE." description="Discover real VYBE creators and published music. Open a creator page to listen, follow, heart, save, and participate." status={<Button asChild variant="outline" className="rounded-full"><Link to="/supporter-interests"><SlidersHorizontal className="mr-2 h-4 w-4" />Tune interests</Link></Button>} />
 
@@ -118,6 +120,7 @@ function DiscoverPage() {
         </span>
       </Link>
     </div>
+      </CreatorBrowseGuard>
   </RoleGuard>;
 }
 

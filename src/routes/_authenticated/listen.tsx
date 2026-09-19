@@ -2,12 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Disc3, Headphones, ListMusic, Mic2, Radio, Sparkles } from "lucide-react";
 import { ExperiencePreviewPage } from "@/components/experience/ExperiencePreviewPage";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { CreatorBrowseGuard } from "@/components/membership/CreatorBrowseGuard";
 
 export const Route = createFileRoute("/_authenticated/listen")({ component: ListenPage });
 
 function ListenPage() {
   return (
     <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
+      <CreatorBrowseGuard>
       <ExperiencePreviewPage
         eyebrow="Listen on VYBE"
         title="Hear the work. Then meet the person behind it."
@@ -52,6 +54,7 @@ function ListenPage() {
         ]}
         note="Music uploads, public creator pages, and shareable playlists are working now. Catalog-wide releases, live audio, and personalized listening remain planned."
       />
+      </CreatorBrowseGuard>
     </RoleGuard>
   );
 }

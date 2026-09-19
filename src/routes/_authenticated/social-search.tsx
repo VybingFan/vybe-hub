@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ExternalLink, Loader2, Search, Share2, X } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { CreatorBrowseGuard } from "@/components/membership/CreatorBrowseGuard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -88,6 +89,7 @@ function SocialSearchPage() {
 
   return (
     <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
+      <CreatorBrowseGuard>
       <div className="mx-auto max-w-6xl space-y-8">
         <WorkspacePageHeader
           eyebrow="Social Discovery"
@@ -265,6 +267,7 @@ function SocialSearchPage() {
           ) : null}
         </div>
       </div>
+      </CreatorBrowseGuard>
     </RoleGuard>
   );
 }

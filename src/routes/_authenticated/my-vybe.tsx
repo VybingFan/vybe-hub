@@ -5,6 +5,7 @@ import {
   MessageCircle, Pencil, Play, Radio, Sparkles, Users,
 } from "lucide-react";
 import { RoleGuard } from "@/components/auth/RoleGuard";
+import { CreatorBrowseGuard } from "@/components/membership/CreatorBrowseGuard";
 import { SavedMusicLists } from "@/components/engagement/SavedMusicLists";
 import { SupporterCreatorUpdates } from "@/components/engagement/SupporterCreatorUpdates";
 import { SupporterFollowingCreators } from "@/components/engagement/SupporterFollowingCreators";
@@ -24,6 +25,7 @@ function MyVybePage() {
 
   return (
     <RoleGuard allow={["supporter", "creator", "business", "admin"]}>
+      <CreatorBrowseGuard>
       <div className="mx-auto max-w-7xl space-y-5 pb-8 sm:space-y-8 sm:pb-12">
         <WorkspacePageHeader
           eyebrow="My VYBE"
@@ -113,6 +115,7 @@ function MyVybePage() {
           <SavedMusicLists />
         </section>
       </div>
+      </CreatorBrowseGuard>
     </RoleGuard>
   );
 }
