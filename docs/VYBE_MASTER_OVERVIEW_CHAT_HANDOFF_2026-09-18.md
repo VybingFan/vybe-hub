@@ -438,3 +438,50 @@ Production smoke checks returned HTTP 200 for:
 - `https://vybewithvybe.com/admin/work-queue`
 
 The account-deletion/admin-escalation application batch is now deployed.
+
+## 21. Operations Home Refinement - Next Back Office Development
+
+Goal: make Back Office Home the operational command center for VYBE so an authorized admin can understand what needs attention without opening every specialized section.
+
+The page should answer immediately:
+- What is urgent?
+- What is unassigned?
+- What is overdue or aging?
+- What is waiting on me?
+- What requires action today?
+
+Primary summary areas:
+- Work Queue: urgent, unassigned, assigned-to-me, overdue, high-priority escalations.
+- Creator Support Tickets: new, in review, waiting on creator, priority support, escalated, aging unresolved.
+- Rights & Ownership: new copyright/unauthorized-use reports, open rights cases, ownership conflicts, review exceptions.
+- Account / Privacy Actions: pending deletion, immediate-deletion review, privacy/legal, account-security issues.
+- Alerts: unread operator/system alerts, overdue partner/business alerts, serious operational warnings.
+- Business / Partner Operations: applications, document reviews, campaign reviews, partner/founding-partner work.
+- Membership / Commerce: entitlement issues, payment/access issues, seller payout readiness, later live-checkout exceptions.
+
+Recommended top summary: **Today at VYBE** with counts for Urgent, Unassigned, Overdue, Waiting on Me, and New Today.
+
+Below that, cards should summarize Support Tickets, Rights & Ownership, Account Actions, Business Operations, Membership & Commerce, and Alerts.
+
+A combined **Needs Attention Now** section should rank the highest-priority items across systems regardless of source.
+
+Operations Home should summarize, not duplicate, the specialized systems. Detailed work continues in Work Queue, Support Tickets, Rights & Protection, Accounts, Business Operations, Memberships, and other domain pages.
+
+Deep-link rule: every actionable summary item should open the exact underlying record whenever possible, following the verified patterns already used for account deletion, rights reports, and support-ticket escalations.
+Later refinements may include admin/team filters, date filters, SLA/aging indicators, assigned-to-me views, daily operational summaries, trend counts, mobile operations layout, notification preferences, and later an AI-generated "What needs your attention today?" summary.
+
+## 22. Recommended Development Order After This Chat
+
+1. Operations Home refinement.
+2. Stripe production checkout / paid creator membership activation and entitlement confirmation.
+3. Fresh-account launch QA across creator/supporter/business identities and membership levels.
+4. Production / marketing go-no-go review.
+5. Deeper rights protection such as per-track rights declarations/evidence where still planned.
+6. Larger post-launch expansions: Film/Video/Theater, Writers/Poets refinement, Creator AI, supporter retention, Play, and broader Business experience.
+
+## 23. Chat Closeout State
+
+This chat's substantive review/build work is complete unless a final audit finds an inconsistency.
+Completed in this chat: regression/constants review, creator/shared-playlist playback verification, account deletion + immediate review, Work Queue improvements, focused Rights & Ownership escalation, Creator Help Center + Tickets Phase 1, support escalation, production deploys, and documentation updates.
+
+Do not treat older untracked Sauce assets, legacy README files, bundle backups, or helper scripts as work from this chat. They were intentionally left untouched.
