@@ -6,6 +6,9 @@ import {
   Crown,
   ExternalLink,
   LockKeyhole,
+  LogOut,
+  ShieldAlert,
+  ShieldCheck,
   UserRound,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -15,6 +18,7 @@ import { WorkspaceSection } from "@/components/workspace/WorkspaceSection";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser } from "@/hooks/useUser";
@@ -62,6 +66,7 @@ function SettingsContent() {
   const [savedAppearance, setSavedAppearance] = useState<AppearanceChoice>("vybe-dark");
   const [savingAppearance, setSavingAppearance] = useState(false);
   const [isOpeningBilling, setIsOpeningBilling] = useState(false);
+  const [isSigningOutEverywhere, setIsSigningOutEverywhere] = useState(false);
   const [preferences, setPreferences] = useState<Record<string, boolean>>({
     email: true,
     followers: true,
@@ -165,6 +170,19 @@ function SettingsContent() {
     if (key === "sound" && checked) playNotificationChime();
     toast.success("Notification preference saved on this device");
   };
+  const signOutEverywhere = async () => {
+    if (!window.confirm("Sign out every VYBE session on every device, including this one?")) return;
+    setIsSigningOutEverywhere(true);
+    try {
+      const { error } = await supabase.auth.signOut({ scope: "global" });
+      if (error) throw error;
+      window.location.assign("/auth/sign-in");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not sign out all devices");
+      setIsSigningOutEverywhere(false);
+    }
+  };
+
   const openBillingPortal = async () => {
     setIsOpeningBilling(true);
     try {
@@ -397,8 +415,21 @@ function SettingsContent() {
         </TabsContent>
 
         <TabsContent value="security">
-          <WorkspaceSection title="Password and security">
+          <WorkspaceSection
+            title="Password and security"
+            description="Protect your VYBE login and end sessions you no longer trust."
+          >
             <div className="space-y-5 p-4 sm:p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/70 bg-muted/20 p-4">
+                <div className="flex items-start gap-3">
+                  {user?.email_confirmed_at ? <ShieldCheck className="mt-0.5 h-5 w-5 text-emerald-500" /> : <ShieldAlert className="mt-0.5 h-5 w-5 text-amber-500" />}
+                  <div>
+                    <p className="font-medium">Email verification</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{user?.email ?? "No account email available"}</p>
+                  </div>
+                </div>
+                <Badge variant={user?.email_confirmed_at ? "secondary" : "outline"}>{user?.email_confirmed_at ? "Verified" : "Verification needed"}</Badge>
+              </div>
               <form
                 onSubmit={changePassword}
                 className="grid gap-4 sm:grid-cols-2"
@@ -426,10 +457,21 @@ function SettingsContent() {
                   Update password
                 </Button>
               </form>
-              <div className="border-t border-border/60 pt-4">
-                <Button variant="outline" onClick={() => signOut()}>
-                  Sign out
-                </Button>
+              <div className="grid gap-3 border-t border-border/60 pt-4 sm:grid-cols-2">
+                <div className="rounded-xl border border-border/70 p-4">
+                  <p className="font-medium">This device</p>
+                  <p className="mt-1 text-sm text-muted-foreground">End the current browser session only.</p>
+                  <Button className="mt-3" variant="outline" onClick={() => signOut()}>
+                    <LogOut className="mr-2 h-4 w-4" /> Sign out
+                  </Button>
+                </div>
+                <div className="rounded-xl border border-destructive/30 p-4">
+                  <p className="font-medium">All devices</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Use this if you lost a device or think someone else may have access to your account.</p>
+                  <Button className="mt-3" variant="destructive" disabled={isSigningOutEverywhere} onClick={() => void signOutEverywhere()}>
+                    <ShieldAlert className="mr-2 h-4 w-4" /> {isSigningOutEverywhere ? "Signing out?" : "Sign out all devices"}
+                  </Button>
+                </div>
               </div>
             </div>
           </WorkspaceSection>
