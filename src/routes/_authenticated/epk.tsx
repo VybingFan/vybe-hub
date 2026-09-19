@@ -19,7 +19,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@/hooks/useUser";
+import { useMembership } from "@/hooks/useMembership";
 import { EpkTierNotice } from "@/components/membership/EpkTierNotice";
+import { LockedFeatureCard } from "@/components/membership/LockedFeatureCard";
 import { supabase } from "@/integrations/supabase/client";
 import {
   creatorEpkService,
@@ -53,6 +55,7 @@ function CreatorEpkPage() {
 
 function CreatorEpkWorkspacePage() {
   const { user } = useUser();
+  const { data: membership } = useMembership();
   const creatorId = user?.id;
   const [data, setData] = useState(emptyWorkspace);
   const [loading, setLoading] = useState(true);
@@ -88,7 +91,10 @@ function CreatorEpkWorkspacePage() {
       ? ["overview", "professional", "media", "music"]
       : ["overview", "professional"];
 
-  const readiness = useMemo(() => calculateReadiness(data), [data]);
+  const readiness = useMemo(() => calculateReadiness(data, epkLevel), [data, epkLevel]);
+  const planCode = membership?.plan_code;
+  const epkLabel = epkLevel === "starter" ? "EPK Starter" : epkLevel === "lite" ? "EPK Lite" : "Full EPK";
+  const membershipLabel = planCode === "founding_beta" ? "Founding Creator" : planCode === "creator_studio" ? "Creator Studio" : planCode === "creator_pro" ? "Creator Pro" : planCode === "creator_plus" ? "Creator Plus" : "Creator Free";
 
   if (loading) {
     return <div className="flex min-h-[50vh] items-center justify-center"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div>;
@@ -100,7 +106,8 @@ function CreatorEpkWorkspacePage() {
         <div>
           <p className="flex items-center gap-2 text-sm font-semibold text-primary"><BriefcaseBusiness className="h-4 w-4" /> Creator professional tools</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">Industry Kit & EPK</h1>
-          <p className="mt-2 max-w-3xl text-sm text-muted-foreground">Build one professional source for booking, press, playlist pitching, and industry opportunities. VYBE starts with information already in your profile and music library.</p>
+          <div className="mt-3 flex flex-wrap items-center gap-2"><BadgeCheck className="h-4 w-4 text-primary" /><span className="rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-sm font-semibold text-primary">{epkLabel}</span><span className="text-sm text-muted-foreground">{membershipLabel}</span></div>
+          <p className="mt-3 max-w-3xl text-sm text-muted-foreground">Build one professional source for booking, press, playlist pitching, and industry opportunities. VYBE starts with information already in your profile and music library.</p>
         </div>
         <div className="rounded-2xl border border-primary/30 bg-primary/5 px-5 py-4 min-[900px]:px-4 min-[900px]:py-3">
           <p className="text-3xl font-semibold text-primary">{readiness.percent}%</p>
@@ -119,9 +126,9 @@ function CreatorEpkWorkspacePage() {
       </div>
 
       {tab === "overview" && <Overview data={data} readiness={readiness} onOpen={setTab} />}
-      {tab === "professional" && creatorId && <ProfessionalForm creatorId={creatorId} data={data} onSaved={load} />}
-      {epkLevel !== "starter" && tab === "media" && creatorId && <MediaWorkspace creatorId={creatorId} data={data} onChanged={load} />}
-      {epkLevel !== "starter" && tab === "music" && creatorId && <MusicWorkspace creatorId={creatorId} data={data} onChanged={load} />}
+      {tab === "professional" && creatorId && <ProfessionalForm creatorId={creatorId} data={data} epkLevel={epkLevel} onSaved={load} />}
+      {epkLevel !== "starter" && tab === "media" && creatorId && <MediaWorkspace creatorId={creatorId} data={data} full={epkLevel === "full"} onChanged={load} />}
+      {epkLevel !== "starter" && tab === "music" && creatorId && <MusicWorkspace creatorId={creatorId} data={data} full={epkLevel === "full"} onChanged={load} />}
       {epkLevel === "full" && tab === "press" && creatorId && <PressWorkspace creatorId={creatorId} data={data} onChanged={load} />}
     </div>
   );
@@ -156,7 +163,7 @@ function Overview({ data, readiness, onOpen }: { data: CreatorEpkWorkspace; read
   );
 }
 
-function ProfessionalForm({ creatorId, data, onSaved }: { creatorId: string; data: CreatorEpkWorkspace; onSaved: () => Promise<void> }) {
+function ProfessionalForm({ creatorId, data, epkLevel, onSaved }: { creatorId: string; data: CreatorEpkWorkspace; epkLevel: "starter" | "lite" | "full"; onSaved: () => Promise<void> }) {
   const sourceBio = data.creator?.bio ?? "";
   const epk = data.epk;
   const [saving, setSaving] = useState(false);
@@ -167,52 +174,83 @@ function ProfessionalForm({ creatorId, data, onSaved }: { creatorId: string; dat
     const text = (name: string) => String(form.get(name) ?? "").trim();
     try {
       await creatorEpkService.saveProfile(creatorId, {
-        status: epk?.status ?? "draft", visibility: epk?.visibility ?? "private", slug: epk?.slug ?? null,
-        short_bio: text("short_bio"), medium_bio: text("medium_bio"), long_bio: text("long_bio"),
-        business_email: text("business_email"), booking_email: text("booking_email"), booking_phone: text("booking_phone"), booking_contact_name: text("booking_contact_name"),
-        management_name: text("management_name"), management_email: text("management_email"), publicist_name: text("publicist_name"), publicist_email: text("publicist_email"),
-        bandcamp_url: text("bandcamp_url"), primary_color: text("primary_color"), secondary_color: text("secondary_color"), accent_color: text("accent_color"),
-        public_business_email: form.get("public_business_email") === "on", public_booking_email: form.get("public_booking_email") === "on", public_booking_phone: form.get("public_booking_phone") === "on",
-        public_management_contact: form.get("public_management_contact") === "on", public_publicist_contact: form.get("public_publicist_contact") === "on",
+        status: epk?.status ?? "draft",
+        visibility: epk?.visibility ?? "private",
+        slug: epk?.slug ?? null,
+        short_bio: text("short_bio"),
+        medium_bio: epkLevel === "starter" ? (epk?.medium_bio ?? "") : text("medium_bio"),
+        long_bio: epkLevel === "full" ? text("long_bio") : (epk?.long_bio ?? ""),
+        business_email: epkLevel === "full" ? text("business_email") : (epk?.business_email ?? ""),
+        booking_email: text("booking_email"),
+        booking_phone: epkLevel === "full" ? text("booking_phone") : (epk?.booking_phone ?? ""),
+        booking_contact_name: epkLevel === "full" ? text("booking_contact_name") : (epk?.booking_contact_name ?? ""),
+        management_name: epkLevel === "full" ? text("management_name") : (epk?.management_name ?? ""),
+        management_email: epkLevel === "full" ? text("management_email") : (epk?.management_email ?? ""),
+        publicist_name: epkLevel === "full" ? text("publicist_name") : (epk?.publicist_name ?? ""),
+        publicist_email: epkLevel === "full" ? text("publicist_email") : (epk?.publicist_email ?? ""),
+        bandcamp_url: epkLevel === "starter" ? (epk?.bandcamp_url ?? "") : text("bandcamp_url"),
+        primary_color: epkLevel === "full" ? text("primary_color") : (epk?.primary_color ?? ""),
+        secondary_color: epkLevel === "full" ? text("secondary_color") : (epk?.secondary_color ?? ""),
+        accent_color: epkLevel === "full" ? text("accent_color") : (epk?.accent_color ?? ""),
+        public_business_email: epkLevel === "full" ? form.get("public_business_email") === "on" : (epk?.public_business_email ?? false),
+        public_booking_email: form.get("public_booking_email") === "on",
+        public_booking_phone: epkLevel === "full" ? form.get("public_booking_phone") === "on" : (epk?.public_booking_phone ?? false),
+        public_management_contact: epkLevel === "full" ? form.get("public_management_contact") === "on" : (epk?.public_management_contact ?? false),
+        public_publicist_contact: epkLevel === "full" ? form.get("public_publicist_contact") === "on" : (epk?.public_publicist_contact ?? false),
       });
-      await onSaved(); toast.success("Professional information saved.");
-    } catch (error) { toast.error(error instanceof Error ? error.message : "Could not save EPK information."); }
-    finally { setSaving(false); }
+      await onSaved();
+      toast.success("Professional information saved.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not save EPK information.");
+    } finally {
+      setSaving(false);
+    }
   };
+
   return <form onSubmit={submit} className="space-y-5 min-[900px]:grid min-[900px]:grid-cols-[1.15fr_.85fr] min-[900px]:items-start min-[900px]:gap-4 min-[900px]:space-y-0">
     <Card className="min-[900px]:col-start-1 min-[900px]:row-span-3"><CardHeader className="min-[900px]:pb-3"><CardTitle>Artist biographies</CardTitle><p className="text-sm text-muted-foreground">Your existing profile bio is used as a starting point. Editing these versions does not overwrite your public VYBE profile.</p></CardHeader><CardContent className="space-y-4 min-[900px]:space-y-3">
-      <TextField name="short_bio" label="Short bio · approximately 50 words" defaultValue={epk?.short_bio || sourceBio} rows={3} maxLength={1000} />
-      <TextField name="medium_bio" label="Medium bio · approximately 150 words" defaultValue={epk?.medium_bio || sourceBio} rows={6} maxLength={3000} />
-      <TextField name="long_bio" label="Long biography" defaultValue={epk?.long_bio || sourceBio} rows={10} maxLength={10000} />
+      <TextField name="short_bio" label="Short bio ? approximately 50 words" defaultValue={epk?.short_bio || sourceBio} rows={3} maxLength={1000} />
+      {epkLevel !== "starter" ? <TextField name="medium_bio" label="Medium bio ? approximately 150 words" defaultValue={epk?.medium_bio || sourceBio} rows={6} maxLength={3000} /> : null}
+      {epkLevel === "full" ? <TextField name="long_bio" label="Long biography" defaultValue={epk?.long_bio || sourceBio} rows={10} maxLength={10000} /> : null}
+      {epkLevel === "starter" ? <LockedFeatureCard title="EPK Lite biographies" description="Creator Plus adds a medium professional biography and expands your private Industry Kit." requiredPlan="creator_plus" educationKey="epk_full" compact /> : null}
+      {epkLevel === "lite" ? <LockedFeatureCard title="Full professional biography" description="Creator Pro adds the long-form biography used for deeper press, booking, and industry packages." requiredPlan="creator_pro" educationKey="epk_full" compact /> : null}
     </CardContent></Card>
+
     <Card className="min-[900px]:col-start-2"><CardHeader className="min-[900px]:pb-3"><CardTitle>Professional and booking contacts</CardTitle></CardHeader><CardContent className="grid gap-4 md:grid-cols-2 min-[900px]:gap-3">
-      <InputField name="business_email" label="Professional business email" defaultValue={epk?.business_email} type="email" />
       <InputField name="booking_email" label="Booking email" defaultValue={epk?.booking_email} type="email" />
-      <InputField name="booking_contact_name" label="Booking contact name" defaultValue={epk?.booking_contact_name} />
-      <InputField name="booking_phone" label="Booking phone" defaultValue={epk?.booking_phone} type="tel" />
-      <InputField name="management_name" label="Manager or management company" defaultValue={epk?.management_name} />
-      <InputField name="management_email" label="Management email" defaultValue={epk?.management_email} type="email" />
-      <InputField name="publicist_name" label="Publicist name" defaultValue={epk?.publicist_name} />
-      <InputField name="publicist_email" label="Publicist email" defaultValue={epk?.publicist_email} type="email" />
-      <InputField name="bandcamp_url" label="Bandcamp artist link" defaultValue={epk?.bandcamp_url} type="url" />
+      {epkLevel !== "starter" ? <InputField name="bandcamp_url" label="Bandcamp artist link" defaultValue={epk?.bandcamp_url} type="url" /> : null}
+      {epkLevel === "full" ? <>
+        <InputField name="business_email" label="Professional business email" defaultValue={epk?.business_email} type="email" />
+        <InputField name="booking_contact_name" label="Booking contact name" defaultValue={epk?.booking_contact_name} />
+        <InputField name="booking_phone" label="Booking phone" defaultValue={epk?.booking_phone} type="tel" />
+        <InputField name="management_name" label="Manager or management company" defaultValue={epk?.management_name} />
+        <InputField name="management_email" label="Management email" defaultValue={epk?.management_email} type="email" />
+        <InputField name="publicist_name" label="Publicist name" defaultValue={epk?.publicist_name} />
+        <InputField name="publicist_email" label="Publicist email" defaultValue={epk?.publicist_email} type="email" />
+      </> : null}
     </CardContent></Card>
-    <Card className="min-[900px]:col-start-2"><CardHeader className="min-[900px]:pb-3"><CardTitle>Brand colors</CardTitle></CardHeader><CardContent className="grid gap-4 md:grid-cols-3 min-[900px]:gap-3">
+
+    {epkLevel === "full" ? <Card className="min-[900px]:col-start-2"><CardHeader className="min-[900px]:pb-3"><CardTitle>Brand colors</CardTitle></CardHeader><CardContent className="grid gap-4 md:grid-cols-3 min-[900px]:gap-3">
       <ColorField name="primary_color" label="Primary" defaultValue={epk?.primary_color} />
       <ColorField name="secondary_color" label="Secondary" defaultValue={epk?.secondary_color} />
       <ColorField name="accent_color" label="Accent" defaultValue={epk?.accent_color} />
-    </CardContent></Card>
+    </CardContent></Card> : <LockedFeatureCard title="Full EPK contacts and brand controls" description="Creator Pro adds complete professional contacts, public contact controls, and brand colors." requiredPlan="creator_pro" educationKey="epk_full" compact />}
+
     <Card className="min-[900px]:col-start-2"><CardHeader className="min-[900px]:pb-3"><CardTitle>Contact visibility</CardTitle></CardHeader><CardContent className="grid gap-3 sm:grid-cols-2 min-[900px]:gap-2.5">
-      <CheckField name="public_business_email" label="Show business email" defaultChecked={epk?.public_business_email} />
       <CheckField name="public_booking_email" label="Show booking email" defaultChecked={epk?.public_booking_email ?? true} />
-      <CheckField name="public_booking_phone" label="Show booking phone" defaultChecked={epk?.public_booking_phone} />
-      <CheckField name="public_management_contact" label="Show management contact" defaultChecked={epk?.public_management_contact} />
-      <CheckField name="public_publicist_contact" label="Show publicist contact" defaultChecked={epk?.public_publicist_contact} />
+      {epkLevel === "full" ? <>
+        <CheckField name="public_business_email" label="Show business email" defaultChecked={epk?.public_business_email} />
+        <CheckField name="public_booking_phone" label="Show booking phone" defaultChecked={epk?.public_booking_phone} />
+        <CheckField name="public_management_contact" label="Show management contact" defaultChecked={epk?.public_management_contact} />
+        <CheckField name="public_publicist_contact" label="Show publicist contact" defaultChecked={epk?.public_publicist_contact} />
+      </> : null}
     </CardContent></Card>
-    <div className="flex justify-end min-[900px]:col-span-2 min-[900px]:sticky min-[900px]:bottom-3 min-[900px]:z-30 min-[900px]:rounded-2xl min-[900px]:border min-[900px]:border-primary/20 min-[900px]:bg-background/95 min-[900px]:p-3 min-[900px]:shadow-xl min-[900px]:backdrop-blur"><Button disabled={saving} type="submit"><Save className="mr-2 h-4 w-4" />{saving ? "Saving…" : "Save professional information"}</Button></div>
+
+    <div className="flex justify-end min-[900px]:col-span-2 min-[900px]:sticky min-[900px]:bottom-3 min-[900px]:z-30 min-[900px]:rounded-2xl min-[900px]:border min-[900px]:border-primary/20 min-[900px]:bg-background/95 min-[900px]:p-3 min-[900px]:shadow-xl min-[900px]:backdrop-blur"><Button disabled={saving} type="submit"><Save className="mr-2 h-4 w-4" />{saving ? "Saving?" : "Save professional information"}</Button></div>
   </form>;
 }
 
-function MediaWorkspace({ creatorId, data, onChanged }: { creatorId: string; data: CreatorEpkWorkspace; onChanged: () => Promise<void> }) {
+function MediaWorkspace({ creatorId, data, full, onChanged }: { creatorId: string; data: CreatorEpkWorkspace; full: boolean; onChanged: () => Promise<void> }) {
   const [uploading, setUploading] = useState(false);
   const upload = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); const form = event.currentTarget; const values = new FormData(form); const file = values.get("file");
@@ -251,14 +289,18 @@ function AssetRow({ asset, onChanged }: { asset: EpkAsset; onChanged: () => Prom
   return <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 p-3"><button type="button" onClick={open} className="flex min-w-0 items-center gap-3 text-left">{previewUrl ? <img src={previewUrl} alt={asset.alt_text || asset.title || asset.original_filename} className="h-20 w-20 shrink-0 rounded-lg border border-border/70 object-cover min-[900px]:h-16 min-[900px]:w-16" /> : <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted min-[900px]:h-16 min-[900px]:w-16"><FileImage className="h-7 w-7 text-muted-foreground" /></span>}<span className="min-w-0"><span className="block truncate font-medium">{asset.title || asset.original_filename}</span><span className="block text-xs capitalize text-muted-foreground">{asset.asset_type.replaceAll("_", " ")} · {asset.orientation ?? "unspecified"}</span><span className="mt-1 block text-xs text-primary">Open full file</span></span></button><Button type="button" size="icon" variant="ghost" onClick={remove}><Trash2 className="h-4 w-4" /></Button></div>;
 }
 
-function MusicWorkspace({ creatorId, data, onChanged }: { creatorId: string; data: CreatorEpkWorkspace; onChanged: () => Promise<void> }) {
+function MusicWorkspace({ creatorId, data, full, onChanged }: { creatorId: string; data: CreatorEpkWorkspace; full: boolean; onChanged: () => Promise<void> }) {
   const selected = new Set(data.featuredTracks.map((item) => item.track_id));
   const toggle = async (trackId: string, checked: boolean) => { try { await creatorEpkService.setFeaturedTrack(creatorId, trackId, checked, { spotify_url: data.creator?.spotify ?? "", apple_music_url: data.creator?.apple_music ?? "", bandcamp_url: data.epk?.bandcamp_url ?? "" }); await onChanged(); } catch (error) { toast.error(error instanceof Error ? error.message : "Could not update featured music."); } };
   const addCredit = async (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const form = event.currentTarget; const values = new FormData(form); try { await creatorEpkService.addCredit({ creator_id: creatorId, track_id: String(values.get("track_id")), credit_role: String(values.get("credit_role")), credited_name: String(values.get("credited_name")), details: String(values.get("details")) }); form.reset(); await onChanged(); toast.success("Credit added."); } catch (error) { toast.error(error instanceof Error ? error.message : "Could not add credit."); } };
   const uploadMaster = async (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); const form = event.currentTarget; const values = new FormData(form); const file = values.get("master"); if (!(file instanceof File) || !file.size) return toast.error("Choose a WAV master."); try { await creatorEpkService.uploadMaster(creatorId, String(values.get("track_id")), file); form.reset(); await onChanged(); toast.success("WAV master uploaded."); } catch (error) { toast.error(error instanceof Error ? error.message : "Could not upload master."); } };
-  return <div className="space-y-5"><Card><CardHeader><CardTitle>Featured EPK music</CardTitle><p className="text-sm text-muted-foreground">Select your strongest tracks. Existing titles, artists, artwork, lyrics, and profile-level streaming links are reused automatically.</p></CardHeader><CardContent className="space-y-3">{data.tracks.length ? data.tracks.map((track) => <label key={track.id} className="flex cursor-pointer items-center justify-between rounded-xl border border-border/70 p-4 min-[900px]:p-3"><span><span className="block font-medium">{track.title}</span><span className="text-xs text-muted-foreground">{track.primary_artist_name} · {track.genre || "Genre not set"} · {track.status}</span></span><input type="checkbox" checked={selected.has(track.id)} onChange={(event) => void toggle(track.id, event.target.checked)} className="h-5 w-5 accent-primary" /></label>) : <p className="text-sm text-muted-foreground">Upload music before selecting EPK tracks.</p>}</CardContent></Card>
-  <div className="grid gap-5 lg:grid-cols-2 min-[900px]:gap-4"><Card><CardHeader><CardTitle>Full song credits</CardTitle></CardHeader><CardContent><form onSubmit={addCredit} className="space-y-3"><TrackSelect tracks={data.tracks} /><SelectField name="credit_role" label="Credit role" options={[['writer','Writer'],['producer','Producer'],['featured_artist','Featured artist'],['performer','Performer'],['engineer','Engineer'],['mixer','Mixer'],['mastering','Mastering'],['publisher','Publisher'],['label','Label'],['other','Other']]} /><InputField name="credited_name" label="Credited name" required /><InputField name="details" label="Details (optional)" /><Button type="submit"><Plus className="mr-2 h-4 w-4" />Add credit</Button></form><div className="mt-5 space-y-2">{data.credits.map((credit) => <div key={credit.id} className="flex items-center justify-between rounded-lg border p-3 text-sm"><span><b>{credit.credited_name}</b> · {credit.credit_role.replaceAll('_',' ')}</span><Button type="button" size="icon" variant="ghost" onClick={async () => { await creatorEpkService.deleteCredit(credit.id); await onChanged(); }}><Trash2 className="h-4 w-4" /></Button></div>)}</div></CardContent></Card>
-  <Card><CardHeader><CardTitle>WAV audio masters</CardTitle><p className="text-sm text-muted-foreground">Keep an uncompressed WAV ready for press, radio, licensing, and professional requests. Masters remain private.</p></CardHeader><CardContent><form onSubmit={uploadMaster} className="space-y-3"><TrackSelect tracks={data.tracks} /><div><Label htmlFor="master-file">WAV file</Label><Input id="master-file" name="master" type="file" accept="audio/wav,audio/x-wav,.wav" required /></div><Button type="submit"><FileAudio className="mr-2 h-4 w-4" />Upload WAV master</Button></form><div className="mt-5 space-y-2">{data.masters.map((master) => <p key={master.id} className="rounded-lg border p-3 text-sm">{data.tracks.find((track) => track.id === master.track_id)?.title ?? "Track"} · {master.original_filename}</p>)}</div></CardContent></Card></div></div>;
+  return <div className="space-y-5">
+    <Card><CardHeader><CardTitle>Featured EPK music</CardTitle><p className="text-sm text-muted-foreground">Select your strongest tracks. Existing titles, artists, artwork, lyrics, and profile-level streaming links are reused automatically.</p></CardHeader><CardContent className="space-y-3">{data.tracks.length ? data.tracks.map((track) => <label key={track.id} className="flex cursor-pointer items-center justify-between rounded-xl border border-border/70 p-4 min-[900px]:p-3"><span><span className="block font-medium">{track.title}</span><span className="text-xs text-muted-foreground">{track.primary_artist_name} ? {track.genre || "Genre not set"} ? {track.status}</span></span><input type="checkbox" checked={selected.has(track.id)} onChange={(event) => void toggle(track.id, event.target.checked)} className="h-5 w-5 accent-primary" /></label>) : <p className="text-sm text-muted-foreground">Upload music before selecting EPK tracks.</p>}</CardContent></Card>
+    {full ? <div className="grid gap-5 lg:grid-cols-2 min-[900px]:gap-4">
+      <Card><CardHeader><CardTitle>Full song credits</CardTitle></CardHeader><CardContent><form onSubmit={addCredit} className="space-y-3"><TrackSelect tracks={data.tracks} /><SelectField name="credit_role" label="Credit role" options={[['writer','Writer'],['producer','Producer'],['featured_artist','Featured artist'],['performer','Performer'],['engineer','Engineer'],['mixer','Mixer'],['mastering','Mastering'],['publisher','Publisher'],['label','Label'],['other','Other']]} /><InputField name="credited_name" label="Credited name" required /><InputField name="details" label="Details (optional)" /><Button type="submit"><Plus className="mr-2 h-4 w-4" />Add credit</Button></form><div className="mt-5 space-y-2">{data.credits.map((credit) => <div key={credit.id} className="flex items-center justify-between rounded-lg border p-3 text-sm"><span><b>{credit.credited_name}</b> ? {credit.credit_role.replaceAll('_',' ')}</span><Button type="button" size="icon" variant="ghost" onClick={async () => { await creatorEpkService.deleteCredit(credit.id); await onChanged(); }}><Trash2 className="h-4 w-4" /></Button></div>)}</div></CardContent></Card>
+      <Card><CardHeader><CardTitle>WAV audio masters</CardTitle><p className="text-sm text-muted-foreground">Keep an uncompressed WAV ready for press, radio, licensing, and professional requests. Masters remain private.</p></CardHeader><CardContent><form onSubmit={uploadMaster} className="space-y-3"><TrackSelect tracks={data.tracks} /><div><Label htmlFor="master-file">WAV file</Label><Input id="master-file" name="master" type="file" accept="audio/wav,audio/x-wav,.wav" required /></div><Button type="submit"><FileAudio className="mr-2 h-4 w-4" />Upload WAV master</Button></form><div className="mt-5 space-y-2">{data.masters.map((master) => <p key={master.id} className="rounded-lg border p-3 text-sm">{data.tracks.find((track) => track.id === master.track_id)?.title ?? "Track"} ? {master.original_filename}</p>)}</div></CardContent></Card>
+    </div> : <LockedFeatureCard title="Full credits and WAV masters" description="Creator Pro adds structured credits and private WAV masters for press, radio, licensing, and professional requests." requiredPlan="creator_pro" educationKey="epk_full" compact />}
+  </div>;
 }
 
 function PressWorkspace({ creatorId, data, onChanged }: { creatorId: string; data: CreatorEpkWorkspace; onChanged: () => Promise<void> }) {
@@ -266,21 +308,30 @@ function PressWorkspace({ creatorId, data, onChanged }: { creatorId: string; dat
   return <div className="grid gap-5 lg:grid-cols-[.9fr_1.1fr] min-[900px]:gap-4"><Card><CardHeader><CardTitle>Add a press highlight or milestone</CardTitle></CardHeader><CardContent><form onSubmit={submit} className="space-y-3"><SelectField name="highlight_type" label="Type" options={[['press_quote','Press quote'],['playlist_placement','Playlist placement'],['radio','Radio'],['show','Notable show'],['award','Award'],['milestone','Milestone'],['other','Other']]} /><InputField name="title" label="Title" required /><InputField name="source_name" label="Publication, playlist, venue, or source" /><InputField name="source_url" label="Source link" type="url" /><InputField name="occurred_on" label="Date" type="date" /><TextField name="quote_text" label="Quote or details" rows={4} /><Button type="submit"><Plus className="mr-2 h-4 w-4" />Add highlight</Button></form></CardContent></Card><Card><CardHeader><CardTitle>Press and career record</CardTitle></CardHeader><CardContent className="space-y-3">{data.highlights.length ? data.highlights.map((item) => <div key={item.id} className="flex items-start justify-between gap-3 rounded-xl border border-border/70 p-4 min-[900px]:p-3"><div><p className="font-medium">{item.title}</p><p className="text-xs capitalize text-primary">{item.highlight_type.replaceAll('_',' ')}</p>{item.source_name && <p className="mt-2 text-sm text-muted-foreground">{item.source_name}</p>}{item.quote_text && <p className="mt-2 text-sm">{item.quote_text}</p>}</div><Button type="button" size="icon" variant="ghost" onClick={async () => { await creatorEpkService.deleteHighlight(item.id); await onChanged(); }}><Trash2 className="h-4 w-4" /></Button></div>) : <p className="text-sm text-muted-foreground">Add reviews, playlist placements, notable shows, awards, and career milestones.</p>}</CardContent></Card></div>;
 }
 
-function calculateReadiness(data: CreatorEpkWorkspace) {
+function calculateReadiness(data: CreatorEpkWorkspace, epkLevel: "starter" | "lite" | "full") {
   const photos = data.assets.filter((item) => item.asset_type === "press_photo").length;
-  const items: { label: string; detail: string; done: boolean; tab: Tab }[] = [
-    { label: "Creator identity", detail: "Artist name, username, genres, and location", done: !!(data.creator?.artist_name && data.creator?.username && data.creator?.genres?.length), tab: "professional" },
-    { label: "Three biography lengths", detail: "Short, medium, and long versions", done: !!(data.epk?.short_bio && data.epk?.medium_bio && data.epk?.long_bio), tab: "professional" },
-    { label: "Booking contact", detail: "Professional booking email or contact", done: !!data.epk?.booking_email, tab: "professional" },
-    { label: "Social and music links", detail: "Website, social platforms, and streaming", done: hasSocial(data) && !!(data.creator?.spotify || data.creator?.apple_music || data.epk?.bandcamp_url), tab: "professional" },
-    { label: "Brand identity", detail: "Logo and brand colors", done: data.assets.some((item) => item.asset_type === "logo") && !!data.epk?.primary_color, tab: "media" },
-    { label: "Press photography", detail: `${photos}/3 minimum photos`, done: photos >= 3, tab: "media" },
-    { label: "Featured music", detail: "Selected tracks for the EPK", done: data.featuredTracks.length > 0, tab: "music" },
-    { label: "Lyrics and credits", detail: "Reviewed lyrics and structured song credits", done: data.lyrics.some((item) => item.refined_lyrics.trim()) && data.credits.length > 0, tab: "music" },
-    { label: "WAV masters", detail: "At least one uncompressed master", done: data.masters.length > 0, tab: "music" },
-    { label: "Technical rider", detail: "Live sound and stage requirements", done: data.assets.some((item) => item.asset_type === "tech_rider"), tab: "media" },
-    { label: "Press and milestones", detail: "Reviews, placements, shows, or achievements", done: data.highlights.length > 0, tab: "press" },
+  const starter = [
+    { label: "Creator identity", detail: "Artist name, username, genres, and location", done: !!(data.creator?.artist_name && data.creator?.username && data.creator?.genres?.length), tab: "professional" as Tab },
+    { label: "Short biography", detail: "A concise creator introduction", done: !!data.epk?.short_bio, tab: "professional" as Tab },
+    { label: "Booking email", detail: "A professional contact for opportunities", done: !!data.epk?.booking_email, tab: "professional" as Tab },
   ];
+  const lite = [
+    ...starter,
+    { label: "Medium biography", detail: "Expanded professional biography", done: !!data.epk?.medium_bio, tab: "professional" as Tab },
+    { label: "Press photography", detail: `${photos}/3 EPK Lite photos`, done: photos >= 3, tab: "media" as Tab },
+    { label: "Featured music", detail: "Selected tracks for the EPK", done: data.featuredTracks.length > 0, tab: "music" as Tab },
+    { label: "Social and music links", detail: "Website, social platforms, and streaming", done: hasSocial(data) && !!(data.creator?.spotify || data.creator?.apple_music || data.epk?.bandcamp_url), tab: "professional" as Tab },
+  ];
+  const full = [
+    ...lite,
+    { label: "Long biography", detail: "Full press and industry biography", done: !!data.epk?.long_bio, tab: "professional" as Tab },
+    { label: "Brand identity", detail: "Logo and brand colors", done: data.assets.some((item) => item.asset_type === "logo") && !!data.epk?.primary_color, tab: "media" as Tab },
+    { label: "Lyrics and credits", detail: "Reviewed lyrics and structured song credits", done: data.lyrics.some((item) => item.refined_lyrics.trim()) && data.credits.length > 0, tab: "music" as Tab },
+    { label: "WAV masters", detail: "At least one uncompressed master", done: data.masters.length > 0, tab: "music" as Tab },
+    { label: "Technical rider", detail: "Live sound and stage requirements", done: data.assets.some((item) => item.asset_type === "tech_rider"), tab: "media" as Tab },
+    { label: "Press and milestones", detail: "Reviews, placements, shows, or achievements", done: data.highlights.length > 0, tab: "press" as Tab },
+  ];
+  const items = epkLevel === "full" ? full : epkLevel === "lite" ? lite : starter;
   const complete = items.filter((item) => item.done).length;
   return { items, complete, total: items.length, percent: Math.round((complete / items.length) * 100) };
 }
