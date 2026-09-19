@@ -7,11 +7,12 @@ const database = supabase as any;
 const AUDIO_BUCKET = "music-audio";
 const COVER_BUCKET = "music-covers";
 const PREVIEW_BUCKET = "music-previews";
-const SIGNED_URL_TTL = 60 * 60 * 6;
+const MEDIA_SIGNED_URL_TTL = 60 * 3;
+const IMAGE_SIGNED_URL_TTL = 60 * 60 * 6;
 
-async function signedUrl(bucket: string, path: string | null | undefined): Promise<string | null> {
+async function signedUrl(bucket: string, path: string | null | undefined, ttl = MEDIA_SIGNED_URL_TTL): Promise<string | null> {
   if (!path) return null;
-  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, SIGNED_URL_TTL);
+  const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, ttl);
   if (error) return null;
   return data?.signedUrl ?? null;
 }
@@ -30,7 +31,7 @@ async function hydrateSavedTrack(row: Track): Promise<Track> {
     preview_storage_path: row.preview_audio_path ?? null,
     playback_available: playbackAvailable,
     audio_url: "",
-    cover_url: await signedUrl(COVER_BUCKET, row.cover_url),
+    cover_url: await signedUrl(COVER_BUCKET, row.cover_url, IMAGE_SIGNED_URL_TTL),
   };
 }
 
